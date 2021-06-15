@@ -1,21 +1,11 @@
-import { Subject, Observable, Subscribable, interval } from "rxjs";
+import { Subject, Observable, interval } from "rxjs";
+import { filter, map } from "rxjs/operators";
 
-export interface IGame {
-    readonly observer: IGameObserver;
-}
-
-class Game implements IGame {
-    readonly observer: IGameObserver;
-
-    tick$ = interval(200);
-
-    constructor() {
-        this.observer = new GameObserver(this);
-    }
-}
+import Constants from "./constants";
 
 export interface IGameObserver {
     ticks(): Observable<number>;
+    days(): Observable<number>;
 }
 
 class GameObserver implements IGameObserver {
@@ -27,6 +17,42 @@ class GameObserver implements IGameObserver {
 
     ticks(): Observable<number> {
         return this.tick$;
+    }
+
+    days(): Observable<number> {
+        const ticksPerDay = Constants.TicksPerSecond * Constants.SecondsPerDay;
+        return this.tick$.pipe(
+            filter(v => v % ticksPerDay === 0),
+            map(v => v / ticksPerDay),
+        );
+    }
+}
+
+import { EntityManager } from "./manager";
+
+export interface IGame {
+    observer(): IGameObserver;
+    reactive(): EntityManager;
+}
+
+class Game implements IGame {
+    readonly _observer: IGameObserver;
+    readonly _entities: EntityManager;
+    tick$ = interval(Constants.MillisecondsPerTick);
+
+    constructor() {
+        this._observer = new GameObserver(this);
+        this._entities = new EntityManager();
+
+        this._entities.resources();
+    }
+
+    observer(): IGameObserver {
+        return this._observer;
+    }
+
+    reactive(): EntityManager {
+        return this._entities;
     }
 }
 

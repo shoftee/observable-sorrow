@@ -2290,6 +2290,11 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
+bootstrap-icons@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.5.0.tgz#2cb19da148aa9105cb3174de2963564982d3dc55"
+  integrity sha512-44feMc7DE1Ccpsas/1wioN8ewFJNquvi5FewA06wLnqct7CwMdGDVy41ieHaacogzDqLfG8nADIvMNp9e4bfbA==
+
 bootstrap@5:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.0.1.tgz#e7939d599119dc818a90478a2a299bdaff037e09"
@@ -5730,6 +5735,11 @@ lines-and-columns@^1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
+
+linq-es2015@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/linq-es2015/-/linq-es2015-2.5.1.tgz#b9eb97d9b47c0e2f8fc71c196650b638faa6457c"
+  integrity sha512-s9TWOlKxS78mTWrL8zIdqm53YXJ+yjVSXCdvCGnYWtRjRlK2dG0wW+sYrffnw/qveAjY2jM0Y6x2ZteNlrsjXA==
 
 load-json-file@^1.0.0:
   version "1.1.0"

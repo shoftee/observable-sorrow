@@ -1,38 +1,20 @@
 <template>
-  <div
-    class="
-      w-100
-      h-100
-      d-flex
-      flex-column
-      align-items-stretch
-      justify-content-center
-    "
-  >
-    <header class="p-1 mb-2 bg-light">
-      Observable Sorrow <span class="text-muted">(a Kittens Game clone)</span>
+  <div class="w-100 h-100 d-flex flex-column">
+    <header class="px-2 y-1 d-flex bg-light">
+      Observable Sorrow - a Kittens Game clone
     </header>
-    <div class="h-100 d-flex flex-row justify-content-between">
-      <div class="p-2 d-flex flex-column">Resources</div>
-      <os-controls />
-      <os-environment />
-    </div>
-    <footer class="p-1 mt-2 bg-light d-flex flex-row justify-content-end">
+    <os-main class="h-100" />
+    <footer class="px-2 py-1 bg-light d-flex flex-row justify-content-end">
       <a href="https://kittensgame.com/web/">Original game here</a>
     </footer>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import Controls from "./components/game/Controls.vue";
-import Environment from "./components/game/Environment.vue";
+import Main from "./components/Main.vue";
 
-@Options({
-  components: {
-    "os-controls": Controls,
-    "os-environment": Environment,
-  },
-})
-export default class App extends Vue {}
+import { defineComponent } from "vue";
+export default defineComponent({
+  components: { "os-main": Main },
+});
 </script>
