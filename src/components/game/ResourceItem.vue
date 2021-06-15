@@ -14,12 +14,12 @@
 </template>
 
 <script lang="ts">
-import { Resource } from "@/app/resource";
+import { State as ResourceState } from "@/app/resources/state";
 import { defineComponent, PropType } from "vue";
 export default defineComponent({
   props: {
     item: {
-      type: Object as PropType<Resource>,
+      type: Object as PropType<ResourceState>,
       required: true,
     },
   },

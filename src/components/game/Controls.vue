@@ -17,19 +17,16 @@
 
 <script lang="ts">
 import Instance from "@/app/game";
-import { Resource } from "@/app/resource";
-import { defineComponent, unref } from "vue";
+import { defineComponent } from "vue";
 export default defineComponent({
-  computed: {
-    catnip(): Resource {
-      let catnip = Instance.reactive().resources().get("catnip");
-      return unref(catnip);
-    },
+  setup() {
+    return {
+      catnip: Instance.reactive().resources().get("catnip"),
+    };
   },
   methods: {
     gather() {
-      let catnip = Instance.reactive().resources().get("catnip");
-      unref(catnip).amount++;
+      this.catnip.amount++;
     },
   },
 });

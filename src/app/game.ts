@@ -28,21 +28,21 @@ class GameObserver implements IGameObserver {
     }
 }
 
-import { EntityManager } from "./manager";
+import { StateManager } from "./manager";
 
 export interface IGame {
     observer(): IGameObserver;
-    reactive(): EntityManager;
+    reactive(): StateManager;
 }
 
 class Game implements IGame {
     readonly _observer: IGameObserver;
-    readonly _entities: EntityManager;
+    readonly _entities: StateManager;
     tick$ = interval(Constants.MillisecondsPerTick);
 
     constructor() {
         this._observer = new GameObserver(this);
-        this._entities = new EntityManager();
+        this._entities = new StateManager();
 
         this._entities.resources();
     }
@@ -51,7 +51,7 @@ class Game implements IGame {
         return this._observer;
     }
 
-    reactive(): EntityManager {
+    reactive(): StateManager {
         return this._entities;
     }
 }

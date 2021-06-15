@@ -1,14 +1,15 @@
-import EntityRefCollection, { IEntityRefCollection } from "./entity";
-import { Id as ResourceId, Resource } from "./resource";
+import { EntityStateMap } from "./core/entity";
+import { Id as ResourceId } from "./resources/types";
+import { State as ResourceState } from "./resources/state";
 
-export class EntityManager {
-    private _resources: IEntityRefCollection<ResourceId, Resource>;
+export class StateManager {
+    private _resources: EntityStateMap<ResourceId, ResourceState>;
 
     constructor() {
-        this._resources = new EntityRefCollection([new Resource()]);
+        this._resources = new EntityStateMap([new ResourceState()]);
     }
 
-    resources(): IEntityRefCollection<ResourceId, Resource> {
+    resources(): EntityStateMap<ResourceId, ResourceState> {
         return this._resources;
     }
 }
