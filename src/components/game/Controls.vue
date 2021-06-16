@@ -21,12 +21,12 @@ import { defineComponent } from "vue";
 export default defineComponent({
   setup() {
     return {
-      catnip: Instance.reactive().resources().get("catnip"),
+      catnip: Instance.resources.getState("catnip"),
     };
   },
   methods: {
     gather() {
-      this.catnip.amount++;
+      Instance.resources.gatherCatnip();
     },
   },
 });

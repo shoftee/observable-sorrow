@@ -1,7 +1,6 @@
-import { asEnumerable } from "linq-es2015";
-import { IEntityMetadata } from "../core/entity";
-import { LocalizationKey } from "../i18n";
-import { Id } from "./types";
+import { LocalizationKey } from "../core/i18n";
+
+type Id = "catnip";
 
 enum Rarity {
   Common,
@@ -43,7 +42,7 @@ enum Calculation {
   PerDay,
 }
 
-export interface IResourceMetadata extends IEntityMetadata<Id> {
+interface IMetadata {
   readonly id: Id;
   readonly title: LocalizationKey;
   readonly craftable: boolean;
@@ -53,7 +52,7 @@ export interface IResourceMetadata extends IEntityMetadata<Id> {
   readonly flags: Flags;
 }
 
-export const Metadata: Record<Id, IResourceMetadata> = {
+const Metadata: Record<Id, IMetadata> = {
   catnip: {
     id: "catnip",
     title: "resources.catnip.title",
@@ -62,5 +61,7 @@ export const Metadata: Record<Id, IResourceMetadata> = {
     resetLogic: ResetLogic.Chronospheres,
     rarity: Rarity.Common,
     flags: new Flags(Flag.DestroyedByApocalypse),
-  }
+  },
 };
+
+export { Id as ResourceId, IMetadata as IResourceMetadata, Metadata };

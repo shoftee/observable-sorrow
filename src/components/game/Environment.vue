@@ -23,8 +23,8 @@ import { defineComponent } from "vue";
 export default defineComponent({
   subscriptions() {
     return {
-      day: from(Game.observer().days()),
-      tick: from(Game.observer().ticks()),
+      day: from(Game.observer.days()),
+      tick: from(Game.observer.ticks()),
     };
   },
 });

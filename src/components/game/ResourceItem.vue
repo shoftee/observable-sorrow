@@ -7,14 +7,19 @@
       <!-- <span class="bg-danger badge badge-light">!</span> -->
     </div>
     <div class="mx-1 amount">{{ item.amount }}</div>
-    <div class="slash">/</div>
-    <div class="mx-1 capacity">{{ item.capacity }}</div>
-    <div class="change">+7.777 QWWT/s</div>
+    <template v-if="item.capacity != undefined">
+      <div class="slash">/</div>
+      <div class="mx-1 capacity">{{ item.capacity }}</div>
+    </template>
+    <template v-else>
+      <div class="no-capacity"></div>
+    </template>
+    <div class="change"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { State as ResourceState } from "@/app/resources/state";
+import { ResourceState } from "@/app/resources/state";
 import { defineComponent, PropType } from "vue";
 export default defineComponent({
   props: {

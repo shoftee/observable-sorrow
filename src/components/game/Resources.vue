@@ -28,7 +28,7 @@ export default defineComponent({
   },
   data: () => ({
     show: true,
-    resources: GameInstance.reactive().resources().all(),
+    resources: GameInstance.resources.allStates(),
   }),
 });
 </script>

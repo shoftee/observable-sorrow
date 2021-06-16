@@ -5736,6 +5736,11 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
+linked-list-typescript@^1.0.11:
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/linked-list-typescript/-/linked-list-typescript-1.0.15.tgz#faeed93cf9203f102e2158c29edcddda320abe82"
+  integrity sha512-RIyUu9lnJIyIaMe63O7/aFv/T2v3KsMFuXMBbUQCHX+cgtGro86ETDj5ed0a8gQL2+DFjzYYsgVG4I36/cUwgw==
+
 linq-es2015@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/linq-es2015/-/linq-es2015-2.5.1.tgz#b9eb97d9b47c0e2f8fc71c196650b638faa6457c"
@@ -7534,6 +7539,13 @@ queue-microtask@^1.2.2:
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
+queue-typescript@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/queue-typescript/-/queue-typescript-1.0.1.tgz#2d7842fc3b3e0e3f33d077887a8f2a5bb0baf460"
+  integrity sha512-tkK08uPfmpPl0cX1WRSU3EoNb/T5zSoZPGkkpfGX4E8QayWvEmLS2cI3pFngNPkNTCU5pCDQ1IwlzN0L5gdFPg==
+  dependencies:
+    linked-list-typescript "^1.0.11"
+
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5, randombytes@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
@@ -8405,6 +8417,13 @@ stable@^0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/stable/-/stable-0.1.8.tgz#836eb3c8382fe2936feaf544631017ce7d47a3cf"
   integrity sha512-ji9qxRnOVfcuLDySj9qzhGSEFVobyt1kIOSkj1qZzYLzq7Tos/oUUWvotUPQLlrsidqsK6tBH89Bc9kL5zHA6w==
+
+stack-typescript@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/stack-typescript/-/stack-typescript-1.0.4.tgz#185c57ca2e5f40c15266794fbdf43e727e7c80f4"
+  integrity sha512-LAFycOVCWRYP6TDbwXR2XeXTmKjZT+wpdC4GEnBWWYfyTUK7NOassuqVTbUXsEA6CTCgk4FMOkUi+yFS33D1mw==
+  dependencies:
+    linked-list-typescript "^1.0.11"
 
 stackframe@^1.1.1:
   version "1.2.0"

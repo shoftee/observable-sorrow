@@ -1,60 +1,79 @@
+import { IGameObserver } from "./core/_interfaces";
+import Constants from "./core/_constants";
+
 import { Subject, Observable, interval } from "rxjs";
 import { filter, map } from "rxjs/operators";
 
-import Constants from "./constants";
-
-export interface IGameObserver {
-    ticks(): Observable<number>;
-    days(): Observable<number>;
-}
-
 class GameObserver implements IGameObserver {
-    readonly tick$ = new Subject<number>();
+  readonly tick$ = new Subject<number>();
 
-    constructor(game: Game) {
-        game.tick$.subscribe(this.tick$);
-    }
+  constructor(game: Game) {
+    game.tick$.subscribe(this.tick$);
+  }
 
-    ticks(): Observable<number> {
-        return this.tick$;
-    }
+  ticks(): Observable<number> {
+    return this.tick$;
+  }
 
-    days(): Observable<number> {
-        const ticksPerDay = Constants.TicksPerSecond * Constants.SecondsPerDay;
-        return this.tick$.pipe(
-            filter(v => v % ticksPerDay === 0),
-            map(v => v / ticksPerDay),
-        );
-    }
+  days(): Observable<number> {
+    const ticksPerDay = Constants.TicksPerSecond * Constants.SecondsPerDay;
+    return this.tick$.pipe(
+      filter((v) => v % ticksPerDay === 0),
+      map((v) => v / ticksPerDay),
+    );
+  }
 }
 
-import { StateManager } from "./manager";
+import { ResourceManager } from "./resources/manager";
+import { LimitsManager } from "./effects/limits/manager";
+import { Queue } from "queue-typescript";
+import { IMutation, IMutationSink } from "./core/mutation";
 
-export interface IGame {
-    observer(): IGameObserver;
-    reactive(): StateManager;
+interface IGame {
+  readonly observer: IGameObserver;
+  readonly resources: ResourceManager;
+  readonly limits: LimitsManager;
 }
 
 class Game implements IGame {
-    readonly _observer: IGameObserver;
-    readonly _entities: StateManager;
-    tick$ = interval(Constants.MillisecondsPerTick);
+  private readonly updater: GameUpdater;
 
-    constructor() {
-        this._observer = new GameObserver(this);
-        this._entities = new StateManager();
+  readonly resources: ResourceManager;
+  readonly limits: LimitsManager;
 
-        this._entities.resources();
-    }
+  readonly observer: IGameObserver;
+  tick$ = interval(Constants.MillisecondsPerTick);
 
-    observer(): IGameObserver {
-        return this._observer;
-    }
+  constructor() {
+    this.observer = new GameObserver(this);
+    this.updater = new GameUpdater(this.observer);
 
-    reactive(): StateManager {
-        return this._entities;
-    }
+    this.resources = new ResourceManager(this.updater);
+    this.limits = new LimitsManager(this.updater);
+  }
 }
 
-export const Instance: IGame = new Game();
+class GameUpdater implements IMutationSink {
+  private mutationQueue = new Queue<IMutation>();
+
+  constructor(readonly observer: IGameObserver) {
+    observer.ticks().subscribe({
+      next: () => this.doUpdates(),
+    });
+  }
+
+  send(m: IMutation) {
+    this.mutationQueue.enqueue(m);
+  }
+
+  private doUpdates() {
+    let m: IMutation;
+    while ((m = this.mutationQueue.dequeue())) {
+      console.log("Applying mutation: ", m);
+      m.apply();
+    }
+  }
+}
+
+const Instance: IGame = new Game();
 export default Instance;
