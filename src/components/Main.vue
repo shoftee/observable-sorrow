@@ -1,15 +1,19 @@
 <template>
   <main class="d-flex flex-row shrinkable">
-    <div class="shrinkable col-3 p-2">
+    <div class="shrinkable col p-2">
       <div class="d-flex flex-column">
         <os-resources />
       </div>
     </div>
-    <div class="shrinkable col-6 p-2">
-      <os-controls />
+    <div class="shrinkable col-5 p-2">
+      <div class="d-flex flex-column">
+        <os-controls />
+      </div>
     </div>
-    <div class="shrinkable col-3 p-2">
-      <os-environment />
+    <div class="shrinkable col p-2">
+      <div class="d-flex flex-column">
+        <os-environment />
+      </div>
     </div>
   </main>
 </template>

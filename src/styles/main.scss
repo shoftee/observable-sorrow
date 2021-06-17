@@ -1,4 +1,10 @@
+@import "/node_modules/bootstrap/scss/bootstrap.scss";
+
 .shrinkable {
     min-height: 0;
     overflow-y: auto;
+}
+
+header, footer {
+    @extend .px-2, .py-1, .bg-light;
 }

@@ -1,7 +1,7 @@
 import { IEntityState } from "../core/entity-types";
 import { ResourceId as Id } from "./metadata";
 
-export class State implements IEntityState<Id> {
+class State implements IEntityState<Id> {
   id: Id = "catnip";
   unlocked = false;
   amount = 0;

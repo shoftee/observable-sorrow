@@ -1,5 +1,5 @@
 <template>
-  <div class="card resources-list">
+  <div class="card">
     <button class="btn shadow-none text-start" @click="show = !show">
       <span>
         Resources
@@ -18,17 +18,19 @@
 </template>
 
 <script lang="ts">
-import GameInstance from "@/app/game";
+import Os from "@/app/os";
 
-import { defineComponent } from "vue";
+const resources = Os.interactors.resources;
+
 import ResourceItem from "./ResourceItem.vue";
+import { defineComponent } from "vue";
 export default defineComponent({
   components: {
     "os-resource-item": ResourceItem,
   },
   data: () => ({
     show: true,
-    resources: GameInstance.resources.allStates(),
+    resources: resources.all(),
   }),
 });
 </script>

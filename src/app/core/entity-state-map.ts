@@ -43,27 +43,6 @@ class Reactive<TId extends string, TState extends IState<TId>> extends Base<
         .Cast<Ref<TState>>(),
     );
   }
-
-  readonly(): Readonly<TId, TState> {
-    return new Readonly(this.refs);
-  }
 }
 
-class Readonly<TId extends string, TState extends IState<TId>> extends Base<
-  TId,
-  TState
-> {
-  constructor(refs: Ref<TState>[]) {
-    super(
-      asEnumerable(refs)
-        .Select((r) => (isReadonly(r) ? r : readonly(r)))
-        .Cast<Ref<TState>>(),
-    );
-  }
-}
-
-export {
-  IStateMap as IEntityStateMap,
-  Reactive as ReactiveStateMap,
-  Readonly as ReadonlyStateMap,
-};
+export { IStateMap as IEntityStateMap, Reactive as ReactiveStateMap };

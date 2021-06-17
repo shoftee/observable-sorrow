@@ -1,31 +1,36 @@
 <template>
-  <div>
+  <div class="card align-self-stretch">
     <section>
       <div class="d-flex flex-column align-items-stretch">
-        <div class="p-2">
-          Game tick <span>{{ tick }}</span>
+        <div class="p-2 align-self-stretch">
+          {{ season.id }}
         </div>
-        <div class="p-2">
-          Day <span>{{ day }}</span>
+        <!-- <div class="p-2">
+          Day <span>{{ state.dayOfSeason }}</span>
         </div>
-        <div class="p-2 align-self-stretch">History</div>
+        <div class="p-2 align-self-stretch">History</div> -->
       </div>
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import Game from "@/app/game";
+import Os from "@/app/os";
 
-import { from } from "rxjs";
+const environment = Os.interactors.environment;
 
-import { defineComponent } from "vue";
+import { defineComponent, unref } from "vue";
 export default defineComponent({
-  subscriptions() {
+  data() {
     return {
-      day: from(Game.observer.days()),
-      tick: from(Game.observer.ticks()),
+      state: environment.state,
     };
+  },
+  computed: {
+    season() {
+      const state = unref(environment.state);
+      return environment.metadata.seasons[state.season];
+    },
   },
 });
 </script>

@@ -1,25 +1,15 @@
 import { Ref } from "@vue/runtime-core";
-import { ReactiveStateMap, ReadonlyStateMap } from "../core/entity-state-map";
+import { ReactiveStateMap } from "../core/entity-state-map";
+import { IGame, IRegisterInGame } from "../game/game";
 import {
   ResourceId as Id,
   IResourceMetadata as IMetadata,
   Metadata,
 } from "./metadata";
-import { State } from "./state";
-import { ChangeAmountMutation } from "./mutations";
-import { IMutationSink } from "../core/mutation";
-import { BaseManager } from "../core/_types";
+import { ResourceState as State } from "./state";
 
-class ResourceManager extends BaseManager {
-  private states: ReactiveStateMap<Id, State>;
-  private readonly: ReadonlyStateMap<Id, State>;
-
-  constructor(mutationSink: IMutationSink) {
-    super(mutationSink);
-
-    this.states = new ReactiveStateMap(Array.of(new State()));
-    this.readonly = this.states.readonly();
-  }
+class ResourceManager {
+  private states = new ReactiveStateMap<Id, State>(Array.of(new State()));
 
   getMeta(id: Id): IMetadata {
     return Metadata[id];
@@ -30,17 +20,12 @@ class ResourceManager extends BaseManager {
   }
 
   getState(id: Id): Ref<State> {
-    return this.readonly.get(id);
+    return this.states.get(id);
   }
 
   allStates(): Ref<State>[] {
-    return this.readonly.all();
-  }
-
-  gatherCatnip(): void {
-    const mutation = new ChangeAmountMutation(this.states.get("catnip"), +1);
-    this.mutationSink.send(mutation);
+    return this.states.all();
   }
 }
 
-export { ResourceManager };
+export default ResourceManager;

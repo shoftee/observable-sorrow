@@ -1,6 +1,5 @@
 import { ReactiveStateMap } from "@/app/core/entity-state-map";
-import { IMutationSink } from "@/app/core/mutation";
-import { BaseManager } from "@/app/core/_types";
+import { IGame, IRegisterInGame } from "@/app/game/game";
 import { Ref } from "@vue/reactivity";
 import {
   ILimitMetadata as IMetadata,
@@ -9,15 +8,10 @@ import {
 } from "./metadata";
 import { LimitState } from "./state";
 
-class LimitsManager extends BaseManager {
-  readonly states: ReactiveStateMap<Id, LimitState>;
-
-  constructor(mutationSink: IMutationSink) {
-    super(mutationSink);
-
-    const states = Array.of(new LimitState("catnip"));
-    this.states = new ReactiveStateMap<Id, LimitState>(states);
-  }
+class Manager implements IRegisterInGame {
+  private readonly states = new ReactiveStateMap<Id, LimitState>(
+    Array.of(new LimitState("catnip")),
+  );
 
   getMeta(id: Id): IMetadata {
     return Metadata[id];
@@ -34,6 +28,8 @@ class LimitsManager extends BaseManager {
   allStates(): Ref<LimitState>[] {
     return this.states.all();
   }
+
+  register(game: IGame): void {}
 }
 
-export { LimitsManager };
+export default Manager;

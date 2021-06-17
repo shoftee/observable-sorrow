@@ -4,7 +4,7 @@
   >
     <div class="name">
       {{ item.id }}
-      <!-- <span class="bg-danger badge badge-light">!</span> -->
+      <!-- <span class="badge bg-danger badge-light">!</span> -->
     </div>
     <div class="mx-1 amount">{{ item.amount }}</div>
     <template v-if="item.capacity != undefined">

@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <section class="d-flex align-items-center justify-content-center">
-      <div class="">
+  <div class="container">
+    <section class="row g-2">
+      <div class="col-6">
         <button
           type="button"
-          class="btn btn-primary"
+          class="btn btn-primary w-100"
           :class="{ disabled: catnip.amount == catnip.capacity }"
-          @click="gather()"
+          @click="gatherCatnip()"
         >
           Gather catnip
         </button>
@@ -16,25 +16,46 @@
 </template>
 
 <script lang="ts">
-import Instance from "@/app/game";
+import Os from "@/app/os";
+
+const controls = Os.interactors.controls;
+
 import { defineComponent } from "vue";
 export default defineComponent({
   setup() {
     return {
-      catnip: Instance.resources.getState("catnip"),
+      catnip: controls.get("catnip"),
     };
   },
   methods: {
-    gather() {
-      Instance.resources.gatherCatnip();
+    gatherCatnip() {
+      controls.gatherCatnip();
+    },
+    refineCatnip() {
+      // controls.refineCatnip();
     },
   },
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-.card {
-  width: 160px;
+<style lang="scss" scoped>
+@import "../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+:root > div > section {
+  & > div {
+    @extend .col-6;
+
+    & button {
+      @extend .btn, .w-100;
+
+      &.primary {
+        @extend .btn-primary;
+      }
+
+      &.light {
+        @extend .btn-light;
+      }
+    }
+  }
 }
 </style>

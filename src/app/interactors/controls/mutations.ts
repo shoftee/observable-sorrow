@@ -1,6 +1,6 @@
 import { Ref, unref } from "vue";
-import { IMutation } from "../core/mutation";
-import { ResourceState as State } from "./state";
+import { IMutation } from "../../game/mutation";
+import { ResourceState as State } from "../../resources/state";
 
 class ChangeAmountMutation implements IMutation {
   readonly entity: Ref<State>;
@@ -16,14 +16,6 @@ class ChangeAmountMutation implements IMutation {
     const intended = this.intended;
     if (intended != 0) {
       this.actual = this.changeAmount(unref(this.entity), this.intended);
-    }
-  }
-
-  undo(): void {
-    const actual = this.actual ?? 0;
-    if (actual != 0) {
-      this.changeAmount(unref(this.entity), -actual);
-      this.actual = undefined;
     }
   }
 
