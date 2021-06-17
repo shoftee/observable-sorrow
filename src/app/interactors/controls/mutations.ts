@@ -1,13 +1,13 @@
 import { Ref, unref } from "vue";
 import { IMutation } from "../../game/mutation";
-import { ResourceState as State } from "../../resources/state";
+import { IResourceState as IState } from "../../entities/resource";
 
 class ChangeAmountMutation implements IMutation {
-  readonly entity: Ref<State>;
+  readonly entity: Ref<IState>;
   readonly intended: number;
   actual?: number;
 
-  constructor(entity: Ref<State>, intended: number) {
+  constructor(entity: Ref<IState>, intended: number) {
     this.entity = entity;
     this.intended = intended;
   }
@@ -19,7 +19,7 @@ class ChangeAmountMutation implements IMutation {
     }
   }
 
-  private changeAmount(entity: State, change: number): number {
+  private changeAmount(entity: IState, change: number): number {
     const currentValue = entity.amount;
     const newValue = this.boundedChange(currentValue, change, entity.capacity);
 

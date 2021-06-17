@@ -1,4 +1,4 @@
-import { ResourceState as State } from "@/app/resources/state";
+import { IResourceState as IState } from "@/app/entities/resource";
 import Manager from "@/app/resources/manager";
 import { IGame, IRegisterInGame } from "../../game/game";
 
@@ -11,8 +11,8 @@ class Interactor implements IRegisterInGame {
     this.resources = game.managers.resources;
   }
 
-  all(): Ref<State>[] {
-    return readonly(this.resources.allStates()) as Ref<State>[];
+  all(): Ref<IState>[] {
+    return readonly(this.resources.allStates()) as Ref<IState>[];
   }
 }
 

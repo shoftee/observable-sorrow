@@ -1,15 +1,16 @@
 import { Ref } from "@vue/runtime-core";
 import { ReactiveStateMap } from "../core/entity-state-map";
-import { IGame, IRegisterInGame } from "../game/game";
 import {
   ResourceId as Id,
   IResourceMetadata as IMetadata,
   Metadata,
-} from "./metadata";
-import { ResourceState as State } from "./state";
+} from "../_metadata/resources";
+import { newResource, IResourceState as IState } from "../entities/resource";
 
 class ResourceManager {
-  private states = new ReactiveStateMap<Id, State>(Array.of(new State()));
+  private states = new ReactiveStateMap<Id, IState>(
+    Array.of(newResource("catnip")),
+  );
 
   getMeta(id: Id): IMetadata {
     return Metadata[id];
@@ -19,11 +20,11 @@ class ResourceManager {
     return Object.values(Metadata);
   }
 
-  getState(id: Id): Ref<State> {
+  getState(id: Id): Ref<IState> {
     return this.states.get(id);
   }
 
-  allStates(): Ref<State>[] {
+  allStates(): Ref<IState>[] {
     return this.states.all();
   }
 }

@@ -50,7 +50,6 @@ class Game implements IGame {
   constructor() {
     this.register(this.managers.updater);
     this.register(this.managers.environment);
-    this.register(this.managers.limits);
 
     this.register(this.interactors.controls);
     this.register(this.interactors.environment);

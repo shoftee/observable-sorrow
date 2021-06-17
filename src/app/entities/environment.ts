@@ -1,4 +1,4 @@
-import { SeasonKind, WeatherKind } from "./metadata";
+import { SeasonKind, WeatherKind } from "../_metadata/environment";
 
 class State {
   year = 0;

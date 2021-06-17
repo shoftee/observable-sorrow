@@ -4,7 +4,7 @@
       <div class="col-6">
         <button
           type="button"
-          class="btn btn-primary w-100"
+          class="btn btn-light w-100"
           :class="{ disabled: catnip.amount == catnip.capacity }"
           @click="gatherCatnip()"
         >

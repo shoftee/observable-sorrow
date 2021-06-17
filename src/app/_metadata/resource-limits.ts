@@ -25,4 +25,4 @@ const Metadata: Record<Id, IMetadata> = {
   // faith: { id: "faith", base: 100 },
 };
 
-export { Id as LimitedResourceId, IMetadata as ILimitMetadata, Metadata };
+export { Id as LimitId, IMetadata as ILimitMetadata, Metadata };

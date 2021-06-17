@@ -1,8 +1,8 @@
 import { Ref } from "vue";
 
 import { IGame, IRegisterInGame } from "../../game/game";
-import { EnvironmentState } from "@/app/environment/state";
-import { IMetadata } from "@/app/environment/metadata";
+import { EnvironmentState } from "@/app/entities/environment";
+import { IMetadata } from "@/app/_metadata/environment";
 import Manager from "@/app/environment/manager";
 
 class Interactor implements IRegisterInGame {

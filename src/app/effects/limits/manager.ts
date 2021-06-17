@@ -1,16 +1,16 @@
 import { ReactiveStateMap } from "@/app/core/entity-state-map";
-import { IGame, IRegisterInGame } from "@/app/game/game";
 import { Ref } from "@vue/reactivity";
 import {
   ILimitMetadata as IMetadata,
-  LimitedResourceId as Id,
+  LimitId as Id,
   Metadata,
-} from "./metadata";
-import { LimitState } from "./state";
+} from "../../_metadata/resource-limits";
+import { ILimitState as IState, newLimit } from "../../entities/resource-limit";
+import { asEnumerable } from "linq-es2015";
 
-class Manager implements IRegisterInGame {
-  private readonly states = new ReactiveStateMap<Id, LimitState>(
-    Array.of(new LimitState("catnip")),
+class Manager {
+  private readonly states = new ReactiveStateMap<Id, IState>(
+    asEnumerable(Object.keys(Metadata) as Id[]).Select((id) => newLimit(id)),
   );
 
   getMeta(id: Id): IMetadata {
@@ -21,15 +21,13 @@ class Manager implements IRegisterInGame {
     return Object.values(Metadata);
   }
 
-  getState(id: Id): Ref<LimitState> {
+  getState(id: Id): Ref<IState> {
     return this.states.get(id);
   }
 
-  allStates(): Ref<LimitState>[] {
+  allStates(): Ref<IState>[] {
     return this.states.all();
   }
-
-  register(game: IGame): void {}
 }
 
 export default Manager;

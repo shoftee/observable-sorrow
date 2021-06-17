@@ -1,5 +1,5 @@
 import { asEnumerable } from "linq-es2015";
-import { isReadonly, reactive, readonly, Ref, unref } from "vue";
+import { reactive, Ref, unref } from "vue";
 
 import { IEntityState as IState } from "./entity-types";
 

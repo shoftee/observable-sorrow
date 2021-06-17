@@ -19,12 +19,12 @@
 </template>
 
 <script lang="ts">
-import { ResourceState } from "@/app/resources/state";
+import { IResourceState as IState } from "@/app/entities/resource";
 import { defineComponent, PropType } from "vue";
 export default defineComponent({
   props: {
     item: {
-      type: Object as PropType<ResourceState>,
+      type: Object as PropType<IState>,
       required: true,
     },
   },

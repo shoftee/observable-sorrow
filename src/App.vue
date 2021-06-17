@@ -11,8 +11,8 @@
     <os-main class="h-100" />
     <footer class="d-flex flex-row justify-content-end">
       <div>
-        Observable Sorrow is a clone of Kittens Game.
-        <a href="https://kittensgame.com/web/">Original game here</a>
+        Observable Sorrow is a clone of
+        <a href="https://kittensgame.com/web/">Kittens Game</a>.
       </div>
     </footer>
   </div>

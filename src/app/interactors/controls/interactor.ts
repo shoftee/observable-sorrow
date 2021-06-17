@@ -1,7 +1,7 @@
 import { IMutationQueue } from "@/app/game/mutation";
 import ResourceManager from "@/app/resources/manager";
-import { ResourceId as Id } from "@/app/resources/metadata";
-import { ResourceState as State } from "@/app/resources/state";
+import { ResourceId as Id } from "@/app/_metadata/resources";
+import { IResourceState as IState } from "@/app/entities/resource";
 import { readonly, Ref } from "vue";
 import { IGame, IRegisterInGame } from "../../game/game";
 import { ChangeAmountMutation } from "./mutations";
@@ -15,8 +15,8 @@ class Interactor implements IRegisterInGame {
     this.resources = game.managers.resources;
   }
 
-  get(id: Id): Ref<State> {
-    return readonly(this.resources.getState(id)) as Ref<State>;
+  get(id: Id): Ref<IState> {
+    return readonly(this.resources.getState(id)) as Ref<IState>;
   }
 
   gatherCatnip(): void {

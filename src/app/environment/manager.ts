@@ -1,8 +1,13 @@
 import { readonly, Ref, ref, unref } from "vue";
 
-import { EnvironmentState as State } from "./state";
+import { EnvironmentState as State } from "../entities/environment";
 import { IGame, IRegisterInGame } from "../game/game";
-import { Constants, Metadata, IMetadata, SeasonKind } from "./metadata";
+import {
+  Constants,
+  Metadata,
+  IMetadata,
+  SeasonKind,
+} from "../_metadata/environment";
 
 class Manager implements IRegisterInGame {
   private _state: Ref<State> = ref(new State()) as Ref<State>;
@@ -36,7 +41,10 @@ class Manager implements IRegisterInGame {
     }
   }
 
-  calculateNextSeason(game: IGame, currentSeason: SeasonKind): SeasonKind {
+  private calculateNextSeason(
+    game: IGame,
+    currentSeason: SeasonKind,
+  ): SeasonKind {
     switch (currentSeason) {
       case "spring":
         return "summer";
