@@ -1,16 +1,13 @@
 <template>
-  <div class="container">
-    <section class="row g-2">
-      <div class="col-6">
-        <button
-          type="button"
-          class="btn btn-light w-100"
-          :class="{ disabled: catnip.amount == catnip.capacity }"
-          @click="gatherCatnip()"
-        >
-          Gather catnip
-        </button>
-      </div>
+  <div class="controls">
+    <section class="row">
+      <os-button
+        :class="{ disabled: catnip.amount == catnip.capacity }"
+        @click="gatherCatnip()"
+      >
+        Gather button
+      </os-button>
+      <os-button>Refine catnip</os-button>
     </section>
   </div>
 </template>
@@ -20,8 +17,13 @@ import Os from "@/app/os";
 
 const controls = Os.interactors.controls;
 
+import Button from "../global/Button.vue";
+
 import { defineComponent } from "vue";
 export default defineComponent({
+  components: {
+    "os-button": Button,
+  },
   setup() {
     return {
       catnip: controls.get("catnip"),
@@ -31,31 +33,6 @@ export default defineComponent({
     gatherCatnip() {
       controls.gatherCatnip();
     },
-    refineCatnip() {
-      // controls.refineCatnip();
-    },
   },
 });
 </script>
-
-<style lang="scss" scoped>
-@import "../../../node_modules/bootstrap/scss/bootstrap.scss";
-
-:root > div > section {
-  & > div {
-    @extend .col-6;
-
-    & button {
-      @extend .btn, .w-100;
-
-      &.primary {
-        @extend .btn-primary;
-      }
-
-      &.light {
-        @extend .btn-light;
-      }
-    }
-  }
-}
-</style>

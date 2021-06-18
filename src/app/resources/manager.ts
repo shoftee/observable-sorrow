@@ -1,4 +1,4 @@
-import { Ref } from "@vue/runtime-core";
+import { Ref } from "vue";
 import { ReactiveStateMap } from "../core/entity-state-map";
 import {
   ResourceId as Id,

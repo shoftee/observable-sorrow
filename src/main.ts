@@ -1,8 +1,13 @@
-import VueRx from "@nopr3d/vue-next-rx";
-
 import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
 import "./styles/main.scss";
 
-import { createApp } from "vue";
-import App from "./App.vue";
-createApp(App).use(VueRx).mount("#app");
+import { App, createApp } from "vue";
+import AppComponent from "./App.vue";
+const app: App<Element> = createApp(AppComponent);
+
+// add vue-rx
+import VueRx from "@nopr3d/vue-next-rx";
+app.use(VueRx);
+
+// mount app to page
+app.mount("#app");

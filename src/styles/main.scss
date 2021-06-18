@@ -1,10 +1,39 @@
 @import "/node_modules/bootstrap/scss/bootstrap.scss";
 
-.shrinkable {
-    min-height: 0;
-    overflow-y: auto;
+// global defaults
+.btn {
+  @extend .btn-light;
 }
 
-header, footer {
-    @extend .px-2, .py-1, .bg-light;
+// remove overflow from flexbox
+.shrinkable {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+// main
+header,
+footer {
+  @extend .px-2, .py-1, .bg-light;
+}
+
+// controls
+.controls {
+  @extend .container;
+
+  & > section.row {
+    @extend .g-2;
+
+    & > div.btn-container {
+      @extend .col-6;
+
+      & button {
+        @extend .btn, .w-100;
+
+        &.primary {
+          @extend .btn-primary;
+        }
+      }
+    }
+  }
 }

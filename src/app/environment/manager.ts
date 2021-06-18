@@ -28,9 +28,8 @@ class Manager implements IRegisterInGame {
     });
   }
 
-  update(game: IGame, tick: number): void {
+  update(game: IGame, _tick: number): void {
     const state = unref(this._state);
-    console.log("Day changed: tick #", tick, " state: ", state);
     state.dayOfSeason++;
     if (state.dayOfSeason >= Constants.DaysPerSeason) {
       state.dayOfSeason -= Constants.DaysPerSeason;
