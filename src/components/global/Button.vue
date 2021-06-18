@@ -3,7 +3,7 @@
     <tippy>
       <button
         type="button"
-        class="btn btn-light w-100"
+        class="btn btn-outline-secondary w-100"
         :class="{ disabled }"
         v-bind="$attrs"
       >

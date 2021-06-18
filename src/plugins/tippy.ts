@@ -9,6 +9,7 @@ function useTippy<TElement>(app: App<TElement>): App<TElement> {
     component: "tippy",
     defaultProps: {
       theme: "light",
+      arrow: false,
       hideOnClick: false,
       duration: 150,
       placement: "right-start",
