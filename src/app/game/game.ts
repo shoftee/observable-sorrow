@@ -1,15 +1,19 @@
 import LimitsManager from "../effects/limits/manager";
-import EnvironmentManager from "../environment/manager";
-import ResourceManager from "../resources/manager";
+import { EnvironmentManager } from "../environment/manager";
+import { ResourceManager } from "../resources/manager";
 import TimeManager from "../time/manager";
 import Updater from "./updater";
-import ControlsInteractor from "../interactors/controls/interactor";
-import EnvironmentInteractor from "../interactors/environment/interactor";
-import ResourcesInteractor from "../interactors/resources/interactor";
+
+import { StateManager, IStateManager } from "../ui/states";
+import { CommandManager, ICommandManager } from "../ui/commands";
 
 interface IGame {
   readonly managers: IGameManagers;
-  readonly interactors: IGameInteractors;
+}
+
+interface IUiGame {
+  readonly commands: ICommandManager;
+  readonly states: IStateManager;
 
   start(): void;
 }
@@ -26,12 +30,6 @@ interface IGameManagers {
   readonly limits: LimitsManager;
 }
 
-interface IGameInteractors {
-  readonly controls: ControlsInteractor;
-  readonly environment: EnvironmentInteractor;
-  readonly resources: ResourcesInteractor;
-}
-
 class Game implements IGame {
   readonly managers: IGameManagers = {
     time: new TimeManager(),
@@ -41,19 +39,15 @@ class Game implements IGame {
     limits: new LimitsManager(),
   };
 
-  readonly interactors: IGameInteractors = {
-    controls: new ControlsInteractor(),
-    environment: new EnvironmentInteractor(),
-    resources: new ResourcesInteractor(),
-  };
+  readonly commands: CommandManager = new CommandManager();
+  readonly states: StateManager = new StateManager();
 
   constructor() {
     this.register(this.managers.updater);
     this.register(this.managers.environment);
 
-    this.register(this.interactors.controls);
-    this.register(this.interactors.environment);
-    this.register(this.interactors.resources);
+    this.register(this.commands);
+    this.register(this.states);
   }
 
   private register(target: IRegisterInGame) {
@@ -65,4 +59,4 @@ class Game implements IGame {
   }
 }
 
-export { Game, IGame, IRegisterInGame };
+export { Game, IGame, IUiGame, IRegisterInGame };

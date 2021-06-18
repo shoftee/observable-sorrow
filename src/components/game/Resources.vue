@@ -19,8 +19,7 @@
 
 <script lang="ts">
 import Os from "@/app/os";
-
-const resources = Os.interactors.resources;
+const resources = Os.states.resources();
 
 import ResourceItem from "./ResourceItem.vue";
 import { defineComponent } from "vue";

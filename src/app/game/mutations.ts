@@ -1,6 +1,6 @@
 import { Ref, unref } from "vue";
-import { IMutation } from "../../game/mutation";
-import { IResourceState as IState } from "../../entities/resource";
+import { IMutation } from "./mutation";
+import { IResourceState as IState } from "../entities/resource";
 
 class ChangeAmountMutation implements IMutation {
   readonly entity: Ref<IState>;

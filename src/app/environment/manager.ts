@@ -3,9 +3,9 @@ import { readonly, Ref, ref, unref } from "vue";
 import { EnvironmentState as State } from "../entities/environment";
 import { IGame, IRegisterInGame } from "../game/game";
 import {
-  Constants,
-  Metadata,
-  IMetadata,
+  EnvironmentConstants as Constants,
+  EnvironmentMetadata as Metadata,
+  IEnvironmentMetadata as IMetadata,
   SeasonKind,
 } from "../_metadata/environment";
 
@@ -57,4 +57,4 @@ class Manager implements IRegisterInGame {
   }
 }
 
-export default Manager;
+export { Manager as EnvironmentManager };

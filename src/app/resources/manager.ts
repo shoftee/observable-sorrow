@@ -7,7 +7,7 @@ import {
 } from "../_metadata/resources";
 import { newResource, IResourceState as IState } from "../entities/resource";
 
-class ResourceManager {
+class Manager {
   private states = new ReactiveStateMap<Id, IState>(
     Array.of(newResource("catnip")),
   );
@@ -29,4 +29,4 @@ class ResourceManager {
   }
 }
 
-export default ResourceManager;
+export { Manager as ResourceManager };

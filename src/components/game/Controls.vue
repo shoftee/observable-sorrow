@@ -23,7 +23,8 @@
 <script lang="ts">
 import Os from "@/app/os";
 
-const controls = Os.interactors.controls;
+const commands = Os.commands;
+const states = Os.states;
 
 import Button from "../global/Button.vue";
 
@@ -32,12 +33,12 @@ export default defineComponent({
   components: { "os-button": Button },
   setup() {
     return {
-      catnip: controls.get("catnip"),
+      catnip: states.resources().get("catnip"),
     };
   },
   methods: {
     gatherCatnip() {
-      controls.gatherCatnip();
+      commands.gatherCatnip();
     },
   },
 });

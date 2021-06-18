@@ -1,4 +1,5 @@
-import { Game, IGame } from "./game/game";
+import { Game, IUiGame } from "./game/game";
 
-const Instance: IGame = new Game();
+const Instance: IUiGame = new Game();
+
 export default Instance;

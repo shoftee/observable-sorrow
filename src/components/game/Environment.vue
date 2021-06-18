@@ -17,19 +17,19 @@
 <script lang="ts">
 import Os from "@/app/os";
 
-const environment = Os.interactors.environment;
+const environment = Os.states.environment();
 
 import { defineComponent, unref } from "vue";
 export default defineComponent({
   data() {
     return {
-      state: environment.state,
+      state: environment.get(),
     };
   },
   computed: {
     season() {
-      const state = unref(environment.state);
-      return environment.metadata.seasons[state.season];
+      const state = unref(environment.get());
+      return environment.meta().seasons[state.season];
     },
   },
 });

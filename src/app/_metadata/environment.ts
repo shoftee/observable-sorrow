@@ -39,4 +39,10 @@ const Metadata: IMetadata = {
   },
 };
 
-export { Constants, SeasonKind, WeatherKind, Metadata, IMetadata };
+export {
+  Constants as EnvironmentConstants,
+  SeasonKind,
+  WeatherKind,
+  Metadata as EnvironmentMetadata,
+  IMetadata as IEnvironmentMetadata,
+};
