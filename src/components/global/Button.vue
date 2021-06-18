@@ -1,7 +1,12 @@
 <template>
-  <div class="btn-container">
+  <div class="col-6">
     <tippy>
-      <button type="button" :class="{ disabled }" v-bind="$attrs">
+      <button
+        type="button"
+        class="btn btn-light w-100"
+        :class="{ disabled }"
+        v-bind="$attrs"
+      >
         <slot></slot>
       </button>
       <template #content>

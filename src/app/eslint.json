@@ -1,9 +1,0 @@
-{    
-    "rules": {
-        "no-unused-variable": {
-            "options": {
-                "ignore-pattern": "^_"
-            }
-        }
-    }
-}

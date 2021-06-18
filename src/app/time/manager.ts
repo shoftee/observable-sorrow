@@ -1,8 +1,9 @@
+import { ITimeManager } from "../systems/time";
 import { Constants } from "./constants";
 import { Observable, Subject, interval } from "rxjs";
 import { filter } from "rxjs/operators";
 
-class TimeManager {
+class TimeManager implements ITimeManager {
   private readonly interval$ = interval(Constants.MillisecondsPerTick);
   private readonly tick$: Subject<number>;
 
@@ -25,4 +26,4 @@ class TimeManager {
   // use Rx throttle operator for pawsing
 }
 
-export default TimeManager;
+export { TimeManager };

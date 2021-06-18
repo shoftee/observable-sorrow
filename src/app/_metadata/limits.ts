@@ -1,14 +1,12 @@
-import { IEntityMetadata } from "@/app/core/entity-types";
+import { ResourceId } from "./resources";
 
-type Id = "catnip";
-
-interface IMetadata extends IEntityMetadata<Id> {
-  id: Id;
+export type LimitMetadataType = {
+  id: ResourceId;
   base: number;
-}
+};
 
-const Metadata: Record<Id, IMetadata> = {
-  catnip: { id: "catnip", base: 5000 },
+export const LimitMetadata: Record<ResourceId, LimitMetadataType> = {
+  catnip: { id: "catnip", base: 100 },
   // wood: { id: "wood", base: 200 },
   // minerals: { id: "minerals", base: 250 },
   // coal: { id: "coal", base: 60 },
@@ -24,5 +22,3 @@ const Metadata: Record<Id, IMetadata> = {
   // culture: { id: "culture", base: 100 },
   // faith: { id: "faith", base: 100 },
 };
-
-export { Id as LimitId, IMetadata as ILimitMetadata, Metadata };

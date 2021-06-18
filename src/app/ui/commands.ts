@@ -1,27 +1,20 @@
 import { unref } from "vue";
-import { IGame, IRegisterInGame } from "../game/game";
-import { ResourceManager } from "../resources/manager";
-import { RecipeId } from "../_metadata/recipes";
-
-interface ICommandManager {
-  gatherCatnip(): void;
-  buildRecipe(id: RecipeId): void;
-}
+import { IRegisterInGame, IGame } from "../systems/game";
+import { IResourceManager } from "../systems/resources";
+import { ICommandManager } from "./interfaces";
 
 class CommandManager implements ICommandManager, IRegisterInGame {
-  resources!: ResourceManager;
+  resources!: IResourceManager;
 
   register(game: IGame): void {
-    this.resources = game.managers.resources;
+    this.resources = game.resources;
   }
 
   gatherCatnip(): void {
-    unref(this.resources.getState("catnip")).amount++;
-  }
-
-  buildRecipe(_id: RecipeId): void {
-    //
+    const catnip = unref(this.resources.getState("catnip"));
+    const capacity = catnip.capacity ?? Number.POSITIVE_INFINITY;
+    catnip.amount = Math.min(catnip.amount + 1, capacity);
   }
 }
 
-export { ICommandManager, CommandManager };
+export { CommandManager };

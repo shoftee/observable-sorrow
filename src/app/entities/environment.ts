@@ -1,10 +1,19 @@
 import { SeasonKind, WeatherKind } from "../_metadata/environment";
 
-class State {
-  year = 0;
-  season: SeasonKind = "spring";
-  weather: WeatherKind = "none";
-  dayOfSeason = 0;
+interface IState {
+  year: number;
+  season: SeasonKind;
+  weather: WeatherKind;
+  dayOfSeason: number;
 }
 
-export { State as EnvironmentState };
+function newEnvironment(): IState {
+  return {
+    year: 0,
+    season: "spring",
+    weather: "none",
+    dayOfSeason: 0,
+  };
+}
+
+export { IState as IEnvironmentState, newEnvironment };

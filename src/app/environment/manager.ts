@@ -1,7 +1,10 @@
 import { readonly, Ref, ref, unref } from "vue";
 
-import { EnvironmentState as State } from "../entities/environment";
-import { IGame, IRegisterInGame } from "../game/game";
+import {
+  IEnvironmentState as IState,
+  newEnvironment,
+} from "../entities/environment";
+import { IGame, IRegisterInGame, IUpdated } from "../systems/game";
 import {
   EnvironmentConstants as Constants,
   EnvironmentMetadata as Metadata,
@@ -9,11 +12,11 @@ import {
   SeasonKind,
 } from "../_metadata/environment";
 
-class Manager implements IRegisterInGame {
-  private refState: Ref<State> = ref(new State()) as Ref<State>;
+class Manager implements IRegisterInGame, IUpdated {
+  private refState: Ref<IState> = ref(newEnvironment()) as Ref<IState>;
 
-  getState(): Ref<State> {
-    return readonly(this.refState) as Ref<State>;
+  getState(): Ref<IState> {
+    return readonly(this.refState) as Ref<IState>;
   }
 
   getMeta(): IMetadata {
@@ -22,28 +25,25 @@ class Manager implements IRegisterInGame {
 
   register(game: IGame): void {
     const ticksPerDay = Constants.SecondsPerDay * Constants.TicksPerSecond;
-    const day$ = game.managers.time.every(ticksPerDay);
+    const day$ = game.time.every(ticksPerDay);
     day$.subscribe({
-      next: (tick: number) => this.update(game, tick),
+      next: (tick: number) => this.update(tick),
     });
   }
 
-  update(game: IGame, _tick: number): void {
+  update(_tick: number): void {
     const state = unref(this.refState);
     state.dayOfSeason++;
     if (state.dayOfSeason >= Constants.DaysPerSeason) {
       state.dayOfSeason -= Constants.DaysPerSeason;
-      state.season = this.calculateNextSeason(game, state.season);
+      state.season = this.calculateNextSeason(state.season);
       if (state.season == "spring") {
         state.year++;
       }
     }
   }
 
-  private calculateNextSeason(
-    _game: IGame,
-    currentSeason: SeasonKind,
-  ): SeasonKind {
+  private calculateNextSeason(currentSeason: SeasonKind): SeasonKind {
     switch (currentSeason) {
       case "spring":
         return "summer";

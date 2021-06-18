@@ -68,17 +68,5 @@ footer {
 
   & > section.row {
     @extend .g-2;
-
-    & > div.btn-container {
-      @extend .col-6;
-
-      & button {
-        @extend .btn, .w-100;
-
-        &.primary {
-          @extend .btn-primary;
-        }
-      }
-    }
   }
 }

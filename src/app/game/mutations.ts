@@ -1,8 +1,7 @@
 import { Ref, unref } from "vue";
-import { IMutation } from "./mutation";
 import { IResourceState as IState } from "../entities/resource";
 
-class ChangeAmountMutation implements IMutation {
+class ChangeAmountMutation {
   readonly entity: Ref<IState>;
   readonly intended: number;
   actual?: number;

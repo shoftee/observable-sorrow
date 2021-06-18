@@ -1,6 +1,6 @@
 import { LocalizationKey } from "../core/i18n";
 
-type Id = "catnip";
+export type ResourceId = "catnip";
 
 enum Rarity {
   Common,
@@ -42,17 +42,17 @@ enum Calculation {
   PerDay,
 }
 
-interface IMetadata {
-  readonly id: Id;
+export type ResourceMetadataType = {
+  readonly id: ResourceId;
   readonly title: LocalizationKey;
   readonly craftable: boolean;
   readonly calculation?: Calculation;
   readonly resetLogic: ResetLogic;
   readonly rarity: Rarity;
   readonly flags: Flags;
-}
+};
 
-const Metadata: Record<Id, IMetadata> = {
+export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   catnip: {
     id: "catnip",
     title: "resources.catnip.title",
@@ -63,5 +63,3 @@ const Metadata: Record<Id, IMetadata> = {
     flags: new Flags(Flag.DestroyedByApocalypse),
   },
 };
-
-export { Id as ResourceId, IMetadata as IResourceMetadata, Metadata };

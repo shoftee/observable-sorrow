@@ -1,16 +1,15 @@
-import { LimitId, Metadata } from "../_metadata/resource-limits";
-
-type Id = LimitId;
+import { LimitMetadata } from "../_metadata/limits";
+import { ResourceId } from "../_metadata/resources";
 
 interface IState {
-  readonly id: Id;
+  readonly id: ResourceId;
   value: number;
 }
 
-function newLimit(id: Id): IState {
+function newLimit(id: ResourceId): IState {
   return {
     id: id,
-    value: Metadata[id].base,
+    value: LimitMetadata[id].base,
   };
 }
 
