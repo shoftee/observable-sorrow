@@ -1,13 +1,21 @@
 <template>
   <div class="controls">
     <section class="row">
-      <os-button
-        :class="{ disabled: catnip.amount == catnip.capacity }"
-        @click="gatherCatnip()"
-      >
-        Gather button
+      <os-button @click="gatherCatnip()">
+        <template #default>Gather catnip</template>
+        <template #tooltip> Gather some catnip in the forest. </template>
       </os-button>
-      <os-button>Refine catnip</os-button>
+      <os-button :disabled="true" @click="refineCatnip()">
+        <template #default>Refine catnip</template>
+        <template #tooltip>
+          <div>Refine catnip into catnip wood.</div>
+          <hr />
+          <div class="clearfix">
+            <div class="float-start">catnip</div>
+            <div class="float-end">50</div>
+          </div>
+        </template>
+      </os-button>
     </section>
   </div>
 </template>
@@ -21,9 +29,7 @@ import Button from "../global/Button.vue";
 
 import { defineComponent } from "vue";
 export default defineComponent({
-  components: {
-    "os-button": Button,
-  },
+  components: { "os-button": Button },
   setup() {
     return {
       catnip: controls.get("catnip"),

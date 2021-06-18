@@ -1,8 +1,53 @@
 @import "/node_modules/bootstrap/scss/bootstrap.scss";
 
-// global defaults
+// global changes
 .btn {
   @extend .btn-light;
+}
+
+// tippy changes
+$tippy-bg-color: $light;
+$tippy-border-color: $dark;
+
+.tippy-box[data-theme~="light"] {
+  .tippy-arrow:before {
+    background-color: $tippy-bg-color;
+  }
+
+  &[data-placement^="top"] > .tippy-arrow::before {
+    border-top-color: $tippy-border-color;
+  }
+
+  &[data-placement^="bottom"] > .tippy-arrow::before {
+    border-bottom-color: $tippy-border-color;
+  }
+
+  &[data-placement^="left"] > .tippy-arrow::before {
+    border-left-color: $tippy-border-color;
+  }
+
+  &[data-placement^="right"] > .tippy-arrow::before {
+    border-right-color: $tippy-border-color;
+  }
+}
+
+@mixin tippy-shadow {
+  background-color: $light;
+  box-shadow: 0 0 20px 4px rgba(154, 161, 177, 0.15),
+    0 4px 40px -8px rgba(36, 40, 47, 0.25),
+    0 4px 4px -2px rgba(91, 94, 105, 0.15);
+}
+
+.tippy-box {
+  @include tippy-shadow();
+  & .card-body {
+    @extend .m-0, .p-0;
+  }
+}
+
+.tippy-content {
+  @include tippy-shadow();
+  @extend .p-3;
 }
 
 // remove overflow from flexbox

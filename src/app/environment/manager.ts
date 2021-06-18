@@ -10,10 +10,10 @@ import {
 } from "../_metadata/environment";
 
 class Manager implements IRegisterInGame {
-  private _state: Ref<State> = ref(new State()) as Ref<State>;
+  private refState: Ref<State> = ref(new State()) as Ref<State>;
 
   getState(): Ref<State> {
-    return readonly(this._state) as Ref<State>;
+    return readonly(this.refState) as Ref<State>;
   }
 
   getMeta(): IMetadata {
@@ -29,7 +29,7 @@ class Manager implements IRegisterInGame {
   }
 
   update(game: IGame, _tick: number): void {
-    const state = unref(this._state);
+    const state = unref(this.refState);
     state.dayOfSeason++;
     if (state.dayOfSeason >= Constants.DaysPerSeason) {
       state.dayOfSeason -= Constants.DaysPerSeason;
@@ -41,7 +41,7 @@ class Manager implements IRegisterInGame {
   }
 
   private calculateNextSeason(
-    game: IGame,
+    _game: IGame,
     currentSeason: SeasonKind,
   ): SeasonKind {
     switch (currentSeason) {

@@ -9,5 +9,9 @@ const app: App<Element> = createApp(AppComponent);
 import VueRx from "@nopr3d/vue-next-rx";
 app.use(VueRx);
 
+// add vue-tippy
+import useTippy from "./plugins/tippy";
+useTippy(app);
+
 // mount app to page
 app.mount("#app");
