@@ -4,7 +4,7 @@ import VueTippy from "vue-tippy";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light.css";
 
-function useTippy<TElement>(app: App<TElement>): App<TElement> {
+function applyTippy<TElement>(app: App<TElement>): App<TElement> {
   return app.use(VueTippy, {
     component: "tippy",
     defaultProps: {
@@ -17,4 +17,4 @@ function useTippy<TElement>(app: App<TElement>): App<TElement> {
   });
 }
 
-export default useTippy;
+export default applyTippy;

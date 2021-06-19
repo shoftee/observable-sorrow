@@ -3,12 +3,8 @@
     <section>
       <div class="d-flex flex-column align-items-stretch">
         <div class="p-2 align-self-stretch">
-          {{ season.id }}
+          {{ t(season) }}
         </div>
-        <!-- <div class="p-2">
-          Day <span>{{ state.dayOfSeason }}</span>
-        </div>
-        <div class="p-2 align-self-stretch">History</div> -->
       </div>
     </section>
   </div>
@@ -18,19 +14,19 @@
 import Os from "@/app/os";
 
 const environment = Os.states.environment();
+const text = Os.text.environment();
 
-import { defineComponent, unref } from "vue";
+import { computed, defineComponent, unref } from "vue";
+import { useI18n } from "vue-i18n";
 export default defineComponent({
-  data() {
+  setup() {
+    const state = environment.get();
+    const season = computed(() => text.season(unref(state).season));
     return {
-      state: environment.get(),
+      ...useI18n(),
+      state,
+      season,
     };
-  },
-  computed: {
-    season() {
-      const state = unref(environment.get());
-      return environment.meta().seasons[state.season];
-    },
   },
 });
 </script>

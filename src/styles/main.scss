@@ -5,6 +5,10 @@
   @extend .btn-light;
 }
 
+body {
+  @extend .user-select-none;
+}
+
 // tippy changes
 $tippy-bg-color: $light;
 $tippy-border-color: $dark;
@@ -31,23 +35,26 @@ $tippy-border-color: $dark;
   }
 }
 
-@mixin tippy-shadow {
+@mixin tippy-box-main {
+  border-radius: calc(0.25rem - 1px);
   background-color: $light;
   box-shadow: 0 0 20px 4px rgba(154, 161, 177, 0.15),
     0 4px 40px -8px rgba(36, 40, 47, 0.25),
     0 4px 4px -2px rgba(91, 94, 105, 0.15);
 }
 
-.tippy-box {
-  @include tippy-shadow();
-  & .card-body {
-    @extend .m-0, .p-0;
-  }
+.tippy-box[data-theme~="light"] {
+  @include tippy-box-main();
+  @extend .card, .bg-transparent;
 }
 
 .tippy-content {
-  @include tippy-shadow();
-  @extend .p-3;
+  @include tippy-box-main();
+  @extend .m-0, .p-0;
+
+  & .card-header {
+    @extend .px-3, .py-2;
+  }
 }
 
 // remove overflow from flexbox

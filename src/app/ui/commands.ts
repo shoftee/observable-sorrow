@@ -1,7 +1,10 @@
 import { unref } from "vue";
 import { IRegisterInGame, IGame } from "../systems/game";
 import { IResourceManager } from "../systems/resources";
-import { ICommandManager } from "./interfaces";
+
+interface ICommandManager {
+  gatherCatnip(): void;
+}
 
 class CommandManager implements ICommandManager, IRegisterInGame {
   resources!: IResourceManager;
@@ -17,4 +20,4 @@ class CommandManager implements ICommandManager, IRegisterInGame {
   }
 }
 
-export { CommandManager };
+export { ICommandManager, CommandManager };

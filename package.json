@@ -18,10 +18,12 @@
     "rxjs": "^6.0.0",
     "stack-typescript": "^1.0.4",
     "vue": "^3.0.0",
+    "vue-i18n": "^9.1.6",
     "vue-tippy": "^6.0.0-alpha.30"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
+    "@intlify/vue-i18n-loader": "^2.1.0",
     "@types/bootstrap": "^5.0.16",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",

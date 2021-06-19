@@ -1,5 +1,3 @@
-import { LocalizationKey } from "../core/i18n";
-
 const Constants = {
   TicksPerSecond: 5,
   SecondsPerDay: 2,
@@ -10,8 +8,8 @@ type WeatherKind = "none" | "warm" | "cold";
 type SeasonKind = "spring" | "summer" | "autumn" | "winter";
 
 type SeasonMetadataType = {
-  title: LocalizationKey;
   id: SeasonKind;
+  title: string;
 };
 
 interface IMetadata {

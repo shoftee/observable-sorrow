@@ -2,18 +2,23 @@
   <div class="controls">
     <section class="row">
       <os-button @click="gatherCatnip()">
-        <template #default>Gather catnip</template>
-        <template #tooltip> Gather some catnip in the forest. </template>
+        <template #default>{{ t("bonfire.gather-catnip.title") }}</template>
+        <template #tooltip>
+          <div class="card-header">
+            {{ t("bonfire.gather-catnip.desc") }}
+          </div>
+        </template>
       </os-button>
       <os-button :disabled="true" @click="refineCatnip()">
-        <template #default>Refine catnip</template>
+        <template #default>{{ t("bonfire.refine-catnip.title") }}</template>
         <template #tooltip>
-          <div>Refine catnip into catnip wood.</div>
-          <hr />
-          <div class="clearfix">
-            <div class="float-start">catnip</div>
-            <div class="float-end">50</div>
-          </div>
+          <div class="card-header">{{ t("bonfire.refine-catnip.desc") }}</div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item clearfix">
+              <div class="float-start">catnip</div>
+              <div class="float-end">50</div>
+            </li>
+          </ul>
         </template>
       </os-button>
     </section>
@@ -24,17 +29,15 @@
 import Os from "@/app/os";
 
 const commands = Os.commands;
-const states = Os.states;
 
 import Button from "../global/Button.vue";
 
 import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
 export default defineComponent({
   components: { "os-button": Button },
   setup() {
-    return {
-      catnip: states.resources().get("catnip"),
-    };
+    return { ...useI18n() };
   },
   methods: {
     gatherCatnip() {

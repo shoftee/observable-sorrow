@@ -3,7 +3,7 @@
     class="d-inline-flex align-items-center align-items-stretch resource-item"
   >
     <div class="name">
-      {{ item.id }}
+      <span>{{ t(title) }}</span>
       <!-- <span class="badge bg-danger badge-light">!</span> -->
     </div>
     <div class="mx-1 amount">{{ item.amount }}</div>
@@ -20,13 +20,21 @@
 
 <script lang="ts">
 import { IResourceState as IState } from "@/app/entities/resource";
+import { ResourceMetadata } from "@/app/_metadata/resources";
 import { defineComponent, PropType } from "vue";
+import { useI18n } from "vue-i18n";
 export default defineComponent({
   props: {
     item: {
       type: Object as PropType<IState>,
       required: true,
     },
+  },
+  setup(props) {
+    return {
+      ...useI18n(),
+      title: ResourceMetadata[props.item.id].title,
+    };
   },
 });
 </script>

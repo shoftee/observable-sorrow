@@ -10,8 +10,12 @@ import VueRx from "@nopr3d/vue-next-rx";
 app.use(VueRx);
 
 // add vue-tippy
-import useTippy from "./plugins/tippy";
-useTippy(app);
+import applyTippy from "./plugins/tippy";
+applyTippy(app);
+
+// add vue-i18n
+import applyI18n from "./plugins/vue-i18n";
+applyI18n(app);
 
 // mount app to page
 app.mount("#app");

@@ -1,10 +1,12 @@
 <template>
   <div class="card">
     <button class="btn shadow-none text-start" @click="show = !show">
-      <span>
-        Resources
-        <i v-if="!show" class="bi bi-arrows-expand"></i>
-      </span>
+      <div class="clearfix">
+        <span class="float-start"> {{ t("resources.section.title") }} </span>
+        <span class="float-end">
+          <i v-if="!show" class="bi bi-arrows-expand"></i
+        ></span>
+      </div>
     </button>
     <ul
       v-show="show"
@@ -23,9 +25,13 @@ const resources = Os.states.resources();
 
 import ResourceItem from "./ResourceItem.vue";
 import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
 export default defineComponent({
   components: {
     "os-resource-item": ResourceItem,
+  },
+  setup() {
+    return { ...useI18n() };
   },
   data: () => ({
     show: true,

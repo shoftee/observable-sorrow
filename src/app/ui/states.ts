@@ -1,9 +1,24 @@
+import { Ref } from "vue";
+import { IEnvironmentState } from "../entities/environment";
+import { IResourceState } from "../entities/resource";
 import { IRegisterInGame, IGame } from "../systems/game";
-import {
-  IEnvironmentAccessor,
-  IResourceAccessor,
-  IStateManager,
-} from "./interfaces";
+import { IEnvironmentMetadata } from "../_metadata/environment";
+import { ResourceId } from "../_metadata/resources";
+
+interface IResourceAccessor {
+  all(): Ref<IResourceState>[];
+  get(id: ResourceId): Ref<IResourceState>;
+}
+
+interface IEnvironmentAccessor {
+  get(): Ref<IEnvironmentState>;
+  meta(): IEnvironmentMetadata;
+}
+
+interface IStateManager {
+  resources(): IResourceAccessor;
+  environment(): IEnvironmentAccessor;
+}
 
 class StateManager implements IStateManager, IRegisterInGame {
   private resourceAccessor!: IResourceAccessor;
@@ -29,4 +44,4 @@ class StateManager implements IStateManager, IRegisterInGame {
   }
 }
 
-export { StateManager };
+export { IStateManager, StateManager };

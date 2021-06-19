@@ -1,5 +1,3 @@
-import { LocalizationKey } from "../core/i18n";
-
 export type ResourceId = "catnip";
 
 enum Rarity {
@@ -44,7 +42,7 @@ enum Calculation {
 
 export type ResourceMetadataType = {
   readonly id: ResourceId;
-  readonly title: LocalizationKey;
+  readonly title: string;
   readonly craftable: boolean;
   readonly calculation?: Calculation;
   readonly resetLogic: ResetLogic;
