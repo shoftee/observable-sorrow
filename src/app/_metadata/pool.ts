@@ -1,15 +1,18 @@
-import { EnvironmentMetadata, IEnvironmentMetadata } from "./environment";
-import { LimitMetadata, LimitMetadataType } from "./limits";
+import {
+  EnvironmentMetadata,
+  IEnvironmentMetadata,
+} from "../environment/metadata";
+import { RecipeId, RecipeMetadata, RecipeMetadataType } from "./recipes";
 import {
   ResourceMetadataType,
   ResourceId,
   ResourceMetadata,
-} from "./resources";
+} from "../resources/metadata";
 
 class MetadataPool {
   environment: IEnvironmentMetadata = EnvironmentMetadata;
   resources: Record<ResourceId, ResourceMetadataType> = ResourceMetadata;
-  limits: Record<ResourceId, LimitMetadataType> = LimitMetadata;
+  recipes: Record<RecipeId, RecipeMetadataType> = RecipeMetadata;
 }
 
 export { MetadataPool };

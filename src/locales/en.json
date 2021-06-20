@@ -1,5 +1,7 @@
 {
   "resources.section.title": "Resources",
+  "resources.section.empty": "Your paws are empty and cold.",
+
   "resources.catnip.title": "catnip",
 
   "environment.seasons.spring.title": "Spring",

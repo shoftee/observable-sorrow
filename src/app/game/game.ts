@@ -1,50 +1,90 @@
 import { MetadataPool } from "../_metadata/pool";
-import { LimitsManager } from "../limits/manager";
-import { EnvironmentManager } from "../environment/manager";
-import { ResourceManager } from "../resources/manager";
-import { TimeManager } from "../time/manager";
+import { ResourceManager } from "../entities/resources";
+import { EnvironmentEntity } from "../environment";
 
 import { StateManager } from "../ui/states";
 import { CommandManager } from "../ui/commands";
 import { TextManager } from "../ui/text";
 import { IGame, IRegisterInGame } from "../systems/game";
+import { GameUpdater } from "./updater";
+import { SystemTimestampProvider } from "../components/common";
+import { IUiGame } from "../ui/game";
+import { EnvironmentPresenter } from "../ui/environment";
 
 class Game implements IGame {
   readonly metadata: MetadataPool = new MetadataPool();
-  readonly time: TimeManager = new TimeManager();
-  readonly environment: EnvironmentManager = new EnvironmentManager();
+  readonly environment: EnvironmentEntity = new EnvironmentEntity();
   readonly resources: ResourceManager = new ResourceManager();
-  readonly limits: LimitsManager = new LimitsManager();
 
+  constructor() {
+    this.register(this.resources);
+  }
+
+  register(target: IRegisterInGame): void {
+    target.register(this);
+  }
+
+  init(): IUiGame {
+    this.environment.init();
+
+    return new UiGame(this);
+  }
+
+  private updater?: GameUpdater;
+
+  start(): void {
+    this.updater = new GameUpdater(
+      (deltaTime) => this.update(deltaTime),
+      new SystemTimestampProvider(),
+    );
+    this.updater.start();
+  }
+
+  stop(): void {
+    this.updater?.stop();
+  }
+
+  private update(deltaTime: number): void {
+    this.environment.update(deltaTime);
+  }
+
+  forceUpdate(): void {
+    this.updater?.force();
+  }
+}
+
+class UiGame implements IUiGame {
+  readonly game: Game;
+
+  readonly environment: EnvironmentPresenter = new EnvironmentPresenter();
   readonly commands: CommandManager = new CommandManager();
   readonly states: StateManager = new StateManager();
   readonly text: TextManager = new TextManager();
 
-  constructor() {
-    this.register(this.environment);
-    this.register(this.resources);
+  constructor(game: Game) {
+    this.game = game;
 
+    this.register(this.environment);
     this.register(this.commands);
     this.register(this.states);
     this.register(this.text);
   }
 
-  private register(target: IRegisterInGame) {
-    target.register(this);
+  private register(manager: IRegisterInGame) {
+    this.game.register(manager);
   }
 
   start(): void {
-    this.update(0);
-    this.time.every().subscribe({
-      next: (tick) => this.update(tick),
-    });
-    this.time.start();
+    this.game.start();
   }
 
-  private update(tick: number): void {
-    this.resources.update(tick);
-    //
+  stop(): void {
+    this.game.stop();
+  }
+
+  forceUpdate(): void {
+    this.game.forceUpdate();
   }
 }
 
-export { Game };
+export { Game, UiGame };

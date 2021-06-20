@@ -1,19 +1,12 @@
-const Constants = {
-  TicksPerSecond: 5,
-  SecondsPerDay: 2,
-  DaysPerSeason: 100,
-};
-
-type WeatherKind = "none" | "warm" | "cold";
-type SeasonKind = "spring" | "summer" | "autumn" | "winter";
+type SeasonId = "spring" | "summer" | "autumn" | "winter";
 
 type SeasonMetadataType = {
-  id: SeasonKind;
+  id: SeasonId;
   title: string;
 };
 
 interface IMetadata {
-  seasons: Record<SeasonKind, SeasonMetadataType>;
+  seasons: Record<SeasonId, SeasonMetadataType>;
 }
 
 const Metadata: IMetadata = {
@@ -38,9 +31,7 @@ const Metadata: IMetadata = {
 };
 
 export {
-  Constants as EnvironmentConstants,
-  SeasonKind,
-  WeatherKind,
+  SeasonId as SeasonId,
   Metadata as EnvironmentMetadata,
   IMetadata as IEnvironmentMetadata,
 };

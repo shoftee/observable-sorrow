@@ -19,8 +19,8 @@
 </template>
 
 <script lang="ts">
-import { IResourceState as IState } from "@/app/entities/resource";
-import { ResourceMetadata } from "@/app/_metadata/resources";
+import { IResourceState as IState } from "@/app/components/resource";
+import { ResourceMetadata } from "@/app/resources/metadata";
 import { defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
 export default defineComponent({
@@ -31,10 +31,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    return {
-      ...useI18n(),
-      title: ResourceMetadata[props.item.id].title,
-    };
+    const resourceTitle = ResourceMetadata[props.item.id].title;
+    const { t } = { ...useI18n() };
+    return { t, title: resourceTitle };
   },
 });
 </script>

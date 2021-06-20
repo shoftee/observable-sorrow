@@ -1,9 +1,9 @@
 <template>
-  <div class="card align-self-stretch">
+  <div class="d-flex flex-column card align-self-stretch">
     <section>
       <div class="d-flex flex-column align-items-stretch">
         <div class="p-2 align-self-stretch">
-          {{ t(season) }}
+          {{ t(season.title) }} - {{ state.dayOfSeason }}
         </div>
       </div>
     </section>
@@ -13,20 +13,18 @@
 <script lang="ts">
 import Os from "@/app/os";
 
-const environment = Os.states.environment();
+const states = Os.environment;
 const text = Os.text.environment();
 
 import { computed, defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
 export default defineComponent({
   setup() {
-    const state = environment.get();
+    const state = states.calendar();
     const season = computed(() => text.season(unref(state).season));
-    return {
-      ...useI18n(),
-      state,
-      season,
-    };
+    const { t } = { ...useI18n() };
+
+    return { t, state, season };
   },
 });
 </script>

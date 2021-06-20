@@ -1,5 +1,5 @@
 import { Ref, unref } from "vue";
-import { IResourceState as IState } from "../entities/resource";
+import { IResourceState as IState } from "../components/resource";
 
 class ChangeAmountMutation {
   readonly entity: Ref<IState>;

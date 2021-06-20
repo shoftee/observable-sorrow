@@ -1,4 +1,4 @@
-import { ResourceId as Id } from "../_metadata/resources";
+import { ResourceId as Id } from "../resources/metadata";
 
 interface IState {
   readonly id: Id;

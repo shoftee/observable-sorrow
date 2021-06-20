@@ -1,5 +1,5 @@
 <template>
-  <div class="controls">
+  <div class="d-flex flex-column controls">
     <section class="row">
       <os-button @click="gatherCatnip()">
         <template #default>{{ t("bonfire.gather-catnip.title") }}</template>
@@ -37,7 +37,8 @@ import { useI18n } from "vue-i18n";
 export default defineComponent({
   components: { "os-button": Button },
   setup() {
-    return { ...useI18n() };
+    const { t } = { ...useI18n() };
+    return { t };
   },
   methods: {
     gatherCatnip() {

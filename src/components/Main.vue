@@ -1,17 +1,17 @@
 <template>
   <main class="d-flex flex-row shrinkable">
     <div class="shrinkable col p-2">
-      <div class="d-flex flex-column">
+      <div>
         <os-resources />
       </div>
     </div>
     <div class="shrinkable col-5 p-2">
-      <div class="d-flex flex-column">
+      <div>
         <os-controls />
       </div>
     </div>
     <div class="shrinkable col p-2">
-      <div class="d-flex flex-column">
+      <div>
         <os-environment />
       </div>
     </div>

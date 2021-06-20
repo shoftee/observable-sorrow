@@ -1,6 +1,6 @@
 import { Ref } from "vue";
-import { ILimitState } from "../entities/resource-limit";
-import { ResourceId } from "../_metadata/resources";
+import { ILimitState } from "../components/limit";
+import { ResourceId } from "../resources/metadata";
 
 interface ILimitsManager {
   getState(id: ResourceId): Ref<ILimitState>;

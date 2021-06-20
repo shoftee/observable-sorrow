@@ -1,12 +1,8 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column">
-    <header class="d-flex">
-      <div>
-        Observable Sorrow
-        <span class="badge bg-success text-uppercase"
-          ><i class="bi bi-droplet"></i> beta</span
-        >
-      </div>
+    <header class="d-flex d-row align-items-center gap-1">
+      <div>Observable Sorrow</div>
+      <div class="badge bg-success"><i class="bi bi-droplet"></i> &beta;</div>
     </header>
     <os-main class="h-100" />
     <footer class="d-flex flex-row justify-content-end">
