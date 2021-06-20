@@ -1,41 +1,28 @@
 export type ResourceId = "catnip";
 
-enum Rarity {
+export enum Rarity {
   Common,
   Uncommon,
   Rare,
   Exotic,
 }
 
-enum ResetLogic {
+export enum ResetLogic {
   Chronospheres,
   Disappears,
   KeptAsIs,
 }
 
-enum Flag {
+export enum Flag {
   DestroyedByApocalypse,
   BaseMetal,
   ImprovedByMagneto,
   RelockedWhenDepleted,
 }
 
-class Flags {
-  flags: { [key in keyof typeof Flag]: boolean } = {
-    BaseMetal: false,
-    DestroyedByApocalypse: false,
-    ImprovedByMagneto: false,
-    RelockedWhenDepleted: false,
-  };
+type Flags = Partial<{ [key in keyof typeof Flag]: boolean }>;
 
-  constructor(...flags: Flag[]) {
-    for (const flag of flags) {
-      this.flags[flag] = true;
-    }
-  }
-}
-
-enum Calculation {
+export enum CalculationRate {
   PerTick,
   PerDay,
 }
@@ -44,7 +31,7 @@ export type ResourceMetadataType = {
   readonly id: ResourceId;
   readonly title: string;
   readonly craftable: boolean;
-  readonly calculation?: Calculation;
+  readonly calculationRate?: CalculationRate;
   readonly resetLogic: ResetLogic;
   readonly rarity: Rarity;
   readonly flags: Flags;
@@ -55,10 +42,10 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     id: "catnip",
     title: "resources.catnip.title",
     craftable: false,
-    calculation: Calculation.PerTick,
+    calculationRate: CalculationRate.PerTick,
     resetLogic: ResetLogic.Chronospheres,
     rarity: Rarity.Common,
-    flags: new Flags(Flag.DestroyedByApocalypse),
+    flags: { [Flag.DestroyedByApocalypse]: true },
   },
 };
 

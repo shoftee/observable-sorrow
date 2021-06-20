@@ -1,6 +1,5 @@
-import { Ref, ref, unref, shallowReadonly } from "vue";
 import { TickerComponent } from "../components/common";
-import { IEntity, Entity } from "../ecs";
+import { Entity } from "../ecs";
 import { CalendarComponent, CalendarState } from "./calendar";
 import { SeasonId } from "./metadata";
 
@@ -9,40 +8,28 @@ const Constants = {
   DaysPerSeason: 100,
 };
 
-export interface IEnvironmentEntity extends IEntity {
-  calendar(): Ref<CalendarState>;
-}
-
-export class EnvironmentEntity extends Entity implements IEnvironmentEntity {
+export class EnvironmentEntity extends Entity {
   readonly id = "environment";
 
   private _ticker = new TickerComponent();
-  private _calendar = new CalendarComponent();
-
-  private _calendarRef!: Ref<CalendarState>;
+  calendar!: CalendarComponent;
 
   constructor() {
     super();
   }
 
-  calendar(): Ref<CalendarState> {
-    return shallowReadonly(this._calendarRef);
-  }
-
   init(): void {
-    this._ticker = new TickerComponent(Constants.TicksPerDay);
-    this.components.add(this._ticker);
+    this._ticker = this.components.add(
+      new TickerComponent(Constants.TicksPerDay),
+    );
 
-    this._calendar = new CalendarComponent();
-    this.components.add(this._calendar);
-
-    this._calendarRef = ref(this._calendar) as Ref<CalendarState>;
+    this.calendar = this.components.add(new CalendarComponent());
   }
 
   update(deltaTime: number): void {
     this._ticker.update(deltaTime);
     if (this._ticker.ticked) {
-      this.updateCalendar(unref(this._calendarRef));
+      this.updateCalendar(this.calendar);
     }
   }
 

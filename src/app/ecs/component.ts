@@ -28,31 +28,32 @@ export class ComponentPool implements Iterable<IComponent> {
     return this.pool;
   }
 
-  public add(component: IComponent): void {
+  public add<T extends IComponent>(component: T): T {
     this.pool.push(component);
     component.owner = this.owner;
+    return component;
   }
 
-  public get<C extends IComponent>(constr: Constructor<C>): C | undefined {
+  public get<T extends IComponent>(constr: Constructor<T>): T | undefined {
     for (const component of this.pool) {
       if (component instanceof constr) {
-        return component as C;
+        return component as T;
       }
     }
 
     return undefined;
   }
 
-  public remove<C extends IComponent>(constr: Constructor<C>): void {
-    const result = this.find<C>(constr);
+  public remove<T extends IComponent>(constr: Constructor<T>): void {
+    const result = this.find<T>(constr);
     if (result) {
       result.component.owner = undefined;
       this.pool.splice(result.index, 1);
     }
   }
 
-  public find<C extends IComponent>(
-    constr: Constructor<C>,
+  public find<T extends IComponent>(
+    constr: Constructor<T>,
   ): FindComponentResult | undefined {
     for (let index = 0; index < this.pool.length; index++) {
       const component = this.pool[index];
@@ -64,7 +65,7 @@ export class ComponentPool implements Iterable<IComponent> {
     return undefined;
   }
 
-  public contains<C extends IComponent>(constr: Constructor<C>): boolean {
+  public contains<T extends IComponent>(constr: Constructor<T>): boolean {
     for (const component of this.pool) {
       if (component instanceof constr) {
         return true;

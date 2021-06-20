@@ -1,5 +1,4 @@
-import { markRaw } from "vue";
-import { ComponentPool } from "./component";
+import { ComponentPool, IComponent } from "./component";
 import { IInit, IUpdate } from "./lifecycle";
 
 export interface IEntity {
@@ -15,7 +14,9 @@ export abstract class Entity implements IEntity, IInit, IUpdate {
 
   constructor() {
     this.components = new ComponentPool(this);
+  }
 
-    markRaw(this);
+  protected addComponent<T extends IComponent>(value: T): T {
+    return this.components.add(value);
   }
 }

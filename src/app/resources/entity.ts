@@ -1,40 +1,42 @@
-import { markRaw, ref, Ref } from "vue";
+import { Ref, unref } from "vue";
 import { ComponentState, Entity } from "../ecs";
 import { AmountComponent } from "./amount";
-import { ResourceId, ResourceMetadataType } from "./metadata";
-import { ResourcePool } from "./pool";
+import { Flag, ResourceId, ResourceMetadataType } from "./metadata";
 
 export type AmountState = ComponentState<AmountComponent>;
 
 export class ResourceEntity extends Entity {
   readonly id: ResourceId;
-  private readonly pool: ResourcePool;
   private readonly metadata: ResourceMetadataType;
 
-  constructor(pool: ResourcePool, metadata: ResourceMetadataType) {
+  amount!: AmountComponent;
+
+  constructor(metadata: ResourceMetadataType) {
     super();
     this.id = metadata.id;
 
-    this.pool = pool;
     this.metadata = metadata;
   }
 
   init(): void {
-    this.components.add(new AmountComponent());
-  }
-
-  getAmount(): Ref<AmountState> {
-    const c = this.components.get<AmountComponent>(AmountComponent);
-    return ref(c) as Ref<AmountState>;
+    this.amount = this.addComponent(new AmountComponent());
   }
 
   update(_deltaTime: number): void {
-    // for (const state of this.states.all()) {
-    //   const resource = unref(state);
-    //   const limit = this.metadata.limits[resource.id];
-    //   if (limit !== undefined) {
-    //     resource.capacity = limit.base;
-    //   }
-    // }
+    this.updateAmount(unref(this.amount));
+  }
+
+  updateAmount(amount: AmountComponent): void {
+    if (amount.value > 0) {
+      // all resources unlock once they reach positive amounts
+      if (!amount.unlocked) {
+        amount.unlocked = true;
+      }
+    } else {
+      // some resources re-lock when they are depleted
+      if (amount.unlocked && this.metadata.flags[Flag.RelockedWhenDepleted]) {
+        amount.unlocked = false;
+      }
+    }
   }
 }

@@ -12,7 +12,7 @@
           ></span>
         </div>
       </button>
-      <ul v-show="show" class="list-group list-group-flush">
+      <ul v-if="show" class="list-group list-group-flush">
         <os-resource-item
           v-for="resource in resources"
           :key="resource.id"
@@ -26,9 +26,9 @@
 
 <script lang="ts">
 import Os from "@/app/os";
-const resources = Os.states.resources();
+const resources = Os.resources;
 
-import { computed, defineComponent } from "vue";
+import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 
 import ResourceItem from "./ResourceItem.vue";
@@ -37,9 +37,10 @@ export default defineComponent({
     "os-resource-item": ResourceItem,
   },
   setup() {
-    const list = computed(() => resources.all());
     const { t } = { ...useI18n() };
-    return { t, show: true, resources: list };
+
+    const state = { show: true, resources: resources.unlocked };
+    return { t, ...state };
   },
 });
 </script>

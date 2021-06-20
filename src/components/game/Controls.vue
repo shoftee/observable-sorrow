@@ -26,10 +26,6 @@
 </template>
 
 <script lang="ts">
-import Os from "@/app/os";
-
-const commands = Os.commands;
-
 import Button from "../global/Button.vue";
 
 import { defineComponent } from "vue";
@@ -42,7 +38,7 @@ export default defineComponent({
   },
   methods: {
     gatherCatnip() {
-      commands.gatherCatnip();
+      //
     },
   },
 });

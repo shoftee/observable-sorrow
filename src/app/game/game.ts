@@ -1,33 +1,28 @@
 import { MetadataPool } from "../_metadata/pool";
-import { ResourceManager } from "../entities/resources";
-import { EnvironmentEntity } from "../environment";
-
-import { StateManager } from "../ui/states";
-import { CommandManager } from "../ui/commands";
-import { TextManager } from "../ui/text";
-import { IGame, IRegisterInGame } from "../systems/game";
-import { GameUpdater } from "./updater";
 import { SystemTimestampProvider } from "../components/common";
-import { IUiGame } from "../ui/game";
-import { EnvironmentPresenter } from "../ui/environment";
+import { EnvironmentEntity } from "../environment";
+import { ResourcePoolEntity } from "../resources";
+import { GamePresenter, GameUpdater } from ".";
 
-class Game implements IGame {
+interface IGame {
+  readonly environment: EnvironmentEntity;
+  readonly resources: ResourcePoolEntity;
+  readonly metadata: MetadataPool;
+}
+
+export class Game implements IGame {
   readonly metadata: MetadataPool = new MetadataPool();
   readonly environment: EnvironmentEntity = new EnvironmentEntity();
-  readonly resources: ResourceManager = new ResourceManager();
+  readonly resources: ResourcePoolEntity = new ResourcePoolEntity();
 
-  constructor() {
-    this.register(this.resources);
-  }
+  presenter?: GamePresenter;
 
-  register(target: IRegisterInGame): void {
-    target.register(this);
-  }
-
-  init(): IUiGame {
+  init(): GamePresenter {
     this.environment.init();
+    this.resources.init();
 
-    return new UiGame(this);
+    this.presenter = new GamePresenter(this);
+    return this.presenter;
   }
 
   private updater?: GameUpdater;
@@ -46,45 +41,12 @@ class Game implements IGame {
 
   private update(deltaTime: number): void {
     this.environment.update(deltaTime);
+    this.resources.update(deltaTime);
+
+    this.presenter?.render();
   }
 
   forceUpdate(): void {
     this.updater?.force();
   }
 }
-
-class UiGame implements IUiGame {
-  readonly game: Game;
-
-  readonly environment: EnvironmentPresenter = new EnvironmentPresenter();
-  readonly commands: CommandManager = new CommandManager();
-  readonly states: StateManager = new StateManager();
-  readonly text: TextManager = new TextManager();
-
-  constructor(game: Game) {
-    this.game = game;
-
-    this.register(this.environment);
-    this.register(this.commands);
-    this.register(this.states);
-    this.register(this.text);
-  }
-
-  private register(manager: IRegisterInGame) {
-    this.game.register(manager);
-  }
-
-  start(): void {
-    this.game.start();
-  }
-
-  stop(): void {
-    this.game.stop();
-  }
-
-  forceUpdate(): void {
-    this.game.forceUpdate();
-  }
-}
-
-export { Game, UiGame };

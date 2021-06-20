@@ -1,6 +1,5 @@
-import { ref, Ref, ComputedRef } from "vue";
+import { asEnumerable } from "linq-es2015";
 import { IEntity, ComponentPool } from ".";
-import { valuesRef } from "../_reactive";
 
 export abstract class EntityPool<TId extends string, TEntity extends IEntity>
   implements IEntity
@@ -8,12 +7,10 @@ export abstract class EntityPool<TId extends string, TEntity extends IEntity>
   abstract readonly id: string;
 
   private readonly pool: Map<TId, TEntity>;
-  private readonly poolRef: Ref<Map<TId, TEntity>>;
   readonly components: ComponentPool;
 
   constructor() {
     this.pool = new Map<TId, TEntity>();
-    this.poolRef = ref(this.pool) as Ref<Map<TId, TEntity>>;
     this.components = new ComponentPool(this);
   }
 
@@ -21,7 +18,20 @@ export abstract class EntityPool<TId extends string, TEntity extends IEntity>
     return this.pool.get(id);
   }
 
-  all(): ComputedRef<Iterable<TEntity>> {
-    return valuesRef(this.poolRef);
+  protected set(id: TId, entity: TEntity) {
+    this.pool.set(id, entity);
+  }
+
+  protected delete(id: TId) {
+    this.pool.delete(id);
+  }
+
+  all(predicate?: (e: TEntity) => boolean): Iterable<TEntity> {
+    const values = this.pool.values();
+    if (predicate) {
+      return asEnumerable(values).Where(predicate);
+    } else {
+      return values;
+    }
   }
 }

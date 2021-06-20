@@ -1,5 +1,7 @@
-import { Game } from "./game/game";
-import { IUiGame } from "./ui/game";
+import { Game, IGamePresenter } from "./game";
 
-const Instance: IUiGame = new Game().init();
-export default Instance;
+const presenter = new Game().init();
+presenter.render();
+
+const Presenter: IGamePresenter = presenter;
+export default Presenter;
