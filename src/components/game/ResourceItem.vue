@@ -19,14 +19,14 @@
 </template>
 
 <script lang="ts">
-import { IResourceListItemViewModel } from "@/app/resources";
+import { ListItem } from "@/app/resources";
 
 import { defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
 export default defineComponent({
   props: {
     item: {
-      type: Object as PropType<IResourceListItemViewModel>,
+      type: Object as PropType<ListItem>,
       required: true,
     },
   },

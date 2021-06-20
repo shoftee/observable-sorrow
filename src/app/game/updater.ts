@@ -1,4 +1,4 @@
-import { ITimestampProvider } from "../components/common";
+import { ITimestampProvider } from "../core/timestamp-provider";
 import { TimeConstants } from "../constants";
 
 type UpdateFunction = (deltaTime: number) => void;

@@ -1,4 +1,4 @@
-import { TickerComponent } from "../components/common";
+import { TickerComponent } from "../ecs/common/ticker";
 import { Entity } from "../ecs";
 import { CalendarComponent, CalendarState } from "./calendar";
 import { SeasonId } from "./metadata";

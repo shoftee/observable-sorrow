@@ -1,24 +1,6 @@
-import { TimeConstants } from "../constants";
-import { Component } from "../ecs";
-import mathx from "../utils/mathx";
-
-export interface ITimestampProvider {
-  millis(): number;
-}
-
-export class SystemTimestampProvider implements ITimestampProvider {
-  millis(): number {
-    return Date.now();
-  }
-}
-
-export abstract class TimeAwareComponent extends Component {
-  readonly provider: ITimestampProvider;
-  constructor(provider?: ITimestampProvider) {
-    super();
-    this.provider = provider ?? new SystemTimestampProvider();
-  }
-}
+import { TimeConstants } from "../../constants";
+import { Component } from "..";
+import mathx from "../../utils/mathx";
 
 export class TickerComponent extends Component {
   /** Fractional ticks (0.001 precision) */

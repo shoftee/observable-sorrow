@@ -1,11 +1,11 @@
-import { asEnumerable } from "linq-es2015";
-import { Ref, ref } from "vue";
+import { Ref, ref, unref } from "vue";
 import { ResourceId, ResourceMetadataType, ResourcePoolEntity } from ".";
 import { IRender } from "../ecs";
-import { IGame, IRegisterInGame } from "../systems/game";
+import { IGame, IRegisterInGame } from "../game";
+import { ResourceEntity } from "./entity";
 
 export interface IResourcePresenter {
-  readonly unlocked: Ref<IResourceListItemViewModel[]>;
+  readonly unlocked: Ref<ListItem[]>;
 }
 
 export class ResourcePresenter
@@ -14,10 +14,10 @@ export class ResourcePresenter
   private pool!: ResourcePoolEntity;
   private metadata!: Record<ResourceId, ResourceMetadataType>;
 
-  readonly unlocked: Ref<IResourceListItemViewModel[]>;
+  readonly unlocked: Ref<ListItem[]>;
 
   constructor() {
-    this.unlocked = ref([]) as Ref<IResourceListItemViewModel[]>;
+    this.unlocked = ref([]) as Ref<ListItem[]>;
   }
 
   register(game: IGame): void {
@@ -26,24 +26,51 @@ export class ResourcePresenter
   }
 
   render(): void {
-    const unlocked = asEnumerable(this.pool.all((e) => e.amount.unlocked));
-    const vms = unlocked
-      .Select(
-        (e) =>
-          <IResourceListItemViewModel>{
-            id: e.id,
-            title: this.metadata[e.id].title,
-            unlocked: e.amount.unlocked,
-            amount: e.amount.value,
-          },
-      )
-      .ToArray();
-    this.unlocked.value = vms;
+    const vm = unref(this.unlocked);
+
+    // Apply additions/deletions to view model.
+    this.pool.changes.applyChanges({
+      add: (id) => {
+        // todo: consider order
+        const entity = this.pool.get(id);
+        if (entity && this.isUnlocked(entity)) {
+          vm.push(this.newListItem(entity));
+        }
+      },
+      delete: (id) => {
+        const index = vm.findIndex((item) => item.id == id);
+        vm.splice(index, 1);
+      },
+    });
+
+    // update resource properties
+    for (let item of vm) {
+      const entity = this.pool.get(item.id);
+      if (entity) {
+        ({ ...item } = { ...this.newListItem(entity) });
+      }
+    }
+    for (let index = 0; index < vm.length; index++) {
+      let item = vm[index];
+    }
+  }
+
+  private isUnlocked(e: ResourceEntity): boolean {
+    return e.amount.unlocked;
+  }
+
+  private newListItem(e: ResourceEntity) {
+    return <ListItem>{
+      id: e.id,
+      title: this.metadata[e.id].title,
+      unlocked: e.amount.unlocked,
+      amount: e.amount.value,
+    };
   }
 }
 
-export interface IResourceListItemViewModel {
-  readonly id: string;
+export interface ListItem {
+  readonly id: ResourceId;
   title: string;
   amount: number;
   capacity?: number;

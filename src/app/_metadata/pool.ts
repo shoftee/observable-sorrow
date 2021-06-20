@@ -2,7 +2,11 @@ import {
   EnvironmentMetadata,
   IEnvironmentMetadata,
 } from "../environment/metadata";
-import { RecipeId, RecipeMetadata, RecipeMetadataType } from "./recipes";
+import {
+  RecipeId,
+  RecipeMetadata,
+  RecipeMetadataType,
+} from "../workshop/metadata";
 import {
   ResourceMetadataType,
   ResourceId,

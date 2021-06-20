@@ -1,6 +1,6 @@
 import { EnvironmentPresenter, IEnvironmentPresenter } from "../environment";
 import { IResourcePresenter, ResourcePresenter } from "../resources";
-import { Game } from "./game";
+import { Game } from "./entity";
 
 export interface IGamePresenter {
   readonly environment: IEnvironmentPresenter;

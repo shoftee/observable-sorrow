@@ -1,7 +1,7 @@
 import { ref, Ref, unref } from "vue";
 import { IEnvironmentMetadata } from ".";
 import { IRender } from "../ecs";
-import { IGame, IRegisterInGame } from "../systems/game";
+import { IGame, IRegisterInGame } from "../game";
 import { EnvironmentEntity } from "./entity";
 
 export interface IEnvironmentPresenter {
@@ -24,11 +24,25 @@ export class EnvironmentPresenter implements IRegisterInGame, IRender {
 
   render(): void {
     const entity = this.entity.calendar;
-    this.calendar.value = <ICalendarViewModel>{
-      dayOfSeason: entity.dayOfSeason,
-      seasonTitle: this.metadata.seasons[entity.season].title,
-      year: entity.year,
-    };
+    const seasonTitle = this.metadata.seasons[entity.season].title;
+    if (this.calendar.value === undefined) {
+      this.calendar.value = <ICalendarViewModel>{
+        dayOfSeason: entity.dayOfSeason,
+        seasonTitle: seasonTitle,
+        year: entity.year,
+      };
+    } else {
+      const raw = unref(this.calendar);
+      if (raw.dayOfSeason != entity.dayOfSeason) {
+        raw.dayOfSeason = entity.dayOfSeason;
+      }
+      if (raw.seasonTitle != seasonTitle) {
+        raw.seasonTitle = seasonTitle;
+      }
+      if (raw.year != entity.year) {
+        raw.year = entity.year;
+      }
+    }
   }
 }
 

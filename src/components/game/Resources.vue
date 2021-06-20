@@ -1,12 +1,12 @@
 <template>
   <div class="card">
-    <div v-if="resources.length == 0" class="text-start p-2">
-      {{ t("resources.section.empty") }}
+    <div v-if="items.length == 0" class="text-start p-2">
+      <span>{{ t("resources.section.empty") }}</span>
     </div>
     <div v-else class="d-flex flex-column align-items-stretch">
       <button class="btn shadow-none" @click="show = !show">
         <div class="clearfix">
-          <span class="float-start"> {{ t("resources.section.title") }} </span>
+          <span class="float-start">{{ t("resources.section.title") }}</span>
           <span class="float-end">
             <i v-if="!show" class="bi bi-arrows-expand"></i
           ></span>
@@ -14,7 +14,7 @@
       </button>
       <ul v-if="show" class="list-group list-group-flush">
         <os-resource-item
-          v-for="resource in resources"
+          v-for="resource in items"
           :key="resource.id"
           :item="resource"
           class="p-1 small list-group-item"
@@ -28,7 +28,7 @@
 import Os from "@/app/os";
 const resources = Os.resources;
 
-import { defineComponent } from "vue";
+import { defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import ResourceItem from "./ResourceItem.vue";
@@ -38,9 +38,15 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-
-    const state = { show: true, resources: resources.unlocked };
-    return { t, ...state };
+    return {
+      t,
+      show: true,
+      items: unref(resources.unlocked),
+      messages: {
+        empty: t("resources.section.empty"),
+        title: t("resources.section.title"),
+      },
+    };
   },
 });
 </script>

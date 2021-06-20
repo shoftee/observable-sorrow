@@ -1,13 +1,17 @@
 import { MetadataPool } from "../_metadata/pool";
-import { SystemTimestampProvider } from "../components/common";
+import { SystemTimestampProvider } from "../core/timestamp-provider";
 import { EnvironmentEntity } from "../environment";
 import { ResourcePoolEntity } from "../resources";
 import { GamePresenter, GameUpdater } from ".";
 
-interface IGame {
+export interface IGame {
   readonly environment: EnvironmentEntity;
   readonly resources: ResourcePoolEntity;
   readonly metadata: MetadataPool;
+}
+
+export interface IRegisterInGame {
+  register(game: Game): void;
 }
 
 export class Game implements IGame {
