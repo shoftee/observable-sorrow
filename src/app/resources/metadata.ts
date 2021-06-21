@@ -1,4 +1,4 @@
-export type ResourceId = "catnip";
+export type ResourceId = "catnip" | "wood";
 
 export enum Rarity {
   Common,
@@ -47,6 +47,18 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     rarity: Rarity.Common,
     flags: { [Flag.DestroyedByApocalypse]: true },
   },
+  wood: {
+    id: "wood",
+    title: "resources.wood.title",
+    craftable: true,
+    calculationRate: CalculationRate.PerTick,
+    resetLogic: ResetLogic.Chronospheres,
+    rarity: Rarity.Common,
+    flags: {
+      [Flag.DestroyedByApocalypse]: true,
+      [Flag.ImprovedByMagneto]: true,
+    },
+  },
 };
 
 export type LimitMetadataType = {
@@ -56,6 +68,7 @@ export type LimitMetadataType = {
 
 export const LimitMetadata: Record<ResourceId, LimitMetadataType> = {
   catnip: { id: "catnip", base: 100 },
+  wood: { id: "wood", base: 100 },
   // wood: { id: "wood", base: 200 },
   // minerals: { id: "minerals", base: 250 },
   // coal: { id: "coal", base: 60 },

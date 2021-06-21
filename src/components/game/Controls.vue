@@ -9,14 +9,26 @@
           </div>
         </template>
       </os-button>
-      <os-button :disabled="true" @click="refineCatnip()">
+      <os-button :disabled="!recipe.fulfilled" @click="refineCatnip()">
         <template #default>{{ t("bonfire.refine-catnip.title") }}</template>
         <template #tooltip>
           <div class="card-header">{{ t("bonfire.refine-catnip.desc") }}</div>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item clearfix">
-              <div class="float-start">catnip</div>
-              <div class="float-end">50</div>
+            <li
+              v-for="ingredient in recipe.ingredients"
+              :key="ingredient.id"
+              class="list-group-item clearfix"
+              :class="{ 'text-danger': !ingredient.fulfilled }"
+            >
+              <div class="float-start">
+                {{ t("resources." + ingredient.id + ".title") }}
+              </div>
+              <div class="float-end">
+                <span v-show="!ingredient.fulfilled"
+                  >{{ ingredient.fulfillment }} /
+                </span>
+                {{ ingredient.requirement }}
+              </div>
             </li>
           </ul>
         </template>
@@ -26,10 +38,11 @@
 </template>
 
 <script lang="ts">
-import { Presenter } from "@/app/os";
-const workshop = Presenter.workshop;
+import { Presenter, Interactor } from "@/app/os";
+const presenter = Presenter.workshop;
+const interactor = Interactor.workshop;
 
-import { defineComponent } from "vue";
+import { defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Button from "../global/Button.vue";
@@ -37,14 +50,15 @@ export default defineComponent({
   components: { "os-button": Button },
   setup() {
     const { t } = { ...useI18n() };
-    return { t };
+    const recipe = unref(presenter.recipes).get("refine-catnip");
+    return { t, recipe };
   },
   methods: {
     gatherCatnip() {
-      workshop.gatherCatnip();
+      interactor.gatherCatnip();
     },
     refineCatnip() {
-      workshop.refineCatnip();
+      interactor.refineCatnip();
     },
   },
 });

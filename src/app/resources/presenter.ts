@@ -16,11 +16,11 @@ export interface IResourcePresenter extends IRender {
 }
 
 export class ResourcePresenter implements IResourcePresenter {
-  private metadata: Record<ResourceId, ResourceMetadataType>;
+  private readonly metadata: Record<ResourceId, ResourceMetadataType>;
 
   readonly unlocked: Ref<Map<ResourceId, ListItem>>;
 
-  constructor(private resources: ResourcePool) {
+  constructor(private readonly resources: ResourcePool) {
     this.metadata = ResourceMetadata;
 
     this.unlocked = ref(new Map<ResourceId, ListItem>()) as Ref<
@@ -71,11 +71,10 @@ export class ResourcePresenter implements IResourcePresenter {
     }
   }
 
-  private newListItem(e: ResourceEntity) {
-    return <ListItem>{
+  private newListItem(e: ResourceEntity): ListItem {
+    return {
       id: e.id,
       title: this.metadata[e.id].title,
-      unlocked: e.amount.unlocked,
       amount: e.amount.value,
     };
   }
@@ -85,5 +84,4 @@ export interface ListItem {
   readonly id: ResourceId;
   title: string;
   amount: number;
-  capacity?: number;
 }

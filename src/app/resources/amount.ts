@@ -11,6 +11,14 @@ export class CapacityComponent extends Component {
 }
 
 export class MutationComponent extends QueueComponent<number> {
+  debit(n: number): void {
+    this.enqueue(n);
+  }
+
+  credit(n: number): void {
+    this.enqueue(-n);
+  }
+
   sum(): number {
     let total = 0;
     this.consume((item) => {

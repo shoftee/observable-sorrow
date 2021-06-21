@@ -2,7 +2,7 @@ import { ResourceId } from "../resources/metadata";
 
 export type RecipeId = "gather-catnip" | "refine-catnip";
 
-type RecipeIngredientType = {
+type RecipeResourceType = {
   id: ResourceId;
   amount: number;
 };
@@ -11,7 +11,8 @@ export type RecipeMetadataType = {
   id: RecipeId;
   title: string;
   desc: string;
-  ingredients: RecipeIngredientType[];
+  ingredients: RecipeResourceType[];
+  results: RecipeResourceType[];
 };
 
 export const RecipeMetadata: Record<RecipeId, RecipeMetadataType> = {
@@ -19,14 +20,14 @@ export const RecipeMetadata: Record<RecipeId, RecipeMetadataType> = {
     id: "gather-catnip",
     title: "bonfire.gather-catnip.title",
     desc: "bonfire.gather-catnip.desc",
-    ingredients: [
-      // Free recipe.
-    ],
+    ingredients: [], // Free recipe.
+    results: [{ id: "catnip", amount: 1 }],
   },
   "refine-catnip": {
     id: "refine-catnip",
     title: "bonfire.refine-catnip.title",
     desc: "bonfire.refine-catnip.desc",
     ingredients: [{ id: "catnip", amount: 100 }],
+    results: [{ id: "wood", amount: 1 }],
   },
 };
