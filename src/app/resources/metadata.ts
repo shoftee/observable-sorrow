@@ -29,7 +29,7 @@ export enum CalculationRate {
 
 export type ResourceMetadataType = {
   readonly id: ResourceId;
-  readonly title: string;
+  readonly label: string;
   readonly craftable: boolean;
   readonly calculationRate?: CalculationRate;
   readonly resetLogic: ResetLogic;
@@ -40,7 +40,7 @@ export type ResourceMetadataType = {
 export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   catnip: {
     id: "catnip",
-    title: "resources.catnip.title",
+    label: "resources.catnip.label",
     craftable: false,
     calculationRate: CalculationRate.PerTick,
     resetLogic: ResetLogic.Chronospheres,
@@ -49,7 +49,7 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   },
   wood: {
     id: "wood",
-    title: "resources.wood.title",
+    label: "resources.wood.label",
     craftable: true,
     calculationRate: CalculationRate.PerTick,
     resetLogic: ResetLogic.Chronospheres,

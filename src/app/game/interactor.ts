@@ -1,9 +1,9 @@
-import { IWorkshopInteractor } from "../workshop";
+import { IBonfireInteractor } from "../bonfire";
 
 export interface IGameInteractor {
-  readonly workshop: IWorkshopInteractor;
+  readonly bonfire: IBonfireInteractor;
 }
 
 export class GameInteractor implements IGameInteractor {
-  constructor(readonly workshop: IWorkshopInteractor) {}
+  constructor(readonly bonfire: IBonfireInteractor) {}
 }

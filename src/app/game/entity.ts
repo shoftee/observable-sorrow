@@ -4,7 +4,7 @@ import { Environment, IEnvironmentPresenter } from "../environment";
 import { ResourcePool, ResourcePresenter } from "../resources";
 import { Workshop } from "../workshop/entity";
 import { GameUpdater, IGameRunner } from ".";
-import { WorkshopPresenter } from "../workshop";
+import { BonfirePresenter } from "../bonfire";
 
 export interface IGame {
   readonly runner: IGameRunner;
@@ -20,7 +20,7 @@ export class Game implements IGame {
     private readonly _workshop: Workshop,
     private readonly _environmentPresenter: IEnvironmentPresenter,
     private readonly _resourcesPresenter: ResourcePresenter,
-    private readonly _workshopPresenter: WorkshopPresenter,
+    private readonly _bonfirePresenter: BonfirePresenter,
   ) {
     this._updater = new GameUpdater(
       (dt) => this.update(dt),
@@ -46,6 +46,6 @@ export class Game implements IGame {
 
     this._environmentPresenter.render();
     this._resourcesPresenter.render();
-    this._workshopPresenter.render();
+    this._bonfirePresenter.render();
   }
 }

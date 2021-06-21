@@ -2,7 +2,7 @@ type SeasonId = "spring" | "summer" | "autumn" | "winter";
 
 type SeasonMetadataType = {
   id: SeasonId;
-  title: string;
+  label: string;
 };
 
 interface IMetadata {
@@ -13,19 +13,19 @@ const Metadata: IMetadata = {
   seasons: {
     spring: {
       id: "spring",
-      title: "environment.seasons.spring.title",
+      label: "environment.seasons.spring.label",
     },
     summer: {
       id: "summer",
-      title: "environment.seasons.summer.title",
+      label: "environment.seasons.summer.label",
     },
     autumn: {
       id: "autumn",
-      title: "environment.seasons.autumn.title",
+      label: "environment.seasons.autumn.label",
     },
     winter: {
       id: "winter",
-      title: "environment.seasons.winter.title",
+      label: "environment.seasons.winter.label",
     },
   },
 };

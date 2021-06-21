@@ -3,7 +3,7 @@
     class="d-inline-flex align-items-center align-items-stretch resource-item"
   >
     <div class="name">
-      <span>{{ t(item.title) }}</span>
+      <span>{{ t(item.label) }}</span>
       <!-- <span class="badge bg-danger badge-light">!</span> -->
     </div>
     <div class="mx-1 amount">{{ item.amount }}</div>
@@ -23,6 +23,7 @@ import { ListItem } from "@/app/resources";
 
 import { defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
+
 export default defineComponent({
   props: {
     item: {

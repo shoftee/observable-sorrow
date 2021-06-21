@@ -74,7 +74,7 @@ export class ResourcePresenter implements IResourcePresenter {
   private newListItem(e: ResourceEntity): ListItem {
     return {
       id: e.id,
-      title: this.metadata[e.id].title,
+      label: this.metadata[e.id].label,
       amount: e.amount.value,
     };
   }
@@ -82,6 +82,6 @@ export class ResourcePresenter implements IResourcePresenter {
 
 export interface ListItem {
   readonly id: ResourceId;
-  title: string;
+  label: string;
   amount: number;
 }

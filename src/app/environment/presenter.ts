@@ -16,7 +16,7 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
     this.metadata = EnvironmentMetadata;
     this.calendar = ref({
       dayOfSeason: 0,
-      season: this.metadata.seasons.spring.title,
+      season: this.metadata.seasons.spring.label,
       year: 0,
     }) as Ref<ICalendarViewModel>;
   }
@@ -28,9 +28,9 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
       raw.dayOfSeason = entity.dayOfSeason;
     }
 
-    const season = this.metadata.seasons[entity.season].title;
-    if (raw.season != season) {
-      raw.season = season;
+    const season = this.metadata.seasons[entity.season];
+    if (raw.season != season.label) {
+      raw.season = season.label;
     }
 
     if (raw.year != entity.year) {

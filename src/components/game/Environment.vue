@@ -3,7 +3,7 @@
     <section>
       <div class="d-flex flex-column align-items-stretch">
         <div class="p-2 align-self-stretch">
-          {{ t(vm.season) }}
+          {{ t(calendar.season) }}
         </div>
       </div>
     </section>
@@ -12,15 +12,15 @@
 
 <script lang="ts">
 import { Presenter } from "@/app/os";
-const environment = Presenter.environment;
 
-import { defineComponent } from "vue";
+import { defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
+
 export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
-
-    return { t, vm: environment.calendar };
+    const calendar = unref(Presenter.environment.calendar);
+    return { t, calendar };
   },
 });
 </script>

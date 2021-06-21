@@ -1,30 +1,32 @@
 <template>
   <div class="d-flex flex-column controls">
     <section class="row">
-      <os-button @click="gatherCatnip()">
-        <template #default>{{ t("bonfire.gather-catnip.title") }}</template>
+      <os-button
+        v-for="item in items.values()"
+        :key="item.id"
+        :disabled="!item.fulfilled"
+        @click="buildItem(item.id)"
+      >
+        <template #default>{{ t(item.label) }}</template>
         <template #tooltip>
           <div class="card-header">
-            {{ t("bonfire.gather-catnip.desc") }}
+            {{ t(item.description) }}
           </div>
-        </template>
-      </os-button>
-      <os-button :disabled="!recipe.fulfilled" @click="refineCatnip()">
-        <template #default>{{ t("bonfire.refine-catnip.title") }}</template>
-        <template #tooltip>
-          <div class="card-header">{{ t("bonfire.refine-catnip.desc") }}</div>
-          <ul class="list-group list-group-flush">
+          <ul
+            v-if="item.ingredients.length > 0"
+            class="list-group list-group-flush"
+          >
             <li
-              v-for="ingredient in recipe.ingredients"
+              v-for="ingredient in item.ingredients"
               :key="ingredient.id"
               class="list-group-item clearfix"
               :class="{ 'text-danger': !ingredient.fulfilled }"
             >
               <div class="float-start">
-                {{ t("resources." + ingredient.id + ".title") }}
+                {{ t(ingredient.label) }}
               </div>
               <div class="float-end">
-                <span v-show="!ingredient.fulfilled"
+                <span v-if="!ingredient.fulfilled"
                   >{{ ingredient.fulfillment }} /
                 </span>
                 {{ ingredient.requirement }}
@@ -38,9 +40,8 @@
 </template>
 
 <script lang="ts">
+import { BonfireItemId } from "@/app/bonfire/metadata";
 import { Presenter, Interactor } from "@/app/os";
-const presenter = Presenter.workshop;
-const interactor = Interactor.workshop;
 
 import { defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -50,15 +51,12 @@ export default defineComponent({
   components: { "os-button": Button },
   setup() {
     const { t } = { ...useI18n() };
-    const recipe = unref(presenter.recipes).get("refine-catnip");
-    return { t, recipe };
+    const items = unref(Presenter.bonfire.items);
+    return { t, items };
   },
   methods: {
-    gatherCatnip() {
-      interactor.gatherCatnip();
-    },
-    refineCatnip() {
-      interactor.refineCatnip();
+    buildItem(id: BonfireItemId) {
+      Interactor.bonfire.buildRecipe(id);
     },
   },
 });

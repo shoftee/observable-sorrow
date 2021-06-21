@@ -1,18 +1,18 @@
 {
-  "resources.section.title": "Resources",
+  "resources.section.label": "Resources",
   "resources.section.empty": "Your paws are empty.",
 
-  "resources.catnip.title": "catnip",
-  "resources.wood.title": "wood",
+  "resources.catnip.label": "catnip",
+  "resources.wood.label": "wood",
 
-  "environment.seasons.spring.title": "Spring",
-  "environment.seasons.summer.title": "Summer",
-  "environment.seasons.autumn.title": "Autumn",
-  "environment.seasons.winter.title": "Winter",
+  "environment.seasons.spring.label": "Spring",
+  "environment.seasons.summer.label": "Summer",
+  "environment.seasons.autumn.label": "Autumn",
+  "environment.seasons.winter.label": "Winter",
 
-  "bonfire.gather-catnip.title": "Gather catnip",
+  "bonfire.gather-catnip.label": "Gather catnip",
   "bonfire.gather-catnip.desc": "Gather some catnip in the forest.",
 
-  "bonfire.refine-catnip.title": "Refine catnip",
+  "bonfire.refine-catnip.label": "Refine catnip",
   "bonfire.refine-catnip.desc": "Refine catnip into catnip wood."
 }
