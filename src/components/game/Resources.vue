@@ -28,7 +28,7 @@
 import { Presenter } from "@/app/os";
 const resources = Presenter.resources;
 
-import { defineComponent, unref } from "vue";
+import { defineComponent, ref, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import ResourceItem from "./ResourceItem.vue";
@@ -40,7 +40,7 @@ export default defineComponent({
     const { t } = { ...useI18n() };
     return {
       t,
-      show: true,
+      show: ref(true),
       items: unref(resources.unlocked),
       messages: {
         empty: t("resources.section.empty"),

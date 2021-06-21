@@ -1,10 +1,14 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column">
-    <header class="d-flex d-row align-items-center gap-1">
+    <header
+      class="d-flex flex-row align-items-center justify-content-start gap-1"
+    >
       <div>Observable Sorrow</div>
       <div class="badge bg-success"><i class="bi bi-droplet"></i> &beta;</div>
     </header>
-    <os-main class="h-100" />
+    <main class="h-100 shrinkable d-flex justify-content-center">
+      <os-main class="w-100" />
+    </main>
     <footer class="d-flex flex-row justify-content-end">
       <div>
         Observable Sorrow is a clone of

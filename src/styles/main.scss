@@ -69,6 +69,10 @@ footer {
   @extend .px-2, .py-1, .bg-light;
 }
 
+.main-container {
+  max-width: 1920px;
+}
+
 // controls
 .controls {
   @extend .container;

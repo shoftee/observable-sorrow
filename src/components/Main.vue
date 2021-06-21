@@ -1,5 +1,5 @@
 <template>
-  <main class="d-flex flex-row shrinkable">
+  <div class="main-container d-flex flex-row shrinkable">
     <div class="shrinkable col p-2">
       <div>
         <os-resources />
@@ -15,7 +15,7 @@
         <os-environment />
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script lang="ts">
