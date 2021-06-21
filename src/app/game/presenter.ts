@@ -1,10 +1,14 @@
+import { Resolver } from "../core";
+import { IEntity, IInit } from "../ecs";
 import { EnvironmentPresenter, IEnvironmentPresenter } from "../environment";
 import { IResourcePresenter, ResourcePresenter } from "../resources";
+import { IWorkshopPresenter, WorkshopPresenter } from "../workshop/presenter";
 import { Game } from "./entity";
 
 export interface IGamePresenter {
   readonly environment: IEnvironmentPresenter;
   readonly resources: IResourcePresenter;
+  readonly workshop: IWorkshopPresenter;
 
   start(): void;
   stop(): void;
@@ -12,16 +16,21 @@ export interface IGamePresenter {
   render(): void;
 }
 
-export class GamePresenter implements IGamePresenter {
+export class GamePresenter implements IGamePresenter, IInit {
   private readonly game: Game;
 
   readonly environment: EnvironmentPresenter = new EnvironmentPresenter();
   readonly resources: ResourcePresenter = new ResourcePresenter();
+  readonly workshop: WorkshopPresenter = new WorkshopPresenter();
 
   constructor(game: Game) {
     this.game = game;
-    this.environment.register(this.game);
-    this.resources.register(this.game);
+  }
+
+  init(resolver: Resolver<IEntity>): void {
+    this.environment.init(resolver);
+    this.resources.init(resolver);
+    this.workshop.init(resolver);
   }
 
   start(): void {

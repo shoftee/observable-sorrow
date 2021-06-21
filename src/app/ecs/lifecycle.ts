@@ -1,5 +1,8 @@
+import { IEntity } from ".";
+import { Resolver } from "../core";
+
 export interface IInit {
-  init(): void;
+  init(resolver: Resolver<IEntity>): void;
 }
 
 export interface IUpdate {

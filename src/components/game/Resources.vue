@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div v-if="items.length == 0" class="text-start p-2">
+    <div v-if="items.size == 0" class="text-start p-2">
       <span>{{ t("resources.section.empty") }}</span>
     </div>
     <div v-else class="d-flex flex-column align-items-stretch">
@@ -14,7 +14,7 @@
       </button>
       <ul v-if="show" class="list-group list-group-flush">
         <os-resource-item
-          v-for="resource in items"
+          v-for="resource in items.values()"
           :key="resource.id"
           :item="resource"
           class="p-1 small list-group-item"

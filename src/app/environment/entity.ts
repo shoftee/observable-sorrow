@@ -1,7 +1,8 @@
 import { TickerComponent } from "../ecs/common/ticker";
-import { Entity } from "../ecs";
+import { Entity, IEntity } from "../ecs";
 import { CalendarComponent, CalendarState } from "./calendar";
 import { SeasonId } from "./metadata";
+import { Resolver } from "../core";
 
 const Constants = {
   TicksPerDay: 10,
@@ -16,14 +17,15 @@ export class EnvironmentEntity extends Entity {
 
   constructor() {
     super();
-  }
-
-  init(): void {
-    this._ticker = this.components.add(
+    this._ticker = this.addComponent(
       new TickerComponent(Constants.TicksPerDay),
     );
 
-    this.calendar = this.components.add(new CalendarComponent());
+    this.calendar = this.addComponent(new CalendarComponent());
+  }
+
+  init(_resolver: Resolver<IEntity>): void {
+    //
   }
 
   update(deltaTime: number): void {

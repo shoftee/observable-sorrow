@@ -30,6 +30,7 @@ import Button from "../global/Button.vue";
 
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
+import Presenter from "@/app/os";
 export default defineComponent({
   components: { "os-button": Button },
   setup() {
@@ -38,7 +39,12 @@ export default defineComponent({
   },
   methods: {
     gatherCatnip() {
-      //
+      Presenter.workshop.gatherCatnip();
+      Presenter.forceUpdate();
+    },
+    refineCatnip() {
+      Presenter.workshop.refineCatnip();
+      Presenter.forceUpdate();
     },
   },
 });

@@ -1,10 +1,21 @@
 import { Component } from "../ecs";
+import { QueueComponent } from "../ecs/common/queue-component";
 
 export class AmountComponent extends Component {
-  unlocked: boolean = false;
-  value: number = 0;
+  unlocked = false;
+  value = 0;
 }
 
 export class CapacityComponent extends Component {
-  capacity: number = 0;
+  capacity = 0;
+}
+
+export class MutationComponent extends QueueComponent<number> {
+  sum(): number {
+    let total = 0;
+    this.consume((item) => {
+      total += item;
+    });
+    return total;
+  }
 }

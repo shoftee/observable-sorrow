@@ -1,5 +1,5 @@
-import { ComponentPool, IComponent } from "./component";
-import { IInit, IUpdate } from "./lifecycle";
+import { Resolver } from "../core";
+import { IInit, IUpdate, ComponentPool, IComponent } from ".";
 
 export interface IEntity {
   readonly id: string;
@@ -7,14 +7,15 @@ export interface IEntity {
 
 export abstract class Entity implements IEntity, IInit, IUpdate {
   abstract readonly id: string;
-  abstract init(): void;
-  abstract update(deltaTime: number): void;
 
   readonly components: ComponentPool;
 
   constructor() {
     this.components = new ComponentPool(this);
   }
+
+  abstract init(resolver: Resolver<IEntity>): void;
+  abstract update(deltaTime: number): void;
 
   protected addComponent<T extends IComponent>(value: T): T {
     return this.components.add(value);

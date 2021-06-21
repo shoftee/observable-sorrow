@@ -1,32 +1,48 @@
-import { MetadataPool } from "../_metadata/pool";
 import { SystemTimestampProvider } from "../core/timestamp-provider";
 import { EnvironmentEntity } from "../environment";
 import { ResourcePoolEntity } from "../resources";
-import { GamePresenter, GameUpdater } from ".";
+import { GamePresenter, GameUpdater, EntityResolver } from ".";
+import { WorkshopEntity } from "../workshop/entity";
 
 export interface IGame {
   readonly environment: EnvironmentEntity;
   readonly resources: ResourcePoolEntity;
-  readonly metadata: MetadataPool;
-}
-
-export interface IRegisterInGame {
-  register(game: Game): void;
 }
 
 export class Game implements IGame {
-  readonly metadata: MetadataPool = new MetadataPool();
-  readonly environment: EnvironmentEntity = new EnvironmentEntity();
-  readonly resources: ResourcePoolEntity = new ResourcePoolEntity();
+  private entities = {
+    "resource-pool": new ResourcePoolEntity(),
+    environment: new EnvironmentEntity(),
+    workshop: new WorkshopEntity(),
+  };
+
+  private readonly resolver: EntityResolver;
+  constructor() {
+    this.resolver = new EntityResolver(this.entities);
+  }
 
   presenter?: GamePresenter;
 
   init(): GamePresenter {
-    this.environment.init();
-    this.resources.init();
+    for (const entity of Object.values(this.entities)) {
+      entity.init(this.resolver);
+    }
 
     this.presenter = new GamePresenter(this);
+    this.presenter.init(this.resolver);
     return this.presenter;
+  }
+
+  get resources(): ResourcePoolEntity {
+    return this.entities["resource-pool"];
+  }
+
+  get environment(): EnvironmentEntity {
+    return this.entities["environment"];
+  }
+
+  get workshop(): WorkshopEntity {
+    return this.entities["workshop"];
   }
 
   private updater?: GameUpdater;
@@ -44,6 +60,8 @@ export class Game implements IGame {
   }
 
   private update(deltaTime: number): void {
+    this.workshop.update(deltaTime);
+
     this.environment.update(deltaTime);
     this.resources.update(deltaTime);
 

@@ -1,14 +1,15 @@
 import { ref, Ref, unref } from "vue";
 import { IEnvironmentMetadata } from ".";
-import { IRender } from "../ecs";
-import { IGame, IRegisterInGame } from "../game";
+import { Resolver } from "../core";
+import { IEntity, IInit, IRender } from "../ecs";
 import { EnvironmentEntity } from "./entity";
+import { EnvironmentMetadata } from "./metadata";
 
 export interface IEnvironmentPresenter {
   readonly calendar: Ref<ICalendarViewModel>;
 }
 
-export class EnvironmentPresenter implements IRegisterInGame, IRender {
+export class EnvironmentPresenter implements IInit, IRender {
   private entity!: EnvironmentEntity;
   private metadata!: IEnvironmentMetadata;
   readonly calendar: Ref<ICalendarViewModel>;
@@ -17,9 +18,9 @@ export class EnvironmentPresenter implements IRegisterInGame, IRender {
     this.calendar = ref<ICalendarViewModel>() as Ref<ICalendarViewModel>;
   }
 
-  register(game: IGame): void {
-    this.metadata = game.metadata.environment;
-    this.entity = game.environment;
+  init(resolver: Resolver<IEntity>): void {
+    this.metadata = EnvironmentMetadata;
+    this.entity = resolver.get("environment", EnvironmentEntity);
   }
 
   render(): void {

@@ -1,57 +1,73 @@
+import { asEnumerable } from "linq-es2015";
 import { Ref, ref, unref } from "vue";
 import { ResourceId, ResourceMetadataType, ResourcePoolEntity } from ".";
-import { IRender } from "../ecs";
-import { IGame, IRegisterInGame } from "../game";
+import { Resolver } from "../core";
+import { IEntity, IInit, IRender } from "../ecs";
 import { ResourceEntity } from "./entity";
+import { ResourceMetadata } from "./metadata";
 
 export interface IResourcePresenter {
-  readonly unlocked: Ref<ListItem[]>;
+  readonly unlocked: Ref<Map<ResourceId, ListItem>>;
 }
 
-export class ResourcePresenter
-  implements IResourcePresenter, IRegisterInGame, IRender
-{
+export class ResourcePresenter implements IResourcePresenter, IInit, IRender {
   private pool!: ResourcePoolEntity;
   private metadata!: Record<ResourceId, ResourceMetadataType>;
 
-  readonly unlocked: Ref<ListItem[]>;
+  readonly unlocked: Ref<Map<ResourceId, ListItem>>;
 
   constructor() {
-    this.unlocked = ref([]) as Ref<ListItem[]>;
+    this.unlocked = ref(new Map<ResourceId, ListItem>()) as Ref<
+      Map<ResourceId, ListItem>
+    >;
   }
 
-  register(game: IGame): void {
-    this.metadata = game.metadata.resources;
-    this.pool = game.resources;
+  init(resolver: Resolver<IEntity>): void {
+    this.metadata = ResourceMetadata;
+
+    this.pool = resolver.get("resource-pool", ResourcePoolEntity);
   }
 
   render(): void {
     const vm = unref(this.unlocked);
 
-    // Apply additions/deletions to view model.
-    this.pool.changes.applyChanges({
-      add: (id) => {
-        // todo: consider order
-        const entity = this.pool.get(id);
-        if (entity && this.isUnlocked(entity)) {
-          vm.push(this.newListItem(entity));
-        }
-      },
-      delete: (id) => {
-        const index = vm.findIndex((item) => item.id == id);
-        vm.splice(index, 1);
-      },
-    });
+    const newIds = new Set<ResourceId>();
+    const updatedIds = new Set<ResourceId>();
+    const deletedIds = new Set<ResourceId>();
 
-    // update resource properties
-    for (let item of vm) {
-      const entity = this.pool.get(item.id);
-      if (entity) {
-        ({ ...item } = { ...this.newListItem(entity) });
+    const entities = asEnumerable(
+      this.pool.all((e) => e.amount.unlocked),
+    ).ToMap(
+      (e) => e.id,
+      (e) => e,
+    );
+
+    for (const entity of entities.values()) {
+      if (!vm.has(entity.id)) {
+        newIds.add(entity.id);
+      } else if (entity.changed) {
+        updatedIds.add(entity.id);
       }
     }
-    for (let index = 0; index < vm.length; index++) {
-      let item = vm[index];
+
+    for (const [key] of vm) {
+      if (!entities.has(key)) {
+        deletedIds.add(key);
+      }
+    }
+
+    // update resource properties
+    for (const key of vm.keys() as Iterable<ResourceId>) {
+      if (updatedIds.has(key)) {
+        vm.set(key, this.newListItem(this.pool.get(key)!));
+      } else if (deletedIds.has(key)) {
+        vm.delete(key);
+      }
+    }
+
+    for (const newId of newIds) {
+      const entity = this.pool.get(newId)!;
+      vm.set(newId, this.newListItem(entity));
     }
   }
 

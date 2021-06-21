@@ -1,4 +1,5 @@
-import { EntityPool, IInit, IUpdate } from "../ecs";
+import { Resolver } from "../core";
+import { EntityPool, IEntity, IInit, IUpdate } from "../ecs";
 import { ResourceEntity } from "./entity";
 import { ResourceId, ResourceMetadata, ResourceMetadataType } from "./metadata";
 
@@ -10,11 +11,11 @@ export class ResourcePoolEntity
 
   private metadata!: Record<ResourceId, ResourceMetadataType>;
 
-  init(): void {
+  init(resolver: Resolver<IEntity>): void {
     this.metadata = ResourceMetadata;
     for (const item of Object.values(this.metadata)) {
-      const entity = new ResourceEntity(item);
-      entity.init();
+      const entity = new ResourceEntity(this, item);
+      entity.init(resolver);
       this.set(item.id, entity);
     }
   }
