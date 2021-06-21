@@ -1,31 +1,31 @@
 import { asEnumerable } from "linq-es2015";
-import { Ref, ref, unref } from "vue";
-import { ResourceId, ResourceMetadataType, ResourcePoolEntity } from ".";
-import { Resolver } from "../core";
-import { IEntity, IInit, IRender } from "../ecs";
-import { ResourceEntity } from "./entity";
-import { ResourceMetadata } from "./metadata";
 
-export interface IResourcePresenter {
+import { Ref, ref, unref } from "vue";
+
+import { IRender } from "../ecs";
+import {
+  ResourceId,
+  ResourceEntity,
+  ResourceMetadata,
+  ResourceMetadataType,
+  ResourcePool,
+} from ".";
+
+export interface IResourcePresenter extends IRender {
   readonly unlocked: Ref<Map<ResourceId, ListItem>>;
 }
 
-export class ResourcePresenter implements IResourcePresenter, IInit, IRender {
-  private pool!: ResourcePoolEntity;
-  private metadata!: Record<ResourceId, ResourceMetadataType>;
+export class ResourcePresenter implements IResourcePresenter {
+  private metadata: Record<ResourceId, ResourceMetadataType>;
 
   readonly unlocked: Ref<Map<ResourceId, ListItem>>;
 
-  constructor() {
+  constructor(private resources: ResourcePool) {
+    this.metadata = ResourceMetadata;
+
     this.unlocked = ref(new Map<ResourceId, ListItem>()) as Ref<
       Map<ResourceId, ListItem>
     >;
-  }
-
-  init(resolver: Resolver<IEntity>): void {
-    this.metadata = ResourceMetadata;
-
-    this.pool = resolver.get("resource-pool", ResourcePoolEntity);
   }
 
   render(): void {
@@ -36,7 +36,7 @@ export class ResourcePresenter implements IResourcePresenter, IInit, IRender {
     const deletedIds = new Set<ResourceId>();
 
     const entities = asEnumerable(
-      this.pool.all((e) => e.amount.unlocked),
+      this.resources.all((e) => e.amount.unlocked),
     ).ToMap(
       (e) => e.id,
       (e) => e,
@@ -59,20 +59,16 @@ export class ResourcePresenter implements IResourcePresenter, IInit, IRender {
     // update resource properties
     for (const key of vm.keys() as Iterable<ResourceId>) {
       if (updatedIds.has(key)) {
-        vm.set(key, this.newListItem(this.pool.get(key)!));
+        vm.set(key, this.newListItem(this.resources.get(key)!));
       } else if (deletedIds.has(key)) {
         vm.delete(key);
       }
     }
 
     for (const newId of newIds) {
-      const entity = this.pool.get(newId)!;
+      const entity = this.resources.get(newId)!;
       vm.set(newId, this.newListItem(entity));
     }
-  }
-
-  private isUnlocked(e: ResourceEntity): boolean {
-    return e.amount.unlocked;
   }
 
   private newListItem(e: ResourceEntity) {

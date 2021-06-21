@@ -1,14 +1,10 @@
-import { unref } from "vue";
-import { ResourcePoolEntity } from ".";
-import { Resolver } from "../core";
-import { ComponentState, Entity, IEntity } from "../ecs";
+import { ComponentState, Entity } from "../ecs";
 import { AmountComponent, MutationComponent } from "./amount";
 import { Flag, ResourceId, ResourceMetadataType } from "./metadata";
 
 export type AmountState = ComponentState<AmountComponent>;
 
 export class ResourceEntity extends Entity {
-  private readonly pool: ResourcePoolEntity;
   private readonly metadata: ResourceMetadataType;
 
   readonly id: ResourceId;
@@ -20,19 +16,14 @@ export class ResourceEntity extends Entity {
     return this._changed;
   }
 
-  constructor(pool: ResourcePoolEntity, metadata: ResourceMetadataType) {
+  constructor(metadata: ResourceMetadataType) {
     super();
 
-    this.pool = pool;
     this.metadata = metadata;
 
     this.id = metadata.id;
     this.mutations = this.addComponent(new MutationComponent());
     this.amount = this.addComponent(new AmountComponent());
-  }
-
-  init(_resolver: Resolver<IEntity>): void {
-    //
   }
 
   update(_deltaTime: number): void {

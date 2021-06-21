@@ -1,54 +1,46 @@
 import { ref, Ref, unref } from "vue";
-import { IEnvironmentMetadata } from ".";
-import { Resolver } from "../core";
-import { IEntity, IInit, IRender } from "../ecs";
-import { EnvironmentEntity } from "./entity";
-import { EnvironmentMetadata } from "./metadata";
 
-export interface IEnvironmentPresenter {
+import { IRender } from "../ecs";
+import { Environment } from "./entity";
+import { EnvironmentMetadata, IEnvironmentMetadata } from "./metadata";
+
+export interface IEnvironmentPresenter extends IRender {
   readonly calendar: Ref<ICalendarViewModel>;
 }
 
-export class EnvironmentPresenter implements IInit, IRender {
-  private entity!: EnvironmentEntity;
-  private metadata!: IEnvironmentMetadata;
+export class EnvironmentPresenter implements IEnvironmentPresenter {
   readonly calendar: Ref<ICalendarViewModel>;
+  readonly metadata: IEnvironmentMetadata;
 
-  constructor() {
-    this.calendar = ref<ICalendarViewModel>() as Ref<ICalendarViewModel>;
-  }
-
-  init(resolver: Resolver<IEntity>): void {
+  constructor(private environment: Environment) {
     this.metadata = EnvironmentMetadata;
-    this.entity = resolver.get("environment", EnvironmentEntity);
+    this.calendar = ref({
+      dayOfSeason: 0,
+      season: this.metadata.seasons.spring.title,
+      year: 0,
+    }) as Ref<ICalendarViewModel>;
   }
 
   render(): void {
-    const entity = this.entity.calendar;
-    const seasonTitle = this.metadata.seasons[entity.season].title;
-    if (this.calendar.value === undefined) {
-      this.calendar.value = <ICalendarViewModel>{
-        dayOfSeason: entity.dayOfSeason,
-        seasonTitle: seasonTitle,
-        year: entity.year,
-      };
-    } else {
-      const raw = unref(this.calendar);
-      if (raw.dayOfSeason != entity.dayOfSeason) {
-        raw.dayOfSeason = entity.dayOfSeason;
-      }
-      if (raw.seasonTitle != seasonTitle) {
-        raw.seasonTitle = seasonTitle;
-      }
-      if (raw.year != entity.year) {
-        raw.year = entity.year;
-      }
+    const entity = this.environment.calendar;
+    const raw = unref(this.calendar);
+    if (raw.dayOfSeason != entity.dayOfSeason) {
+      raw.dayOfSeason = entity.dayOfSeason;
+    }
+
+    const season = this.metadata.seasons[entity.season].title;
+    if (raw.season != season) {
+      raw.season = season;
+    }
+
+    if (raw.year != entity.year) {
+      raw.year = entity.year;
     }
   }
 }
 
 export interface ICalendarViewModel {
   dayOfSeason: number;
-  seasonTitle: string;
+  season: string;
   year: number;
 }

@@ -1,21 +1,20 @@
-import { Resolver } from "../core";
-import { EntityPool, IEntity, IInit, IUpdate } from "../ecs";
+import { EntityPool, IUpdate } from "../ecs";
 import { ResourceEntity } from "./entity";
 import { ResourceId, ResourceMetadata, ResourceMetadataType } from "./metadata";
 
-export class ResourcePoolEntity
+export class ResourcePool
   extends EntityPool<ResourceId, ResourceEntity>
-  implements IInit, IUpdate
+  implements IUpdate
 {
   readonly id = "resource-pool";
 
-  private metadata!: Record<ResourceId, ResourceMetadataType>;
+  private readonly metadata: Record<ResourceId, ResourceMetadataType>;
 
-  init(resolver: Resolver<IEntity>): void {
+  constructor() {
+    super();
     this.metadata = ResourceMetadata;
     for (const item of Object.values(this.metadata)) {
-      const entity = new ResourceEntity(this, item);
-      entity.init(resolver);
+      const entity = new ResourceEntity(item);
       this.set(item.id, entity);
     }
   }

@@ -1,15 +1,14 @@
 import { TickerComponent } from "../ecs/common/ticker";
-import { Entity, IEntity } from "../ecs";
+import { Entity, IUpdate } from "../ecs";
 import { CalendarComponent, CalendarState } from "./calendar";
 import { SeasonId } from "./metadata";
-import { Resolver } from "../core";
 
 const Constants = {
   TicksPerDay: 10,
   DaysPerSeason: 100,
 };
 
-export class EnvironmentEntity extends Entity {
+export class Environment extends Entity implements IUpdate {
   readonly id = "environment";
 
   private _ticker = new TickerComponent();
@@ -22,10 +21,6 @@ export class EnvironmentEntity extends Entity {
     );
 
     this.calendar = this.addComponent(new CalendarComponent());
-  }
-
-  init(_resolver: Resolver<IEntity>): void {
-    //
   }
 
   update(deltaTime: number): void {

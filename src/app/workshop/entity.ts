@@ -1,23 +1,27 @@
-import { Resolver } from "../core";
-import { Entity, IEntity } from "../ecs";
+import { Entity, IUpdate } from "../ecs";
 import { QueueComponent } from "../ecs/common/queue-component";
-import { ResourcePoolEntity } from "../resources";
+import { ResourcePool } from "../resources";
 import { RecipeId, RecipeMetadataType } from "./metadata";
 
-export class WorkshopEntity extends Entity {
+export const WorkshopSymbol = Symbol("Workshop");
+
+export interface IWorkshop extends IUpdate {
+  order(id: RecipeId): void;
+}
+
+export class Workshop extends Entity implements IWorkshop {
   readonly id = "workshop";
 
   private readonly orders: RecipeInputComponent;
 
-  constructor() {
+  constructor(private resources: ResourcePool) {
     super();
+
     this.orders = this.addComponent(new RecipeInputComponent());
   }
 
-  private resources!: ResourcePoolEntity;
-
-  init(resolver: Resolver<IEntity>): void {
-    this.resources = resolver.get("resource-pool", ResourcePoolEntity);
+  order(id: RecipeId): void {
+    this.orders.enqueue(id);
   }
 
   update(_deltaTime: number): void {
@@ -32,10 +36,6 @@ export class WorkshopEntity extends Entity {
       }
     }
   }
-
-  order(id: RecipeId): void {
-    this.orders.enqueue(id);
-  }
 }
 
 export class RecipeEntity extends Entity {
@@ -43,17 +43,11 @@ export class RecipeEntity extends Entity {
 
   readonly inputs: RecipeInputComponent;
 
-  constructor(metadata: RecipeMetadataType) {
+  constructor(private resources: ResourcePool, metadata: RecipeMetadataType) {
     super();
     this.id = metadata.id;
 
     this.inputs = this.components.add(new RecipeInputComponent());
-  }
-
-  private resources!: ResourcePoolEntity;
-
-  init(resolver: Resolver<IEntity>): void {
-    this.resources = resolver.get("resource-pool", ResourcePoolEntity);
   }
 
   update(_deltaTime: number): void {
@@ -61,7 +55,6 @@ export class RecipeEntity extends Entity {
       switch (item) {
         case "gather-catnip": {
           const entity = this.resources.get("catnip")!;
-          console.log(entity);
           entity.mutations.enqueue(1);
         }
       }

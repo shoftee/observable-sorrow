@@ -1,7 +1,31 @@
-import { Game, IGamePresenter } from "./game";
+import { ResourcePool, ResourcePresenter } from "./resources";
+import { Environment, EnvironmentPresenter } from "./environment";
+import { Workshop, WorkshopPresenter } from "./workshop";
+import { Game } from "./game";
+import { GamePresenter, IGamePresenter } from "./game/presenter";
+import { IGameRunner } from "./game/runner";
 
-const presenter = new Game().init();
-presenter.render();
+const resourcePool = new ResourcePool();
+const environment = new Environment();
+const workshop = new Workshop(resourcePool);
+const environmentPresenter = new EnvironmentPresenter(environment);
+const resourcePresenter = new ResourcePresenter(resourcePool);
+const game = new Game(
+  resourcePool,
+  environment,
+  workshop,
+  environmentPresenter,
+  resourcePresenter,
+);
 
-const Presenter: IGamePresenter = presenter;
-export default Presenter;
+const runner = game.runner;
+
+const workshopPresenter = new WorkshopPresenter(workshop, runner);
+const presenter = new GamePresenter(
+  environmentPresenter,
+  resourcePresenter,
+  workshopPresenter,
+);
+
+export const Presenter: IGamePresenter = presenter;
+export const Runner: IGameRunner = runner;

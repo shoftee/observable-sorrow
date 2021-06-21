@@ -1,74 +1,48 @@
 import { SystemTimestampProvider } from "../core/timestamp-provider";
-import { EnvironmentEntity } from "../environment";
-import { ResourcePoolEntity } from "../resources";
-import { GamePresenter, GameUpdater, EntityResolver } from ".";
-import { WorkshopEntity } from "../workshop/entity";
+
+import { Environment, IEnvironmentPresenter } from "../environment";
+import { ResourcePool, ResourcePresenter } from "../resources";
+import { Workshop } from "../workshop/entity";
+import { GameUpdater, IGameRunner } from ".";
 
 export interface IGame {
-  readonly environment: EnvironmentEntity;
-  readonly resources: ResourcePoolEntity;
+  readonly runner: IGameRunner;
 }
 
 export class Game implements IGame {
-  private entities = {
-    "resource-pool": new ResourcePoolEntity(),
-    environment: new EnvironmentEntity(),
-    workshop: new WorkshopEntity(),
-  };
+  private readonly _updater: GameUpdater;
+  private readonly _runner: IGameRunner;
 
-  private readonly resolver: EntityResolver;
-  constructor() {
-    this.resolver = new EntityResolver(this.entities);
-  }
-
-  presenter?: GamePresenter;
-
-  init(): GamePresenter {
-    for (const entity of Object.values(this.entities)) {
-      entity.init(this.resolver);
-    }
-
-    this.presenter = new GamePresenter(this);
-    this.presenter.init(this.resolver);
-    return this.presenter;
-  }
-
-  get resources(): ResourcePoolEntity {
-    return this.entities["resource-pool"];
-  }
-
-  get environment(): EnvironmentEntity {
-    return this.entities["environment"];
-  }
-
-  get workshop(): WorkshopEntity {
-    return this.entities["workshop"];
-  }
-
-  private updater?: GameUpdater;
-
-  start(): void {
-    this.updater = new GameUpdater(
-      (deltaTime) => this.update(deltaTime),
+  constructor(
+    private readonly _resources: ResourcePool,
+    private readonly _environment: Environment,
+    private readonly _workshop: Workshop,
+    private readonly _environmentPresenter: IEnvironmentPresenter,
+    private readonly _resourcesPresenter: ResourcePresenter,
+  ) {
+    this._updater = new GameUpdater(
+      (dt) => this.update(dt),
       new SystemTimestampProvider(),
     );
-    this.updater.start();
+
+    this._runner = {
+      start: () => this._updater.start(),
+      stop: () => this._updater.stop(),
+      forceUpdate: () => this._updater.force(),
+    };
   }
 
-  stop(): void {
-    this.updater?.stop();
+  get runner(): IGameRunner {
+    return this._runner;
   }
 
   private update(deltaTime: number): void {
-    this.workshop.update(deltaTime);
+    this._workshop.update(deltaTime);
 
-    this.environment.update(deltaTime);
-    this.resources.update(deltaTime);
+    this._environment.update(deltaTime);
+    this._resources.update(deltaTime);
 
-    this.presenter?.render();
-  }
-
-  forceUpdate(): void {
-    this.updater?.force();
+    this._environmentPresenter.render();
+    this._resourcesPresenter.render();
   }
 }

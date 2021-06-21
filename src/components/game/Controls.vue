@@ -26,11 +26,13 @@
 </template>
 
 <script lang="ts">
-import Button from "../global/Button.vue";
+import { Presenter } from "@/app/os";
+const workshop = Presenter.workshop;
 
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
-import Presenter from "@/app/os";
+
+import Button from "../global/Button.vue";
 export default defineComponent({
   components: { "os-button": Button },
   setup() {
@@ -39,12 +41,10 @@ export default defineComponent({
   },
   methods: {
     gatherCatnip() {
-      Presenter.workshop.gatherCatnip();
-      Presenter.forceUpdate();
+      workshop.gatherCatnip();
     },
     refineCatnip() {
-      Presenter.workshop.refineCatnip();
-      Presenter.forceUpdate();
+      workshop.refineCatnip();
     },
   },
 });

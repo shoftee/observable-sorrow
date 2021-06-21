@@ -25,8 +25,8 @@
 </template>
 
 <script lang="ts">
-import Os from "@/app/os";
-const resources = Os.resources;
+import { Presenter } from "@/app/os";
+const resources = Presenter.resources;
 
 import { defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";

@@ -6,6 +6,7 @@ type UpdateFunction = (deltaTime: number) => void;
 export class GameUpdater {
   private readonly callback: UpdateFunction;
   private readonly timestampProvider: ITimestampProvider;
+
   private lastTimestamp = 0;
   private handle?: number;
 
@@ -23,14 +24,8 @@ export class GameUpdater {
     );
   }
 
-  private doUpdate(): void {
-    const now = this.timestampProvider.millis();
-    const delta = Math.round(now - this.lastTimestamp);
-    // ignore calls which happen impossibly soon (under 1ms)
-    if (delta > 0) {
-      this.lastTimestamp = now;
-      this.callback(delta);
-    }
+  stop(): void {
+    this.cancel();
   }
 
   /** Forces the game to update its internal state.
@@ -53,8 +48,14 @@ export class GameUpdater {
     return true;
   }
 
-  stop(): void {
-    this.cancel();
+  private doUpdate(): void {
+    const now = this.timestampProvider.millis();
+    const delta = Math.round(now - this.lastTimestamp);
+    // ignore calls which happen impossibly soon (under 1ms)
+    if (delta > 0) {
+      this.lastTimestamp = now;
+      this.callback(delta);
+    }
   }
 
   private cancel() {

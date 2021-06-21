@@ -1,6 +1,5 @@
 import { asEnumerable } from "linq-es2015";
 import { IEntity, ComponentPool } from ".";
-import { QueueComponent } from "./common/queue-component";
 
 export abstract class EntityPool<TId extends string, TEntity extends IEntity>
   implements IEntity

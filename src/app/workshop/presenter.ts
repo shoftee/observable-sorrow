@@ -1,21 +1,17 @@
-import { Resolver } from "../core";
-import { IEntity, IInit } from "../ecs";
-import { WorkshopEntity } from "./entity";
+import { IGameRunner } from "../game";
+import { IWorkshop } from "./entity";
 
 export interface IWorkshopPresenter {
   gatherCatnip(): void;
   refineCatnip(): void;
 }
 
-export class WorkshopPresenter implements IWorkshopPresenter, IInit {
-  private workshop!: WorkshopEntity;
-
-  init(resolver: Resolver<IEntity>): void {
-    this.workshop = resolver.get("workshop", WorkshopEntity);
-  }
+export class WorkshopPresenter implements IWorkshopPresenter {
+  constructor(private workshop: IWorkshop, private runner: IGameRunner) {}
 
   gatherCatnip(): void {
     this.workshop.order("gather-catnip");
+    this.runner.forceUpdate();
   }
 
   refineCatnip(): void {

@@ -15,14 +15,15 @@
 </template>
 
 <script lang="ts">
-import Main from "./components/Main.vue";
-import Os from "./app/os";
+import { Runner } from "./app/os";
 
 import { defineComponent } from "vue";
+
+import Main from "./components/Main.vue";
 export default defineComponent({
   components: { "os-main": Main },
   mounted() {
-    Os.start();
+    Runner.start();
   },
 });
 </script>
