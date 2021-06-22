@@ -1,5 +1,5 @@
 import { Component, ComponentState } from "@/app/ecs";
-import { SeasonId } from "./metadata";
+import { SeasonId } from "../core/metadata/environment";
 
 export class CalendarComponent extends Component {
   year = 0;

@@ -4,24 +4,27 @@ import {
   BonfireItemId,
   BonfireMetadata,
   BonfireMetadataType,
-} from "./metadata";
+} from "../core/metadata/bonfire";
+import { ResourcePool } from "../resources";
 
 export interface IBonfireInteractor {
-  buildRecipe(id: BonfireItemId): void;
+  buildItem(id: BonfireItemId): void;
 }
 
 export class BonfireInteractor implements IBonfireInteractor {
-  private readonly metadata: Record<BonfireItemId, BonfireMetadataType>;
-
   constructor(
+    private readonly resources: ResourcePool,
     private readonly workshop: Workshop,
     private readonly runner: IGameRunner,
-  ) {
-    this.metadata = BonfireMetadata;
-  }
+  ) {}
 
-  buildRecipe(id: BonfireItemId): void {
-    this.workshop.order(this.metadata[id].recipeId);
+  buildItem(id: BonfireItemId): void {
+    if (id == "gather-catnip") {
+      this.resources.get("catnip").mutations.debit(1);
+    } else if (id == "refine-catnip") {
+      this.workshop.order("refine-catnip");
+    }
+
     this.runner.forceUpdate();
   }
 }

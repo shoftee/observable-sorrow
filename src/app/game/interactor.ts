@@ -1,9 +1,9 @@
 import { IBonfireInteractor } from "../bonfire";
 
-export interface IGameInteractor {
+export interface IInteractorSystem {
   readonly bonfire: IBonfireInteractor;
 }
 
-export class GameInteractor implements IGameInteractor {
+export class InteractorSystem implements IInteractorSystem {
   constructor(readonly bonfire: IBonfireInteractor) {}
 }

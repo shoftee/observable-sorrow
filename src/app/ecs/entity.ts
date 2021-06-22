@@ -1,12 +1,6 @@
 import { IUpdate, ComponentPool, IComponent } from ".";
 
-export interface IEntity {
-  readonly id: string;
-}
-
-export abstract class Entity implements IEntity, IUpdate {
-  abstract readonly id: string;
-
+export abstract class Entity implements IUpdate {
   readonly components: ComponentPool;
 
   constructor() {

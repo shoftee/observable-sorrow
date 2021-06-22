@@ -1,7 +1,7 @@
 import { TickerComponent } from "../ecs/common/ticker";
 import { Entity, IUpdate } from "../ecs";
 import { CalendarComponent, CalendarState } from "./calendar";
-import { SeasonId } from "./metadata";
+import { SeasonId } from "../core/metadata/environment";
 
 const Constants = {
   TicksPerDay: 10,

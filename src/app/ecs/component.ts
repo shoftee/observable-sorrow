@@ -1,7 +1,7 @@
-import { IEntity } from "./entity";
+import { Entity } from "./entity";
 
 export interface IComponent {
-  owner?: IEntity;
+  owner?: Entity;
 }
 
 export type ComponentState<TComponent extends IComponent> = Omit<
@@ -10,5 +10,5 @@ export type ComponentState<TComponent extends IComponent> = Omit<
 >;
 
 export abstract class Component implements IComponent {
-  owner?: IEntity;
+  owner?: Entity;
 }

@@ -3,8 +3,8 @@ import { Environment, EnvironmentPresenter } from "./environment";
 import { ResourcePool, ResourcePresenter } from "./resources";
 import { Workshop } from "./workshop";
 import { Game } from "./game";
-import { GameInteractor, IGameInteractor } from "./game/interactor";
-import { GamePresenter, IGamePresenter } from "./game/presenter";
+import { InteractorSystem, IInteractorSystem } from "./game/interactor";
+import { PresenterSystem, IPresenterSystem } from "./game/presenter";
 import { IGameRunner } from "./game/runner";
 
 const resourcePool = new ResourcePool();
@@ -24,16 +24,16 @@ const game = new Game(
 
 const runner = game.runner;
 
-const presenter = new GamePresenter(
+const presenter = new PresenterSystem(
   bonfirePresenter,
   environmentPresenter,
   resourcePresenter,
 );
 
-const bonfireInteractor = new BonfireInteractor(workshop, runner);
-const interactor = new GameInteractor(bonfireInteractor);
+const bonfireInteractor = new BonfireInteractor(resourcePool, workshop, runner);
+const interactor = new InteractorSystem(bonfireInteractor);
 
 export const Runner: IGameRunner = runner;
 
-export const Interactor: IGameInteractor = interactor;
-export const Presenter: IGamePresenter = presenter;
+export const Interactor: IInteractorSystem = interactor;
+export const Presenter: IPresenterSystem = presenter;

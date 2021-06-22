@@ -1,4 +1,4 @@
 export * from "./calendar";
 export * from "./entity";
-export * from "./metadata";
+export * from "../core/metadata/environment";
 export * from "./presenter";

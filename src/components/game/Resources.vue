@@ -14,7 +14,7 @@
       </button>
       <ul v-if="show" class="list-group list-group-flush">
         <os-resource-item
-          v-for="resource in resources.values()"
+          v-for="resource in unlocked"
           :key="resource.id"
           :item="resource"
           class="p-1 small list-group-item"
@@ -38,13 +38,18 @@ export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
     const show = ref(true);
-    const resources = unref(Presenter.resources.unlocked);
-    const isEmpty = computed(() => resources.size == 0);
+    const resources = unref(Presenter.resources.items);
+
+    const unlocked = computed(() => {
+      return resources.filter((e) => e.unlocked);
+    });
+
+    const isEmpty = computed(() => unref(unlocked).length == 0);
     return {
       t,
       show,
       isEmpty,
-      resources,
+      unlocked,
       messages: {
         empty: t("resources.section.empty"),
         title: t("resources.section.label"),

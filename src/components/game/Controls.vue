@@ -18,7 +18,7 @@
           >
             <li
               v-for="ingredient in item.ingredients"
-              :key="ingredient.id"
+              :key="ingredient.resourceId"
               class="list-group-item clearfix"
               :class="{ 'text-danger': !ingredient.fulfilled }"
             >
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { BonfireItemId } from "@/app/bonfire/metadata";
+import { BonfireItemId } from "@/app/core/metadata/bonfire";
 import { Presenter, Interactor } from "@/app/os";
 
 import { defineComponent, unref } from "vue";
@@ -56,7 +56,7 @@ export default defineComponent({
   },
   methods: {
     buildItem(id: BonfireItemId) {
-      Interactor.bonfire.buildRecipe(id);
+      Interactor.bonfire.buildItem(id);
     },
   },
 });

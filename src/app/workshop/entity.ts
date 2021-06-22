@@ -1,47 +1,46 @@
 import { Entity, IUpdate } from "../ecs";
 import { QueueComponent } from "../ecs/common/queue-component";
 import { ResourcePool } from "../resources";
-import { RecipeId, RecipeMetadata, RecipeMetadataType } from "./metadata";
+import {
+  WorkshopRecipeId,
+  WorkshopRecipeMetadata,
+} from "../core/metadata/crafting";
 
 export const WorkshopSymbol = Symbol("Workshop");
 
 export interface IWorkshop extends IUpdate {
-  order(id: RecipeId): void;
+  order(id: WorkshopRecipeId): void;
 }
 
 export class Workshop extends Entity implements IWorkshop {
-  readonly id = "workshop";
-
-  private readonly metadata: Record<RecipeId, RecipeMetadataType>;
   private readonly orders: RecipeOrdersComponent;
 
-  constructor(private resources: ResourcePool) {
+  constructor(private readonly resources: ResourcePool) {
     super();
-    this.metadata = RecipeMetadata;
     this.orders = this.addComponent(new RecipeOrdersComponent());
   }
 
-  order(id: RecipeId): void {
+  order(id: WorkshopRecipeId): void {
     this.orders.enqueue(id);
     // todo: use microtask to update immediately?
   }
 
-  update(_deltaTime: number): void {
+  update(_dt: number): void {
     this.orders.consume((id) => this.build(id));
   }
 
-  private build(recipeId: RecipeId) {
+  private build(recipeId: WorkshopRecipeId) {
     // todo: check if enough ingredients first?
-    const recipe = this.metadata[recipeId];
+    const recipe = WorkshopRecipeMetadata[recipeId];
     for (const ingredient of recipe.ingredients) {
       const resource = this.resources.get(ingredient.id);
       resource.mutations.credit(ingredient.amount);
     }
-    for (const result of recipe.results) {
+    for (const result of recipe.products) {
       const resource = this.resources.get(result.id);
       resource.mutations.debit(result.amount);
     }
   }
 }
 
-export class RecipeOrdersComponent extends QueueComponent<RecipeId> {}
+export class RecipeOrdersComponent extends QueueComponent<WorkshopRecipeId> {}

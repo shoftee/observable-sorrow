@@ -2,7 +2,10 @@ import { ref, Ref, unref } from "vue";
 
 import { IRender } from "../ecs";
 import { Environment } from "./entity";
-import { EnvironmentMetadata, IEnvironmentMetadata } from "./metadata";
+import {
+  EnvironmentMetadata,
+  IEnvironmentMetadata,
+} from "../core/metadata/environment";
 
 export interface IEnvironmentPresenter extends IRender {
   readonly calendar: Ref<ICalendarViewModel>;

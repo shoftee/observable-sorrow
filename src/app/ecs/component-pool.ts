@@ -1,4 +1,4 @@
-import { IEntity } from "./entity";
+import { Entity } from "./entity";
 import { IComponent } from "./component";
 import { Constructor } from "../core";
 
@@ -7,7 +7,7 @@ type FindComponentResult = { component: IComponent; index: number };
 export class ComponentPool implements Iterable<IComponent> {
   private pool: IComponent[] = [];
 
-  constructor(readonly owner: IEntity) {}
+  constructor(readonly owner: Entity) {}
 
   [Symbol.iterator](): Iterator<IComponent> {
     return this.pool.values();

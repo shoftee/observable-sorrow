@@ -38,11 +38,11 @@ export class Game implements IGame {
     return this._runner;
   }
 
-  private update(deltaTime: number): void {
-    this._workshop.update(deltaTime);
+  private update(dt: number): void {
+    this._workshop.update(dt);
 
-    this._environment.update(deltaTime);
-    this._resources.update(deltaTime);
+    this._environment.update(dt);
+    this._resources.update(dt);
 
     this._environmentPresenter.render();
     this._resourcesPresenter.render();

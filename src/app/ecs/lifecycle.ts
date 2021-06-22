@@ -1,5 +1,5 @@
 export interface IUpdate {
-  update(deltaTime: number): void;
+  update(dt: number): void;
 }
 
 export interface IRender {

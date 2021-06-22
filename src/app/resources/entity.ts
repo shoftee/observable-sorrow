@@ -1,6 +1,10 @@
 import { ComponentState, Entity } from "../ecs";
 import { AmountComponent, MutationComponent } from "./amount";
-import { Flag, ResourceId, ResourceMetadataType } from "./metadata";
+import {
+  Flag,
+  ResourceId,
+  ResourceMetadataType,
+} from "../core/metadata/resources";
 
 export type AmountState = ComponentState<AmountComponent>;
 

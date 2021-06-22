@@ -1,15 +1,16 @@
 import { asEnumerable } from "linq-es2015";
-import { IEntity, ComponentPool } from ".";
+import { ComponentPool, Entity } from ".";
 
-export abstract class EntityPool<TId extends string, TEntity extends IEntity>
-  implements IEntity
-{
-  abstract readonly id: string;
-
+export abstract class EntityPool<
+  TId extends string,
+  TEntity extends Entity,
+> extends Entity {
   private readonly pool: Map<TId, TEntity>;
   readonly components: ComponentPool;
 
   constructor() {
+    super();
+
     this.pool = new Map<TId, TEntity>();
     this.components = new ComponentPool(this);
   }

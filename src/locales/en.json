@@ -11,8 +11,12 @@
   "environment.seasons.winter.label": "Winter",
 
   "bonfire.gather-catnip.label": "Gather catnip",
-  "bonfire.gather-catnip.desc": "Gather some catnip in the forest.",
+  "bonfire.gather-catnip.description": "Gather some catnip in the forest.",
 
   "bonfire.refine-catnip.label": "Refine catnip",
-  "bonfire.refine-catnip.desc": "Refine catnip into catnip wood."
+  "bonfire.refine-catnip.description": "Refine catnip into catnip wood.",
+
+  "bonfire.catnip-field.label": "Catnip field",
+  "bonfire.catnip-field.description": "Plant some catnip to grow in the village. Fields have increased production during Spring and decreased production during Winter.",
+  "bonfire.catnip-field.flavor": "'Nip as far as the eye can see."
 }
