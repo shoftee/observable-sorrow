@@ -1,11 +1,8 @@
 import { IGameRunner } from "../game";
 import { Workshop } from "../workshop/entity";
-import {
-  BonfireItemId,
-  BonfireMetadata,
-  BonfireMetadataType,
-} from "../core/metadata/bonfire";
+import { BonfireItemId, BonfireMetadata } from "../core/metadata/bonfire";
 import { ResourcePool } from "../resources";
+import { BuildingPool } from "../buildings/pool";
 
 export interface IBonfireInteractor {
   buildItem(id: BonfireItemId): void;
@@ -13,16 +10,20 @@ export interface IBonfireInteractor {
 
 export class BonfireInteractor implements IBonfireInteractor {
   constructor(
+    private readonly runner: IGameRunner,
+    private readonly buildings: BuildingPool,
     private readonly resources: ResourcePool,
     private readonly workshop: Workshop,
-    private readonly runner: IGameRunner,
   ) {}
 
   buildItem(id: BonfireItemId): void {
-    if (id == "gather-catnip") {
-      this.resources.get("catnip").mutations.debit(1);
-    } else if (id == "refine-catnip") {
+    const metadata = BonfireMetadata[id];
+    if (metadata.intent.kind == "gather-catnip") {
+      this.resources.get("catnip").mutations.give(1);
+    } else if (metadata.intent.kind == "refine-catnip") {
       this.workshop.order("refine-catnip");
+    } else {
+      this.buildings.buy(metadata.intent.buildingId);
     }
 
     this.runner.forceUpdate();

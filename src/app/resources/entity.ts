@@ -1,24 +1,22 @@
 import { ComponentState, Entity } from "../ecs";
-import { AmountComponent, MutationComponent } from "./amount";
+import { ChangeNotifierComponent, setAndNotify } from "../ecs/common";
+import { ResourceStateComponent, MutationComponent } from "./components";
 import {
   Flag,
   ResourceId,
   ResourceMetadataType,
 } from "../core/metadata/resources";
 
-export type AmountState = ComponentState<AmountComponent>;
+type State = ComponentState<ResourceStateComponent>;
+type ChangeNotifier = ChangeNotifierComponent<State>;
 
 export class ResourceEntity extends Entity {
   private readonly metadata: ResourceMetadataType;
 
   readonly id: ResourceId;
   readonly mutations: MutationComponent;
-  readonly amount: AmountComponent;
-
-  private _changed = false;
-  get changed() {
-    return this._changed;
-  }
+  readonly state: ResourceStateComponent;
+  readonly changes: ChangeNotifier;
 
   constructor(metadata: ResourceMetadataType) {
     super();
@@ -27,49 +25,40 @@ export class ResourceEntity extends Entity {
 
     this.id = metadata.id;
     this.mutations = this.addComponent(new MutationComponent());
-    this.amount = this.addComponent(new AmountComponent());
+    this.state = this.addComponent(new ResourceStateComponent());
+    this.changes = this.addComponent(new ChangeNotifierComponent());
   }
 
-  update(_deltaTime: number): void {
-    this._changed = false;
+  update(_dt: number): void {
+    this.updateAmount();
+    this.updateUnlocked();
+  }
 
-    const amount = this.amount;
+  private updateAmount() {
+    const current = this.state.amount;
+    const capacity = Number.POSITIVE_INFINITY; // finish later
 
-    const delta = this.calculateDelta(amount.value, this.mutations);
-    if (delta != 0) {
-      amount.value += delta;
-      this._changed = true;
-    }
+    // calculate delta from mutations
+    const delta = this.mutations.sum();
 
-    if (amount.value > 0) {
+    // determine new value, truncate
+    let newValue = current + delta;
+    newValue = Math.max(newValue, 0);
+    newValue = Math.min(newValue, capacity);
+
+    // set and notify
+    setAndNotify(this.state, this.changes, "amount", newValue);
+  }
+
+  private updateUnlocked() {
+    if (this.state.amount > 0) {
       // all resources unlock once they reach positive amounts
-      if (!amount.unlocked) {
-        amount.unlocked = true;
-        this._changed = true;
-      }
+      setAndNotify(this.state, this.changes, "unlocked", true);
     } else {
       // some resources re-lock when they are depleted
-      if (amount.unlocked && this.metadata.flags[Flag.RelockedWhenDepleted]) {
-        amount.unlocked = false;
-        this._changed = true;
+      if (this.metadata.flags[Flag.RelockedWhenDepleted]) {
+        setAndNotify(this.state, this.changes, "unlocked", false);
       }
     }
-  }
-
-  private calculateDelta(
-    current: number,
-    mutations: MutationComponent,
-    capacity?: number,
-  ) {
-    const change = mutations.sum();
-    let newValue = current + change;
-
-    // No negative values. For now.
-    newValue = Math.max(newValue, 0);
-
-    // No values past infinity. For now.
-    newValue = Math.min(newValue, capacity ?? Number.POSITIVE_INFINITY);
-
-    return newValue - current;
   }
 }

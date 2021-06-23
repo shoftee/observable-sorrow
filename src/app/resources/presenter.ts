@@ -28,8 +28,10 @@ export class ResourcePresenter implements IResourcePresenter {
   render(): void {
     for (const item of unref(this.items)) {
       const entity = this.resources.get(item.id);
-      item.amount = entity.amount.value;
-      item.unlocked = entity.amount.unlocked;
+      entity.changes.apply((key) => {
+        if (key == "unlocked") item.unlocked = entity.state.unlocked;
+        if (key == "amount") item.amount = entity.state.amount;
+      });
     }
   }
 
@@ -37,8 +39,8 @@ export class ResourcePresenter implements IResourcePresenter {
     return {
       id: e.id,
       label: ResourceMetadata[e.id].label,
-      amount: e.amount.value,
-      unlocked: e.amount.unlocked,
+      amount: e.state.amount,
+      unlocked: e.state.unlocked,
     };
   }
 }

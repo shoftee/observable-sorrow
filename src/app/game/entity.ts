@@ -5,6 +5,7 @@ import { ResourcePool, ResourcePresenter } from "../resources";
 import { Workshop } from "../workshop/entity";
 import { GameUpdater, IGameRunner } from ".";
 import { BonfirePresenter } from "../bonfire";
+import { BuildingPool } from "../buildings/pool";
 
 export interface IGame {
   readonly runner: IGameRunner;
@@ -15,8 +16,9 @@ export class Game implements IGame {
   private readonly _runner: IGameRunner;
 
   constructor(
-    private readonly _resources: ResourcePool,
+    private readonly _buildings: BuildingPool,
     private readonly _environment: Environment,
+    private readonly _resources: ResourcePool,
     private readonly _workshop: Workshop,
     private readonly _environmentPresenter: IEnvironmentPresenter,
     private readonly _resourcesPresenter: ResourcePresenter,
@@ -43,6 +45,7 @@ export class Game implements IGame {
 
     this._environment.update(dt);
     this._resources.update(dt);
+    this._buildings.update(dt);
 
     this._environmentPresenter.render();
     this._resourcesPresenter.render();

@@ -1,9 +1,9 @@
 import { Component } from "../ecs";
-import { QueueComponent } from "../ecs/common/queue-component";
+import { QueueComponent } from "../ecs/common";
 
-export class AmountComponent extends Component {
+export class ResourceStateComponent extends Component {
   unlocked = false;
-  value = 0;
+  amount = 0;
 }
 
 export class CapacityComponent extends Component {
@@ -11,11 +11,11 @@ export class CapacityComponent extends Component {
 }
 
 export class MutationComponent extends QueueComponent<number> {
-  debit(n: number): void {
+  give(n: number): void {
     this.enqueue(n);
   }
 
-  credit(n: number): void {
+  take(n: number): void {
     this.enqueue(-n);
   }
 

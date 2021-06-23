@@ -7,7 +7,10 @@
         :disabled="!item.fulfilled"
         @click="buildItem(item.id)"
       >
-        <template #default>{{ t(item.label) }}</template>
+        <template #default
+          >{{ t(item.label) }}
+          <span v-if="item.level > 0">({{ item.level }})</span>
+        </template>
         <template #tooltip>
           <div class="card-header">
             {{ t(item.description) }}
@@ -43,7 +46,7 @@
 import { BonfireItemId } from "@/app/core/metadata/bonfire";
 import { Presenter, Interactor } from "@/app/os";
 
-import { defineComponent, unref } from "vue";
+import { computed, defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Button from "../global/Button.vue";
@@ -52,7 +55,8 @@ export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
     const items = unref(Presenter.bonfire.items);
-    return { t, items };
+    const unlocked = computed(() => items.filter((i) => i.unlocked));
+    return { t, items: unlocked };
   },
   methods: {
     buildItem(id: BonfireItemId) {

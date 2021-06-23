@@ -14,9 +14,9 @@ export class ResourcePool
     }
   }
 
-  update(deltaTime: number): void {
+  update(dt: number): void {
     for (const iterator of this.all()) {
-      iterator.update(deltaTime);
+      iterator.update(dt);
     }
   }
 }

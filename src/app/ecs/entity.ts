@@ -7,7 +7,7 @@ export abstract class Entity implements IUpdate {
     this.components = new ComponentPool(this);
   }
 
-  abstract update(deltaTime: number): void;
+  abstract update(dt: number): void;
 
   protected addComponent<T extends IComponent>(value: T): T {
     return this.components.add(value);

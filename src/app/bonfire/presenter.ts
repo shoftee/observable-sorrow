@@ -1,4 +1,5 @@
 import { Ref, ref, unref } from "vue";
+import { BuildingPool } from "../buildings/pool";
 
 import {
   BonfireItemId,
@@ -20,7 +21,10 @@ export interface IBonfirePresenter extends IRender {
 export class BonfirePresenter implements IBonfirePresenter {
   readonly items: Ref<BonfireItem[]>;
 
-  constructor(private readonly resources: ResourcePool) {
+  constructor(
+    private readonly buildings: BuildingPool,
+    private readonly resources: ResourcePool,
+  ) {
     const items = Object.values(BonfireMetadata).map((e) =>
       this.newBonfireItem(e),
     );
@@ -29,10 +33,22 @@ export class BonfirePresenter implements IBonfirePresenter {
   }
 
   render(): void {
-    for (const recipe of unref(this.items)) {
-      for (const ingredient of recipe.ingredients) {
+    for (const item of unref(this.items)) {
+      const metadata = BonfireMetadata[item.id];
+
+      // update fulfillment values for tooltips
+      for (const ingredient of item.ingredients) {
         const resource = this.resources.get(ingredient.id);
-        ingredient.fulfillment = resource.amount.value;
+        ingredient.fulfillment = resource.state.amount;
+      }
+
+      // Update unlocked status
+      if (metadata.intent.kind == "buy-building") {
+        const building = this.buildings.get(metadata.intent.buildingId);
+        building.changes.apply((key) => {
+          if (key == "unlocked") item.unlocked = building.state.unlocked;
+          if (key == "level") item.level = building.state.level;
+        });
       }
     }
   }
@@ -78,6 +94,7 @@ class BonfireItem {
   label: string;
   description: string;
   flavor?: string;
+  level?: number;
   unlocked = false;
   ingredients: RecipeIngredientItem[] = [];
 

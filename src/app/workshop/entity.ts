@@ -1,5 +1,5 @@
 import { Entity, IUpdate } from "../ecs";
-import { QueueComponent } from "../ecs/common/queue-component";
+import { RawQueueComponent } from "../ecs/common";
 import { ResourcePool } from "../resources";
 import {
   WorkshopRecipeId,
@@ -22,7 +22,6 @@ export class Workshop extends Entity implements IWorkshop {
 
   order(id: WorkshopRecipeId): void {
     this.orders.enqueue(id);
-    // todo: use microtask to update immediately?
   }
 
   update(_dt: number): void {
@@ -34,13 +33,13 @@ export class Workshop extends Entity implements IWorkshop {
     const recipe = WorkshopRecipeMetadata[recipeId];
     for (const ingredient of recipe.ingredients) {
       const resource = this.resources.get(ingredient.id);
-      resource.mutations.credit(ingredient.amount);
+      resource.mutations.take(ingredient.amount);
     }
     for (const result of recipe.products) {
       const resource = this.resources.get(result.id);
-      resource.mutations.debit(result.amount);
+      resource.mutations.give(result.amount);
     }
   }
 }
 
-export class RecipeOrdersComponent extends QueueComponent<WorkshopRecipeId> {}
+export class RecipeOrdersComponent extends RawQueueComponent<WorkshopRecipeId> {}
