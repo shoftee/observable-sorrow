@@ -5,7 +5,7 @@
         type="button"
         class="btn btn-outline-secondary w-100"
         :class="{ disabled }"
-        v-bind="$attrs"
+        @click="clicked()"
       >
         <slot></slot>
       </button>
@@ -25,6 +25,13 @@ export default defineComponent({
       default: false,
     },
   },
-  inheritAttrs: false,
+  emits: ["click"],
+  methods: {
+    clicked() {
+      if (!this.disabled) {
+        this.$emit("click");
+      }
+    },
+  },
 });
 </script>
