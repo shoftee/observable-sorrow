@@ -67,7 +67,7 @@ export type LimitMetadataType = {
 };
 
 export const LimitMetadata: Record<ResourceId, LimitMetadataType> = {
-  catnip: { id: "catnip", base: 100 },
+  catnip: { id: "catnip", base: 5000 },
   wood: { id: "wood", base: 100 },
   // wood: { id: "wood", base: 200 },
   // minerals: { id: "minerals", base: 250 },

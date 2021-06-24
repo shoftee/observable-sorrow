@@ -1,75 +1,36 @@
-import { Component, ComponentState, Entity, IUpdate } from "../ecs";
-import {
-  ChangeNotifierComponent,
-  QueueComponent,
-  setAndNotify,
-} from "../ecs/common";
+import { cloneDeep } from "lodash";
 
-import { BuildingMetadataType } from "../core/metadata";
-import { ResourcePool } from "../resources";
+import { ComponentState, Entity } from "../ecs";
+import { ChangeNotifierComponent } from "../ecs/common";
+import { BuildingId, BuildingMetadata } from "../core/metadata";
+
+import { EntityAdmin } from "../game/entity-admin";
+import {
+  BuildingPriceComponent,
+  BuildingStateComponent,
+  BuildQueueComponent,
+} from "./components";
 
 type State = ComponentState<BuildingStateComponent>;
-type ChangeNotifier = ChangeNotifierComponent<State>;
+type Price = ComponentState<BuildingPriceComponent>;
+type ChangeNotifier = ChangeNotifierComponent<State & Price>;
 
-export class BuildingEntity extends Entity implements IUpdate {
-  readonly buildQueue: BuildQueueComponent;
-  readonly state: BuildingStateComponent;
-  readonly changes: ChangeNotifier;
+export class BuildingEntity extends Entity {
+  buildQueue!: BuildQueueComponent;
+  state!: BuildingStateComponent;
+  price!: BuildingPriceComponent;
+  changes!: ChangeNotifier;
 
-  constructor(
-    private readonly resources: ResourcePool,
-    private readonly metadata: BuildingMetadataType,
-  ) {
-    super();
+  constructor(admin: EntityAdmin, readonly id: BuildingId) {
+    super(admin, id);
+  }
+
+  init(): void {
+    this.price = this.addComponent(new BuildingPriceComponent());
+    this.price.ingredients = cloneDeep(BuildingMetadata[this.id].ingredients);
+
     this.buildQueue = this.addComponent(new BuildQueueComponent());
     this.state = this.addComponent(new BuildingStateComponent());
     this.changes = this.addComponent(new ChangeNotifierComponent());
-  }
-
-  update(_dt: number): void {
-    if (!this.state.unlocked) {
-      this.updateUnlocked();
-    }
-    this.buildQueue.consume((item) => {
-      if (item.intent == "construct") {
-        const newLevel = this.state.level + 1;
-        setAndNotify(this.state, this.changes, "level", newLevel);
-      } else {
-        throw new Error("Only constructing building is supported for now.");
-      }
-    });
-  }
-
-  private updateUnlocked() {
-    for (const requirement of this.metadata.ingredients) {
-      const resource = this.resources.get(requirement.id);
-      const amount = resource.state.amount;
-      if (amount >= requirement.amount * this.metadata.unlockRatio) {
-        setAndNotify(this.state, this.changes, "unlocked", true);
-      }
-    }
-  }
-}
-
-class BuildingStateComponent extends Component {
-  unlocked = false;
-  level = 0;
-}
-
-interface BuildingCommand {
-  intent: "construct" | "deconstruct";
-}
-
-class BuildQueueComponent extends QueueComponent<BuildingCommand> {
-  construct() {
-    this.enqueue({ intent: "construct" });
-  }
-
-  deconstruct() {
-    this.enqueue({ intent: "deconstruct" });
-  }
-
-  consume(callback: (item: BuildingCommand) => void): void {
-    super.consume(callback);
   }
 }

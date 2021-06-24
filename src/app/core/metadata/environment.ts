@@ -1,15 +1,15 @@
-type SeasonId = "spring" | "summer" | "autumn" | "winter";
+export type SeasonId = "spring" | "summer" | "autumn" | "winter";
 
 type SeasonMetadataType = {
   id: SeasonId;
   label: string;
 };
 
-interface IMetadata {
+export interface EnvironmentMetadataType {
   seasons: Record<SeasonId, SeasonMetadataType>;
 }
 
-const Metadata: IMetadata = {
+export const EnvironmentMetadata: EnvironmentMetadataType = {
   seasons: {
     spring: {
       id: "spring",
@@ -28,10 +28,4 @@ const Metadata: IMetadata = {
       label: "environment.seasons.winter.label",
     },
   },
-};
-
-export {
-  SeasonId as SeasonId,
-  Metadata as EnvironmentMetadata,
-  IMetadata as IEnvironmentMetadata,
 };

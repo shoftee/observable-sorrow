@@ -6,10 +6,10 @@
       <span>{{ t(item.label) }}</span>
       <!-- <span class="badge bg-danger badge-light">!</span> -->
     </div>
-    <div class="mx-1 amount">{{ item.amount }}</div>
+    <div class="mx-1 amount">{{ item.amount.toPrecision(4) }}</div>
     <template v-if="item.capacity != undefined">
       <div class="slash">/</div>
-      <div class="mx-1 capacity">{{ item.capacity }}</div>
+      <div class="mx-1 capacity">{{ item.capacity.toPrecision(4) }}</div>
     </template>
     <template v-else>
       <div class="no-capacity"></div>

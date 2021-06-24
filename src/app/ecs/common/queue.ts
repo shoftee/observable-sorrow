@@ -12,6 +12,10 @@ export class QueueComponent<T> extends Component {
     return this.queue.dequeue();
   }
 
+  protected get length(): number {
+    return this.queue.length;
+  }
+
   protected consume(callback: (item: T) => void): void {
     let item: T | undefined;
     while ((item = this.dequeue()) != undefined) {

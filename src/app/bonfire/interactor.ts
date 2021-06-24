@@ -1,8 +1,10 @@
 import { IGameRunner } from "../game";
-import { Workshop } from "../workshop/entity";
 import { BonfireItemId, BonfireMetadata } from "../core/metadata/bonfire";
-import { ResourcePool } from "../resources";
-import { BuildingPool } from "../buildings/pool";
+import {
+  IBuildingSystem,
+  ICraftingSystem,
+  ITransactionSystem,
+} from "../systems";
 
 export interface IBonfireInteractor {
   buildItem(id: BonfireItemId): void;
@@ -11,19 +13,25 @@ export interface IBonfireInteractor {
 export class BonfireInteractor implements IBonfireInteractor {
   constructor(
     private readonly runner: IGameRunner,
-    private readonly buildings: BuildingPool,
-    private readonly resources: ResourcePool,
-    private readonly workshop: Workshop,
+    private readonly buildings: IBuildingSystem,
+    private readonly crafting: ICraftingSystem,
+    private readonly transactions: ITransactionSystem,
   ) {}
 
   buildItem(id: BonfireItemId): void {
     const metadata = BonfireMetadata[id];
-    if (metadata.intent.kind == "gather-catnip") {
-      this.resources.get("catnip").mutations.give(1);
-    } else if (metadata.intent.kind == "refine-catnip") {
-      this.workshop.order("refine-catnip");
-    } else {
-      this.buildings.buy(metadata.intent.buildingId);
+    switch (metadata.intent.kind) {
+      case "gather-catnip":
+        this.transactions.giveResource("catnip", metadata.intent.amount);
+        break;
+
+      case "refine-catnip":
+        this.crafting.order("refine-catnip");
+        break;
+
+      case "buy-building":
+        this.buildings.order(metadata.intent.buildingId);
+        break;
     }
 
     this.runner.forceUpdate();

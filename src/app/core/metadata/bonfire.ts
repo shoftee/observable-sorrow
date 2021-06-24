@@ -3,7 +3,7 @@ export type BonfireItemId = "gather-catnip" | "refine-catnip" | "catnip-field";
 export type BonfireBuildingId = "catnip-field";
 
 type BonfireIntentType =
-  | { kind: "gather-catnip" }
+  | { kind: "gather-catnip"; amount: number }
   | { kind: "refine-catnip"; recipeId: "refine-catnip" }
   | { kind: "buy-building"; buildingId: BonfireBuildingId };
 
@@ -18,7 +18,7 @@ export type BonfireMetadataType = {
 export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   "gather-catnip": {
     id: "gather-catnip",
-    intent: { kind: "gather-catnip" },
+    intent: { kind: "gather-catnip", amount: 1000 },
     label: "bonfire.gather-catnip.label",
     description: "bonfire.gather-catnip.description",
   },

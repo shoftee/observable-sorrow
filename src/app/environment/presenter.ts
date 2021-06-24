@@ -1,25 +1,24 @@
 import { ref, Ref, unref } from "vue";
 
 import { IRender } from "../ecs";
-import { Environment } from "./entity";
-import {
-  EnvironmentMetadata,
-  IEnvironmentMetadata,
-} from "../core/metadata/environment";
+import { EnvironmentMetadata } from "../core/metadata/environment";
+import { EntityAdmin } from "../game/entity-admin";
+import { EnvironmentEntity } from ".";
 
 export interface IEnvironmentPresenter extends IRender {
   readonly calendar: Ref<ICalendarViewModel>;
 }
 
 export class EnvironmentPresenter implements IEnvironmentPresenter {
-  readonly calendar: Ref<ICalendarViewModel>;
-  readonly metadata: IEnvironmentMetadata;
+  private readonly environment: EnvironmentEntity;
 
-  constructor(private environment: Environment) {
-    this.metadata = EnvironmentMetadata;
+  readonly calendar: Ref<ICalendarViewModel>;
+
+  constructor(admin: EntityAdmin) {
+    this.environment = admin.environment();
     this.calendar = ref({
       dayOfSeason: 0,
-      season: this.metadata.seasons.spring.label,
+      season: EnvironmentMetadata.seasons.spring.label,
       year: 0,
     }) as Ref<ICalendarViewModel>;
   }
@@ -31,7 +30,7 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
       raw.dayOfSeason = entity.dayOfSeason;
     }
 
-    const season = this.metadata.seasons[entity.season];
+    const season = EnvironmentMetadata.seasons[entity.season];
     if (raw.season != season.label) {
       raw.season = season.label;
     }

@@ -1,18 +1,19 @@
 import { Ref, ref, unref } from "vue";
-import { BuildingPool } from "../buildings/pool";
 
+import { IRender } from "../ecs";
+
+import { BuildingEntity } from "../buildings";
 import {
   BonfireItemId,
   BonfireMetadata,
   BonfireMetadataType,
-} from "../core/metadata/bonfire";
-import { BuildingMetadata } from "../core/metadata/buildings";
-import { WorkshopRecipeMetadata } from "../core/metadata/crafting";
-import { ResourceQuantityType } from "../core/metadata/recipes";
-import { ResourceId, ResourceMetadata } from "../core/metadata/resources";
-
-import { IRender } from "../ecs";
-import { ResourcePool } from "../resources";
+  BuildingMetadata,
+  ResourceQuantityType,
+  ResourceId,
+  ResourceMetadata,
+  WorkshopRecipeMetadata,
+} from "../core/metadata";
+import { EntityAdmin } from "../game/entity-admin";
 
 export interface IBonfirePresenter extends IRender {
   readonly items: Ref<BonfireItem[]>;
@@ -21,10 +22,7 @@ export interface IBonfirePresenter extends IRender {
 export class BonfirePresenter implements IBonfirePresenter {
   readonly items: Ref<BonfireItem[]>;
 
-  constructor(
-    private readonly buildings: BuildingPool,
-    private readonly resources: ResourcePool,
-  ) {
+  constructor(private readonly admin: EntityAdmin) {
     const items = Object.values(BonfireMetadata).map((e) =>
       this.newBonfireItem(e),
     );
@@ -38,18 +36,35 @@ export class BonfirePresenter implements IBonfirePresenter {
 
       // update fulfillment values for tooltips
       for (const ingredient of item.ingredients) {
-        const resource = this.resources.get(ingredient.id);
+        const resource = this.admin.resource(ingredient.id);
         ingredient.fulfillment = resource.state.amount;
       }
 
       // Update unlocked status
       if (metadata.intent.kind == "buy-building") {
-        const building = this.buildings.get(metadata.intent.buildingId);
+        const building = this.admin.building(metadata.intent.buildingId);
         building.changes.apply((key) => {
-          if (key == "unlocked") item.unlocked = building.state.unlocked;
-          if (key == "level") item.level = building.state.level;
+          switch (key) {
+            case "unlocked":
+              item.unlocked = building.state.unlocked;
+              break;
+            case "level":
+              item.level = building.state.level;
+              break;
+            case "ingredients":
+              this.updatePrices(item, building);
+              break;
+          }
         });
       }
+    }
+  }
+
+  updatePrices(item: BonfireItem, entity: BuildingEntity): void {
+    for (let i = 0; i < item.ingredients.length; i++) {
+      const itemIngredient = item.ingredients[i];
+      const entityIngredient = entity.price.ingredients[i];
+      itemIngredient.requirement = entityIngredient.amount;
     }
   }
 

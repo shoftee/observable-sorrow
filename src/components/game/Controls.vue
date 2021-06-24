@@ -30,9 +30,9 @@
               </div>
               <div class="float-end">
                 <span v-if="!ingredient.fulfilled"
-                  >{{ ingredient.fulfillment }} /
+                  >{{ ingredient.fulfillment.toPrecision(4) }} /
                 </span>
-                {{ ingredient.requirement }}
+                {{ ingredient.requirement.toPrecision(4) }}
               </div>
             </li>
           </ul>

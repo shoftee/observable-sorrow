@@ -1,4 +1,3 @@
-import { ComponentState, IComponent } from "..";
 import { QueueComponent } from "./queue";
 
 export class ChangeNotifierComponent<
@@ -20,20 +19,8 @@ export class ChangeNotifierComponent<
       }
     });
   }
-}
 
-export function setAndNotify<
-  TComponent extends IComponent,
-  TState extends ComponentState<TComponent>,
-  K extends keyof TState,
->(
-  state: TState,
-  notifier: ChangeNotifierComponent<TState>,
-  key: K,
-  value: TState[K],
-): void {
-  if (state[key] != value) {
-    state[key] = value;
-    notifier.notify(key);
+  hasChanges(): boolean {
+    return this.length > 0;
   }
 }
