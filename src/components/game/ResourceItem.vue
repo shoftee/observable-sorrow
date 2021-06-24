@@ -6,10 +6,10 @@
       <span>{{ t(item.label) }}</span>
       <!-- <span class="badge bg-danger badge-light">!</span> -->
     </div>
-    <div class="mx-1 amount">{{ item.amount.toPrecision(4) }}</div>
+    <div class="mx-1 amount">{{ n(item.amount) }}</div>
     <template v-if="item.capacity != undefined">
       <div class="slash">/</div>
-      <div class="mx-1 capacity">{{ item.capacity.toPrecision(4) }}</div>
+      <div class="mx-1 capacity">{{ n(item.capacity) }}</div>
     </template>
     <template v-else>
       <div class="no-capacity"></div>
@@ -20,6 +20,9 @@
 
 <script lang="ts">
 import { ListItem } from "@/app/resources";
+
+import { Presenter } from "@/app/os";
+const notation = Presenter.numbers;
 
 import { defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
@@ -33,7 +36,8 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-    return { t };
+    const n = (v: number) => notation.display(v, 2, false);
+    return { t, n };
   },
 });
 </script>

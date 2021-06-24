@@ -30,9 +30,9 @@
               </div>
               <div class="float-end">
                 <span v-if="!ingredient.fulfilled"
-                  >{{ ingredient.fulfillment.toPrecision(4) }} /
+                  >{{ n(ingredient.fulfillment) }} /
                 </span>
-                {{ ingredient.requirement.toPrecision(4) }}
+                {{ n(ingredient.requirement) }}
               </div>
             </li>
           </ul>
@@ -45,6 +45,7 @@
 <script lang="ts">
 import { BonfireItemId } from "@/app/core/metadata/bonfire";
 import { Presenter, Interactor } from "@/app/os";
+const notation = Presenter.numbers;
 
 import { computed, defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -56,7 +57,8 @@ export default defineComponent({
     const { t } = { ...useI18n() };
     const items = unref(Presenter.bonfire.items);
     const unlocked = computed(() => items.filter((i) => i.unlocked));
-    return { t, items: unlocked };
+    const n = (v: number) => notation.display(v, 2, false);
+    return { t, n, items: unlocked };
   },
   methods: {
     buildItem(id: BonfireItemId) {

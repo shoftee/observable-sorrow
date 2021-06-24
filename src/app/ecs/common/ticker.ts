@@ -1,6 +1,7 @@
+import { round } from "../../utils/mathx";
+
 import { TimeConstants } from "../../constants";
 import { Component } from "..";
-import mathx from "../../utils/mathx";
 
 export class TickerComponent extends Component {
   /** Fractional ticks (0.001 precision) */
@@ -23,7 +24,7 @@ export class TickerComponent extends Component {
   update(deltaTime: number): void {
     this.delta = (TimeConstants.TicksPerMillisecond * deltaTime) / this.every;
     const last = this.tick;
-    this.tick = mathx.round(this.tick + this.delta, 3);
+    this.tick = round(this.tick + this.delta, 3);
     this.ticked = Math.floor(last) < Math.floor(this.tick);
   }
 }

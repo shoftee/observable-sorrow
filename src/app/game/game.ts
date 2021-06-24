@@ -21,6 +21,7 @@ import {
   TimeSystem,
   TransactionSystem,
 } from "../systems";
+import { SandcastleBuilderNotation } from "../utils/notation";
 import { WorkshopEntity } from "../workshop";
 import { EntityAdmin } from "./entity-admin";
 
@@ -74,6 +75,7 @@ export class Game implements IGame {
       new BonfirePresenter(this.admin),
       new EnvironmentPresenter(this.admin),
       new ResourcePresenter(this.admin),
+      new SandcastleBuilderNotation(),
     );
 
     this._interactor = new InteractorSystem(

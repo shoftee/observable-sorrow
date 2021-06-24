@@ -26,7 +26,6 @@ export class BonfirePresenter implements IBonfirePresenter {
     const items = Object.values(BonfireMetadata).map((e) =>
       this.newBonfireItem(e),
     );
-
     this.items = ref(items) as Ref<BonfireItem[]>;
   }
 
@@ -60,7 +59,7 @@ export class BonfirePresenter implements IBonfirePresenter {
     }
   }
 
-  updatePrices(item: BonfireItem, entity: BuildingEntity): void {
+  private updatePrices(item: BonfireItem, entity: BuildingEntity): void {
     for (let i = 0; i < item.ingredients.length; i++) {
       const itemIngredient = item.ingredients[i];
       const entityIngredient = entity.price.ingredients[i];

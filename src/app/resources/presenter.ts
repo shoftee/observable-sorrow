@@ -16,7 +16,6 @@ export class ResourcePresenter implements IResourcePresenter {
 
   constructor(private admin: EntityAdmin) {
     const entities = this.getListItems();
-
     this.items = ref(entities) as Ref<ListItem[]>;
   }
 
