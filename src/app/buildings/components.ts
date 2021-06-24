@@ -17,11 +17,11 @@ interface BuildingCommand {
 }
 
 export class BuildQueueComponent extends QueueComponent<BuildingCommand> {
-  construct() {
+  construct(): void {
     this.enqueue({ intent: "construct" });
   }
 
-  deconstruct() {
+  deconstruct(): void {
     this.enqueue({ intent: "deconstruct" });
   }
 
