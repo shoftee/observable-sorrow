@@ -41,8 +41,10 @@ export class ResourcePresenter implements IResourcePresenter {
     return {
       id: e.id,
       label: ResourceMetadata[e.id].label,
-      amount: e.state.amount,
       unlocked: e.state.unlocked,
+      amount: e.state.amount,
+      change: e.state.change,
+      capacity: e.state.capacity,
     };
   }
 }
@@ -50,8 +52,8 @@ export class ResourcePresenter implements IResourcePresenter {
 export interface ListItem {
   readonly id: ResourceId;
   label: string;
+  unlocked: boolean;
   amount: number;
   change?: number;
   capacity?: number;
-  unlocked: boolean;
 }

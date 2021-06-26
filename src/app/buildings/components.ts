@@ -12,8 +12,8 @@ export class BuildingPriceComponent extends Component {
   ingredients: ResourceQuantityType[] = [];
 }
 
-export class BuildingProductionComponent extends Component {
-  effects: ProductionEffectType[] = [];
+export class BuildingEffectComponent extends Component {
+  production: ProductionEffectType[] = [];
 }
 
 interface BuildingCommand {

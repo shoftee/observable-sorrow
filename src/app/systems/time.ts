@@ -19,14 +19,15 @@ export class TimeSystem extends System {
   }
 
   update(dt: number): void {
+    // Advance timers
     this.ticks.update(dt);
     this.days.update(dt);
 
     this.updateCalendar(this.calendar, this.days.delta);
   }
 
-  private updateCalendar(calendar: CalendarComponent, delta: number): void {
-    calendar.dayOfSeason += delta;
+  private updateCalendar(calendar: CalendarComponent, daysDelta: number): void {
+    calendar.dayOfSeason += daysDelta;
     while (calendar.dayOfSeason >= CalendarConstants.DaysPerSeason) {
       calendar.dayOfSeason -= CalendarConstants.DaysPerSeason;
       calendar.season = this.calculateNextSeason(calendar.season);

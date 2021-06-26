@@ -19,7 +19,7 @@ export class TransactionSystem extends System implements ITransactionSystem {
 
   private updateAmount(resource: ResourceEntity): boolean {
     const currentValue = resource.state.amount;
-    const capacity = Number.POSITIVE_INFINITY; // finish later
+    const capacity = resource.state.capacity ?? Number.POSITIVE_INFINITY;
 
     // calculate delta from mutations
     const delta = resource.mutations.sum();

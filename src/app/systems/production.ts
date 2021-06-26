@@ -1,7 +1,9 @@
 import { ResourceId } from "../core/metadata";
+
 import { System } from "../ecs";
 import { TimerComponent } from "../ecs/common";
 import { EntityAdmin } from "../game/entity-admin";
+
 import { ResourceEntity } from "../resources";
 
 export class ProductionSystem extends System {
@@ -21,7 +23,7 @@ export class ProductionSystem extends System {
     // recalculate production effects from buildings
     for (const building of this.admin.buildings()) {
       const level = building.state.level;
-      for (const effect of building.production.effects) {
+      for (const effect of building.effects.production) {
         const effectAmount = level * effect.amount;
         const resource = this.resource(effect.resourceId);
         if (resource.state.change !== effectAmount) {
