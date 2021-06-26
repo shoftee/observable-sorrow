@@ -16,7 +16,7 @@ export class LockToggleSystem extends System {
   private updateResourceUnlocked(resource: ResourceEntity): boolean {
     if (!resource.state.unlocked && resource.state.amount > 0) {
       resource.state.unlocked = true;
-      resource.changes.notify("unlocked");
+      resource.notifier.mark("unlocked");
       return true;
     } else {
       // some resources re-lock when they are depleted
@@ -25,7 +25,7 @@ export class LockToggleSystem extends System {
         ResourceMetadata[resource.id].flags[Flag.RelockedWhenDepleted]
       ) {
         resource.state.unlocked = false;
-        resource.changes.notify("unlocked");
+        resource.notifier.mark("unlocked");
         return true;
       }
     }
@@ -41,7 +41,7 @@ export class LockToggleSystem extends System {
         const amount = resource.state.amount;
         if (amount >= requirement.amount * metadata.unlockRatio) {
           building.state.unlocked = true;
-          building.changes.notify("unlocked");
+          building.notifier.mark("unlocked");
           return true;
         }
       }

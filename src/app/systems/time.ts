@@ -3,18 +3,30 @@ import { System } from "../ecs";
 import { CalendarConstants } from "../core/metadata";
 
 import { CalendarComponent, SeasonId } from "../environment";
+import { TimerComponent } from "../ecs/common";
 
 export class TimeSystem extends System {
-  update(dt: number): void {
-    const environment = this.admin.environment();
-    environment.ticker.update(dt);
-    if (environment.ticker.ticked) {
-      this.updateCalendar(environment.calendar);
-    }
+  private get ticks(): TimerComponent {
+    return this.admin.timers().ticks;
   }
 
-  private updateCalendar(calendar: CalendarComponent): void {
-    calendar.dayOfSeason++;
+  private get days(): TimerComponent {
+    return this.admin.timers().days;
+  }
+
+  private get calendar(): CalendarComponent {
+    return this.admin.environment().calendar;
+  }
+
+  update(dt: number): void {
+    this.ticks.update(dt);
+    this.days.update(dt);
+
+    this.updateCalendar(this.calendar, this.days.delta);
+  }
+
+  private updateCalendar(calendar: CalendarComponent, delta: number): void {
+    calendar.dayOfSeason += delta;
     while (calendar.dayOfSeason >= CalendarConstants.DaysPerSeason) {
       calendar.dayOfSeason -= CalendarConstants.DaysPerSeason;
       calendar.season = this.calculateNextSeason(calendar.season);

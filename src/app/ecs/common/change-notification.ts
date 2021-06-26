@@ -4,7 +4,7 @@ export class ChangeNotifierComponent<
   TState,
   K extends keyof TState = keyof TState,
 > extends QueueComponent<K> {
-  notify(...keys: K[]): void {
+  mark(...keys: K[]): void {
     for (const key of keys) {
       this.enqueue(key);
     }

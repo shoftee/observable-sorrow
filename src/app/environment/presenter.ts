@@ -26,8 +26,10 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
   render(): void {
     const entity = this.environment.calendar;
     const raw = unref(this.calendar);
-    if (raw.dayOfSeason != entity.dayOfSeason) {
-      raw.dayOfSeason = entity.dayOfSeason;
+
+    const dayOfSeason = Math.floor(entity.dayOfSeason);
+    if (raw.dayOfSeason != dayOfSeason) {
+      raw.dayOfSeason = dayOfSeason;
     }
 
     const season = EnvironmentMetadata.seasons[entity.season];

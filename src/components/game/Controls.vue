@@ -12,12 +12,12 @@
           <span v-if="item.level > 0">({{ item.level }})</span>
         </template>
         <template #tooltip>
-          <div class="card-header">
+          <div class="card-header p-1">
             {{ t(item.description) }}
           </div>
           <ul
-            v-if="item.ingredients.length > 0"
             class="list-group list-group-flush"
+            v-if="item.ingredients.length > 0"
           >
             <li
               v-for="ingredient in item.ingredients"
@@ -36,6 +36,21 @@
               </div>
             </li>
           </ul>
+          <div v-if="item.effects.length > 0">
+            <div class="card-header">
+              {{ t("effects.title.per-level.label") }}
+            </div>
+            <ul class="list-group list-group-flush">
+              <li
+                v-for="effect in item.effects"
+                :key="effect.resourceId"
+                class="list-group-item clearfix"
+              >
+                <div class="float-start">{{ t(effect.label) }}</div>
+                <div class="float-end">{{ n(effect.change, true) }}/t</div>
+              </li>
+            </ul>
+          </div>
         </template>
       </os-button>
     </section>
@@ -57,7 +72,7 @@ export default defineComponent({
     const { t } = { ...useI18n() };
     const items = unref(Presenter.bonfire.items);
     const unlocked = computed(() => items.filter((i) => i.unlocked));
-    const n = (v: number) => notation.display(v, 2, false);
+    const n = (v: number, signed = false) => notation.display(v, 3, signed);
     return { t, n, items: unlocked };
   },
   methods: {

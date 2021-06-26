@@ -4,11 +4,11 @@ import { QueueComponent } from "../ecs/common";
 export class ResourceStateComponent extends Component {
   unlocked = false;
   amount = 0;
+  capacity?: number;
+  change?: number;
 }
 
-export class CapacityComponent extends Component {
-  capacity = 0;
-}
+export class CapacityComponent extends Component {}
 
 export class MutationComponent extends QueueComponent<number> {
   give(n: number): void {

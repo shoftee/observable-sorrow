@@ -8,6 +8,7 @@ import {
   LockToggleSystem,
   TimeSystem,
 } from ".";
+import { ProductionSystem } from "./production";
 
 export interface IGameSystems {
   readonly buildings: IBuildingSystem;
@@ -20,6 +21,7 @@ export class GameSystems implements IGameSystems {
     readonly buildings: BuildingSystem,
     readonly crafting: CraftingSystem,
     readonly lockToggle: LockToggleSystem,
+    readonly production: ProductionSystem,
     readonly time: TimeSystem,
     readonly transactions: TransactionSystem,
   ) {}

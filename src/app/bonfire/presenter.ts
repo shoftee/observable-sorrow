@@ -12,6 +12,8 @@ import {
   ResourceId,
   ResourceMetadata,
   WorkshopRecipeMetadata,
+  ProductionEffectType,
+  ProductionEffectMetadata,
 } from "../core/metadata";
 import { EntityAdmin } from "../game/entity-admin";
 
@@ -42,7 +44,7 @@ export class BonfirePresenter implements IBonfirePresenter {
       // Update unlocked status
       if (metadata.intent.kind == "buy-building") {
         const building = this.admin.building(metadata.intent.buildingId);
-        building.changes.apply((key) => {
+        building.notifier.apply((key) => {
           switch (key) {
             case "unlocked":
               item.unlocked = building.state.unlocked;
@@ -83,7 +85,10 @@ export class BonfirePresenter implements IBonfirePresenter {
 
       case "buy-building":
         result.ingredients = this.newRecipeList(
-          BuildingMetadata[item.intent.buildingId].ingredients,
+          BuildingMetadata[item.intent.buildingId].effects.prices.ingredients,
+        );
+        result.effects = this.newEffectsList(
+          BuildingMetadata[item.intent.buildingId].effects.production,
         );
         return result;
     }
@@ -101,6 +106,19 @@ export class BonfirePresenter implements IBonfirePresenter {
         ),
     );
   }
+
+  private newEffectsList(
+    effects: ProductionEffectType[],
+  ): ProductionEffectItem[] {
+    return effects.map(
+      (effect) =>
+        new ProductionEffectItem(
+          effect.resourceId,
+          ProductionEffectMetadata[effect.id].label,
+          effect.amount,
+        ),
+    );
+  }
 }
 
 class BonfireItem {
@@ -111,6 +129,7 @@ class BonfireItem {
   level?: number;
   unlocked = false;
   ingredients: RecipeIngredientItem[] = [];
+  effects: ProductionEffectItem[] = [];
 
   constructor(metadata: BonfireMetadataType) {
     this.id = metadata.id;
@@ -140,4 +159,12 @@ class RecipeIngredientItem {
   get fulfilled(): boolean {
     return this.fulfillment >= this.requirement;
   }
+}
+
+class ProductionEffectItem {
+  constructor(
+    public id: ResourceId,
+    public label: string,
+    public change: number,
+  ) {}
 }

@@ -1,25 +1,24 @@
 import { cloneDeep } from "lodash";
 
-import { ComponentState, Entity } from "../ecs";
-import { ChangeNotifierComponent } from "../ecs/common";
+import { ChangeTrackedEntity, ComponentState } from "../ecs";
 import { BuildingId, BuildingMetadata } from "../core/metadata";
 
 import { EntityAdmin } from "../game/entity-admin";
 import {
   BuildingPriceComponent,
+  BuildingProductionComponent,
   BuildingStateComponent,
   BuildQueueComponent,
 } from "./components";
 
 type State = ComponentState<BuildingStateComponent>;
 type Price = ComponentState<BuildingPriceComponent>;
-type ChangeNotifier = ChangeNotifierComponent<State & Price>;
 
-export class BuildingEntity extends Entity {
+export class BuildingEntity extends ChangeTrackedEntity<State & Price> {
   buildQueue!: BuildQueueComponent;
   state!: BuildingStateComponent;
   price!: BuildingPriceComponent;
-  changes!: ChangeNotifier;
+  production!: BuildingProductionComponent;
 
   constructor(admin: EntityAdmin, readonly id: BuildingId) {
     super(admin, id);
@@ -27,10 +26,16 @@ export class BuildingEntity extends Entity {
 
   init(): void {
     this.price = this.addComponent(new BuildingPriceComponent());
-    this.price.ingredients = cloneDeep(BuildingMetadata[this.id].ingredients);
+    this.price.ingredients = cloneDeep(
+      BuildingMetadata[this.id].effects.prices.ingredients,
+    );
+
+    this.production = this.addComponent(new BuildingProductionComponent());
+    this.production.effects = cloneDeep(
+      BuildingMetadata[this.id].effects.production,
+    );
 
     this.buildQueue = this.addComponent(new BuildQueueComponent());
     this.state = this.addComponent(new BuildingStateComponent());
-    this.changes = this.addComponent(new ChangeNotifierComponent());
   }
 }

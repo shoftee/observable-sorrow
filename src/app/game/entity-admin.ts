@@ -5,8 +5,9 @@ import { WorkshopEntity } from "../workshop";
 import { Constructor } from "../core";
 import { BuildingEntity } from "../buildings/entity";
 import { EnvironmentEntity } from "../environment";
+import { TimersEntity } from "./timers";
 
-type EntityId = ResourceId | BuildingId | "workshop" | "environment";
+type EntityId = ResourceId | BuildingId | "environment" | "timers" | "workshop";
 
 export class EntityAdmin {
   readonly pool = new Map<EntityId, Entity>();
@@ -51,6 +52,10 @@ export class EntityAdmin {
 
   environment(): EnvironmentEntity {
     return this.entity("environment", EnvironmentEntity);
+  }
+
+  timers(): TimersEntity {
+    return this.entity("timers", TimersEntity);
   }
 
   init(): void {

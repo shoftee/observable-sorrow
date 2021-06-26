@@ -1,5 +1,6 @@
 import { ComponentPool, IComponent } from ".";
 import { EntityAdmin } from "../game/entity-admin";
+import { ChangeNotifierComponent } from "./common";
 
 export abstract class Entity {
   readonly components: ComponentPool;
@@ -12,5 +13,15 @@ export abstract class Entity {
 
   protected addComponent<T extends IComponent>(value: T): T {
     return this.components.add(value);
+  }
+}
+
+export abstract class ChangeTrackedEntity<TState> extends Entity {
+  readonly notifier: ChangeNotifierComponent<TState>;
+
+  constructor(admin: EntityAdmin, id: string) {
+    super(admin, id);
+
+    this.notifier = this.addComponent(new ChangeNotifierComponent<TState>());
   }
 }

@@ -18,5 +18,8 @@
 
   "bonfire.catnip-field.label": "Catnip field",
   "bonfire.catnip-field.description": "Plant some catnip to grow in the village. Fields have increased production during Spring and decreased production during Winter.",
-  "bonfire.catnip-field.flavor": "'Nip as far as the eye can see."
+  "bonfire.catnip-field.flavor": "'Nip as far as the eye can see.",
+
+  "effects.title.per-level.label": "Effects (per level)",
+  "effects.catnip-production.label": "Catnip production"
 }

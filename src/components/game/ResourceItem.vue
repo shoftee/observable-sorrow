@@ -14,7 +14,7 @@
     <template v-else>
       <div class="no-capacity"></div>
     </template>
-    <div class="change"></div>
+    <div class="change">{{ n(item.change, true) }}/t</div>
   </div>
 </template>
 
@@ -36,7 +36,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-    const n = (v: number) => notation.display(v, 2, false);
+    const n = (v: number, signed = false) => notation.display(v, 3, signed);
     return { t, n };
   },
 });

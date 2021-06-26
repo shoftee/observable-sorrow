@@ -28,7 +28,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
       const levelChanged = this.processBuildQueue(building);
       if (levelChanged) {
         this.updatePrices(building);
-        building.changes.notify("ingredients");
+        building.notifier.mark("ingredients");
       }
     }
   }
@@ -46,7 +46,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
 
     if (level != building.state.level) {
       building.state.level = level;
-      building.changes.notify("level");
+      building.notifier.mark("level");
       return true;
     }
 
@@ -55,12 +55,12 @@ export class BuildingSystem extends System implements IBuildingSystem {
 
   private updatePrices(building: BuildingEntity) {
     const buildingMetadata = BuildingMetadata[building.id];
-    const priceRatio = buildingMetadata.priceRatio;
+    const prices = buildingMetadata.effects.prices;
     const level = building.state.level;
-    const priceMultiplier = Math.pow(priceRatio, level);
+    const priceMultiplier = Math.pow(prices.ratio, level);
 
-    for (let i = 0; i < buildingMetadata.ingredients.length; i++) {
-      const ingredientMetadata = buildingMetadata.ingredients[i];
+    for (let i = 0; i < prices.ingredients.length; i++) {
+      const ingredientMetadata = prices.ingredients[i];
       const effective = building.price.ingredients[i];
       effective.amount = ingredientMetadata.amount * priceMultiplier;
     }

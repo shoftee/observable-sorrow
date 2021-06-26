@@ -21,9 +21,11 @@ import {
   TimeSystem,
   TransactionSystem,
 } from "../systems";
+import { ProductionSystem } from "../systems/production";
 import { SandcastleBuilderNotation } from "../utils/notation";
 import { WorkshopEntity } from "../workshop";
 import { EntityAdmin } from "./entity-admin";
+import { TimersEntity } from "./timers";
 
 export interface IGame {
   readonly runner: IGameRunner;
@@ -50,12 +52,14 @@ export class Game implements IGame {
     }
     this.admin.add(new WorkshopEntity(this.admin));
     this.admin.add(new EnvironmentEntity(this.admin));
+    this.admin.add(new TimersEntity(this.admin));
     this.admin.init();
 
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
       new CraftingSystem(this.admin),
       new LockToggleSystem(this.admin),
+      new ProductionSystem(this.admin),
       new TimeSystem(this.admin),
       new TransactionSystem(this.admin),
     );
@@ -105,8 +109,9 @@ export class Game implements IGame {
   }
 
   private update(dt: number): void {
-    this._systems.crafting.update(dt);
     this._systems.time.update(dt);
+    this._systems.production.update(dt);
+    this._systems.crafting.update(dt);
     this._systems.transactions.update(dt);
     this._systems.buildings.update(dt);
     this._systems.lockToggle.update(dt);

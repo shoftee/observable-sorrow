@@ -22,16 +22,10 @@ export enum Flag {
 
 type Flags = Partial<{ [key in keyof typeof Flag]: boolean }>;
 
-export enum CalculationRate {
-  PerTick,
-  PerDay,
-}
-
 export type ResourceMetadataType = {
   readonly id: ResourceId;
   readonly label: string;
   readonly craftable: boolean;
-  readonly calculationRate?: CalculationRate;
   readonly resetLogic: ResetLogic;
   readonly rarity: Rarity;
   readonly flags: Flags;
@@ -42,7 +36,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     id: "catnip",
     label: "resources.catnip.label",
     craftable: false,
-    calculationRate: CalculationRate.PerTick,
     resetLogic: ResetLogic.Chronospheres,
     rarity: Rarity.Common,
     flags: { [Flag.DestroyedByApocalypse]: true },
@@ -51,7 +44,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     id: "wood",
     label: "resources.wood.label",
     craftable: true,
-    calculationRate: CalculationRate.PerTick,
     resetLogic: ResetLogic.Chronospheres,
     rarity: Rarity.Common,
     flags: {

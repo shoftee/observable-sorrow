@@ -1,7 +1,7 @@
 import { Component } from "../ecs";
 import { QueueComponent } from "../ecs/common";
 
-import { ResourceQuantityType } from "../core/metadata";
+import { ProductionEffectType, ResourceQuantityType } from "../core/metadata";
 
 export class BuildingStateComponent extends Component {
   unlocked = false;
@@ -10,6 +10,10 @@ export class BuildingStateComponent extends Component {
 
 export class BuildingPriceComponent extends Component {
   ingredients: ResourceQuantityType[] = [];
+}
+
+export class BuildingProductionComponent extends Component {
+  effects: ProductionEffectType[] = [];
 }
 
 interface BuildingCommand {
