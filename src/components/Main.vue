@@ -1,21 +1,24 @@
 <template>
-  <div class="main-container d-flex flex-row shrinkable">
-    <div class="shrinkable col p-2">
+  <div class="main-container d-flex flex-row scrollable">
+    <div class="scrollable col p-2 pe-1">
       <div>
         <os-resources />
       </div>
     </div>
-    <div class="shrinkable col-5 p-2">
+    <div class="scrollable col-5 py-2 px-1">
       <div>
         <os-controls />
       </div>
     </div>
-    <div class="d-flex flex-column shrinkable col p-2">
+    <div class="scrollable col p-2 ps-1 d-flex flex-column">
       <div class="mb-2">
         <os-environment />
       </div>
-      <div class="shrinkable">
-        <div class="p-2">You are a kitten in a catnip forest.</div>
+      <div class="mb-2">You are a kitten in a catnip forest.</div>
+      <div class="scrollable">
+        <section class="scrollable .scrollable-overflow card p-2">
+          History log would appear here if it was implemented.
+        </section>
       </div>
     </div>
   </div>

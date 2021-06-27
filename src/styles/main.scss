@@ -55,18 +55,15 @@ $tippy-border-color: $dark;
   & .card-header {
     @extend .px-3, .py-2;
 
-    & p {
+    & > * {
       @extend .mb-1;
       &:last-child {
         @extend .mb-0;
       }
-      &.flavor {
-        @extend .text-muted, .fst-italic;
-      }
     }
 
     & .flavor {
-      @extend .text-end, .text-muted;
+      @extend .text-end, .text-muted, .fst-italic;
     }
   }
 
@@ -112,9 +109,11 @@ ul.resources-list {
 }
 
 // remove overflow from flexbox
-.shrinkable {
-  min-height: 0;
+.scrollable {
   overflow-y: auto;
+  &.scrollable-overflow {
+    min-height: 0;
+  }
 }
 
 // main
@@ -129,8 +128,6 @@ footer {
 
 // controls
 .controls {
-  @extend .container;
-
   & > section.row {
     @extend .g-2;
   }

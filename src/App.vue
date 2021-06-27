@@ -6,7 +6,7 @@
       <div>Observable Sorrow</div>
       <div class="badge bg-success"><i class="bi bi-droplet"></i> &beta;</div>
     </header>
-    <main class="h-100 shrinkable d-flex justify-content-center">
+    <main class="h-100 scrollable d-flex justify-content-center">
       <os-main class="w-100" />
     </main>
     <footer class="d-flex flex-row justify-content-end">

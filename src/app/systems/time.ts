@@ -26,8 +26,8 @@ export class TimeSystem extends System {
     const environment = this.admin.environment();
     const calendar = environment.calendar;
 
-    if (this.days.ticked) {
-      calendar.day += this.days.delta;
+    if (this.days.wholeTicks > 0) {
+      calendar.day += this.days.wholeTicks;
       environment.notifier.mark("day");
 
       while (calendar.day >= CalendarConstants.DaysPerSeason) {

@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column controls">
-    <section class="row row-cols-1 row-cols-xl-2 g-2">
+  <div class="controls d-flex flex-column">
+    <section class="row row-cols-1 row-cols-xl-2">
       <div class="col" v-for="item in items.values()" :key="item.id">
         <os-button :disabled="!item.fulfilled" @click="buildItem(item.id)">
           <template #default
