@@ -1,7 +1,13 @@
 #!/usr/bin/env sh
 
+# don't put this stuff in command history
+set +o history
+
 # abort on errors
 set -e
+
+# test
+npm run unit
 
 # build
 npm run build
@@ -20,3 +26,6 @@ git branch -M main
 git push --force origin main:gh-pages
 
 cd -
+
+# turn history back on
+set -o history
