@@ -31,7 +31,7 @@ export class ResourcePresenter implements IResourcePresenter {
       entity.notifier.apply((key) => {
         if (key == "unlocked") item.unlocked = entity.state.unlocked;
         if (key == "amount") item.amount = entity.state.amount;
-        if (key == "capacity") item.change = entity.state.capacity;
+        if (key == "capacity") item.capacity = entity.state.capacity;
         if (key == "change") item.change = entity.state.change;
       });
     }

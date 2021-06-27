@@ -1,20 +1,18 @@
 <template>
-  <div
-    class="d-inline-flex align-items-center align-items-stretch resource-item"
-  >
+  <div class="d-inline-flex align-items-center align-items-stretch">
     <div class="name">
       <span>{{ t(item.label) }}</span>
       <!-- <span class="badge bg-danger badge-light">!</span> -->
     </div>
     <div class="mx-1 amount">{{ n(item.amount) }}</div>
-    <template v-if="item.capacity != undefined">
+    <template v-if="item.capacity">
       <div class="slash">/</div>
       <div class="mx-1 capacity">{{ n(item.capacity) }}</div>
     </template>
     <template v-else>
       <div class="no-capacity"></div>
     </template>
-    <div class="change">{{ n(item.change, true) }}/t</div>
+    <div class="change" v-if="item.change">{{ n(item.change, true) }}/t</div>
   </div>
 </template>
 

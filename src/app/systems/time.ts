@@ -1,9 +1,9 @@
 import { System } from "../ecs";
+import { TimerComponent } from "../ecs/common";
 
 import { CalendarConstants } from "../core/metadata";
 
-import { CalendarComponent, SeasonId } from "../environment";
-import { TimerComponent } from "../ecs/common";
+import { SeasonId } from "../environment";
 
 export class TimeSystem extends System {
   private get ticks(): TimerComponent {
@@ -14,25 +14,31 @@ export class TimeSystem extends System {
     return this.admin.timers().days;
   }
 
-  private get calendar(): CalendarComponent {
-    return this.admin.environment().calendar;
-  }
-
   update(dt: number): void {
     // Advance timers
     this.ticks.update(dt);
     this.days.update(dt);
 
-    this.updateCalendar(this.calendar, this.days.delta);
+    this.updateCalendar();
   }
 
-  private updateCalendar(calendar: CalendarComponent, daysDelta: number): void {
-    calendar.dayOfSeason += daysDelta;
-    while (calendar.dayOfSeason >= CalendarConstants.DaysPerSeason) {
-      calendar.dayOfSeason -= CalendarConstants.DaysPerSeason;
-      calendar.season = this.calculateNextSeason(calendar.season);
-      if (calendar.season === "spring") {
-        calendar.year++;
+  private updateCalendar(): void {
+    const environment = this.admin.environment();
+    const calendar = environment.calendar;
+
+    if (this.days.ticked) {
+      calendar.day += this.days.delta;
+      environment.notifier.mark("day");
+
+      while (calendar.day >= CalendarConstants.DaysPerSeason) {
+        calendar.day -= CalendarConstants.DaysPerSeason;
+        calendar.season = this.calculateNextSeason(calendar.season);
+        environment.notifier.mark("season");
+
+        if (calendar.season === "spring") {
+          calendar.year++;
+          environment.notifier.mark("year");
+        }
       }
     }
   }

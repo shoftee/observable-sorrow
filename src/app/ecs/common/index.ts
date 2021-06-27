@@ -1,3 +1,3 @@
-export * from "./change-notification";
+export * from "./change-notifier";
 export * from "./queue";
 export * from "./timer";

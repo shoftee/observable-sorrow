@@ -12,42 +12,38 @@
           <span v-if="item.level > 0">({{ item.level }})</span>
         </template>
         <template #tooltip>
-          <div class="card-header p-1">
-            {{ t(item.description) }}
+          <div>
+            <div class="card-header">
+              <p class="description">{{ t(item.description) }}</p>
+              <p class="flavor" v-if="item.flavor">
+                {{ t(item.flavor) }}
+              </p>
+            </div>
+            <ul class="ingredients-list" v-if="item.ingredients.length > 0">
+              <li
+                v-for="ingredient in item.ingredients"
+                :key="ingredient.resourceId"
+                :class="{ unfulfilled: !ingredient.fulfilled }"
+              >
+                <div class="ingredient-label">
+                  {{ t(ingredient.label) }}
+                </div>
+                <div class="ingredient-fulfillment">
+                  <span v-if="!ingredient.fulfilled"
+                    >{{ n(ingredient.fulfillment) }} /
+                  </span>
+                  {{ n(ingredient.requirement) }}
+                </div>
+              </li>
+            </ul>
           </div>
-          <ul
-            class="list-group list-group-flush"
-            v-if="item.ingredients.length > 0"
-          >
-            <li
-              v-for="ingredient in item.ingredients"
-              :key="ingredient.resourceId"
-              class="list-group-item clearfix"
-              :class="{ 'text-danger': !ingredient.fulfilled }"
-            >
-              <div class="float-start">
-                {{ t(ingredient.label) }}
-              </div>
-              <div class="float-end">
-                <span v-if="!ingredient.fulfilled"
-                  >{{ n(ingredient.fulfillment) }} /
-                </span>
-                {{ n(ingredient.requirement) }}
-              </div>
-            </li>
-          </ul>
           <div v-if="item.effects.length > 0">
             <div class="card-header">
               {{ t("effects.title.per-level.label") }}
             </div>
-            <ul class="list-group list-group-flush">
-              <li
-                v-for="effect in item.effects"
-                :key="effect.resourceId"
-                class="list-group-item clearfix"
-              >
-                <div class="float-start">{{ t(effect.label) }}</div>
-                <div class="float-end">{{ n(effect.change, true) }}/t</div>
+            <ul class="effects-list">
+              <li v-for="effect in item.effects" :key="effect.resourceId">
+                {{ t(effect.label) }}: {{ n(effect.change, true) }}/t
               </li>
             </ul>
           </div>

@@ -54,6 +54,56 @@ $tippy-border-color: $dark;
 
   & .card-header {
     @extend .px-3, .py-2;
+
+    & p {
+      @extend .mb-1;
+      &:last-child {
+        @extend .mb-0;
+      }
+      &.flavor {
+        @extend .text-muted, .fst-italic;
+      }
+    }
+
+    & .flavor {
+      @extend .text-end, .text-muted;
+    }
+  }
+
+  & ul.ingredients-list {
+    @extend .list-group, .list-group-flush;
+
+    & > li {
+      @extend .clearfix, .list-group-item, .py-1;
+
+      & > .ingredient-label {
+        @extend .float-start;
+      }
+
+      & > .ingredient-fulfillment {
+        @extend .float-end;
+      }
+
+      &.unfulfilled > .ingredient-fulfillment {
+        @extend .text-danger;
+      }
+    }
+  }
+
+  & ul.effects-list {
+    @extend .list-group, .list-group-flush;
+
+    & > li {
+      @extend .list-group-item, .py-1;
+    }
+  }
+}
+
+ul.resources-list {
+  @extend .list-group, .list-group-flush;
+
+  & > .resource-item {
+    @extend .p-1, .small, .list-group-item;
   }
 }
 

@@ -1,23 +1,23 @@
 <template>
   <div class="card">
     <div v-if="isEmpty" class="text-start p-2">
-      <span>{{ t("resources.section.empty") }}</span>
+      {{ messages.empty }}
     </div>
     <div v-else class="d-flex flex-column align-items-stretch">
       <button class="btn shadow-none" @click="show = !show">
         <div class="clearfix">
-          <span class="float-start">{{ t("resources.section.label") }}</span>
+          <span class="float-start">{{ messages.title }}</span>
           <span class="float-end">
             <i v-if="!show" class="bi bi-arrows-expand"></i
           ></span>
         </div>
       </button>
-      <ul v-if="show" class="list-group list-group-flush">
+      <ul v-if="show" class="resources-list">
         <os-resource-item
           v-for="resource in unlocked"
           :key="resource.id"
           :item="resource"
-          class="p-1 small list-group-item"
+          class="resource-item"
         />
       </ul>
     </div>
