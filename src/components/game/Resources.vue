@@ -3,7 +3,7 @@
     <div v-if="isEmpty" class="text-start p-2">
       {{ messages.empty }}
     </div>
-    <div v-else class="d-flex flex-column align-items-stretch">
+    <div v-else class="d-flex flex-column">
       <button class="btn shadow-none" @click="show = !show">
         <div class="clearfix">
           <span class="float-start">{{ messages.title }}</span>
@@ -13,12 +13,9 @@
         </div>
       </button>
       <ul v-if="show" class="resources-list">
-        <os-resource-item
-          v-for="resource in unlocked"
-          :key="resource.id"
-          :item="resource"
-          class="resource-item"
-        />
+        <li v-for="resource in unlocked" :key="resource.id">
+          <os-resource-item :item="resource" class="w-100" />
+        </li>
       </ul>
     </div>
   </div>

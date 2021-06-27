@@ -1,19 +1,17 @@
 <template>
-  <div class="col-6">
-    <tippy>
-      <button
-        type="button"
-        class="btn btn-outline-secondary w-100"
-        :class="{ disabled }"
-        @click="clicked()"
-      >
-        <slot></slot>
-      </button>
-      <template #content>
-        <slot name="tooltip"></slot>
-      </template>
-    </tippy>
-  </div>
+  <tippy>
+    <button
+      type="button"
+      class="btn btn-outline-secondary w-100"
+      :class="{ disabled }"
+      @click="clicked()"
+    >
+      <slot></slot>
+    </button>
+    <template #content>
+      <slot name="tooltip"></slot>
+    </template>
+  </tippy>
 </template>
 
 <script lang="ts">

@@ -102,9 +102,13 @@ $tippy-border-color: $dark;
 ul.resources-list {
   @extend .list-group, .list-group-flush;
 
-  & > .resource-item {
+  & > li {
     @extend .p-1, .small, .list-group-item;
   }
+}
+
+.number {
+  @extend .font-monospace;
 }
 
 // remove overflow from flexbox

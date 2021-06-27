@@ -10,9 +10,12 @@
         <os-controls />
       </div>
     </div>
-    <div class="shrinkable col p-2">
-      <div>
+    <div class="d-flex flex-column shrinkable col p-2">
+      <div class="mb-2">
         <os-environment />
+      </div>
+      <div class="shrinkable">
+        <div class="p-2">You are a kitten in a catnip forest.</div>
       </div>
     </div>
   </div>
