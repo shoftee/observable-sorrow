@@ -15,9 +15,7 @@
         <os-environment />
       </div>
       <div class="scrollable">
-        <section class="scrollable scrollable-overflow card p-2">
-          You are a kitten in a catnip forest.
-        </section>
+        <os-history />
       </div>
     </div>
   </div>
@@ -27,6 +25,7 @@
 import Resources from "./game/Resources.vue";
 import Controls from "./game/Controls.vue";
 import Environment from "./game/Environment.vue";
+import History from "./game/History.vue";
 
 import { defineComponent } from "vue";
 export default defineComponent({
@@ -34,6 +33,7 @@ export default defineComponent({
     "os-resources": Resources,
     "os-controls": Controls,
     "os-environment": Environment,
+    "os-history": History,
   },
 });
 </script> 
