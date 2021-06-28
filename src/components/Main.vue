@@ -10,14 +10,13 @@
         <os-controls />
       </div>
     </div>
-    <div class="scrollable col p-2 ps-1 d-flex flex-column">
-      <div class="mb-2">
+    <div class="scrollable col p-2 ps-1 d-flex flex-column gap-2">
+      <div>
         <os-environment />
       </div>
-      <div class="mb-2">You are a kitten in a catnip forest.</div>
       <div class="scrollable">
-        <section class="scrollable .scrollable-overflow card p-2">
-          History log would appear here if it was implemented.
+        <section class="scrollable scrollable-overflow card p-2">
+          You are a kitten in a catnip forest.
         </section>
       </div>
     </div>

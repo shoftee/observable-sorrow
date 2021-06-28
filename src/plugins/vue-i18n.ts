@@ -6,7 +6,6 @@ const i18n = createI18n({
   legacy: false,
   locale: "en",
   fallbackLocale: "en",
-  flatJson: true,
   messages: {
     en,
   },

@@ -38,7 +38,7 @@
             </div>
             <div v-if="item.effects.length > 0">
               <div class="card-header">
-                {{ t("effects.title.per-level.label") }}
+                {{ t("effects.title.per-level") }}
               </div>
               <ul class="effects-list">
                 <li v-for="effect in item.effects" :key="effect.resourceId">

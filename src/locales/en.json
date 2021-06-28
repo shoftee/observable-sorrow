@@ -1,25 +1,70 @@
 {
-  "resources.section.label": "Resources",
-  "resources.section.empty": "Your paws are empty.",
+  "resources": {
+    "section": {
+      "label": "Resources",
+      "empty": "Your paws are empty."
+    },
+    "catnip": {
+      "label": "catnip"
+    },
+    "wood": {
+      "label": "wood"
+    }
+  },
 
-  "resources.catnip.label": "catnip",
-  "resources.wood.label": "wood",
+  "environment": {
+    "seasons": {
+      "spring": {
+        "label": "Spring"
+      },
+      "summer": {
+        "label": "Summer"
+      },
+      "autumn": {
+        "label": "Autumn"
+      },
+      "winter": {
+        "label": "Winter"
+      }
+    },
+    "weather": {
+      "warm": "Warm",
+      "cold": "Cold"
+    },
+    "calendar": {
+      "basic": {
+        "no-weather": "{season}",
+        "weather": "{season} ({weather})"
+      },
+      "full": {
+        "no-weather": "Year {year} – {season}, day {day}",
+        "weather": "Year {year} – {season} ({weather}), day {day}"
+      }
+    }
+  },
 
-  "environment.seasons.spring.label": "Spring",
-  "environment.seasons.summer.label": "Summer",
-  "environment.seasons.autumn.label": "Autumn",
-  "environment.seasons.winter.label": "Winter",
+  "bonfire": {
+    "gather-catnip": {
+      "label": "Gather catnip",
+      "description": "Gather some catnip in the forest."
+    },
+    "refine-catnip": {
+      "label": "Refine catnip",
+      "description": "Refine catnip into catnip wood."
+    },
+    "catnip-field": {
+      "label": "Catnip field",
+      "description": "Plant some catnip to grow in the village. Fields have increased production during Spring and decreased production during Winter.",
+      "flavor": "‘Nip as far as the eye can see."
+    }
+  },
 
-  "bonfire.gather-catnip.label": "Gather catnip",
-  "bonfire.gather-catnip.description": "Gather some catnip in the forest.",
-
-  "bonfire.refine-catnip.label": "Refine catnip",
-  "bonfire.refine-catnip.description": "Refine catnip into catnip wood.",
-
-  "bonfire.catnip-field.label": "Catnip field",
-  "bonfire.catnip-field.description": "Plant some catnip to grow in the village. Fields have increased production during Spring and decreased production during Winter.",
-  "bonfire.catnip-field.flavor": "'Nip as far as the eye can see.",
-
-  "effects.title.per-level.label": "Effects (per level)",
-  "effects.catnip-production.label": "Catnip production"
+  "effects": {
+    "title": {
+      "per-level": "Effects (per level)"
+    },
+    "catnip-production": {
+      "label": "Catnip production"
+    }
+  }
 }
