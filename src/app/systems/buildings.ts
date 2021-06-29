@@ -55,7 +55,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
 
   private updatePrices(building: BuildingEntity) {
     const buildingMetadata = BuildingMetadata[building.id];
-    const prices = buildingMetadata.effects.prices;
+    const prices = buildingMetadata.prices;
     const level = building.state.level;
     const priceMultiplier = Math.pow(prices.ratio, level);
 

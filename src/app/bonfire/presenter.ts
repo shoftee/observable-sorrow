@@ -85,7 +85,7 @@ export class BonfirePresenter implements IBonfirePresenter {
 
       case "buy-building":
         result.ingredients = this.newRecipeList(
-          BuildingMetadata[item.intent.buildingId].effects.prices.ingredients,
+          BuildingMetadata[item.intent.buildingId].prices.ingredients,
         );
         result.effects = this.newEffectsList(
           BuildingMetadata[item.intent.buildingId].effects.production,

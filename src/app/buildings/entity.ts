@@ -27,7 +27,7 @@ export class BuildingEntity extends ChangeTrackedEntity<State & Price> {
   init(): void {
     this.price = this.addComponent(new BuildingPriceComponent());
     this.price.ingredients = cloneDeep(
-      BuildingMetadata[this.id].effects.prices.ingredients,
+      BuildingMetadata[this.id].prices.ingredients,
     );
 
     this.effects = this.addComponent(new BuildingEffectComponent());
