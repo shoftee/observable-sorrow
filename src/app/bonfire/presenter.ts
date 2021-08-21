@@ -12,8 +12,8 @@ import {
   ResourceId,
   ResourceMetadata,
   WorkshopRecipeMetadata,
-  ProductionEffectType,
   ProductionEffectMetadata,
+  ProductionEffectId,
 } from "../core/metadata";
 import { EntityAdmin } from "../game/entity-admin";
 
@@ -108,16 +108,18 @@ export class BonfirePresenter implements IBonfirePresenter {
   }
 
   private newEffectsList(
-    effects: ProductionEffectType[],
+    productionEffectIds: ProductionEffectId[],
   ): ProductionEffectItem[] {
-    return effects.map(
-      (effect) =>
-        new ProductionEffectItem(
-          effect.resourceId,
-          ProductionEffectMetadata[effect.id].label,
-          effect.amount,
-        ),
-    );
+    return productionEffectIds
+      .map((id) => ProductionEffectMetadata[id])
+      .map(
+        (effect) =>
+          new ProductionEffectItem(
+            effect.resourceId,
+            effect.label,
+            effect.amount,
+          ),
+      );
   }
 }
 

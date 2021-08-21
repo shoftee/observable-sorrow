@@ -1,4 +1,4 @@
-import { ProductionEffectType } from ".";
+import { ProductionEffectId } from "./effects";
 import { ResourceQuantityType } from "./recipes";
 
 export type BuildingId = "catnip-field";
@@ -11,7 +11,7 @@ export type BuildingMetadataType = {
     ingredients: ResourceQuantityType[];
   };
   effects: {
-    production: ProductionEffectType[];
+    production: ProductionEffectId[];
   };
 };
 
@@ -24,9 +24,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     },
     unlockRatio: 0.3,
     effects: {
-      production: [
-        { id: "catnip-field-production", resourceId: "catnip", amount: 0.025 },
-      ],
+      production: ["catnip-field-production"],
     },
   },
 };

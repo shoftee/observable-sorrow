@@ -9,7 +9,12 @@ import {
 import { BonfirePresenter, BonfireInteractor } from "../bonfire";
 import { BuildingEntity } from "../buildings";
 import { SystemTimestampProvider } from "../core";
-import { BuildingMetadata, ResourceMetadata } from "../core/metadata";
+import {
+  BuildingMetadata,
+  ProductionEffectMetadata,
+  ResourceMetadata,
+} from "../core/metadata";
+import { ProductionEffectEntity } from "../effects";
 import { EnvironmentEntity, EnvironmentPresenter } from "../environment";
 import { ResourceEntity, ResourcePresenter } from "../resources";
 import {
@@ -46,6 +51,9 @@ export class Game implements IGame {
   constructor() {
     for (const building of Object.values(BuildingMetadata)) {
       this.admin.add(new BuildingEntity(this.admin, building.id));
+    }
+    for (const effect of Object.values(ProductionEffectMetadata)) {
+      this.admin.add(new ProductionEffectEntity(this.admin, effect.id));
     }
     for (const resource of Object.values(ResourceMetadata)) {
       this.admin.add(new ResourceEntity(this.admin, resource.id));

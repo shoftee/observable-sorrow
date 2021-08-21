@@ -8,15 +8,18 @@ export type ProductionEffectType = {
   amount: number;
 };
 
-type LocalizationData = {
+export type ProductionEffectMetadataType = ProductionEffectType & {
   label: string;
 };
 
 export const ProductionEffectMetadata: Record<
   ProductionEffectId,
-  LocalizationData
+  ProductionEffectMetadataType
 > = {
   "catnip-field-production": {
+    id: "catnip-field-production",
+    resourceId: "catnip",
+    amount: 0.025,
     label: "effects.catnip-field-production.label",
   },
 };

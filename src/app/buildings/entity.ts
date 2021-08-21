@@ -6,7 +6,6 @@ import { BuildingId, BuildingMetadata } from "../core/metadata";
 import { EntityAdmin } from "../game/entity-admin";
 import {
   BuildingPriceComponent,
-  BuildingEffectComponent,
   BuildingStateComponent,
   BuildQueueComponent,
 } from "./components";
@@ -18,7 +17,6 @@ export class BuildingEntity extends ChangeTrackedEntity<State & Price> {
   buildQueue!: BuildQueueComponent;
   state!: BuildingStateComponent;
   price!: BuildingPriceComponent;
-  effects!: BuildingEffectComponent;
 
   constructor(admin: EntityAdmin, readonly id: BuildingId) {
     super(admin, id);
@@ -28,11 +26,6 @@ export class BuildingEntity extends ChangeTrackedEntity<State & Price> {
     this.price = this.addComponent(new BuildingPriceComponent());
     this.price.ingredients = cloneDeep(
       BuildingMetadata[this.id].prices.ingredients,
-    );
-
-    this.effects = this.addComponent(new BuildingEffectComponent());
-    this.effects.production = cloneDeep(
-      BuildingMetadata[this.id].effects.production,
     );
 
     this.buildQueue = this.addComponent(new BuildQueueComponent());
