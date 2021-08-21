@@ -1,14 +1,13 @@
 <template>
   <div class="controls d-flex flex-column">
-    <section class="row row-cols-1 row-cols-xl-2">
+    <section class="row row-cols-1 row-cols-xl-2 g-2">
       <div class="col" v-for="item in items.values()" :key="item.id">
         <os-button :disabled="!item.fulfilled" @click="buildItem(item.id)">
           <template #default
             >{{ t(item.label) }}
-            <span v-if="item.level > 0"
-              >(<span class="number">{{ item.level }}</span
-              >)</span
-            >
+            <span v-if="item.level > 0" class="structure-level">
+              {{ item.level }}
+            </span>
           </template>
           <template #tooltip>
             <div>

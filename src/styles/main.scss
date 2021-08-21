@@ -127,8 +127,7 @@ footer {
 }
 
 // controls
-.controls {
-  & > section.row {
-    @extend .g-2;
-  }
+.btn .structure-level {
+  @extend .number, .badge, .bg-secondary;
+  top: -2px;
 }
