@@ -21,12 +21,13 @@ import {
   IGameSystems,
   GameSystems,
   BuildingSystem,
+  BuildingEffectsSystem,
   CraftingSystem,
   LockToggleSystem,
+  ResourceProductionSystem,
   TimeSystem,
   TransactionSystem,
 } from "../systems";
-import { ProductionSystem } from "../systems/production";
 import { SandcastleBuilderNotation } from "../utils/notation";
 import { WorkshopEntity } from "../workshop";
 import { EntityAdmin } from "./entity-admin";
@@ -65,9 +66,10 @@ export class Game implements IGame {
 
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
+      new BuildingEffectsSystem(this.admin),
       new CraftingSystem(this.admin),
       new LockToggleSystem(this.admin),
-      new ProductionSystem(this.admin),
+      new ResourceProductionSystem(this.admin),
       new TimeSystem(this.admin),
       new TransactionSystem(this.admin),
     );
@@ -118,11 +120,14 @@ export class Game implements IGame {
 
   private update(dt: number): void {
     this._systems.time.update(dt);
-    this._systems.production.update(dt);
+
     this._systems.crafting.update(dt);
     this._systems.transactions.update(dt);
     this._systems.buildings.update(dt);
+    this._systems.buildingEffects.update(dt);
     this._systems.lockToggle.update(dt);
+
+    this._systems.resourceProduction.update(dt);
 
     this._presenter.environment.render();
     this._presenter.resources.render();

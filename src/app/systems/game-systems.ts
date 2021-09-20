@@ -1,14 +1,15 @@
 import {
-  BuildingSystem,
   IBuildingSystem,
   ITransactionSystem,
-  TransactionSystem,
-  CraftingSystem,
   ICraftingSystem,
+  BuildingSystem,
+  BuildingEffectsSystem,
+  CraftingSystem,
   LockToggleSystem,
+  ResourceProductionSystem,
   TimeSystem,
+  TransactionSystem,
 } from ".";
-import { ProductionSystem } from "./production";
 
 export interface IGameSystems {
   readonly buildings: IBuildingSystem;
@@ -19,9 +20,10 @@ export interface IGameSystems {
 export class GameSystems implements IGameSystems {
   constructor(
     readonly buildings: BuildingSystem,
+    readonly buildingEffects: BuildingEffectsSystem,
     readonly crafting: CraftingSystem,
     readonly lockToggle: LockToggleSystem,
-    readonly production: ProductionSystem,
+    readonly resourceProduction: ResourceProductionSystem,
     readonly time: TimeSystem,
     readonly transactions: TransactionSystem,
   ) {}
