@@ -2,7 +2,16 @@
   <div class="d-inline-flex align-items-center">
     <div class="name col-3">
       <span>{{ t(item.label) }}</span>
-      <!-- <span class="badge bg-danger badge-light">!</span> -->
+      <span
+        class="ms-1 badge"
+        :class="{
+          'bg-primary': !item.decorationKind,
+          'badge-light': !!item.decorationKind,
+          'bg-success': item.decorationKind == 'bonus',
+          'bg-danger': item.decorationKind == 'malus',
+        }"
+        >{{ item.decorationText }}</span
+      >
     </div>
     <div class="col-3 number amount">{{ n(item.amount) }}</div>
     <template v-if="item.capacity">

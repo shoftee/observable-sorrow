@@ -14,6 +14,7 @@ import {
   ProductionEffectMetadata,
   ResourceMetadata,
 } from "../core/metadata";
+import { ChangeTrackedEntity } from "../ecs";
 import { ProductionEffectEntity } from "../effects";
 import { EnvironmentEntity, EnvironmentPresenter } from "../environment";
 import { ResourceEntity, ResourcePresenter } from "../resources";
@@ -22,8 +23,8 @@ import {
   GameSystems,
   BuildingSystem,
   BuildingEffectsSystem,
-  CalendarSystem,
   CraftingSystem,
+  EnvironmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
   TransactionSystem,
@@ -67,8 +68,8 @@ export class Game implements IGame {
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
       new BuildingEffectsSystem(this.admin),
-      new CalendarSystem(this.admin),
       new CraftingSystem(this.admin),
+      new EnvironmentSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
       new TransactionSystem(this.admin),
@@ -122,7 +123,7 @@ export class Game implements IGame {
     // Advance timers
     this.admin.timers().update(dt);
 
-    this._systems.calendar.update();
+    this._systems.environment.update();
 
     this._systems.crafting.update();
     this._systems.transactions.update();
@@ -135,5 +136,12 @@ export class Game implements IGame {
     this._presenter.environment.render();
     this._presenter.resources.render();
     this._presenter.bonfire.render();
+
+    // Clear tracked changes for this tick.
+    for (const entity of this.admin.pool.values()) {
+      if (entity instanceof ChangeTrackedEntity) {
+        entity.notifier.clear();
+      }
+    }
   }
 }

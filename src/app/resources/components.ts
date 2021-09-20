@@ -8,8 +8,6 @@ export class ResourceStateComponent extends Component {
   change?: number;
 }
 
-export class CapacityComponent extends Component {}
-
 export class MutationComponent extends QueueComponent<number> {
   give(n: number): void {
     this.enqueue(n);

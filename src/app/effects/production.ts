@@ -1,11 +1,9 @@
 import { ProductionEffectComponent } from ".";
 import { ProductionEffectId, ProductionEffectMetadata } from "../core/metadata";
-import { ChangeTrackedEntity, ComponentState } from "../ecs";
+import { Entity } from "../ecs";
 import { EntityAdmin } from "../game/entity-admin";
 
-type State = ComponentState<ProductionEffectComponent>;
-
-export class ProductionEffectEntity extends ChangeTrackedEntity<State> {
+export class ProductionEffectEntity extends Entity {
   constructor(admin: EntityAdmin, readonly id: ProductionEffectId) {
     super(admin, id);
   }

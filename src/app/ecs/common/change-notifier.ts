@@ -1,26 +1,28 @@
-import { QueueComponent } from "./queue";
+import { Component } from "..";
 
-export class ChangeNotifierComponent<
+export class ChangeTrackedComponent<
   TState,
   K extends keyof TState = keyof TState,
-> extends QueueComponent<K> {
+> extends Component {
+  private marked = new Set<K>();
+
   mark(...keys: K[]): void {
     for (const key of keys) {
-      this.enqueue(key);
+      this.marked.add(key);
     }
   }
 
   apply(handler: (key: K) => void): void {
-    const keys = new Set<K>();
-    this.consume((key) => {
-      if (!keys.has(key)) {
-        handler(key);
-        keys.add(key);
-      }
-    });
+    for (const key of this.marked) {
+      handler(key);
+    }
+  }
+
+  clear(): void {
+    this.marked.clear();
   }
 
   hasChanges(): boolean {
-    return this.length > 0;
+    return this.marked.size > 0;
   }
 }
