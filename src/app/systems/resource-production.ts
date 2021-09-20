@@ -6,7 +6,7 @@ export class ResourceProductionSystem extends System {
     super(admin);
   }
 
-  update(_dt: number): void {
+  update(): void {
     // queue mutations based on delta time
     const delta = this.admin.timers().ticks.delta;
     for (const resource of this.admin.resources()) {

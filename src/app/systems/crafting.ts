@@ -16,7 +16,7 @@ export class CraftingSystem extends System implements ICraftingSystem {
     this.admin.workshop().orders.enqueue(id);
   }
 
-  update(_dt: number): void {
+  update(): void {
     this.admin.workshop().orders.consume((id) => this.build(id));
   }
 

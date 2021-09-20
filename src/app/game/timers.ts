@@ -1,9 +1,9 @@
 import { CalendarConstants } from "../core/metadata";
-import { Entity } from "../ecs";
+import { SimpleEntity } from "../ecs";
 import { TimerComponent } from "../ecs/common";
 import { EntityAdmin } from "./entity-admin";
 
-export class TimersEntity extends Entity {
+export class TimersEntity extends SimpleEntity {
   ticks!: TimerComponent;
   days!: TimerComponent;
 
@@ -16,5 +16,10 @@ export class TimersEntity extends Entity {
     this.days = this.addComponent(
       new TimerComponent(CalendarConstants.TicksPerDay),
     );
+  }
+
+  update(dt: number): void {
+    this.ticks.update(dt);
+    this.days.update(dt);
   }
 }

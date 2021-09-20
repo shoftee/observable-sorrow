@@ -11,7 +11,7 @@ export class TransactionSystem extends System implements ITransactionSystem {
     this.admin.resource(id).mutations.give(amount);
   }
 
-  update(_dt: number): void {
+  update(): void {
     for (const resource of this.admin.resources()) {
       this.updateAmount(resource);
     }

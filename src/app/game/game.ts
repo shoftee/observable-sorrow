@@ -22,10 +22,10 @@ import {
   GameSystems,
   BuildingSystem,
   BuildingEffectsSystem,
+  CalendarSystem,
   CraftingSystem,
   LockToggleSystem,
   ResourceProductionSystem,
-  TimeSystem,
   TransactionSystem,
 } from "../systems";
 import { SandcastleBuilderNotation } from "../utils/notation";
@@ -67,10 +67,10 @@ export class Game implements IGame {
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
       new BuildingEffectsSystem(this.admin),
+      new CalendarSystem(this.admin),
       new CraftingSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
-      new TimeSystem(this.admin),
       new TransactionSystem(this.admin),
     );
 
@@ -119,15 +119,18 @@ export class Game implements IGame {
   }
 
   private update(dt: number): void {
-    this._systems.time.update(dt);
+    // Advance timers
+    this.admin.timers().update(dt);
 
-    this._systems.crafting.update(dt);
-    this._systems.transactions.update(dt);
-    this._systems.buildings.update(dt);
-    this._systems.buildingEffects.update(dt);
-    this._systems.lockToggle.update(dt);
+    this._systems.calendar.update();
 
-    this._systems.resourceProduction.update(dt);
+    this._systems.crafting.update();
+    this._systems.transactions.update();
+    this._systems.buildings.update();
+    this._systems.buildingEffects.update();
+    this._systems.lockToggle.update();
+
+    this._systems.resourceProduction.update();
 
     this._presenter.environment.render();
     this._presenter.resources.render();

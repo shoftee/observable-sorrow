@@ -5,29 +5,14 @@ import { CalendarConstants } from "../core/metadata";
 
 import { SeasonId } from "../environment";
 
-export class TimeSystem extends System {
-  private get ticks(): TimerComponent {
-    return this.admin.timers().ticks;
-  }
-
-  private get days(): TimerComponent {
-    return this.admin.timers().days;
-  }
-
-  update(dt: number): void {
-    // Advance timers
-    this.ticks.update(dt);
-    this.days.update(dt);
-
-    this.updateCalendar();
-  }
-
-  private updateCalendar(): void {
+export class CalendarSystem extends System {
+  update(): void {
     const environment = this.admin.environment();
     const calendar = environment.calendar;
 
-    if (this.days.wholeTicks > 0) {
-      calendar.day += this.days.wholeTicks;
+    const days = this.admin.timers().days;
+    if (days.wholeTicks > 0) {
+      calendar.day += days.wholeTicks;
       environment.notifier.mark("day");
 
       while (calendar.day >= CalendarConstants.DaysPerSeason) {

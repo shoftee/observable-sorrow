@@ -25,3 +25,7 @@ export abstract class ChangeTrackedEntity<TState> extends Entity {
     this.notifier = this.addComponent(new ChangeNotifierComponent<TState>());
   }
 }
+
+export abstract class SimpleEntity extends Entity {
+  abstract update(dt: number): void;
+}

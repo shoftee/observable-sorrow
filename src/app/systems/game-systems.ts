@@ -4,10 +4,10 @@ import {
   ICraftingSystem,
   BuildingSystem,
   BuildingEffectsSystem,
+  CalendarSystem,
   CraftingSystem,
   LockToggleSystem,
   ResourceProductionSystem,
-  TimeSystem,
   TransactionSystem,
 } from ".";
 
@@ -21,10 +21,10 @@ export class GameSystems implements IGameSystems {
   constructor(
     readonly buildings: BuildingSystem,
     readonly buildingEffects: BuildingEffectsSystem,
+    readonly calendar: CalendarSystem,
     readonly crafting: CraftingSystem,
     readonly lockToggle: LockToggleSystem,
     readonly resourceProduction: ResourceProductionSystem,
-    readonly time: TimeSystem,
     readonly transactions: TransactionSystem,
   ) {}
 }

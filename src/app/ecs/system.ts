@@ -1,8 +1,7 @@
 import { EntityAdmin } from "../game/entity-admin";
-import { IUpdate } from "./lifecycle";
 
-export abstract class System implements IUpdate {
+export abstract class System {
   constructor(protected readonly admin: EntityAdmin) {}
 
-  abstract update(dt: number): void;
+  abstract update(): void;
 }

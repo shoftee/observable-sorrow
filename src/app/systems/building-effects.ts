@@ -8,7 +8,7 @@ export class BuildingEffectsSystem extends System {
     super(admin);
   }
 
-  update(_dt: number): void {
+  update(): void {
     // recalculate production effects from buildings
     for (const building of this.admin.buildings()) {
       const level = building.state.level;

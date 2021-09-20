@@ -4,7 +4,7 @@ import { System } from "../ecs";
 import { ResourceEntity } from "../resources";
 
 export class LockToggleSystem extends System {
-  update(_dt: number): void {
+  update(): void {
     for (const resource of this.admin.resources()) {
       this.updateResourceUnlocked(resource);
     }

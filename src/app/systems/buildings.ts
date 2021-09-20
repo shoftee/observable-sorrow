@@ -23,7 +23,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
   }
 
   // update method
-  update(_dt: number): void {
+  update(): void {
     for (const building of this.admin.buildings()) {
       const levelChanged = this.processBuildQueue(building);
       if (levelChanged) {
