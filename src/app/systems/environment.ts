@@ -27,19 +27,19 @@ export class EnvironmentSystem extends System {
   }
 
   private progressToNextSeason(environment: EnvironmentEntity) {
-    const nextSeason = this.calculateNextSeason(environment.calendar.season);
-    environment.calendar.season = nextSeason;
+    const newSeason = this.calculateNextSeason(environment.calendar.season);
+    environment.calendar.season = newSeason;
     environment.notifier.mark("season");
 
-    if (environment.calendar.season === "spring") {
+    if (newSeason === "spring") {
       environment.calendar.year++;
       environment.notifier.mark("year");
     }
 
     let weatherSeasonAdjustment = 0;
-    if (environment.calendar.season === "spring") {
+    if (newSeason === "spring") {
       weatherSeasonAdjustment = 0.5;
-    } else if (environment.calendar.season === "winter") {
+    } else if (newSeason === "winter") {
       weatherSeasonAdjustment = -0.75;
     }
 
