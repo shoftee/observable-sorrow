@@ -11,12 +11,9 @@ export class ResourceProductionSystem extends System {
       const resource = this.admin.resource(entity.effect.resourceId);
       resource.state.change = entity.effect.amount;
       if (entity.id == "catnip-field-production") {
-        const weatherAdjustment = this.admin.environment().weather.adjustment;
-        if (weatherAdjustment != 0) {
-          resource.state.change *= 1 + weatherAdjustment;
-        }
+        const weatherModifier = this.admin.environment().state.weatherModifier;
+        resource.state.change *= 1 + weatherModifier;
       }
-      resource.notifier.mark("change");
     }
 
     // queue mutations based on delta time

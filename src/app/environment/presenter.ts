@@ -29,20 +29,17 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
     const calendarRaw = unref(this.calendar);
     const weatherRaw = unref(this.weather);
 
-    const calendar = entity.calendar;
-    const weather = entity.weather;
-
-    entity.notifier.apply((key) => {
-      if (key == "day") calendarRaw.day = calendar.day;
-      if (key == "season") calendarRaw.seasonId = calendar.season;
-      if (key == "year") calendarRaw.year = calendar.year;
+    entity.changes.apply((key) => {
+      if (key == "day") calendarRaw.day = entity.state.day;
+      if (key == "season") calendarRaw.seasonId = entity.state.season;
+      if (key == "year") calendarRaw.year = entity.state.year;
 
       if (key == "weatherId") {
-        weatherRaw.weatherId = weather.weatherId;
+        weatherRaw.weatherId = entity.state.weatherId;
       }
 
-      if (key == "adjustment") {
-        weatherRaw.adjustment = weather.adjustment;
+      if (key == "weatherModifier") {
+        weatherRaw.weatherModifier = entity.state.weatherModifier;
       }
     });
   }
@@ -65,11 +62,11 @@ export class CalendarViewModel {
 }
 
 export class WeatherViewModel {
-  adjustment: number;
+  weatherModifier: number;
   title: string;
 
   constructor() {
-    this.adjustment = 0;
+    this.weatherModifier = 0;
     this.title = "";
   }
 

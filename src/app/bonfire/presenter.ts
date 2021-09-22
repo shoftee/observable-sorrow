@@ -44,7 +44,7 @@ export class BonfirePresenter implements IBonfirePresenter {
       // Update unlocked status
       if (metadata.intent.kind == "buy-building") {
         const building = this.admin.building(metadata.intent.buildingId);
-        building.notifier.apply((key) => {
+        building.changes.apply((key) => {
           switch (key) {
             case "unlocked":
               item.unlocked = building.state.unlocked;
@@ -64,7 +64,7 @@ export class BonfirePresenter implements IBonfirePresenter {
   private updatePrices(item: BonfireItem, entity: BuildingEntity): void {
     for (let i = 0; i < item.ingredients.length; i++) {
       const itemIngredient = item.ingredients[i];
-      const entityIngredient = entity.price.ingredients[i];
+      const entityIngredient = entity.state.ingredients[i];
       itemIngredient.requirement = entityIngredient.amount;
     }
   }

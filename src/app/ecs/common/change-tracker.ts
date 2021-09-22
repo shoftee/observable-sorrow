@@ -1,6 +1,6 @@
 import { Component } from "..";
 
-export class ChangeTrackedComponent<
+export class ChangeTracker<
   TState,
   K extends keyof TState = keyof TState,
 > extends Component {

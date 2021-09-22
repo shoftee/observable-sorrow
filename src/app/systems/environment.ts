@@ -10,50 +10,58 @@ import { EnvironmentEntity, SeasonId } from "../environment";
 import { DefaultChooser } from "../utils/probability";
 
 export class EnvironmentSystem extends System {
+  get environment(): EnvironmentEntity {
+    return this.admin.environment();
+  }
+
+  init(): void {
+    this.updateWeather("spring");
+  }
+
   update(): void {
-    const environment = this.admin.environment();
-    const calendar = environment.calendar;
+    const environment = this.environment;
 
     const days = this.admin.timers().days;
     if (days.wholeTicks > 0) {
-      calendar.day += days.wholeTicks;
-      environment.notifier.mark("day");
+      environment.state.day += days.wholeTicks;
 
-      while (calendar.day >= CalendarConstants.DaysPerSeason) {
-        calendar.day -= CalendarConstants.DaysPerSeason;
-        this.progressToNextSeason(environment);
+      while (environment.state.day >= CalendarConstants.DaysPerSeason) {
+        environment.state.day -= CalendarConstants.DaysPerSeason;
+        this.progressToNextSeason();
       }
     }
   }
 
-  private progressToNextSeason(environment: EnvironmentEntity) {
-    const newSeason = this.calculateNextSeason(environment.calendar.season);
-    environment.calendar.season = newSeason;
-    environment.notifier.mark("season");
+  private progressToNextSeason() {
+    const environment = this.environment;
+    const newSeason = this.calculateNextSeason(environment.state.season);
+    environment.state.season = newSeason;
 
     if (newSeason === "spring") {
-      environment.calendar.year++;
-      environment.notifier.mark("year");
+      environment.state.year++;
     }
 
-    let weatherSeasonAdjustment = 0;
-    if (newSeason === "spring") {
-      weatherSeasonAdjustment = 0.5;
-    } else if (newSeason === "winter") {
-      weatherSeasonAdjustment = -0.75;
+    this.updateWeather(newSeason);
+  }
+
+  private updateWeather(season: string) {
+    const environment = this.environment;
+    let seasonModifier = 0;
+    if (season === "spring") {
+      seasonModifier = 0.5;
+    } else if (season === "winter") {
+      seasonModifier = -0.75;
     }
 
-    const weatherId: WeatherId = this.calculateNextWeather();
-    if (environment.weather.weatherId != weatherId) {
-      environment.weather.weatherId = weatherId;
-      environment.notifier.mark("weatherId");
+    const weatherId: WeatherId = this.chooseWeather();
+    if (environment.state.weatherId != weatherId) {
+      environment.state.weatherId = weatherId;
     }
 
-    const weatherAdjustment =
-      weatherSeasonAdjustment + WeatherMetadata[weatherId].adjustment;
-    if (environment.weather.adjustment != weatherAdjustment) {
-      environment.weather.adjustment = weatherAdjustment;
-      environment.notifier.mark("adjustment");
+    const totalModifier =
+      seasonModifier + WeatherMetadata[weatherId].adjustment;
+    if (environment.state.weatherModifier != totalModifier) {
+      environment.state.weatherModifier = totalModifier;
     }
   }
 
@@ -70,7 +78,13 @@ export class EnvironmentSystem extends System {
     }
   }
 
-  private calculateNextWeather(): WeatherId {
+  private chooseWeather(): WeatherId {
+    // Weather is handicapped to neutral during the first four years.
+    const year = this.environment.state.year;
+    if (0 <= year && year <= 3) {
+      return "neutral";
+    }
+
     return DefaultChooser.choose(
       [
         {

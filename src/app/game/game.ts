@@ -72,6 +72,7 @@ export class Game implements IGame {
       new ResourceProductionSystem(this.admin),
       new TransactionSystem(this.admin),
     );
+    this._systems.init();
 
     this.updater = new GameUpdater(
       (dt) => this.update(dt),
@@ -141,7 +142,7 @@ export class Game implements IGame {
     // Clear tracked changes for this tick.
     for (const entity of this.admin.pool.values()) {
       if (entity instanceof ChangeTrackedEntity) {
-        entity.notifier.clear();
+        entity.changes.clear();
       }
     }
   }

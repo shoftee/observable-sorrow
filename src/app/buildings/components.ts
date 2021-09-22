@@ -1,15 +1,23 @@
+import { cloneDeep } from "lodash";
+
 import { Component } from "../ecs";
 import { QueueComponent } from "../ecs/common";
 
-import { ResourceQuantityType } from "../core/metadata";
+import {
+  BuildingId,
+  BuildingMetadata,
+  ResourceQuantityType,
+} from "../core/metadata";
 
 export class BuildingStateComponent extends Component {
+  readonly ingredients: ResourceQuantityType[];
   unlocked = false;
   level = 0;
-}
 
-export class BuildingPriceComponent extends Component {
-  ingredients: ResourceQuantityType[] = [];
+  constructor(id: BuildingId) {
+    super();
+    this.ingredients = cloneDeep(BuildingMetadata[id].prices.ingredients);
+  }
 }
 
 interface BuildingCommand {

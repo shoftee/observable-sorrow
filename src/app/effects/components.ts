@@ -1,13 +1,19 @@
-import { ResourceId, ProductionEffectType } from "../core/metadata";
+import {
+  ResourceId,
+  ProductionEffectMetadata,
+  ProductionEffectId,
+} from "../core/metadata";
 import { Component } from "../ecs";
 
 export class ProductionEffectComponent extends Component {
   resourceId: ResourceId;
   amount: number;
 
-  constructor(proto: ProductionEffectType) {
+  constructor(id: ProductionEffectId) {
     super();
-    this.resourceId = proto.resourceId;
-    this.amount = proto.amount;
+
+    const metadata = ProductionEffectMetadata[id];
+    this.resourceId = metadata.resourceId;
+    this.amount = metadata.amount;
   }
 }

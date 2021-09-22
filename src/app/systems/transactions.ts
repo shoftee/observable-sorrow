@@ -32,7 +32,6 @@ export class TransactionSystem extends System implements ITransactionSystem {
     // set and notify
     if (newValue != currentValue) {
       resource.state.amount = newValue;
-      resource.notifier.mark("amount");
       return true;
     }
 

@@ -1,3 +1,3 @@
-export * from "./change-tracked-component";
+export * from "./change-tracker";
 export * from "./queue";
 export * from "./timer";

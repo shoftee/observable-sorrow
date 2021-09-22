@@ -15,7 +15,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
   // external contract
   order(id: BuildingId): void {
     const building = this.admin.building(id);
-    for (const ingredient of building.price.ingredients) {
+    for (const ingredient of building.state.ingredients) {
       const resource = this.admin.resource(ingredient.id);
       resource.mutations.take(ingredient.amount);
     }
@@ -28,7 +28,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
       const levelChanged = this.processBuildQueue(building);
       if (levelChanged) {
         this.updatePrices(building);
-        building.notifier.mark("ingredients");
+        building.changes.mark("ingredients");
       }
     }
   }
@@ -46,7 +46,6 @@ export class BuildingSystem extends System implements IBuildingSystem {
 
     if (level != building.state.level) {
       building.state.level = level;
-      building.notifier.mark("level");
       return true;
     }
 
@@ -61,7 +60,7 @@ export class BuildingSystem extends System implements IBuildingSystem {
 
     for (let i = 0; i < prices.ingredients.length; i++) {
       const ingredientMetadata = prices.ingredients[i];
-      const effective = building.price.ingredients[i];
+      const effective = building.state.ingredients[i];
       effective.amount = ingredientMetadata.amount * priceMultiplier;
     }
   }

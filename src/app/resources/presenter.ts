@@ -38,7 +38,7 @@ export class ResourcePresenter implements IResourcePresenter {
   render(): void {
     for (const item of unref(this.items)) {
       const entity = this.admin.resource(item.id);
-      entity.notifier.apply((key) => {
+      entity.changes.apply((key) => {
         if (key == "unlocked") item.unlocked = entity.state.unlocked;
         if (key == "amount") item.amount = entity.state.amount;
         if (key == "capacity") item.capacity = entity.state.capacity;
@@ -53,8 +53,8 @@ export class ResourcePresenter implements IResourcePresenter {
     }
 
     const environment = this.admin.environment();
-    environment.notifier.apply((key) => {
-      if (key == "adjustment") {
+    environment.changes.apply((key) => {
+      if (key == "weatherModifier") {
         this.updateCatnipDecorations();
       }
     });
@@ -69,8 +69,8 @@ export class ResourcePresenter implements IResourcePresenter {
       if (catnipFieldProduction.effect.amount == 0) {
         catnip.clearDecoration();
       } else {
-        catnip.setDecorationAdjustment(
-          this.admin.environment().weather.adjustment,
+        catnip.setModifierDecoration(
+          this.admin.environment().state.weatherModifier,
         );
       }
     }
@@ -94,15 +94,15 @@ export class ListItem {
     this.decorationKind = undefined;
   }
 
-  setDecorationAdjustment(adjustment: number): void {
-    if (adjustment == 0) {
+  setModifierDecoration(modifier: number): void {
+    if (modifier == 0) {
       this.clearDecoration();
-    } else if (adjustment > 0) {
+    } else if (modifier > 0) {
       this.decorationKind = "bonus";
-      this.decorationText = `+${percent(adjustment)}%`;
-    } else if (adjustment < 0) {
+      this.decorationText = `+${percent(modifier)}%`;
+    } else if (modifier < 0) {
       this.decorationKind = "malus";
-      this.decorationText = `${percent(adjustment)}%`;
+      this.decorationText = `${percent(modifier)}%`;
     }
   }
 }
