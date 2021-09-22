@@ -1,7 +1,4 @@
 import {
-  IBuildingSystem,
-  ITransactionSystem,
-  ICraftingSystem,
   BuildingSystem,
   BuildingEffectsSystem,
   CraftingSystem,
@@ -11,13 +8,7 @@ import {
   TransactionSystem,
 } from ".";
 
-export interface IGameSystems {
-  readonly buildings: IBuildingSystem;
-  readonly crafting: ICraftingSystem;
-  readonly transactions: ITransactionSystem;
-}
-
-export class GameSystems implements IGameSystems {
+export class GameSystems {
   constructor(
     readonly buildings: BuildingSystem,
     readonly buildingEffects: BuildingEffectsSystem,

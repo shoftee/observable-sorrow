@@ -19,7 +19,6 @@ import { ProductionEffectEntity } from "../effects";
 import { EnvironmentEntity, EnvironmentPresenter } from "../environment";
 import { ResourceEntity, ResourcePresenter } from "../resources";
 import {
-  IGameSystems,
   GameSystems,
   BuildingSystem,
   BuildingEffectsSystem,
@@ -36,7 +35,6 @@ import { TimersEntity } from "./timers";
 
 export interface IGame {
   readonly runner: IGameRunner;
-  readonly systems: IGameSystems;
   readonly presenter: IPresenterSystem;
   readonly interactor: IInteractorSystem;
 }
@@ -107,10 +105,6 @@ export class Game implements IGame {
     return this._runner;
   }
 
-  get systems(): IGameSystems {
-    return this._systems;
-  }
-
   get presenter(): IPresenterSystem {
     return this._presenter;
   }
@@ -123,14 +117,21 @@ export class Game implements IGame {
     // Advance timers
     this.admin.timers().update(dt);
 
+    // Update environment.
     this._systems.environment.update();
 
+    // Handle crafting and pending resource transactions.
     this._systems.crafting.update();
     this._systems.transactions.update();
+
+    // Handle buildings and building effects.
     this._systems.buildings.update();
     this._systems.buildingEffects.update();
+
+    // Lock/unlock elements.
     this._systems.lockToggle.update();
 
+    // Handle resources
     this._systems.resourceProduction.update();
 
     this._presenter.environment.render();
