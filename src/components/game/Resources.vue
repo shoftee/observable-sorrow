@@ -1,19 +1,19 @@
 <template>
   <div class="card">
     <div v-if="isEmpty" class="text-start p-2">
-      {{ messages.empty }}
+      {{ t("resources.section.empty") }}
     </div>
     <div v-else class="d-flex flex-column">
       <button class="btn shadow-none" @click="show = !show">
         <div class="clearfix">
-          <span class="float-start">{{ messages.title }}</span>
+          <span class="float-start">{{ t("resources.section.label") }}</span>
           <span class="float-end">
             <i v-if="!show" class="bi bi-arrows-expand"></i
           ></span>
         </div>
       </button>
       <ul v-if="show" class="resources-list">
-        <li v-for="resource in unlocked" :key="resource.id">
+        <li v-for="resource in resources" :key="resource.id">
           <os-resource-item :item="resource" class="w-100" />
         </li>
       </ul>
@@ -35,22 +35,16 @@ export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
     const show = ref(true);
-    const resources = unref(Presenter.resources.items);
+    const items = unref(Presenter.resources.items);
 
-    const unlocked = computed(() => {
-      return resources.filter((e) => e.unlocked);
-    });
+    const resources = computed(() => items.filter((e) => e.unlocked));
+    const isEmpty = computed(() => unref(resources).length == 0);
 
-    const isEmpty = computed(() => unref(unlocked).length == 0);
     return {
       t,
       show,
       isEmpty,
-      unlocked,
-      messages: {
-        empty: t("resources.section.empty"),
-        title: t("resources.section.label"),
-      },
+      resources,
     };
   },
 });
