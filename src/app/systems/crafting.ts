@@ -3,17 +3,9 @@ import { System } from "../ecs";
 import { WorkshopRecipeId, WorkshopRecipeMetadata } from "../core/metadata";
 import { EntityAdmin } from "../game/entity-admin";
 
-export interface ICraftingSystem {
-  order(id: WorkshopRecipeId): void;
-}
-
-export class CraftingSystem extends System implements ICraftingSystem {
+export class CraftingSystem extends System {
   constructor(admin: EntityAdmin) {
     super(admin);
-  }
-
-  order(id: WorkshopRecipeId): void {
-    this.admin.workshop().orders.enqueue(id);
   }
 
   update(): void {

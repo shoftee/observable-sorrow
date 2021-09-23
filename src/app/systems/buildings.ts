@@ -1,25 +1,11 @@
-import { BuildingId, BuildingMetadata } from "../core/metadata";
+import { BuildingMetadata } from "../core/metadata";
 import { System } from "../ecs/system";
 import { EntityAdmin } from "../game/entity-admin";
 import { BuildingEntity } from "../buildings/entity";
 
-export interface IBuildingSystem {
-  order(id: BuildingId): void;
-}
-
-export class BuildingSystem extends System implements IBuildingSystem {
+export class BuildingSystem extends System {
   constructor(admin: EntityAdmin) {
     super(admin);
-  }
-
-  // external contract
-  order(id: BuildingId): void {
-    const building = this.admin.building(id);
-    for (const ingredient of building.state.ingredients) {
-      const resource = this.admin.resource(ingredient.id);
-      resource.mutations.take(ingredient.amount);
-    }
-    building.buildQueue.construct();
   }
 
   // update method
@@ -38,9 +24,11 @@ export class BuildingSystem extends System implements IBuildingSystem {
     let level = building.state.level;
     building.buildQueue.consume((item) => {
       if (item.intent == "construct") {
+        for (const ingredient of building.state.ingredients) {
+          const resource = this.admin.resource(ingredient.id);
+          resource.mutations.take(ingredient.amount);
+        }
         level++;
-      } else {
-        level--;
       }
     });
 

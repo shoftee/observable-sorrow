@@ -29,10 +29,6 @@ export class BuildQueueComponent extends QueueComponent<BuildingCommand> {
     this.enqueue({ intent: "construct" });
   }
 
-  deconstruct(): void {
-    this.enqueue({ intent: "deconstruct" });
-  }
-
   consume(callback: (item: BuildingCommand) => void): void {
     super.consume(callback);
   }

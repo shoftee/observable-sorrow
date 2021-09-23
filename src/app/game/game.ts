@@ -26,7 +26,6 @@ import {
   EnvironmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
-  TransactionSystem,
 } from "../systems";
 import { SandcastleBuilderNotation } from "../utils/notation";
 import { WorkshopEntity } from "../workshop";
@@ -70,7 +69,6 @@ export class Game implements IGame {
       new EnvironmentSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
-      new TransactionSystem(this.admin),
     );
     this._systems.init();
 
@@ -93,12 +91,7 @@ export class Game implements IGame {
     );
 
     this._interactor = new InteractorSystem(
-      new BonfireInteractor(
-        this._runner,
-        this._systems.buildings,
-        this._systems.crafting,
-        this._systems.transactions,
-      ),
+      new BonfireInteractor(this._runner, this.admin),
     );
   }
 
@@ -121,10 +114,6 @@ export class Game implements IGame {
     // Update environment.
     this._systems.environment.update();
 
-    // Handle crafting and pending resource transactions.
-    this._systems.crafting.update();
-    this._systems.transactions.update();
-
     // Handle buildings and building effects.
     this._systems.buildings.update();
     this._systems.buildingEffects.update();
@@ -133,6 +122,7 @@ export class Game implements IGame {
     this._systems.lockToggle.update();
 
     // Handle resources
+    this._systems.crafting.update();
     this._systems.resourceProduction.update();
 
     this._presenter.environment.render();

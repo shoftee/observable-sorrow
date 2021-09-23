@@ -5,7 +5,6 @@ import {
   EnvironmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
-  TransactionSystem,
 } from ".";
 import { System } from "../ecs";
 
@@ -17,7 +16,6 @@ export class GameSystems {
     readonly environment: EnvironmentSystem,
     readonly lockToggle: LockToggleSystem,
     readonly resourceProduction: ResourceProductionSystem,
-    readonly transactions: TransactionSystem,
   ) {}
 
   init(): void {
