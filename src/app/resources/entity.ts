@@ -1,11 +1,12 @@
 import {
   ChangeTrackedEntity,
   ComponentState,
-  CreateChangeTrackingProxy,
+  ChangeTrackingProxy,
 } from "../ecs";
-import { ResourceStateComponent, MutationComponent } from "./components";
 import { ResourceId } from "../core/metadata";
+
 import { EntityAdmin } from "../game/entity-admin";
+import { ResourceStateComponent, MutationComponent } from "./components";
 
 type State = ComponentState<ResourceStateComponent>;
 
@@ -17,7 +18,7 @@ export class ResourceEntity extends ChangeTrackedEntity<State> {
     super(admin, id);
 
     this.mutations = this.addComponent(new MutationComponent());
-    this.state = CreateChangeTrackingProxy(
+    this.state = ChangeTrackingProxy(
       this.addComponent(new ResourceStateComponent()),
       this.changes,
     );

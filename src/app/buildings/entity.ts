@@ -1,7 +1,7 @@
 import {
   ChangeTrackedEntity,
   ComponentState,
-  CreateChangeTrackingProxy,
+  ChangeTrackingProxy,
 } from "../ecs";
 import { BuildingId } from "../core/metadata";
 
@@ -17,7 +17,7 @@ export class BuildingEntity extends ChangeTrackedEntity<State> {
   constructor(admin: EntityAdmin, readonly id: BuildingId) {
     super(admin, id);
     this.buildQueue = this.addComponent(new BuildQueueComponent());
-    this.state = CreateChangeTrackingProxy(
+    this.state = ChangeTrackingProxy(
       this.addComponent(new BuildingStateComponent(this.id)),
       this.changes,
     );

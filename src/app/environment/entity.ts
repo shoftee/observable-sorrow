@@ -1,10 +1,11 @@
 import {
   ChangeTrackedEntity,
   ComponentState,
-  CreateChangeTrackingProxy,
+  ChangeTrackingProxy,
 } from "../ecs";
-import { EnvironmentComponent } from ".";
+
 import { EntityAdmin } from "../game/entity-admin";
+import { EnvironmentComponent } from ".";
 
 type State = ComponentState<EnvironmentComponent>;
 
@@ -14,7 +15,7 @@ export class EnvironmentEntity extends ChangeTrackedEntity<State> {
   constructor(admin: EntityAdmin, readonly id = "environment") {
     super(admin, id);
 
-    this.state = CreateChangeTrackingProxy(
+    this.state = ChangeTrackingProxy(
       this.addComponent(new EnvironmentComponent()),
       this.changes,
     );

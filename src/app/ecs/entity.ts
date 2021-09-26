@@ -1,6 +1,6 @@
+import { ChangeTracker } from "./common";
 import { ComponentPool, IComponent } from ".";
 import { EntityAdmin } from "../game/entity-admin";
-import { ChangeTracker } from "./common";
 
 export abstract class Entity {
   readonly components: ComponentPool;
@@ -23,7 +23,7 @@ export abstract class ChangeTrackedEntity<TState> extends Entity {
 }
 
 type State = Record<string, unknown>;
-export function CreateChangeTrackingProxy<TState extends State>(
+export function ChangeTrackingProxy<TState extends State>(
   state: TState,
   changeTracker: ChangeTracker<TState>,
 ): TState {
