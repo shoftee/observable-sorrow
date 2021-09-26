@@ -32,7 +32,7 @@ export const EffectMetadata: Record<EffectId, EffectMetadataType> = {
   },
   "catnip-field-base-catnip": {
     id: "catnip-field-base-catnip",
-    value: BaseEffect(0.025),
+    value: BaseEffect(0.125),
   },
   "catnip-field-count": {
     id: "catnip-field-count",
