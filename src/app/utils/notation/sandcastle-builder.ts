@@ -1,8 +1,15 @@
 import { round } from "../mathx";
 
+export type ShowSign = "remove" | "negative" | "always";
+
+export interface INumberNotation {
+  number(value: number, precision: number, showSign: ShowSign): string;
+  percent(value: number, precision: number, showSign: ShowSign): string;
+}
+
 export class SandcastleBuilderNotation {
-  display(value: number, precision: 2 | 3, displaySign: boolean): string {
-    const signString = getSignString(value, displaySign);
+  number(value: number, precision: number, showSign: ShowSign): string {
+    const signString = getSignString(value, showSign);
     let valueString: string;
     if (Number.isFinite(value)) {
       const absValue = Math.abs(value);
@@ -13,9 +20,13 @@ export class SandcastleBuilderNotation {
 
     return signString + valueString;
   }
+
+  percent(value: number, precision: number, showSign: ShowSign): string {
+    return this.number(value * 100, precision, showSign) + "%";
+  }
 }
 
-// almost shamelessly copied from from Sandcastle Builder
+// almost shamelessly copied from Sandcastle Builder
 // https://github.com/eternaldensity/Sandcastle-Builder/blob/master/redundancy.js
 const scales = [
   { limit: 1e210, divisor: 1e210, postfix: "Q" },
@@ -37,19 +48,23 @@ const scales = [
   { limit: 9e3, divisor: 1e3, postfix: "K" },
 ];
 
-function getSignString(value: number, show: boolean): string {
-  if (show) {
-    const sign = Math.sign(value);
-    if (sign > 0) {
-      return "+";
-    } else if (sign < 0) {
-      return "-";
-    }
+function getSignString(value: number, showSign: ShowSign): string {
+  const sign = Math.sign(value);
+  switch (showSign) {
+    case "negative":
+      if (sign < 0) return "-";
+      break;
+
+    case "always":
+      if (sign > 0) return "+";
+      if (sign < 0) return "-";
+      break;
   }
+
   return "";
 }
 
-function getValueString(value: number, precision: 2 | 3): string {
+function getValueString(value: number, precision: number): string {
   let postfix = "";
 
   for (const scale of scales) {

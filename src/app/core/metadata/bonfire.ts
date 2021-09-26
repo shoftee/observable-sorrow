@@ -1,6 +1,4 @@
-export type BonfireItemId = "gather-catnip" | "refine-catnip" | "catnip-field";
-
-export type BonfireBuildingId = "catnip-field";
+import { BonfireBuildingId, BonfireItemId } from "./_id";
 
 type BonfireIntentType =
   | { kind: "gather-catnip"; amount: number }
@@ -9,10 +7,10 @@ type BonfireIntentType =
 
 export type BonfireMetadataType = {
   id: BonfireItemId;
+  intent: BonfireIntentType;
   label: string;
   description: string;
   flavor?: string;
-  intent: BonfireIntentType;
 };
 
 export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {

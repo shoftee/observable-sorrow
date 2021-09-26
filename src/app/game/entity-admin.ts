@@ -1,17 +1,17 @@
+import { Constructor } from "../core";
 import { Entity } from "../ecs/entity";
-import { BuildingId, ProductionEffectId, ResourceId } from "../core/metadata";
+import { BuildingId, ResourceId } from "../core/metadata";
 import { ResourceEntity } from "../resources";
 import { WorkshopEntity } from "../workshop";
-import { Constructor } from "../core";
 import { BuildingEntity } from "../buildings/entity";
 import { EnvironmentEntity } from "../environment";
 import { TimersEntity } from "./timers";
-import { ProductionEffectEntity } from "../effects";
+import { EffectPoolEntity } from "../effects";
 
 type EntityId =
   | ResourceId
   | BuildingId
-  | ProductionEffectId
+  | "effects"
   | "environment"
   | "timers"
   | "workshop";
@@ -53,12 +53,8 @@ export class EntityAdmin {
     return this.entities(BuildingEntity);
   }
 
-  productionEffect(id: ProductionEffectId): ProductionEffectEntity {
-    return this.entity(id, ProductionEffectEntity);
-  }
-
-  productionEffects(): Iterable<ProductionEffectEntity> {
-    return this.entities(ProductionEffectEntity);
+  effects(): EffectPoolEntity {
+    return this.entity("effects", EffectPoolEntity);
   }
 
   workshop(): WorkshopEntity {

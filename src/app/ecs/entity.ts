@@ -27,7 +27,7 @@ export abstract class ChangeTrackedEntity<TState> extends Entity {
 type State = Record<string, unknown>;
 export function CreateChangeTrackingProxy<TState extends State>(
   state: TState,
-  notifier: ChangeTracker<TState>,
+  changeTracker: ChangeTracker<TState>,
 ): TState {
   return new Proxy<TState>(state, {
     set: (target, property, value, receiver) => {
@@ -36,7 +36,7 @@ export function CreateChangeTrackingProxy<TState extends State>(
         if (!Reflect.set(target, property, value, receiver)) {
           return false;
         }
-        notifier.mark(property as keyof TState);
+        changeTracker.mark(property as keyof TState);
       }
 
       return true;

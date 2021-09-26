@@ -3,14 +3,13 @@
     <div class="name col-3">
       <span>{{ t(item.label) }}</span>
       <span
-        class="ms-1 badge"
+        v-if="item.modifier"
+        class="ms-1 badge badge-light"
         :class="{
-          'bg-primary': !item.decorationKind,
-          'badge-light': !!item.decorationKind,
-          'bg-success': item.decorationKind == 'bonus',
-          'bg-danger': item.decorationKind == 'malus',
+          'bg-success': item.modifier > 0,
+          'bg-danger': item.modifier < 0,
         }"
-        >{{ item.decorationText }}</span
+        >{{ p(item.modifier) }}</span
       >
     </div>
     <div class="col-3 number amount">{{ n(item.amount) }}</div>
@@ -47,8 +46,9 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-    const n = (v: number, signed = false) => notation.display(v, 3, signed);
-    return { t, n };
+    const n = (v: number) => notation.number(v, 3, "negative");
+    const p = (v: number) => notation.percent(v, 0, "always");
+    return { t, n, p };
   },
 });
 </script>

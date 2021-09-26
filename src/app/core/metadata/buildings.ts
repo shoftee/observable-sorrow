@@ -1,17 +1,22 @@
-import { ProductionEffectId } from "./effects";
-import { ResourceQuantityType } from "./recipes";
+import { BuildingCountId } from ".";
+import { BuildingId, EffectId } from "./_id";
+import { ResourceQuantityType } from "./_types";
 
-export type BuildingId = "catnip-field";
+export type BuildingEffectType = {
+  id: EffectId;
+  label: string;
+};
 
 export type BuildingMetadataType = {
   id: BuildingId;
   unlockRatio: number;
   prices: {
     ratio: number;
-    ingredients: ResourceQuantityType[];
+    baseIngredients: ResourceQuantityType[];
   };
   effects: {
-    production: ProductionEffectId[];
+    count: BuildingCountId;
+    production: BuildingEffectType[];
   };
 };
 
@@ -20,11 +25,17 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     id: "catnip-field",
     prices: {
       ratio: 1.12,
-      ingredients: [{ id: "catnip", amount: 10 }],
+      baseIngredients: [{ id: "catnip", amount: 10 }],
     },
     unlockRatio: 0.3,
     effects: {
-      production: ["catnip-field-production"],
+      count: "catnip-field-count",
+      production: [
+        {
+          id: "catnip-field-base-catnip",
+          label: "building-effects.catnip-field.catnip-production.label",
+        },
+      ],
     },
   },
 };

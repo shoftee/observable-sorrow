@@ -35,7 +35,7 @@ export default defineComponent({
         ? "environment.calendar.full.weather"
         : "environment.calendar.full.no-weather";
     });
-    const n = (v: number) => notation.display(v, 3, false);
+    const n = (v: number) => notation.number(v, 3, "negative");
     return { t, n, calendar, weather, keypath };
   },
 });

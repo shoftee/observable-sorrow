@@ -1,13 +1,11 @@
 import { System } from "../ecs";
-
-import {
-  CalendarConstants,
-  WeatherId,
-  WeatherMetadata,
-} from "../core/metadata";
-
-import { EnvironmentEntity, SeasonId } from "../environment";
+import { CalendarConstants } from "../constants/calendar";
 import { DefaultChooser } from "../utils/probability";
+
+import { SeasonId, WeatherId } from "../core/metadata";
+import { WeatherMetadata } from "../core/metadata/weather";
+
+import { EnvironmentEntity } from "../environment";
 
 export class EnvironmentSystem extends System {
   get environment(): EnvironmentEntity {
@@ -45,24 +43,21 @@ export class EnvironmentSystem extends System {
   }
 
   private updateWeather(season: string) {
-    const environment = this.environment;
-    let seasonModifier = 0;
+    const effects = this.admin.effects();
+    const seasonModifier = effects.entry("weather-season-modifier");
     if (season === "spring") {
-      seasonModifier = 0.5;
+      seasonModifier.set(0.5);
     } else if (season === "winter") {
-      seasonModifier = -0.75;
+      seasonModifier.set(-0.75);
+    } else {
+      seasonModifier.set(0);
     }
 
     const weatherId: WeatherId = this.chooseWeather();
-    if (environment.state.weatherId != weatherId) {
-      environment.state.weatherId = weatherId;
-    }
+    this.environment.state.weatherId = weatherId;
 
-    const totalModifier =
-      seasonModifier + WeatherMetadata[weatherId].adjustment;
-    if (environment.state.weatherModifier != totalModifier) {
-      environment.state.weatherModifier = totalModifier;
-    }
+    const severityModifier = effects.entry("weather-severity-modifier");
+    severityModifier.set(WeatherMetadata[weatherId].adjustment);
   }
 
   private calculateNextSeason(currentSeason: SeasonId): SeasonId {

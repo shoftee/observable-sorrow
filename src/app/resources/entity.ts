@@ -4,7 +4,7 @@ import {
   CreateChangeTrackingProxy,
 } from "../ecs";
 import { ResourceStateComponent, MutationComponent } from "./components";
-import { ResourceId } from "../core/metadata/resources";
+import { ResourceId } from "../core/metadata";
 import { EntityAdmin } from "../game/entity-admin";
 
 type State = ComponentState<ResourceStateComponent>;

@@ -12,10 +12,17 @@ export class ChangeTracker<
     }
   }
 
-  apply(handler: (key: K) => void): void {
+  apply(handlers: Partial<Record<K, () => void>>): void {
     for (const key of this.marked) {
-      handler(key);
+      const fn = handlers[key];
+      if (fn) {
+        fn();
+      }
     }
+  }
+
+  has(key: K): boolean {
+    return this.marked.has(key);
   }
 
   clear(): void {

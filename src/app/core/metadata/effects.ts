@@ -1,50 +1,68 @@
-import { ResourceId } from ".";
+import { BaseEffect, MultiplicationModifier, VariableEffect } from ".";
+import { EffectId } from "./_id";
+import {
+  AbsoluteModifier,
+  CompoundEffect,
+  EffectMetadataType,
+  ProportionalModifier,
+} from "./_types";
 
-export type ProductionEffectId = "catnip-field-production";
-
-export type ProductionEffectType = {
-  id: ProductionEffectId;
-  resourceId: ResourceId;
-  amount: number;
-};
-
-export type ProductionEffectMetadataType = ProductionEffectType & {
-  label: string;
-};
-
-export const ProductionEffectMetadata: Record<
-  ProductionEffectId,
-  ProductionEffectMetadataType
-> = {
+export const EffectMetadata: Record<EffectId, EffectMetadataType> = {
+  "catnip-production": {
+    id: "catnip-production",
+    value: CompoundEffect(
+      AbsoluteModifier("catnip-field-production"),
+      ProportionalModifier("catnip-field-weather"),
+    ),
+  },
+  "catnip-limit": {
+    id: "catnip-limit",
+    value: CompoundEffect(AbsoluteModifier("catnip-limit-base")),
+  },
+  "catnip-limit-base": {
+    id: "catnip-limit-base",
+    value: BaseEffect(5000),
+  },
   "catnip-field-production": {
     id: "catnip-field-production",
-    resourceId: "catnip",
-    amount: 0.025,
-    label: "effects.catnip-field-production.label",
+    value: CompoundEffect(
+      AbsoluteModifier("catnip-field-base-catnip"),
+      MultiplicationModifier("catnip-field-count"),
+    ),
   },
-};
-
-export type WeatherId = "neutral" | "warm" | "cold";
-
-export type WeatherMetadataType = {
-  id: WeatherId;
-  adjustment: number;
-  label?: string;
-};
-
-export const WeatherMetadata: Record<WeatherId, WeatherMetadataType> = {
-  neutral: {
-    id: "neutral",
-    adjustment: 0,
+  "catnip-field-base-catnip": {
+    id: "catnip-field-base-catnip",
+    value: BaseEffect(0.025),
   },
-  warm: {
-    id: "warm",
-    adjustment: +0.15,
-    label: "environment.weather.warm",
+  "catnip-field-count": {
+    id: "catnip-field-count",
+    value: VariableEffect(),
   },
-  cold: {
-    id: "cold",
-    adjustment: -0.15,
-    label: "environment.weather.cold",
+  "catnip-field-weather": {
+    id: "catnip-field-weather",
+    value: CompoundEffect(
+      AbsoluteModifier("weather-season-modifier"),
+      AbsoluteModifier("weather-severity-modifier"),
+    ),
+  },
+  "weather-season-modifier": {
+    id: "weather-season-modifier",
+    value: VariableEffect(),
+  },
+  "weather-severity-modifier": {
+    id: "weather-severity-modifier",
+    value: VariableEffect(),
+  },
+  "wood-production": {
+    id: "wood-production",
+    value: VariableEffect(),
+  },
+  "wood-limit": {
+    id: "wood-limit",
+    value: CompoundEffect(AbsoluteModifier("wood-limit-base")),
+  },
+  "wood-limit-base": {
+    id: "wood-limit-base",
+    value: BaseEffect(200),
   },
 };

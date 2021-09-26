@@ -1,7 +1,9 @@
 import { Entity } from "../ecs";
-import { WorkshopRecipeId } from "../core/metadata/crafting";
-import { EntityAdmin } from "../game/entity-admin";
 import { RawQueueComponent } from "../ecs/common";
+
+import { WorkshopRecipeId } from "../core/metadata";
+
+import { EntityAdmin } from "../game/entity-admin";
 
 export class WorkshopEntity extends Entity {
   orders!: RecipeOrdersComponent;

@@ -1,4 +1,4 @@
-import { BuildingMetadata, ProductionEffectMetadata } from "../core/metadata";
+import { BuildingMetadata } from "../core/metadata";
 
 import { System } from "../ecs";
 import { EntityAdmin } from "../game/entity-admin";
@@ -10,15 +10,12 @@ export class BuildingEffectsSystem extends System {
 
   update(): void {
     // recalculate production effects from buildings
+    const effects = this.admin.effects();
     for (const building of this.admin.buildings()) {
-      const level = building.state.level;
-      const buildingMetadata = BuildingMetadata[building.id];
-      for (const effectId of buildingMetadata.effects.production) {
-        const metadata = ProductionEffectMetadata[effectId];
-        const entity = this.admin.productionEffect(effectId);
-        const calculatedAmount = level * metadata.amount;
-        entity.effect.amount = calculatedAmount;
-      }
+      effects.set(
+        BuildingMetadata[building.id].effects.count,
+        building.state.level,
+      );
     }
   }
 }

@@ -1,4 +1,4 @@
-export type SeasonId = "spring" | "summer" | "autumn" | "winter";
+import { SeasonId } from "./_id";
 
 type SeasonMetadataType = {
   id: SeasonId;

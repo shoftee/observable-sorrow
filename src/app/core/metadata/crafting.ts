@@ -1,6 +1,5 @@
-import { ResourceQuantityType } from "./recipes";
-
-export type WorkshopRecipeId = "refine-catnip";
+import { WorkshopRecipeId } from "./_id";
+import { ResourceQuantityType } from "./_types";
 
 export type WorkshopRecipeType = {
   id: WorkshopRecipeId;

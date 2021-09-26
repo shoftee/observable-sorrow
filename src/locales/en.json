@@ -59,12 +59,14 @@
     }
   },
 
-  "effects": {
+  "building-effects": {
     "title": {
       "per-level": "Effects (per level)"
     },
-    "catnip-field-production": {
-      "label": "Catnip production"
+    "catnip-field": {
+      "catnip-production": {
+        "label": "Catnip production {amount}"
+      }
     }
   }
 }

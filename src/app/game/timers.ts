@@ -1,5 +1,6 @@
-import { CalendarConstants } from "../core/metadata";
 import { SimpleEntity } from "../ecs";
+import { CalendarConstants } from "../constants/calendar";
+
 import { TimerComponent } from "../ecs/common";
 import { EntityAdmin } from "./entity-admin";
 

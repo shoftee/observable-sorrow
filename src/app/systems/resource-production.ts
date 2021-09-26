@@ -1,4 +1,6 @@
 import { System } from "../ecs";
+import { ResourceMetadata } from "../core/metadata";
+
 import { EntityAdmin } from "../game/entity-admin";
 import { ResourceEntity } from "../resources";
 
@@ -7,21 +9,21 @@ export class ResourceProductionSystem extends System {
     super(admin);
   }
 
-  update(): void {
-    for (const entity of this.admin.productionEffects()) {
-      const resource = this.admin.resource(entity.effect.resourceId);
-      resource.state.change = entity.effect.amount;
-      if (entity.id == "catnip-field-production") {
-        const weatherModifier = this.admin.environment().state.weatherModifier;
-        resource.state.change *= 1 + weatherModifier;
-      }
-    }
+  init(): void {
+    this.updateEffectValues();
+  }
 
-    // queue mutations based on delta time
-    const delta = this.admin.timers().ticks.delta;
+  update(): void {
+    this.updateEffectValues();
+
+    const dt = this.admin.timers().ticks.delta;
     for (const resource of this.admin.resources()) {
-      if (resource.state.change) {
-        const change = delta * resource.state.change;
+      if (
+        resource.state.change &&
+        resource.state.amount < resource.state.effectiveCapacity
+      ) {
+        // calculate new amounts based on fractional ticks
+        const change = dt * resource.state.change;
         resource.mutations.give(change);
       }
 
@@ -29,9 +31,21 @@ export class ResourceProductionSystem extends System {
     }
   }
 
+  private updateEffectValues() {
+    for (const resource of this.admin.resources()) {
+      const meta = ResourceMetadata[resource.id];
+
+      const limitEffect = meta.limitEffect;
+      resource.state.capacity = this.admin.effects().get(limitEffect);
+
+      const productionEffect = meta.productionEffect;
+      resource.state.change = this.admin.effects().get(productionEffect) ?? 0;
+    }
+  }
+
   private updateAmount(resource: ResourceEntity): void {
     const currentValue = resource.state.amount;
-    const capacity = resource.state.capacity ?? Number.POSITIVE_INFINITY;
+    const capacity = resource.state.effectiveCapacity;
 
     // calculate delta from mutations
     const delta = resource.mutations.sum();

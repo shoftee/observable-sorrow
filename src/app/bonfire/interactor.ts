@@ -1,5 +1,6 @@
 import { IGameRunner } from "../game";
-import { BonfireItemId, BonfireMetadata } from "../core/metadata/bonfire";
+import { BonfireItemId } from "../core/metadata";
+import { BonfireMetadata } from "../core/metadata/bonfire";
 import { EntityAdmin } from "../game/entity-admin";
 
 export interface IBonfireInteractor {

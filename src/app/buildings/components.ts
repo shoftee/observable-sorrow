@@ -16,7 +16,7 @@ export class BuildingStateComponent extends Component {
 
   constructor(id: BuildingId) {
     super();
-    this.ingredients = cloneDeep(BuildingMetadata[id].prices.ingredients);
+    this.ingredients = cloneDeep(BuildingMetadata[id].prices.baseIngredients);
   }
 }
 

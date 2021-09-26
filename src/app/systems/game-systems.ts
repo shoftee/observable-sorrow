@@ -7,12 +7,14 @@ import {
   ResourceProductionSystem,
 } from ".";
 import { System } from "../ecs";
+import { EffectsSystem } from "./effects";
 
 export class GameSystems {
   constructor(
     readonly buildings: BuildingSystem,
     readonly buildingEffects: BuildingEffectsSystem,
     readonly crafting: CraftingSystem,
+    readonly effects: EffectsSystem,
     readonly environment: EnvironmentSystem,
     readonly lockToggle: LockToggleSystem,
     readonly resourceProduction: ResourceProductionSystem,

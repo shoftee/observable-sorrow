@@ -1,10 +1,7 @@
 import { IBonfirePresenter } from "../bonfire/presenter";
 import { IEnvironmentPresenter } from "../environment/presenter";
 import { IResourcePresenter } from "../resources/presenter";
-
-export interface INumberNotation {
-  display(value: number, precision: 2 | 3, showSign: boolean): string;
-}
+import { INumberNotation } from "../utils/notation";
 
 export interface IPresenterSystem {
   readonly bonfire: IBonfirePresenter;

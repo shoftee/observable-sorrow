@@ -9,21 +9,18 @@ import {
 import { BonfirePresenter, BonfireInteractor } from "../bonfire";
 import { BuildingEntity } from "../buildings";
 import { SystemTimestampProvider } from "../core";
-import {
-  BuildingMetadata,
-  ProductionEffectMetadata,
-  ResourceMetadata,
-} from "../core/metadata";
+import { BuildingMetadata, ResourceMetadata } from "../core/metadata";
 import { ChangeTrackedEntity } from "../ecs";
-import { ProductionEffectEntity } from "../effects";
+import { EffectPoolEntity } from "../effects";
 import { EnvironmentEntity, EnvironmentPresenter } from "../environment";
 import { ResourceEntity, ResourcePresenter } from "../resources";
 import {
-  GameSystems,
   BuildingSystem,
   BuildingEffectsSystem,
   CraftingSystem,
+  GameSystems,
   EnvironmentSystem,
+  EffectsSystem,
   LockToggleSystem,
   ResourceProductionSystem,
 } from "../systems";
@@ -51,25 +48,28 @@ export class Game implements IGame {
     for (const building of Object.values(BuildingMetadata)) {
       this.admin.add(new BuildingEntity(this.admin, building.id));
     }
-    for (const effect of Object.values(ProductionEffectMetadata)) {
-      this.admin.add(new ProductionEffectEntity(this.admin, effect.id));
-    }
-    for (const resource of Object.values(ResourceMetadata)) {
-      this.admin.add(new ResourceEntity(this.admin, resource.id));
-    }
+
+    this.admin.add(new EffectPoolEntity(this.admin));
     this.admin.add(new WorkshopEntity(this.admin));
     this.admin.add(new EnvironmentEntity(this.admin));
     this.admin.add(new TimersEntity(this.admin));
+
+    for (const resource of Object.values(ResourceMetadata)) {
+      this.admin.add(new ResourceEntity(this.admin, resource.id));
+    }
+
     this.admin.init();
 
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
       new BuildingEffectsSystem(this.admin),
       new CraftingSystem(this.admin),
+      new EffectsSystem(this.admin),
       new EnvironmentSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
     );
+
     this._systems.init();
 
     this.updater = new GameUpdater(
@@ -120,6 +120,9 @@ export class Game implements IGame {
 
     // Lock/unlock elements.
     this._systems.lockToggle.update();
+
+    // Update effects pool.
+    this._systems.effects.update();
 
     // Handle resources
     this._systems.crafting.update();

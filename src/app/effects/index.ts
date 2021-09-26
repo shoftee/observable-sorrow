@@ -1,2 +1,1 @@
-export * from "./components";
-export * from "./production";
+export * from "./entity";

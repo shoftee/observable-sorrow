@@ -1,21 +1,21 @@
 import { Ref, ref, unref } from "vue";
 
 import { IRender } from "../ecs";
-
-import { BuildingEntity } from "../buildings";
 import {
   BonfireItemId,
   BonfireMetadata,
   BonfireMetadataType,
+  BuildingEffectType,
   BuildingMetadata,
-  ResourceQuantityType,
+  EffectId,
   ResourceId,
   ResourceMetadata,
+  ResourceQuantityType,
   WorkshopRecipeMetadata,
-  ProductionEffectMetadata,
-  ProductionEffectId,
 } from "../core/metadata";
+
 import { EntityAdmin } from "../game/entity-admin";
+import { BuildingEntity } from "../buildings";
 
 export interface IBonfirePresenter extends IRender {
   readonly items: Ref<BonfireItem[]>;
@@ -44,18 +44,16 @@ export class BonfirePresenter implements IBonfirePresenter {
       // Update unlocked status
       if (metadata.intent.kind == "buy-building") {
         const building = this.admin.building(metadata.intent.buildingId);
-        building.changes.apply((key) => {
-          switch (key) {
-            case "unlocked":
-              item.unlocked = building.state.unlocked;
-              break;
-            case "level":
-              item.level = building.state.level;
-              break;
-            case "ingredients":
-              this.updatePrices(item, building);
-              break;
-          }
+        building.changes.apply({
+          unlocked: () => {
+            item.unlocked = building.state.unlocked;
+          },
+          level: () => {
+            item.level = building.state.level;
+          },
+          ingredients: () => {
+            this.updatePrices(item, building);
+          },
         });
       }
     }
@@ -85,7 +83,7 @@ export class BonfirePresenter implements IBonfirePresenter {
 
       case "buy-building":
         result.ingredients = this.newRecipeList(
-          BuildingMetadata[item.intent.buildingId].prices.ingredients,
+          BuildingMetadata[item.intent.buildingId].prices.baseIngredients,
         );
         result.effects = this.newEffectsList(
           BuildingMetadata[item.intent.buildingId].effects.production,
@@ -108,18 +106,12 @@ export class BonfirePresenter implements IBonfirePresenter {
   }
 
   private newEffectsList(
-    productionEffectIds: ProductionEffectId[],
+    effects: BuildingEffectType[],
   ): ProductionEffectItem[] {
-    return productionEffectIds
-      .map((id) => ProductionEffectMetadata[id])
-      .map(
-        (effect) =>
-          new ProductionEffectItem(
-            effect.resourceId,
-            effect.label,
-            effect.amount,
-          ),
-      );
+    const entity = this.admin.effects();
+    return effects.map((e) => {
+      return new ProductionEffectItem(e.id, e.label, entity.get(e.id));
+    });
   }
 }
 
@@ -165,8 +157,8 @@ class RecipeIngredientItem {
 
 class ProductionEffectItem {
   constructor(
-    public id: ResourceId,
+    public id: EffectId,
     public label: string,
-    public change: number,
+    public amount?: number,
   ) {}
 }

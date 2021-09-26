@@ -1,10 +1,12 @@
-import { ref, Ref, unref } from "vue";
+import { ref, Ref } from "vue";
 
 import { IRender } from "../ecs";
-import { SeasonId, SeasonsMetadata } from "../core/metadata/environment";
+import { SeasonId, WeatherId } from "../core/metadata";
+import { SeasonsMetadata } from "../core/metadata/environment";
+import { WeatherMetadata } from "../core/metadata/weather";
+
 import { EntityAdmin } from "../game/entity-admin";
 import { EnvironmentEntity } from ".";
-import { WeatherId, WeatherMetadata } from "../core/metadata";
 
 export interface IEnvironmentPresenter extends IRender {
   readonly calendar: Ref<CalendarViewModel>;
@@ -26,21 +28,19 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
 
   render(): void {
     const entity = this.environment;
-    const calendarRaw = unref(this.calendar);
-    const weatherRaw = unref(this.weather);
-
-    entity.changes.apply((key) => {
-      if (key == "day") calendarRaw.day = entity.state.day;
-      if (key == "season") calendarRaw.seasonId = entity.state.season;
-      if (key == "year") calendarRaw.year = entity.state.year;
-
-      if (key == "weatherId") {
-        weatherRaw.weatherId = entity.state.weatherId;
-      }
-
-      if (key == "weatherModifier") {
-        weatherRaw.weatherModifier = entity.state.weatherModifier;
-      }
+    entity.changes.apply({
+      day: () => {
+        this.calendar.value.day = entity.state.day;
+      },
+      season: () => {
+        this.calendar.value.seasonId = entity.state.season;
+      },
+      year: () => {
+        this.calendar.value.year = entity.state.year;
+      },
+      weatherId: () => {
+        this.weather.value.weatherId = entity.state.weatherId;
+      },
     });
   }
 }
@@ -62,13 +62,7 @@ export class CalendarViewModel {
 }
 
 export class WeatherViewModel {
-  weatherModifier: number;
-  title: string;
-
-  constructor() {
-    this.weatherModifier = 0;
-    this.title = "";
-  }
+  title = "";
 
   set weatherId(id: WeatherId) {
     this.title = WeatherMetadata[id].label ?? "";

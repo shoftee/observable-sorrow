@@ -4,8 +4,12 @@ import { QueueComponent } from "../ecs/common";
 export class ResourceStateComponent extends Component {
   unlocked = false;
   amount = 0;
+  change = 0;
   capacity?: number;
-  change?: number;
+
+  get effectiveCapacity(): number {
+    return this.capacity ?? Number.POSITIVE_INFINITY;
+  }
 }
 
 export class MutationComponent extends QueueComponent<number> {

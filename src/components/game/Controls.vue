@@ -27,8 +27,8 @@
                     {{ t(ingredient.label) }}
                   </div>
                   <div class="ingredient-fulfillment number">
-                    <span v-if="!ingredient.fulfilled"
-                      >{{ n(ingredient.fulfillment) }} /
+                    <span v-if="!ingredient.fulfilled">
+                      {{ n(ingredient.fulfillment) }} /
                     </span>
                     {{ n(ingredient.requirement) }}
                   </div>
@@ -37,12 +37,17 @@
             </div>
             <div v-if="item.effects.length > 0">
               <div class="card-header">
-                {{ t("effects.title.per-level") }}
+                {{ t("building-effects.title.per-level") }}
               </div>
               <ul class="effects-list">
-                <li v-for="effect in item.effects" :key="effect.resourceId">
-                  {{ t(effect.label) }}:
-                  <span class="number"> {{ n(effect.change, true) }}/t</span>
+                <li v-for="effect in item.effects" :key="effect.id">
+                  <i18n-t scope="global" :keypath="effect.label" tag="span">
+                    <template v-if="effect.amount" #amount>
+                      <span class="number">
+                        {{ n(effect.amount, true) }}/t
+                      </span>
+                    </template>
+                  </i18n-t>
                 </li>
               </ul>
             </div>
@@ -54,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import { BonfireItemId } from "@/app/core/metadata/bonfire";
+import { BonfireItemId } from "@/app/core/metadata";
 import { Presenter, Interactor } from "@/app/os";
 const notation = Presenter.numbers;
 
@@ -68,7 +73,7 @@ export default defineComponent({
     const { t } = { ...useI18n() };
     const items = unref(Presenter.bonfire.items);
     const unlocked = computed(() => items.filter((i) => i.unlocked));
-    const n = (v: number, signed = false) => notation.display(v, 3, signed);
+    const n = (v: number) => notation.number(v, 3, "negative");
     return { t, n, items: unlocked };
   },
   methods: {

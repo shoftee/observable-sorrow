@@ -3,9 +3,10 @@ import { asEnumerable } from "linq-es2015";
 import { Ref, ref, unref } from "vue";
 
 import { IRender } from "../ecs";
-import { ResourceId, ResourceMetadata } from "../core/metadata/resources";
+
+import { ResourceId } from "../core/metadata";
+import { ResourceMetadata } from "../core/metadata/resources";
 import { EntityAdmin } from "../game/entity-admin";
-import { percent } from "../utils/mathx";
 
 export interface IResourcePresenter extends IRender {
   readonly items: Ref<ListItem[]>;
@@ -38,40 +39,36 @@ export class ResourcePresenter implements IResourcePresenter {
   render(): void {
     for (const item of unref(this.items)) {
       const entity = this.admin.resource(item.id);
-      entity.changes.apply((key) => {
-        if (key == "unlocked") item.unlocked = entity.state.unlocked;
-        if (key == "amount") item.amount = entity.state.amount;
-        if (key == "capacity") item.capacity = entity.state.capacity;
-        if (key == "change") {
+      entity.changes.apply({
+        unlocked: () => {
+          item.unlocked = entity.state.unlocked;
+        },
+        amount: () => {
+          item.amount = entity.state.amount;
+        },
+        capacity: () => {
+          item.capacity = entity.state.capacity;
+        },
+        change: () => {
           item.change = entity.state.change;
-
-          if (item.id == "catnip") {
-            this.updateCatnipDecorations();
-          }
-        }
+        },
       });
     }
 
-    const environment = this.admin.environment();
-    environment.changes.apply((key) => {
-      if (key == "weatherModifier") {
-        this.updateCatnipDecorations();
-      }
+    this.admin.effects().changes.apply({
+      "catnip-production": () => this.updateCatnipDecorations(),
+      "catnip-field-weather": () => this.updateCatnipDecorations(),
     });
   }
 
   private updateCatnipDecorations() {
-    const catnip = unref(this.items).find((item) => item.id == "catnip");
-    if (catnip) {
-      const catnipFieldProduction = this.admin.productionEffect(
-        "catnip-field-production",
-      );
-      if (catnipFieldProduction.effect.amount == 0) {
-        catnip.clearDecoration();
+    const item = unref(this.items).find((item) => item.id == "catnip");
+    if (item) {
+      const effects = this.admin.effects();
+      if (effects.get("catnip-field-production") == 0) {
+        item.modifier = undefined;
       } else {
-        catnip.setModifierDecoration(
-          this.admin.environment().state.weatherModifier,
-        );
+        item.modifier = effects.get("catnip-field-weather");
       }
     }
   }
@@ -85,24 +82,6 @@ export class ListItem {
     public amount: number,
     public change?: number,
     public capacity?: number,
-    public decorationText?: string,
-    public decorationKind?: "bonus" | "malus",
+    public modifier?: number,
   ) {}
-
-  clearDecoration(): void {
-    this.decorationText = undefined;
-    this.decorationKind = undefined;
-  }
-
-  setModifierDecoration(modifier: number): void {
-    if (modifier == 0) {
-      this.clearDecoration();
-    } else if (modifier > 0) {
-      this.decorationKind = "bonus";
-      this.decorationText = `+${percent(modifier)}%`;
-    } else if (modifier < 0) {
-      this.decorationKind = "malus";
-      this.decorationText = `${percent(modifier)}%`;
-    }
-  }
 }

@@ -46,8 +46,8 @@ export class BuildingSystem extends System {
     const level = building.state.level;
     const priceMultiplier = Math.pow(prices.ratio, level);
 
-    for (let i = 0; i < prices.ingredients.length; i++) {
-      const ingredientMetadata = prices.ingredients[i];
+    for (let i = 0; i < prices.baseIngredients.length; i++) {
+      const ingredientMetadata = prices.baseIngredients[i];
       const effective = building.state.ingredients[i];
       effective.amount = ingredientMetadata.amount * priceMultiplier;
     }
