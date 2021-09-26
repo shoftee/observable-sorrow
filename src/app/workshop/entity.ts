@@ -6,13 +6,10 @@ import { WorkshopRecipeId } from "../core/metadata";
 import { EntityAdmin } from "../game/entity-admin";
 
 export class WorkshopEntity extends Entity {
-  orders!: RecipeOrdersComponent;
+  readonly orders: RecipeOrdersComponent;
 
   constructor(admin: EntityAdmin) {
     super(admin, "workshop");
-  }
-
-  init(): void {
     this.orders = this.addComponent(new RecipeOrdersComponent());
   }
 }

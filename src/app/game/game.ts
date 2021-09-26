@@ -58,8 +58,6 @@ export class Game implements IGame {
       this.admin.add(new ResourceEntity(this.admin, resource.id));
     }
 
-    this.admin.init();
-
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
       new BuildingEffectsSystem(this.admin),

@@ -69,12 +69,6 @@ export class EntityAdmin {
     return this.entity("timers", TimersEntity);
   }
 
-  init(): void {
-    for (const value of this.pool.values()) {
-      value.init();
-    }
-  }
-
   private entity<E extends Entity>(
     id: EntityId,
     constructor: Constructor<E>,

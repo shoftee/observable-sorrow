@@ -9,8 +9,6 @@ export abstract class Entity {
     this.components = new ComponentPool(this);
   }
 
-  abstract init(): void;
-
   protected addComponent<T extends IComponent>(value: T): T {
     return this.components.add(value);
   }

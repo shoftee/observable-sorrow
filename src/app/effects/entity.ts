@@ -10,13 +10,10 @@ export interface EffectEntry {
 }
 
 export class EffectPoolEntity extends ChangeTrackedEntity<PoolState> {
-  private values!: Map<EffectId, number>;
+  private values: Map<EffectId, number>;
 
   constructor(admin: EntityAdmin) {
     super(admin, "effects");
-  }
-
-  init(): void {
     this.values = new Map<EffectId, number>();
   }
 
