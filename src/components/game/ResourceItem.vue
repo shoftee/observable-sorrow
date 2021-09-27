@@ -4,23 +4,23 @@
       <span>{{ t(item.label) }}</span>
       <span
         v-if="item.modifier"
-        class="ms-1 badge badge-light"
+        class="ms-1 p-1 badge badge-light"
         :class="{
           'bg-success': item.modifier > 0,
           'bg-danger': item.modifier < 0,
         }"
-        >{{ p(item.modifier) }}</span
+        >{{ percent(item.modifier) }}</span
       >
     </div>
-    <div class="col-3 number amount">{{ n(item.amount) }}</div>
+    <div class="col-3 number amount">{{ res(item.amount) }}</div>
     <template v-if="item.capacity">
-      <div class="col-3 number capacity">/ {{ n(item.capacity) }}</div>
+      <div class="col-3 number capacity">/ {{ res(item.capacity) }}</div>
     </template>
     <template v-else>
       <div class="col-3 no-capacity"></div>
     </template>
     <template v-if="item.change">
-      <div class="col-3 number change">{{ n(item.change, true) }}/t</div>
+      <div class="col-3 number change">{{ eff(item.change, true) }}/t</div>
     </template>
     <template v-else>
       <div class="col-3 no-change"></div>
@@ -46,9 +46,10 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-    const n = (v: number) => notation.number(v, 3, "negative");
-    const p = (v: number) => notation.percent(v, 0, "always");
-    return { t, n, p };
+    const res = (v: number) => notation.number(v, 3, "negative");
+    const eff = (v: number) => notation.number(v, 3, "always");
+    const percent = (v: number) => notation.percent(v, 0, "always");
+    return { t, res, eff, percent };
   },
 });
 </script>

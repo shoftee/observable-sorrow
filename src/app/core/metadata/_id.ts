@@ -1,12 +1,17 @@
-export type BonfireItemId = "gather-catnip" | "refine-catnip" | "catnip-field";
 export type BonfireBuildingId = "catnip-field";
 
-export type ResourceId = "catnip" | "wood";
-export type BuildingId = "catnip-field";
+export type BonfireItemId =
+  | "gather-catnip"
+  | "refine-catnip"
+  | BonfireBuildingId;
 
+export type ResourceId = "catnip" | "wood";
+
+export type BuildingId = "catnip-field";
 export type BuildingCountId = `${BuildingId}-count`;
 
 export type ProductionEffectId = "catnip-production" | "wood-production";
+
 export type LimitEffectId =
   | "catnip-limit"
   | "catnip-limit-base"

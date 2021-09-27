@@ -55,10 +55,11 @@ export class ResourcePresenter implements IResourcePresenter {
       });
     }
 
-    this.admin.effects().changes.handle({
-      "catnip-production": () => this.updateCatnipDecorations(),
-      "catnip-field-weather": () => this.updateCatnipDecorations(),
-    });
+    const effects = this.admin.effects();
+    effects.changes.handleAny(
+      ["catnip-production", "catnip-field-weather"],
+      () => this.updateCatnipDecorations(),
+    );
   }
 
   private updateCatnipDecorations() {

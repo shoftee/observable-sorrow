@@ -13,10 +13,9 @@ export class LockToggleSystem extends System {
     }
   }
 
-  private updateResourceUnlocked(resource: ResourceEntity): boolean {
+  private updateResourceUnlocked(resource: ResourceEntity): void {
     if (!resource.state.unlocked && resource.state.amount > 0) {
       resource.state.unlocked = true;
-      return true;
     } else {
       // some resources re-lock when they are depleted
       if (
@@ -24,26 +23,20 @@ export class LockToggleSystem extends System {
         ResourceMetadata[resource.id].flags[Flag.RelockedWhenDepleted]
       ) {
         resource.state.unlocked = false;
-        return true;
       }
     }
-
-    return false;
   }
 
-  private updateBuildingUnlocked(building: BuildingEntity): boolean {
+  private updateBuildingUnlocked(building: BuildingEntity): void {
     if (!building.state.unlocked) {
       const metadata = BuildingMetadata[building.id];
-      for (const requirement of building.state.ingredients) {
-        const resource = this.admin.resource(requirement.id);
-        const amount = resource.state.amount;
-        if (amount >= requirement.amount * metadata.unlockRatio) {
+      for (const [id, amount] of building.state.ingredients) {
+        const resource = this.admin.resource(id);
+        if (resource.state.amount >= amount * metadata.unlockRatio) {
           building.state.unlocked = true;
-          return true;
+          return;
         }
       }
     }
-
-    return false;
   }
 }

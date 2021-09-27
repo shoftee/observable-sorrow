@@ -1,42 +1,58 @@
 import { EffectId, ResourceId } from "./_id";
 
-export enum ModifierKind {
-  Absolute = 1,
-  Proportional = 2,
-  Multiplication = 3,
+export interface Modifier {
+  id: EffectId;
+  apply(accumulator: number, value: number): number;
 }
 
 export enum ValueKind {
-  Preset = 1,
-  Base = 2,
-  Variable = 3,
-  Compound = 4,
+  Base = 1,
+  Variable = 2,
+  Compound = 3,
 }
 
-export type ModifierType = {
-  id: EffectId;
-  kind: ModifierKind;
-};
+class Addition implements Modifier {
+  constructor(readonly id: EffectId) {}
 
-export function AbsoluteModifier(id: EffectId): ModifierType {
-  return { id, kind: ModifierKind.Absolute };
+  apply(accumulator: number, value: number): number {
+    return accumulator + value;
+  }
 }
 
-export function ProportionalModifier(id: EffectId): ModifierType {
-  return { id, kind: ModifierKind.Proportional };
+export function AdditionModifier(id: EffectId): Addition {
+  return new Addition(id);
 }
 
-export function MultiplicationModifier(id: EffectId): ModifierType {
-  return { id, kind: ModifierKind.Multiplication };
+class Ratio implements Modifier {
+  constructor(readonly id: EffectId) {}
+
+  apply(accumulator: number, value: number): number {
+    return accumulator * (1 + value);
+  }
+}
+
+export function ProportionalModifier(id: EffectId): Ratio {
+  return new Ratio(id);
+}
+
+class Multiplication implements Modifier {
+  constructor(readonly id: EffectId) {}
+
+  apply(accumulator: number, value: number): number {
+    return accumulator * value;
+  }
+}
+
+export function MultiplicationModifier(id: EffectId): Multiplication {
+  return new Multiplication(id);
 }
 
 export type EffectValueType =
-  | { kind: ValueKind.Preset; value: number }
   | { kind: ValueKind.Base; value: number }
   | { kind: ValueKind.Variable }
   | {
       kind: ValueKind.Compound;
-      effects: [ModifierType, ...ModifierType[]];
+      effects: [Addition, ...Modifier[]];
     };
 
 export type EffectMetadataType = {
@@ -49,9 +65,10 @@ export type ResourceQuantityType = {
   amount: number;
 };
 
-export function PresetEffect(value: number): EffectValueType {
-  return { kind: ValueKind.Preset, value };
-}
+export type EffectQuantityType = {
+  id: EffectId;
+  amount: number;
+};
 
 export function BaseEffect(value: number): EffectValueType {
   return { kind: ValueKind.Base, value };
@@ -62,8 +79,8 @@ export function VariableEffect(): EffectValueType {
 }
 
 export function CompoundEffect(
-  effect: ModifierType,
-  ...more: ModifierType[]
+  assignment: Addition,
+  ...modifiers: Modifier[]
 ): EffectValueType {
-  return { kind: ValueKind.Compound, effects: [effect, ...more] };
+  return { kind: ValueKind.Compound, effects: [assignment, ...modifiers] };
 }

@@ -7,6 +7,7 @@ import {
   BonfireMetadataType,
   BuildingEffectType,
   BuildingMetadata,
+  BuildingMetadataType,
   EffectId,
   ResourceId,
   ResourceMetadata,
@@ -16,6 +17,7 @@ import {
 
 import { EntityAdmin } from "../game/entity-admin";
 import { BuildingEntity } from "../buildings";
+import { EffectPoolEntity } from "../effects";
 
 export interface IBonfirePresenter extends IRender {
   readonly items: Ref<BonfireItem[]>;
@@ -43,7 +45,10 @@ export class BonfirePresenter implements IBonfirePresenter {
 
       // Update unlocked status
       if (metadata.intent.kind == "buy-building") {
-        const building = this.admin.building(metadata.intent.buildingId);
+        const buildingId = metadata.intent.buildingId;
+        const meta = BuildingMetadata[buildingId];
+        const building = this.admin.building(buildingId);
+        const effects = this.admin.effects();
         building.changes.handle({
           unlocked: () => {
             item.unlocked = building.state.unlocked;
@@ -54,16 +59,33 @@ export class BonfirePresenter implements IBonfirePresenter {
           ingredients: () => {
             this.updatePrices(item, building);
           },
+          effects: () => {
+            this.updateEffects(item, effects, meta);
+          },
         });
       }
     }
   }
 
   private updatePrices(item: BonfireItem, entity: BuildingEntity): void {
-    for (let i = 0; i < item.ingredients.length; i++) {
-      const itemIngredient = item.ingredients[i];
-      const entityIngredient = entity.state.ingredients[i];
-      itemIngredient.requirement = entityIngredient.amount;
+    for (const ingredient of item.ingredients) {
+      ingredient.requirement = entity.state.ingredients.get(ingredient.id) ?? 0;
+    }
+  }
+
+  private updateEffects(
+    item: BonfireItem,
+    effects: EffectPoolEntity,
+    meta: BuildingMetadataType,
+  ): void {
+    for (let i = 0; i < item.effects.length; i++) {
+      const itemEffect = item.effects[i];
+
+      const perLevelEffect = meta.effects.resources[i].per;
+      itemEffect.perLevelAmount = effects.get(perLevelEffect);
+
+      const totalEffect = meta.effects.resources[i].total;
+      itemEffect.totalAmount = effects.get(totalEffect);
     }
   }
 
@@ -86,7 +108,7 @@ export class BonfirePresenter implements IBonfirePresenter {
           BuildingMetadata[item.intent.buildingId].prices.baseIngredients,
         );
         result.effects = this.newEffectsList(
-          BuildingMetadata[item.intent.buildingId].effects.production,
+          BuildingMetadata[item.intent.buildingId].effects.resources,
         );
         return result;
     }
@@ -110,7 +132,7 @@ export class BonfirePresenter implements IBonfirePresenter {
   ): ProductionEffectItem[] {
     const entity = this.admin.effects();
     return effects.map((e) => {
-      return new ProductionEffectItem(e.id, e.label, entity.get(e.id));
+      return new ProductionEffectItem(e.per, e.label, entity.get(e.per));
     });
   }
 }
@@ -159,6 +181,7 @@ class ProductionEffectItem {
   constructor(
     public id: EffectId,
     public label: string,
-    public amount?: number,
+    public perLevelAmount?: number,
+    public totalAmount?: number,
   ) {}
 }

@@ -11,45 +11,42 @@ export class BuildingSystem extends System {
   // update method
   update(): void {
     for (const building of this.admin.buildings()) {
-      const levelChanged = this.processBuildQueue(building);
-      if (levelChanged) {
+      this.processBuildQueue(building);
+      if (building.changes.has("level")) {
         this.updatePrices(building);
-        building.changes.mark("ingredients");
       }
     }
   }
 
   // specific update behaviors
-  private processBuildQueue(building: BuildingEntity): boolean {
+  private processBuildQueue(building: BuildingEntity): void {
     let level = building.state.level;
     building.buildQueue.consume((item) => {
       if (item.intent == "construct") {
-        for (const ingredient of building.state.ingredients) {
-          const resource = this.admin.resource(ingredient.id);
-          resource.mutations.take(ingredient.amount);
+        for (const [resourceId, amount] of building.state.ingredients) {
+          const resource = this.admin.resource(resourceId);
+          resource.mutations.take(amount);
         }
         level++;
       }
     });
 
-    if (level != building.state.level) {
-      building.state.level = level;
-      return true;
-    }
-
-    return false;
+    building.state.level = level;
   }
 
-  private updatePrices(building: BuildingEntity) {
+  private updatePrices(building: BuildingEntity): void {
     const buildingMetadata = BuildingMetadata[building.id];
     const prices = buildingMetadata.prices;
     const level = building.state.level;
     const priceMultiplier = Math.pow(prices.ratio, level);
 
-    for (let i = 0; i < prices.baseIngredients.length; i++) {
-      const ingredientMetadata = prices.baseIngredients[i];
-      const effective = building.state.ingredients[i];
-      effective.amount = ingredientMetadata.amount * priceMultiplier;
+    for (const ingredient of prices.baseIngredients) {
+      building.state.ingredients.set(
+        ingredient.id,
+        ingredient.amount * priceMultiplier,
+      );
     }
+
+    building.changes.mark("ingredients");
   }
 }

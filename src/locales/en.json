@@ -61,7 +61,8 @@
 
   "building-effects": {
     "title": {
-      "per-level": "Effects (per level)"
+      "per-level": "Effects (per level)",
+      "total": "Effects (total)"
     },
     "catnip-field": {
       "catnip-production": {

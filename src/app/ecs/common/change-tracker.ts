@@ -21,6 +21,15 @@ export class ChangeTracker<
     }
   }
 
+  handleAny(keys: K[], handler: () => void): void {
+    for (const key of keys) {
+      if (this.marked.has(key)) {
+        handler();
+        break;
+      }
+    }
+  }
+
   has(key: K): boolean {
     return this.marked.has(key);
   }

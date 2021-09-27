@@ -3,7 +3,8 @@ import { BuildingId, EffectId } from "./_id";
 import { ResourceQuantityType } from "./_types";
 
 export type BuildingEffectType = {
-  id: EffectId;
+  per: EffectId;
+  total: EffectId;
   label: string;
 };
 
@@ -16,7 +17,7 @@ export type BuildingMetadataType = {
   };
   effects: {
     count: BuildingCountId;
-    production: BuildingEffectType[];
+    resources: BuildingEffectType[];
   };
 };
 
@@ -30,9 +31,10 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     unlockRatio: 0.3,
     effects: {
       count: "catnip-field-count",
-      production: [
+      resources: [
         {
-          id: "catnip-field-base-catnip",
+          per: "catnip-field-base-catnip",
+          total: "catnip-field-production",
           label: "building-effects.catnip-field.catnip-production.label",
         },
       ],

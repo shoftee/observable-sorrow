@@ -1,10 +1,5 @@
 import { System } from "../ecs";
-import {
-  EffectId,
-  EffectMetadata,
-  ModifierKind,
-  ValueKind,
-} from "../core/metadata";
+import { EffectId, EffectMetadata, ValueKind } from "../core/metadata";
 
 import { EffectPoolEntity } from "../effects";
 
@@ -48,19 +43,13 @@ export class EffectsSystem extends System {
     }
 
     let calculation = 0;
-    for (const dependency of metadata.value.effects) {
-      if (resolved[dependency.id] !== true) {
-        this.updateCompoundEffect(dependency.id, entity, resolved, force);
+    for (const modifier of metadata.value.effects) {
+      if (resolved[modifier.id] !== true) {
+        this.updateCompoundEffect(modifier.id, entity, resolved, force);
       }
 
-      const dependencyValue = entity.get(dependency.id) ?? 0;
-      if (dependency.kind === ModifierKind.Absolute) {
-        calculation += dependencyValue;
-      } else if (dependency.kind === ModifierKind.Proportional) {
-        calculation *= 1 + dependencyValue;
-      } else if (dependency.kind === ModifierKind.Multiplication) {
-        calculation *= dependencyValue;
-      }
+      const dependencyValue = entity.get(modifier.id) ?? 0;
+      calculation = modifier.apply(calculation, dependencyValue);
     }
 
     entity.set(metadata.id, calculation);

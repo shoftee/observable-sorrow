@@ -20,14 +20,20 @@
 
 <script lang="ts">
 import { Runner } from "./app/os";
+import {
+  useKeyboardEvents,
+  KeyboardEventsKey,
+} from "./composables/keyboard-events";
 
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, provide } from "vue";
 
 import Main from "./components/Main.vue";
 export default defineComponent({
   components: { "os-main": Main },
-  mounted() {
-    Runner.start();
+  setup() {
+    onMounted(() => Runner.start());
+
+    provide(KeyboardEventsKey, useKeyboardEvents());
   },
 });
 </script>
