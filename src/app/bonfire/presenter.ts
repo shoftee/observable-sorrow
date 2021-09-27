@@ -44,7 +44,7 @@ export class BonfirePresenter implements IBonfirePresenter {
       // Update unlocked status
       if (metadata.intent.kind == "buy-building") {
         const building = this.admin.building(metadata.intent.buildingId);
-        building.changes.apply({
+        building.changes.handle({
           unlocked: () => {
             item.unlocked = building.state.unlocked;
           },

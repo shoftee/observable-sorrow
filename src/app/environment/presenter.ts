@@ -28,7 +28,7 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
 
   render(): void {
     const entity = this.environment;
-    entity.changes.apply({
+    entity.changes.handle({
       day: () => {
         this.calendar.value.day = entity.state.day;
       },

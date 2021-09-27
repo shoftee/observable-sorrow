@@ -39,7 +39,7 @@ export class ResourcePresenter implements IResourcePresenter {
   render(): void {
     for (const item of unref(this.items)) {
       const entity = this.admin.resource(item.id);
-      entity.changes.apply({
+      entity.changes.handle({
         unlocked: () => {
           item.unlocked = entity.state.unlocked;
         },
@@ -55,7 +55,7 @@ export class ResourcePresenter implements IResourcePresenter {
       });
     }
 
-    this.admin.effects().changes.apply({
+    this.admin.effects().changes.handle({
       "catnip-production": () => this.updateCatnipDecorations(),
       "catnip-field-weather": () => this.updateCatnipDecorations(),
     });

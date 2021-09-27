@@ -12,7 +12,7 @@ export class ChangeTracker<
     }
   }
 
-  apply(handlers: Partial<Record<K, () => void>>): void {
+  handle(handlers: Partial<Record<K, () => void>>): void {
     for (const key of this.marked) {
       const fn = handlers[key];
       if (fn) {
