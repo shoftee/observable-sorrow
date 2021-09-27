@@ -1075,22 +1075,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@nopr3d/vue-next-rx@^1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@nopr3d/vue-next-rx/-/vue-next-rx-1.0.7.tgz#62889f2f322efd3a85bf415a57bf301f6fba10d8"
-  integrity sha512-HeBEUSXWA52vPYLatxMnhiEShmKHKJKkSfaWgLhDs9bf6o5NkonqeHxnDPcyr7mOAhaIWetcAuvw7iLyU2LxgA==
-
 "@popperjs/core@^2.8.3", "@popperjs/core@^2.9.2":
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
   integrity sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q==
-
-"@reactivex/rxjs@^6.6.7":
-  version "6.6.7"
-  resolved "https://registry.yarnpkg.com/@reactivex/rxjs/-/rxjs-6.6.7.tgz#52ab48f989aba9cda2b995acc904a43e6e1b3b40"
-  integrity sha512-xZIV2JgHhWoVPm3uVcFbZDRVJfx2hgqmuTX7J4MuKaZ+j5jN29agniCPBwrlCmpA15/zLKcPi7/bogt0ZwOFyA==
-  dependencies:
-    tslib "^1.9.0"
 
 "@soda/friendly-errors-webpack-plugin@^1.7.1":
   version "1.8.0"
@@ -8443,7 +8431,7 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
-rxjs@^6.0.0, rxjs@^6.6.0:
+rxjs@^6.6.0:
   version "6.6.7"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
   integrity sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ==

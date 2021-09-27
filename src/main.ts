@@ -5,10 +5,6 @@ import { App, createApp } from "vue";
 import AppComponent from "./App.vue";
 const app: App<Element> = createApp(AppComponent);
 
-// add vue-rx
-import VueRx from "@nopr3d/vue-next-rx";
-app.use(VueRx);
-
 // add vue-tippy
 import applyTippy from "./plugins/tippy";
 applyTippy(app);
