@@ -1,59 +1,43 @@
 import { System } from "../ecs";
-import { EffectId, EffectMetadata, ValueKind } from "../core/metadata";
+import { EffectId, EffectExpressions } from "../core/metadata";
 
 import { EffectPoolEntity } from "../effects";
 
-type EffectBits = Partial<{ [Id in EffectId]: boolean }>;
-
 export class EffectsSystem extends System {
   init(): void {
-    this.updateCompoundEffects(true);
+    this.calculateEffects();
   }
 
   update(): void {
-    this.updateCompoundEffects();
+    this.calculateEffects();
   }
 
-  private updateCompoundEffects(force: boolean = false) {
+  private calculateEffects() {
     const effects = this.admin.effects();
-    const resolved: EffectBits = {};
-    for (const effect of Object.values(EffectMetadata)) {
-      this.updateCompoundEffect(effect.id, effects, resolved, force);
+    const resolved = new Set<EffectId>();
+    for (const id of Object.keys(EffectExpressions)) {
+      this.resolveEffect(effects, resolved, id as EffectId);
     }
   }
 
-  private updateCompoundEffect(
+  private resolveEffect(
+    values: EffectPoolEntity,
+    resolved: Set<EffectId>,
     id: EffectId,
-    entity: EffectPoolEntity,
-    resolved: EffectBits,
-    force: boolean,
   ) {
-    if (resolved[id] === true) {
+    if (resolved.has(id)) {
       return;
     }
 
-    resolved[id] = true;
+    resolved.add(id);
 
-    const metadata = EffectMetadata[id];
-    if (metadata.value.kind === ValueKind.Base) {
-      entity.set(id, metadata.value.value);
-      return;
-    } else if (metadata.value.kind !== ValueKind.Compound) {
-      return;
-    }
-
-    let calculation = 0;
-    for (const modifier of metadata.value.effects) {
-      if (resolved[modifier.id] !== true) {
-        this.updateCompoundEffect(modifier.id, entity, resolved, force);
+    const effectValue = EffectExpressions[id];
+    if (effectValue) {
+      for (const dep of effectValue.deps()) {
+        this.resolveEffect(values, resolved, dep);
       }
-
-      const dependencyValue = entity.get(modifier.id) ?? 0;
-      calculation = modifier.apply(calculation, dependencyValue);
+      const calculated = effectValue.resolve(values);
+      values.set(id, calculated);
     }
-
-    entity.set(metadata.id, calculation);
-
-    return;
   }
 }

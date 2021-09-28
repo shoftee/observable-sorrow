@@ -1,16 +1,10 @@
 import { Component } from "../ecs";
 import { QueueComponent } from "../ecs/common";
 
-import {
-  BuildingId,
-  BuildingMetadata,
-  EffectId,
-  ResourceId,
-} from "../core/metadata";
+import { BuildingId, BuildingMetadata, ResourceId } from "../core/metadata";
 
 export class BuildingStateComponent extends Component {
   readonly ingredients: Map<ResourceId, number>;
-  readonly effects: Map<EffectId, number>;
   unlocked = false;
   level = 0;
 
@@ -19,9 +13,6 @@ export class BuildingStateComponent extends Component {
     const meta = BuildingMetadata[id];
     this.ingredients = new Map<ResourceId, number>(
       meta.prices.baseIngredients.map((m) => [m.id, m.amount]),
-    );
-    this.effects = new Map<EffectId, number>(
-      meta.effects.resources.map((m) => [m.per, 0]),
     );
   }
 }

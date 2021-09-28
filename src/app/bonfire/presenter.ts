@@ -52,15 +52,14 @@ export class BonfirePresenter implements IBonfirePresenter {
         building.changes.handle({
           unlocked: () => {
             item.unlocked = building.state.unlocked;
+            this.updateEffects(item, effects, meta);
           },
           level: () => {
             item.level = building.state.level;
+            this.updateEffects(item, effects, meta);
           },
           ingredients: () => {
             this.updatePrices(item, building);
-          },
-          effects: () => {
-            this.updateEffects(item, effects, meta);
           },
         });
       }

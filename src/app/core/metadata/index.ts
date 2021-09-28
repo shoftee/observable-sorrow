@@ -4,5 +4,5 @@ export * from "./bonfire";
 export * from "./buildings";
 export * from "./crafting";
 export * from "./environment";
-export * from "./effects";
+export * from "./effect-exprs";
 export * from "./resources";
