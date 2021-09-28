@@ -26,14 +26,24 @@ export function useKeyboardEvents(): KeyboardEvents {
     keys.shift = event.shiftKey;
     keys.alt = event.altKey;
   };
+  const reset = () => {
+    if (document.visibilityState === "hidden") {
+      keys.ctrl = false;
+      keys.shift = false;
+      keys.alt = false;
+    }
+  };
 
   onMounted(() => {
     addEventListener("keydown", handler);
     addEventListener("keyup", handler);
+    document.addEventListener("visibilitychange", reset);
   });
+
   onUnmounted(() => {
     removeEventListener("keydown", handler);
     removeEventListener("keyup", handler);
+    document.removeEventListener("visibilitychange", reset);
   });
 
   return keys;
