@@ -18,8 +18,8 @@ export default defineComponent({
     const res = (v: number) => formatter.number(v, "negative");
     const eff = (v: number) => formatter.number(v, "always");
 
-    const items = unref(Presenter.bonfire.items);
-    const unlocked = computed(() => items.filter((i) => i.unlocked));
+    const bonfireItems = unref(Presenter.bonfire.items);
+    const unlocked = computed(() => bonfireItems.filter((i) => i.unlocked));
 
     return { t, res, eff, items: unlocked, events };
   },
