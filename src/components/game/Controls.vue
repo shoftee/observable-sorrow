@@ -1,3 +1,35 @@
+<script lang="ts">
+import { computed, defineComponent, unref, inject } from "vue";
+import { useI18n } from "vue-i18n";
+
+import { BonfireItemId } from "@/app/core/metadata";
+import { Presenter, Interactor } from "@/app/os";
+import { KeyboardEventsKey } from "@/composables/keyboard-events";
+const notation = Presenter.numbers;
+
+import Button from "../global/Button.vue";
+export default defineComponent({
+  components: { "os-button": Button },
+  setup() {
+    const events = inject(KeyboardEventsKey);
+
+    const { t } = { ...useI18n() };
+    const res = (v: number) => notation.number(v, 3, "negative");
+    const eff = (v: number) => notation.number(v, 3, "always");
+
+    const items = unref(Presenter.bonfire.items);
+    const unlocked = computed(() => items.filter((i) => i.unlocked));
+
+    return { t, res, eff, items: unlocked, events };
+  },
+  methods: {
+    buildItem(id: BonfireItemId) {
+      Interactor.bonfire.buildItem(id);
+    },
+  },
+});
+</script>
+
 <template>
   <div class="controls d-flex flex-column">
     <section class="row row-cols-1 row-cols-xl-2 g-2">
@@ -67,35 +99,3 @@
     </section>
   </div>
 </template>
-
-<script lang="ts">
-import { BonfireItemId } from "@/app/core/metadata";
-import { Presenter, Interactor } from "@/app/os";
-import { KeyboardEventsKey } from "@/composables/keyboard-events";
-const notation = Presenter.numbers;
-
-import { computed, defineComponent, unref, inject } from "vue";
-import { useI18n } from "vue-i18n";
-
-import Button from "../global/Button.vue";
-export default defineComponent({
-  components: { "os-button": Button },
-  setup() {
-    const events = inject(KeyboardEventsKey);
-
-    const { t } = { ...useI18n() };
-    const res = (v: number) => notation.number(v, 3, "negative");
-    const eff = (v: number) => notation.number(v, 3, "always");
-
-    const items = unref(Presenter.bonfire.items);
-    const unlocked = computed(() => items.filter((i) => i.unlocked));
-
-    return { t, res, eff, items: unlocked, events };
-  },
-  methods: {
-    buildItem(id: BonfireItemId) {
-      Interactor.bonfire.buildItem(id);
-    },
-  },
-});
-</script>

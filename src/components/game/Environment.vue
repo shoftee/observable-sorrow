@@ -1,3 +1,26 @@
+<script lang="ts">
+import { computed, defineComponent, unref } from "vue";
+import { useI18n } from "vue-i18n";
+
+import { Presenter } from "@/app/os";
+const notation = Presenter.numbers;
+
+export default defineComponent({
+  setup() {
+    const { t } = { ...useI18n() };
+    const calendar = unref(Presenter.environment.calendar);
+    const weather = unref(Presenter.environment.weather);
+    const keypath = computed(() => {
+      return weather.title
+        ? "environment.calendar.full.weather"
+        : "environment.calendar.full.no-weather";
+    });
+    const n = (v: number) => notation.number(v, 3, "negative");
+    return { t, n, calendar, weather, keypath };
+  },
+});
+</script>
+
 <template>
   <div class="d-flex flex-column align-self-stretch">
     <div class="align-self-stretch">
@@ -17,26 +40,3 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Presenter } from "@/app/os";
-
-const notation = Presenter.numbers;
-
-import { computed, defineComponent, unref } from "vue";
-import { useI18n } from "vue-i18n";
-
-export default defineComponent({
-  setup() {
-    const { t } = { ...useI18n() };
-    const calendar = unref(Presenter.environment.calendar);
-    const weather = unref(Presenter.environment.weather);
-    const keypath = computed(() => {
-      return weather.title
-        ? "environment.calendar.full.weather"
-        : "environment.calendar.full.no-weather";
-    });
-    const n = (v: number) => notation.number(v, 3, "negative");
-    return { t, n, calendar, weather, keypath };
-  },
-});
-</script>

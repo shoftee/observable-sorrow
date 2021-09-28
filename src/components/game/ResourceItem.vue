@@ -1,3 +1,28 @@
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { useI18n } from "vue-i18n";
+
+import { ListItem } from "@/app/resources";
+import { Presenter } from "@/app/os";
+const notation = Presenter.numbers;
+
+export default defineComponent({
+  props: {
+    item: {
+      type: Object as PropType<ListItem>,
+      required: true,
+    },
+  },
+  setup() {
+    const { t } = { ...useI18n() };
+    const res = (v: number) => notation.number(v, 3, "negative");
+    const eff = (v: number) => notation.number(v, 3, "always");
+    const percent = (v: number) => notation.percent(v, 0, "always");
+    return { t, res, eff, percent };
+  },
+});
+</script>
+
 <template>
   <div class="d-inline-flex align-items-center">
     <div class="name col-3">
@@ -27,29 +52,3 @@
     </template>
   </div>
 </template>
-
-<script lang="ts">
-import { ListItem } from "@/app/resources";
-
-import { Presenter } from "@/app/os";
-const notation = Presenter.numbers;
-
-import { defineComponent, PropType } from "vue";
-import { useI18n } from "vue-i18n";
-
-export default defineComponent({
-  props: {
-    item: {
-      type: Object as PropType<ListItem>,
-      required: true,
-    },
-  },
-  setup() {
-    const { t } = { ...useI18n() };
-    const res = (v: number) => notation.number(v, 3, "negative");
-    const eff = (v: number) => notation.number(v, 3, "always");
-    const percent = (v: number) => notation.percent(v, 0, "always");
-    return { t, res, eff, percent };
-  },
-});
-</script>
