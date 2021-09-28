@@ -6,9 +6,9 @@ import { BonfireItemId } from "@/app/core/metadata";
 import { Presenter, Interactor } from "@/app/os";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
-import Button from "../global/Button.vue";
+import TooltipButton from "../global/TooltipButton.vue";
 export default defineComponent({
-  components: { "os-button": Button },
+  components: { TooltipButton },
   setup() {
     const events = inject(KeyboardEventsKey);
 
@@ -35,7 +35,7 @@ export default defineComponent({
   <div class="controls d-flex flex-column">
     <section class="row row-cols-1 row-cols-xl-2 g-2">
       <div class="col" v-for="item in items.values()" :key="item.id">
-        <os-button :disabled="!item.fulfilled" @click="buildItem(item.id)">
+        <TooltipButton :disabled="!item.fulfilled" @click="buildItem(item.id)">
           <template #default>
             {{ t(item.label) }}
             <span v-if="item.level && item.level > 0" class="structure-level">
@@ -95,7 +95,7 @@ export default defineComponent({
               </ul>
             </div>
           </template>
-        </os-button>
+        </TooltipButton>
       </div>
     </section>
   </div>
