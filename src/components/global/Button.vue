@@ -23,7 +23,7 @@ export default defineComponent({
     <button
       type="button"
       class="btn btn-outline-secondary w-100"
-      :class="{ disabled: props.disabled }"
+      :disabled="disabled"
       @click="clicked()"
     >
       <slot></slot>
