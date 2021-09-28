@@ -24,7 +24,7 @@ import {
   LockToggleSystem,
   ResourceProductionSystem,
 } from "../systems";
-import { SandcastleBuilderNotation } from "../utils/notation";
+import { NumberFormatter } from "../utils/notation";
 import { WorkshopEntity } from "../workshop";
 import { EntityAdmin } from "./entity-admin";
 import { TimersEntity } from "./timers";
@@ -85,7 +85,7 @@ export class Game implements IGame {
       new BonfirePresenter(this.admin),
       new EnvironmentPresenter(this.admin),
       new ResourcePresenter(this.admin),
-      new SandcastleBuilderNotation(),
+      new NumberFormatter(3),
     );
 
     this._interactor = new InteractorSystem(

@@ -4,7 +4,6 @@ import { useI18n } from "vue-i18n";
 
 import { ListItem } from "@/app/resources";
 import { Presenter } from "@/app/os";
-const notation = Presenter.numbers;
 
 export default defineComponent({
   props: {
@@ -15,10 +14,13 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-    const res = (v: number) => notation.number(v, 3, "negative");
-    const eff = (v: number) => notation.number(v, 3, "always");
-    const percent = (v: number) => notation.percent(v, 0, "always");
-    return { t, res, eff, percent };
+
+    const formatter = Presenter.numbers;
+    const res = (v: number) => formatter.number(v, "negative");
+    const eff = (v: number) => formatter.number(v, "always");
+    const per = (v: number) => formatter.percent(v, "always");
+
+    return { t, res, eff, per };
   },
 });
 </script>
@@ -34,8 +36,9 @@ export default defineComponent({
           'bg-success': item.modifier > 0,
           'bg-danger': item.modifier < 0,
         }"
-        >{{ percent(item.modifier) }}</span
       >
+        {{ per(item.modifier) }}
+      </span>
     </div>
     <div class="col-3 number amount">{{ res(item.amount) }}</div>
     <template v-if="item.capacity">

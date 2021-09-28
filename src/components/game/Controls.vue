@@ -5,7 +5,6 @@ import { useI18n } from "vue-i18n";
 import { BonfireItemId } from "@/app/core/metadata";
 import { Presenter, Interactor } from "@/app/os";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
-const notation = Presenter.numbers;
 
 import Button from "../global/Button.vue";
 export default defineComponent({
@@ -14,8 +13,10 @@ export default defineComponent({
     const events = inject(KeyboardEventsKey);
 
     const { t } = { ...useI18n() };
-    const res = (v: number) => notation.number(v, 3, "negative");
-    const eff = (v: number) => notation.number(v, 3, "always");
+
+    const formatter = Presenter.numbers;
+    const res = (v: number) => formatter.number(v, "negative");
+    const eff = (v: number) => formatter.number(v, "always");
 
     const items = unref(Presenter.bonfire.items);
     const unlocked = computed(() => items.filter((i) => i.unlocked));
@@ -35,8 +36,8 @@ export default defineComponent({
     <section class="row row-cols-1 row-cols-xl-2 g-2">
       <div class="col" v-for="item in items.values()" :key="item.id">
         <os-button :disabled="!item.fulfilled" @click="buildItem(item.id)">
-          <template #default
-            >{{ t(item.label) }}
+          <template #default>
+            {{ t(item.label) }}
             <span v-if="item.level && item.level > 0" class="structure-level">
               {{ item.level }}
             </span>

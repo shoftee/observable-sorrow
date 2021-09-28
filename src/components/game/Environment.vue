@@ -3,8 +3,6 @@ import { computed, defineComponent, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { Presenter } from "@/app/os";
-const notation = Presenter.numbers;
-
 export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
@@ -15,7 +13,9 @@ export default defineComponent({
         ? "environment.calendar.full.weather"
         : "environment.calendar.full.no-weather";
     });
-    const n = (v: number) => notation.number(v, 3, "negative");
+
+    const formatter = Presenter.numbers;
+    const n = (v: number) => formatter.number(v, "negative");
     return { t, n, calendar, weather, keypath };
   },
 });

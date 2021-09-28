@@ -1,13 +1,8 @@
 import { round } from "../mathx";
 
-export type ShowSign = "remove" | "negative" | "always";
+import { INumberNotation, ShowSign } from ".";
 
-export interface INumberNotation {
-  number(value: number, precision: number, showSign: ShowSign): string;
-  percent(value: number, precision: number, showSign: ShowSign): string;
-}
-
-export class SandcastleBuilderNotation {
+export class SandcastleBuilderNotation implements INumberNotation {
   number(value: number, precision: number, showSign: ShowSign): string {
     const signString = getSignString(value, showSign);
     let valueString: string;
