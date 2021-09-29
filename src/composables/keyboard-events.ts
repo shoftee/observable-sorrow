@@ -3,6 +3,7 @@ import {
   onMounted,
   onUnmounted,
   reactive,
+  readonly,
 } from "@vue/runtime-dom";
 
 export interface KeyboardEvents {
@@ -46,5 +47,5 @@ export function useKeyboardEvents(): KeyboardEvents {
     document.removeEventListener("visibilitychange", reset);
   });
 
-  return keys;
+  return readonly(keys);
 }
