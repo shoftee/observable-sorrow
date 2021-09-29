@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { Runner } from "./app/os";
+import { Interactor } from "./app/os";
 import {
   useKeyboardEvents,
   KeyboardEventsKey,
@@ -31,7 +31,7 @@ import Main from "./components/Main.vue";
 export default defineComponent({
   components: { "os-main": Main },
   setup() {
-    onMounted(() => Runner.start());
+    onMounted(() => Interactor.runner.start());
 
     provide(KeyboardEventsKey, useKeyboardEvents());
   },

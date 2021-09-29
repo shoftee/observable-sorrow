@@ -1,7 +1,6 @@
+import { IInteractorSystem } from "@/_interfaces";
 import {
-  IGameRunner,
   IPresenterSystem,
-  IInteractorSystem,
   GameUpdater,
   PresenterSystem,
   InteractorSystem,
@@ -30,7 +29,6 @@ import { EntityAdmin } from "./entity-admin";
 import { TimersEntity } from "./timers";
 
 export interface IGame {
-  readonly runner: IGameRunner;
   readonly presenter: IPresenterSystem;
   readonly interactor: IInteractorSystem;
 }
@@ -38,7 +36,6 @@ export interface IGame {
 export class Game implements IGame {
   private readonly admin: EntityAdmin = new EntityAdmin();
   private readonly updater: GameUpdater;
-  private readonly _runner: IGameRunner;
 
   private readonly _systems: GameSystems;
   private readonly _presenter: PresenterSystem;
@@ -75,12 +72,6 @@ export class Game implements IGame {
       new SystemTimestampProvider(),
     );
 
-    this._runner = {
-      start: () => this.updater.start(),
-      stop: () => this.updater.stop(),
-      forceUpdate: () => this.updater.force(),
-    };
-
     this._presenter = new PresenterSystem(
       new BonfirePresenter(this.admin),
       new EnvironmentPresenter(this.admin),
@@ -88,13 +79,10 @@ export class Game implements IGame {
       new NumberFormatter(3),
     );
 
-    this._interactor = new InteractorSystem(
-      new BonfireInteractor(this._runner, this.admin),
-    );
-  }
-
-  get runner(): IGameRunner {
-    return this._runner;
+    this._interactor = new InteractorSystem(new BonfireInteractor(this.admin), {
+      start: () => this.updater.start(),
+      stop: () => this.updater.stop(),
+    });
   }
 
   get presenter(): IPresenterSystem {

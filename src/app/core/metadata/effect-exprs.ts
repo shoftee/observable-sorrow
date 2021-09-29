@@ -1,4 +1,4 @@
-import { EffectId } from "./_id";
+import { EffectId } from "../../../_interfaces/id";
 
 export type EffectQuantityType = {
   id: EffectId;

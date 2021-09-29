@@ -1,4 +1,4 @@
-export * from "./_id";
+export * from "../../../_interfaces/id";
 export * from "./_types";
 export * from "./bonfire";
 export * from "./buildings";

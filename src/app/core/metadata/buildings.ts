@@ -1,5 +1,5 @@
 import { BuildingCountId } from ".";
-import { BuildingId, EffectId } from "./_id";
+import { BuildingId, EffectId } from "../../../_interfaces/id";
 import { ResourceQuantityType } from "./_types";
 
 export type BuildingEffectType = {

@@ -1,13 +1,14 @@
+import { System } from "../ecs";
+
 import {
   BuildingSystem,
   BuildingEffectsSystem,
   CraftingSystem,
+  EffectsSystem,
   EnvironmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
 } from ".";
-import { System } from "../ecs";
-import { EffectsSystem } from "./effects";
 
 export class GameSystems {
   constructor(

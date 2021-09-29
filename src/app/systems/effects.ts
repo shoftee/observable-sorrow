@@ -1,5 +1,5 @@
 import { System } from "../ecs";
-import { EffectId, EffectExpressions } from "../core/metadata";
+import { EffectExpressions, EffectId } from "../core/metadata";
 
 import { EffectPoolEntity } from "../effects";
 

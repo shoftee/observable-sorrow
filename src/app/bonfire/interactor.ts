@@ -1,17 +1,11 @@
-import { IGameRunner } from "../game";
+import { IBonfireInteractor } from "@/_interfaces/interactor";
+
 import { BonfireItemId } from "../core/metadata";
 import { BonfireMetadata } from "../core/metadata/bonfire";
 import { EntityAdmin } from "../game/entity-admin";
 
-export interface IBonfireInteractor {
-  buildItem(id: BonfireItemId): void;
-}
-
 export class BonfireInteractor implements IBonfireInteractor {
-  constructor(
-    private readonly runner: IGameRunner,
-    private readonly admin: EntityAdmin,
-  ) {}
+  constructor(private readonly admin: EntityAdmin) {}
 
   buildItem(id: BonfireItemId): void {
     const metadata = BonfireMetadata[id];
@@ -28,7 +22,5 @@ export class BonfireInteractor implements IBonfireInteractor {
         this.admin.building(metadata.intent.buildingId).buildQueue.construct();
         break;
     }
-
-    this.runner.forceUpdate();
   }
 }

@@ -1,8 +1,9 @@
 <script lang="ts">
+import { BonfireItemId } from "@/_interfaces";
+
 import { computed, defineComponent, unref, inject } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { BonfireItemId } from "@/app/core/metadata";
 import { Presenter, Interactor } from "@/app/os";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 

@@ -1,4 +1,4 @@
-import { ResourceId } from "./_id";
+import { ResourceId } from "../../../_interfaces/id";
 
 export type ResourceQuantityType = {
   id: ResourceId;

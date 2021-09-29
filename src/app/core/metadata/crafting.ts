@@ -1,4 +1,4 @@
-import { WorkshopRecipeId } from "./_id";
+import { WorkshopRecipeId } from "../../../_interfaces/id";
 import { ResourceQuantityType } from "./_types";
 
 export type WorkshopRecipeType = {

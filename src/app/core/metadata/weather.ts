@@ -1,4 +1,4 @@
-import { WeatherId } from "./_id";
+import { WeatherId } from "../../../_interfaces/id";
 
 export type WeatherMetadataType = {
   id: WeatherId;

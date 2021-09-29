@@ -1,4 +1,4 @@
-import { SeasonId } from "./_id";
+import { SeasonId } from "../../../_interfaces/id";
 
 type SeasonMetadataType = {
   id: SeasonId;

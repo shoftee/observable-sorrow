@@ -1,7 +1,7 @@
+import { WorkshopRecipeId } from "@/_interfaces";
+
 import { Entity } from "../ecs";
 import { RawQueueComponent } from "../ecs/common";
-
-import { WorkshopRecipeId } from "../core/metadata";
 
 import { EntityAdmin } from "../game/entity-admin";
 

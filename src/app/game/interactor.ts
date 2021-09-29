@@ -1,9 +1,12 @@
-import { IBonfireInteractor } from "../bonfire";
-
-export interface IInteractorSystem {
-  readonly bonfire: IBonfireInteractor;
-}
+import {
+  IBonfireInteractor,
+  IInteractorSystem,
+} from "@/_interfaces/interactor";
+import { IGameRunner } from "@/_interfaces/runner";
 
 export class InteractorSystem implements IInteractorSystem {
-  constructor(readonly bonfire: IBonfireInteractor) {}
+  constructor(
+    readonly bonfire: IBonfireInteractor,
+    readonly runner: IGameRunner,
+  ) {}
 }
