@@ -1,8 +1,8 @@
 <script lang="ts">
-import { BonfireItemId } from "@/_interfaces";
-
-import { computed, defineComponent, unref, inject } from "vue";
+import { computed, defineComponent, inject, reactive } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { BonfireItemId } from "@/_interfaces";
 
 import { Presenter, Interactor } from "@/app/os";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
@@ -19,8 +19,8 @@ export default defineComponent({
     const res = (v: number) => formatter.number(v, "negative");
     const eff = (v: number) => formatter.number(v, "always");
 
-    const bonfireItems = unref(Presenter.bonfire.items);
-    const unlocked = computed(() => bonfireItems.filter((i) => i.unlocked));
+    const all = reactive(Presenter.bonfire.all.value);
+    const unlocked = computed(() => all.filter((m) => m.unlocked));
 
     return { t, res, eff, items: unlocked, events };
   },
@@ -35,11 +35,11 @@ export default defineComponent({
 <template>
   <div class="controls d-flex flex-column">
     <section class="row row-cols-1 row-cols-xl-2 g-2">
-      <div class="col" v-for="item in items.values()" :key="item.id">
+      <div class="col" v-for="item in items" :key="item.id">
         <TooltipButton :disabled="!item.fulfilled" @click="buildItem(item.id)">
           <template #default>
             {{ t(item.label) }}
-            <span v-if="item.level && item.level > 0" class="structure-level">
+            <span v-if="item.level > 0" class="structure-level">
               {{ item.level }}
             </span>
           </template>
@@ -68,32 +68,30 @@ export default defineComponent({
                   </div>
                 </li>
               </ul>
-            </div>
-            <div v-if="item.effects.length > 0">
-              <div class="card-header">
-                <template v-if="events.shift">
-                  {{ t("building-effects.title.total") }}
-                </template>
-                <template v-else>
-                  {{ t("building-effects.title.per-level") }}
-                </template>
+              <div v-if="item.effects.length > 0">
+                <div class="card-header">
+                  {{
+                    events.shift
+                      ? t("building-effects.title.total")
+                      : t("building-effects.title.per-level")
+                  }}
+                </div>
+                <ul class="effects-list">
+                  <li v-for="effect in item.effects" :key="effect.id">
+                    <i18n-t scope="global" :keypath="effect.label" tag="span">
+                      <template v-if="effect.perLevelAmount" #amount>
+                        <span class="number">
+                          {{
+                            events.shift
+                              ? eff(effect.totalAmount)
+                              : eff(effect.perLevelAmount)
+                          }}/t
+                        </span>
+                      </template>
+                    </i18n-t>
+                  </li>
+                </ul>
               </div>
-              <ul class="effects-list">
-                <li v-for="effect in item.effects" :key="effect.id">
-                  <i18n-t scope="global" :keypath="effect.label" tag="span">
-                    <template v-if="effect.perLevelAmount" #amount>
-                      <span class="number">
-                        <template v-if="events.shift">
-                          {{ eff(effect.totalAmount) }}/t
-                        </template>
-                        <template v-else>
-                          {{ eff(effect.perLevelAmount) }}/t
-                        </template>
-                      </span>
-                    </template>
-                  </i18n-t>
-                </li>
-              </ul>
             </div>
           </template>
         </TooltipButton>

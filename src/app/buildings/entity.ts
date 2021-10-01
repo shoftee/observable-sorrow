@@ -1,25 +1,19 @@
-import {
-  ChangeTrackedEntity,
-  ComponentState,
-  ChangeTrackingProxy,
-} from "../ecs";
-import { BuildingId } from "../core/metadata";
+import { reactive } from "@vue/runtime-core";
 
-import { EntityAdmin } from "../game/entity-admin";
-import { BuildingStateComponent, BuildQueueComponent } from "./components";
+import { BuildingId } from "@/_interfaces";
+import { BuildingState } from "@/_state";
+import { Entity } from "../ecs";
+import { BuildQueueComponent } from "./components";
 
-type State = ComponentState<BuildingStateComponent>;
-
-export class BuildingEntity extends ChangeTrackedEntity<State> {
+export class BuildingEntity extends Entity {
   readonly buildQueue: BuildQueueComponent;
-  readonly state: BuildingStateComponent;
 
-  constructor(admin: EntityAdmin, readonly id: BuildingId) {
-    super(admin, id);
+  readonly state: BuildingState;
+
+  constructor(readonly id: BuildingId) {
+    super(id);
     this.buildQueue = this.addComponent(new BuildQueueComponent());
-    this.state = ChangeTrackingProxy(
-      this.addComponent(new BuildingStateComponent(this.id)),
-      this.changes,
-    );
+
+    this.state = reactive(new BuildingState(this.id));
   }
 }

@@ -31,7 +31,7 @@ import Main from "./components/Main.vue";
 export default defineComponent({
   components: { "os-main": Main },
   setup() {
-    onMounted(() => Interactor.runner.start());
+    onMounted(() => Interactor.gameController.start());
 
     provide(KeyboardEventsKey, useKeyboardEvents());
   },

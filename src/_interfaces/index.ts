@@ -1,3 +1,3 @@
 export * from "./id";
-export * from "./interactor";
-export * from "./runner";
+export * from "./interactors";
+export * from "./presenter";

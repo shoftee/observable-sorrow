@@ -1,5 +1,5 @@
+import { BuildingMetadata, Flag, ResourceMetadata } from "@/_state";
 import { BuildingEntity } from "../buildings";
-import { BuildingMetadata, Flag, ResourceMetadata } from "../core/metadata";
 import { System } from "../ecs";
 import { ResourceEntity } from "../resources";
 

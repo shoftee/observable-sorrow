@@ -1,12 +1,8 @@
-import {
-  IBonfireInteractor,
-  IInteractorSystem,
-} from "@/_interfaces/interactor";
-import { IGameRunner } from "@/_interfaces/runner";
+import { IBonfireInteractor, IGameController } from "@/_interfaces";
 
-export class InteractorSystem implements IInteractorSystem {
+export class GameInteractor {
   constructor(
     readonly bonfire: IBonfireInteractor,
-    readonly runner: IGameRunner,
+    readonly gameController: IGameController,
   ) {}
 }

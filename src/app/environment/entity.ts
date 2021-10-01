@@ -1,23 +1,14 @@
-import {
-  ChangeTrackedEntity,
-  ComponentState,
-  ChangeTrackingProxy,
-} from "../ecs";
+import { reactive } from "vue";
 
-import { EntityAdmin } from "../game/entity-admin";
-import { EnvironmentComponent } from ".";
+import { EnvironmentState } from "@/_state";
+import { Entity } from "../ecs";
 
-type State = ComponentState<EnvironmentComponent>;
+export class EnvironmentEntity extends Entity {
+  readonly state: EnvironmentState;
 
-export class EnvironmentEntity extends ChangeTrackedEntity<State> {
-  readonly state: EnvironmentComponent;
+  constructor() {
+    super("environment");
 
-  constructor(admin: EntityAdmin, readonly id = "environment") {
-    super(admin, id);
-
-    this.state = ChangeTrackingProxy(
-      this.addComponent(new EnvironmentComponent()),
-      this.changes,
-    );
+    this.state = reactive(new EnvironmentState());
   }
 }

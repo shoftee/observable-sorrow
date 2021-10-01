@@ -1,4 +1,4 @@
-import { BonfireBuildingId, BonfireItemId } from "../../../_interfaces/id";
+import { BonfireBuildingId, BonfireItemId } from "../_interfaces/id";
 
 type BonfireIntentType =
   | { kind: "gather-catnip"; amount: number }

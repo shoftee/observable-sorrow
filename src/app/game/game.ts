@@ -1,18 +1,24 @@
-import { IInteractorSystem } from "@/_interfaces";
+import { IBonfireInteractor, IGameController } from "@/_interfaces";
+import { BuildingMetadata, ResourceMetadata } from "@/_state";
 import {
   IPresenterSystem,
   GameUpdater,
   PresenterSystem,
-  InteractorSystem,
+  GameInteractor,
 } from ".";
-import { BonfirePresenter, BonfireInteractor } from "../bonfire";
+import { BonfireInteractor } from "../bonfire";
 import { BuildingEntity } from "../buildings";
 import { SystemTimestampProvider } from "../core";
-import { BuildingMetadata, ResourceMetadata } from "../core/metadata";
-import { ChangeTrackedEntity } from "../ecs";
+import { Entity } from "../ecs";
 import { EffectPoolEntity } from "../effects";
-import { EnvironmentEntity, EnvironmentPresenter } from "../environment";
-import { ResourceEntity, ResourcePresenter } from "../resources";
+import { EnvironmentEntity } from "../environment";
+import {
+  BonfirePresenter,
+  EnvironmentPresenter,
+  ResourcePresenter,
+} from "../presenters";
+import { RootPresenter } from "../presenters/root";
+import { ResourceEntity } from "../resources";
 import {
   BuildingSystem,
   BuildingEffectsSystem,
@@ -26,33 +32,31 @@ import {
 import { NumberFormatter } from "../utils/notation";
 import { WorkshopEntity } from "../workshop";
 import { EntityAdmin } from "./entity-admin";
+import { EntityWatcher } from "./entity-watcher";
 import { TimersEntity } from "./timers";
 
 export interface IGame {
   readonly presenter: IPresenterSystem;
-  readonly interactor: IInteractorSystem;
+  readonly interactor: {
+    bonfire: IBonfireInteractor;
+    gameController: IGameController;
+  };
 }
 
 export class Game implements IGame {
   private readonly admin: EntityAdmin = new EntityAdmin();
+  private readonly watcher: EntityWatcher = new EntityWatcher();
   private readonly updater: GameUpdater;
 
   private readonly _systems: GameSystems;
+  private readonly _interactor: GameInteractor;
   private readonly _presenter: PresenterSystem;
-  private readonly _interactor: InteractorSystem;
+  private readonly _rootPresenter: RootPresenter;
 
   constructor() {
-    for (const building of Object.values(BuildingMetadata)) {
-      this.admin.add(new BuildingEntity(this.admin, building.id));
-    }
-
-    this.admin.add(new EffectPoolEntity(this.admin));
-    this.admin.add(new WorkshopEntity(this.admin));
-    this.admin.add(new EnvironmentEntity(this.admin));
-    this.admin.add(new TimersEntity(this.admin));
-
-    for (const resource of Object.values(ResourceMetadata)) {
-      this.admin.add(new ResourceEntity(this.admin, resource.id));
+    for (const entity of this.createEntities()) {
+      this.admin.add(entity);
+      this.watcher.watch(entity);
     }
 
     this._systems = new GameSystems(
@@ -72,24 +76,43 @@ export class Game implements IGame {
       new SystemTimestampProvider(),
     );
 
+    this._rootPresenter = new RootPresenter();
+
     this._presenter = new PresenterSystem(
-      new BonfirePresenter(this.admin),
-      new EnvironmentPresenter(this.admin),
-      new ResourcePresenter(this.admin),
+      this._rootPresenter,
+      new BonfirePresenter(this._rootPresenter),
+      new EnvironmentPresenter(this._rootPresenter),
+      new ResourcePresenter(this._rootPresenter),
       new NumberFormatter(3),
     );
 
-    this._interactor = new InteractorSystem(new BonfireInteractor(this.admin), {
+    this._interactor = new GameInteractor(new BonfireInteractor(this.admin), {
+      init: () => this.flushChanges(),
       start: () => this.updater.start(),
       stop: () => this.updater.stop(),
     });
+  }
+
+  *createEntities(): IterableIterator<Entity> {
+    for (const building of Object.values(BuildingMetadata)) {
+      yield new BuildingEntity(building.id);
+    }
+
+    yield new EffectPoolEntity();
+    yield new WorkshopEntity();
+    yield new EnvironmentEntity();
+    yield new TimersEntity();
+
+    for (const resource of Object.values(ResourceMetadata)) {
+      yield new ResourceEntity(resource.id);
+    }
   }
 
   get presenter(): IPresenterSystem {
     return this._presenter;
   }
 
-  get interactor(): IInteractorSystem {
+  get interactor(): GameInteractor {
     return this._interactor;
   }
 
@@ -114,15 +137,11 @@ export class Game implements IGame {
     this._systems.crafting.update();
     this._systems.resourceProduction.update();
 
-    this._presenter.environment.render();
-    this._presenter.resources.render();
-    this._presenter.bonfire.render();
+    // Push changes to presenter.
+    this.flushChanges();
+  }
 
-    // Clear tracked changes for this tick.
-    for (const entity of this.admin.pool.values()) {
-      if (entity instanceof ChangeTrackedEntity) {
-        entity.changes.clear();
-      }
-    }
+  private flushChanges() {
+    this.watcher.flush((changes) => this._rootPresenter.update(changes));
   }
 }

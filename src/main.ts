@@ -13,5 +13,8 @@ applyTippy(app);
 import applyI18n from "./plugins/vue-i18n";
 applyI18n(app);
 
+import { Interactor } from "./app/os";
+Interactor.gameController.init();
+
 // mount app to page
 app.mount("#app");

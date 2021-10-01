@@ -1,4 +1,4 @@
-import { BuildingMetadata } from "../core/metadata";
+import { BuildingMetadata } from "@/_state";
 
 import { System } from "../ecs";
 import { EntityAdmin } from "../game/entity-admin";

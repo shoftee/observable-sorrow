@@ -1,22 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent, unref } from "vue";
+import { defineComponent, readonly } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { Presenter } from "@/app/os";
+
 export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
-    const calendar = unref(Presenter.environment.calendar);
-    const weather = unref(Presenter.environment.weather);
-    const keypath = computed(() => {
-      return weather.title
-        ? "environment.calendar.full.weather"
-        : "environment.calendar.full.no-weather";
-    });
 
     const formatter = Presenter.numbers;
     const n = (v: number) => formatter.number(v, "negative");
-    return { t, n, calendar, weather, keypath };
+
+    const state = readonly(Presenter.environment.calendar);
+    return { t, n, state };
   },
 });
 </script>
@@ -24,19 +20,20 @@ export default defineComponent({
 <template>
   <div class="d-flex flex-column align-self-stretch">
     <div class="align-self-stretch">
-      <i18n-t scope="global" :keypath="keypath" tag="span">
+      <i18n-t scope="global" :keypath="state.calendarLabel" tag="span">
         <template #year>
-          <span class="number">{{ n(calendar.year) }}</span>
+          <span class="number">{{ n(state.year) }}</span>
         </template>
-        <template #season>{{ t(calendar.season) }}</template>
+        <template #season>{{ t(state.seasonLabel) }}</template>
         <template #weather>
-          <span v-if="weather.title">{{ t(weather.title) }}</span>
+          <span v-if="state.weatherLabel">
+            {{ t(state.weatherLabel) }}
+          </span>
         </template>
         <template #day>
-          <span class="number">{{ calendar.day }}</span>
+          <span class="number">{{ state.day }}</span>
         </template>
       </i18n-t>
     </div>
   </div>
 </template>
-

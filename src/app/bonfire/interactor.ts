@@ -1,7 +1,6 @@
-import { IBonfireInteractor } from "@/_interfaces/interactor";
+import { BonfireItemId, IBonfireInteractor } from "@/_interfaces";
 
-import { BonfireItemId } from "../core/metadata";
-import { BonfireMetadata } from "../core/metadata/bonfire";
+import { BonfireMetadata } from "../../_state/bonfire";
 import { EntityAdmin } from "../game/entity-admin";
 
 export class BonfireInteractor implements IBonfireInteractor {

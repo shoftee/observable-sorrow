@@ -1,11 +1,9 @@
-import { ChangeTracker } from "./common";
 import { ComponentPool, IComponent } from ".";
-import { EntityAdmin } from "../game/entity-admin";
 
 export abstract class Entity {
   readonly components: ComponentPool;
 
-  constructor(protected readonly admin: EntityAdmin, readonly id: string) {
+  constructor(readonly id: string) {
     this.components = new ComponentPool(this);
   }
 
@@ -16,28 +14,4 @@ export abstract class Entity {
 
 export abstract class SimpleEntity extends Entity {
   abstract update(dt: number): void;
-}
-
-export abstract class ChangeTrackedEntity<TState> extends Entity {
-  readonly changes = this.addComponent(new ChangeTracker<TState>());
-}
-
-type State = Record<string, unknown>;
-export function ChangeTrackingProxy<TState extends State>(
-  state: TState,
-  changeTracker: ChangeTracker<TState>,
-): TState {
-  return new Proxy<TState>(state, {
-    set: (target, property, value, receiver) => {
-      const oldValue = Reflect.get(target, property, receiver);
-      if (oldValue !== value) {
-        if (!Reflect.set(target, property, value, receiver)) {
-          return false;
-        }
-        changeTracker.mark(property as keyof TState);
-      }
-
-      return true;
-    },
-  });
 }

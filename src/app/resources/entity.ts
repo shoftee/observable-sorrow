@@ -1,26 +1,30 @@
-import {
-  ChangeTrackedEntity,
-  ComponentState,
-  ChangeTrackingProxy,
-} from "../ecs";
-import { ResourceId } from "../core/metadata";
+import { reactive } from "vue";
 
-import { EntityAdmin } from "../game/entity-admin";
-import { ResourceStateComponent, MutationComponent } from "./components";
+import { ResourceId } from "@/_interfaces";
 
-type State = ComponentState<ResourceStateComponent>;
+import { Entity } from "../ecs";
+import { MutationComponent } from "./components";
 
-export class ResourceEntity extends ChangeTrackedEntity<State> {
+export class ResourceEntity extends Entity {
   readonly mutations: MutationComponent;
-  readonly state: ResourceStateComponent;
 
-  constructor(admin: EntityAdmin, readonly id: ResourceId) {
-    super(admin, id);
+  readonly state: ResourceState;
+
+  constructor(readonly id: ResourceId) {
+    super(id);
 
     this.mutations = this.addComponent(new MutationComponent());
-    this.state = ChangeTrackingProxy(
-      this.addComponent(new ResourceStateComponent()),
-      this.changes,
-    );
+    this.state = reactive(new ResourceState());
+  }
+}
+
+export class ResourceState {
+  unlocked = false;
+  amount = 0;
+  change = 0;
+  capacity?: number;
+
+  get effectiveCapacity(): number {
+    return this.capacity ?? Number.POSITIVE_INFINITY;
   }
 }

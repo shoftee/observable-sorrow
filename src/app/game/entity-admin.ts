@@ -1,23 +1,19 @@
+import { BuildingId, ResourceId } from "@/_interfaces";
+
 import { Constructor } from "../core";
+
 import { Entity } from "../ecs/entity";
-import { BuildingId, ResourceId } from "../core/metadata";
 import { ResourceEntity } from "../resources";
 import { WorkshopEntity } from "../workshop";
 import { BuildingEntity } from "../buildings/entity";
 import { EnvironmentEntity } from "../environment";
-import { TimersEntity } from "./timers";
 import { EffectPoolEntity } from "../effects";
 
-type EntityId =
-  | ResourceId
-  | BuildingId
-  | "effects"
-  | "environment"
-  | "timers"
-  | "workshop";
+import { EntityId } from "./_common";
+import { TimersEntity } from "./timers";
 
 export class EntityAdmin {
-  readonly pool = new Map<EntityId, Entity>();
+  private readonly pool = new Map<EntityId, Entity>();
 
   add<TEntity extends Entity>(entity: TEntity): void {
     if (this.pool.has(entity.id as EntityId)) {
@@ -37,8 +33,37 @@ export class EntityAdmin {
     this.pool.delete(id);
   }
 
+  protected entity<E extends Entity>(
+    id: EntityId,
+    constructor: Constructor<E>,
+  ): E {
+    const entity = this.pool.get(id);
+    if (entity === undefined) {
+      throw new Error(`There is no registered entity with the id '${id}'.`);
+    }
+    if (!(entity instanceof constructor)) {
+      throw new Error(
+        `Expected the entity with ID '${id}' to be of type '${constructor}' but it was '${Object.getPrototypeOf(
+          entity,
+        )}' instead.`,
+      );
+    } else {
+      return entity;
+    }
+  }
+
+  protected *entities<E extends Entity>(
+    constructor: Constructor<E>,
+  ): Iterable<E> {
+    for (const entity of this.pool.values()) {
+      if (entity instanceof constructor) {
+        yield entity;
+      }
+    }
+  }
+
   resource(id: ResourceId): ResourceEntity {
-    return this.entity(id, ResourceEntity);
+    return this.entity<ResourceEntity>(id, ResourceEntity);
   }
 
   resources(): Iterable<ResourceEntity> {
@@ -67,33 +92,5 @@ export class EntityAdmin {
 
   timers(): TimersEntity {
     return this.entity("timers", TimersEntity);
-  }
-
-  private entity<E extends Entity>(
-    id: EntityId,
-    constructor: Constructor<E>,
-  ): E {
-    const entity = this.pool.get(id);
-    if (entity === undefined) {
-      throw new Error(`There is no registered entity with the id '${id}'.`);
-    } else if (!(entity instanceof constructor)) {
-      throw new Error(
-        `Expected the entity with ID '${id}' to be of type '${constructor}' but it was '${Object.getPrototypeOf(
-          entity,
-        )}' instead.`,
-      );
-    } else {
-      return entity;
-    }
-  }
-
-  private *entities<E extends Entity>(
-    constructor: Constructor<E>,
-  ): Iterable<E> {
-    for (const entity of this.pool.values()) {
-      if (entity instanceof constructor) {
-        yield entity;
-      }
-    }
   }
 }

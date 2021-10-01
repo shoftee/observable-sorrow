@@ -1,4 +1,4 @@
-import { BuildingMetadata } from "../core/metadata";
+import { BuildingMetadata } from "@/_state";
 import { System } from "../ecs/system";
 import { EntityAdmin } from "../game/entity-admin";
 import { BuildingEntity } from "../buildings/entity";
@@ -12,9 +12,7 @@ export class BuildingSystem extends System {
   update(): void {
     for (const building of this.admin.buildings()) {
       this.processBuildQueue(building);
-      if (building.changes.has("level")) {
-        this.updatePrices(building);
-      }
+      this.updatePrices(building);
     }
   }
 
@@ -40,13 +38,8 @@ export class BuildingSystem extends System {
     const level = building.state.level;
     const priceMultiplier = Math.pow(prices.ratio, level);
 
-    for (const ingredient of prices.baseIngredients) {
-      building.state.ingredients.set(
-        ingredient.id,
-        ingredient.amount * priceMultiplier,
-      );
+    for (const [id, amount] of prices.baseIngredients) {
+      building.state.ingredients.set(id, amount * priceMultiplier);
     }
-
-    building.changes.mark("ingredients");
   }
 }

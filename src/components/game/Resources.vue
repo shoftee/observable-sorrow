@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, computed, ref, unref } from "vue";
+import { defineComponent, computed, ref, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { Presenter } from "@/app/os";
@@ -7,15 +7,15 @@ import { Presenter } from "@/app/os";
 import ResourceItem from "./ResourceItem.vue";
 export default defineComponent({
   components: {
-    "os-resource-item": ResourceItem,
+    ResourceItem,
   },
   setup() {
     const { t } = { ...useI18n() };
-    const show = ref(true);
-    const items = unref(Presenter.resources.items);
 
-    const resources = computed(() => items.filter((e) => e.unlocked));
-    const isEmpty = computed(() => unref(resources).length == 0);
+    const show = ref(true);
+    const all = reactive(Presenter.resources.all.value);
+    const resources = computed(() => all.filter((m) => m.unlocked ?? true));
+    const isEmpty = computed(() => resources.value.length == 0);
 
     return {
       t,
@@ -43,7 +43,7 @@ export default defineComponent({
       </button>
       <ul v-if="show" class="resources-list">
         <li v-for="resource in resources" :key="resource.id">
-          <os-resource-item :item="resource" class="w-100" />
+          <ResourceItem :item="resource" class="w-100" />
         </li>
       </ul>
     </div>

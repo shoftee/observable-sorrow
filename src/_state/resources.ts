@@ -1,5 +1,4 @@
-import { LimitEffectId } from ".";
-import { ProductionEffectId, ResourceId } from "../../../_interfaces/id";
+import { ResourceId, LimitEffectId, ProductionEffectId } from "@/_interfaces";
 
 export enum Flag {
   RelockedWhenDepleted,

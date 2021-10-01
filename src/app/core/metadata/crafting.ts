@@ -1,10 +1,10 @@
-import { WorkshopRecipeId } from "../../../_interfaces/id";
-import { ResourceQuantityType } from "./_types";
+import { WorkshopRecipeId } from "@/_interfaces";
+import { ResourceMap } from "@/_state";
 
 export type WorkshopRecipeType = {
   id: WorkshopRecipeId;
-  ingredients: ResourceQuantityType[];
-  products: ResourceQuantityType[];
+  ingredients: ResourceMap;
+  products: ResourceMap;
 };
 
 export const WorkshopRecipeMetadata: Record<
@@ -13,7 +13,7 @@ export const WorkshopRecipeMetadata: Record<
 > = {
   "refine-catnip": {
     id: "refine-catnip",
-    ingredients: [{ id: "catnip", amount: 100 }],
-    products: [{ id: "wood", amount: 1 }],
+    ingredients: new ResourceMap([["catnip", 100]]),
+    products: new ResourceMap([["wood", 1]]),
   },
 };

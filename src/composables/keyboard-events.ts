@@ -1,10 +1,4 @@
-import {
-  InjectionKey,
-  onMounted,
-  onUnmounted,
-  reactive,
-  readonly,
-} from "@vue/runtime-dom";
+import { InjectionKey, onMounted, onUnmounted, reactive, readonly } from "vue";
 
 export interface KeyboardEvents {
   ctrl: boolean;

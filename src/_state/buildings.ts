@@ -1,6 +1,10 @@
-import { BuildingCountId } from ".";
-import { BuildingId, EffectId } from "../../../_interfaces/id";
-import { ResourceQuantityType } from "./_types";
+import {
+  EffectId,
+  BuildingId,
+  BuildingCountId,
+  ResourceId,
+} from "@/_interfaces";
+import { ResourceMap } from "./_types";
 
 export type BuildingEffectType = {
   per: EffectId;
@@ -13,7 +17,7 @@ export type BuildingMetadataType = {
   unlockRatio: number;
   prices: {
     ratio: number;
-    baseIngredients: ResourceQuantityType[];
+    baseIngredients: ResourceMap;
   };
   effects: {
     count: BuildingCountId;
@@ -26,7 +30,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     id: "catnip-field",
     prices: {
       ratio: 1.12,
-      baseIngredients: [{ id: "catnip", amount: 10 }],
+      baseIngredients: new ResourceMap([["catnip", 10]]),
     },
     unlockRatio: 0.3,
     effects: {
@@ -41,3 +45,14 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     },
   },
 };
+
+export class BuildingState {
+  readonly ingredients: Map<ResourceId, number>;
+  unlocked = false;
+  level = 0;
+
+  constructor(id: BuildingId) {
+    const meta = BuildingMetadata[id];
+    this.ingredients = new ResourceMap(meta.prices.baseIngredients);
+  }
+}
