@@ -6160,11 +6160,6 @@ linked-list-typescript@^1.0.11:
   resolved "https://registry.yarnpkg.com/linked-list-typescript/-/linked-list-typescript-1.0.15.tgz#faeed93cf9203f102e2158c29edcddda320abe82"
   integrity sha512-RIyUu9lnJIyIaMe63O7/aFv/T2v3KsMFuXMBbUQCHX+cgtGro86ETDj5ed0a8gQL2+DFjzYYsgVG4I36/cUwgw==
 
-linq-es2015@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/linq-es2015/-/linq-es2015-2.5.1.tgz#b9eb97d9b47c0e2f8fc71c196650b638faa6457c"
-  integrity sha512-s9TWOlKxS78mTWrL8zIdqm53YXJ+yjVSXCdvCGnYWtRjRlK2dG0wW+sYrffnw/qveAjY2jM0Y6x2ZteNlrsjXA==
-
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
