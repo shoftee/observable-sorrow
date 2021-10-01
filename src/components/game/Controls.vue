@@ -20,9 +20,9 @@ export default defineComponent({
     const eff = (v: number) => formatter.number(v, "always");
 
     const all = reactive(Presenter.bonfire.all.value);
-    const unlocked = computed(() => all.filter((m) => m.unlocked));
+    const items = computed(() => all.filter((m) => m.unlocked));
 
-    return { t, res, eff, items: unlocked, events };
+    return { t, res, eff, items, events };
   },
   methods: {
     buildItem(id: BonfireItemId) {
@@ -51,23 +51,25 @@ export default defineComponent({
                   {{ t(item.flavor) }}
                 </p>
               </div>
-              <ul class="ingredients-list" v-if="item.ingredients.length > 0">
-                <li
-                  v-for="ingredient in item.ingredients"
-                  :key="ingredient.id"
-                  :class="{ unfulfilled: !ingredient.fulfilled }"
-                >
-                  <div class="ingredient-label">
-                    {{ t(ingredient.label) }}
-                  </div>
-                  <div class="ingredient-fulfillment number">
-                    <span v-if="!ingredient.fulfilled">
-                      {{ res(ingredient.fulfillment) }} /
-                    </span>
-                    {{ res(ingredient.requirement) }}
-                  </div>
-                </li>
-              </ul>
+              <div v-if="item.ingredients.length > 0">
+                <ul class="ingredients-list">
+                  <li
+                    v-for="ingredient in item.ingredients"
+                    :key="ingredient.id"
+                    :class="{ unfulfilled: !ingredient.fulfilled }"
+                  >
+                    <div class="ingredient-label">
+                      {{ t(ingredient.label) }}
+                    </div>
+                    <div class="ingredient-fulfillment number">
+                      <span v-if="!ingredient.fulfilled">
+                        {{ res(ingredient.fulfillment) }} /
+                      </span>
+                      {{ res(ingredient.requirement) }}
+                    </div>
+                  </li>
+                </ul>
+              </div>
               <div v-if="item.effects.length > 0">
                 <div class="card-header">
                   {{
