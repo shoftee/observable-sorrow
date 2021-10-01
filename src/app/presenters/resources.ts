@@ -1,11 +1,10 @@
 import { computed, ComputedRef, reactive } from "vue";
-import { asEnumerable } from "linq-es2015";
 
+import { ResourceId } from "@/_interfaces";
 import { ResourceMetadata, ResourceMetadataType } from "@/_state";
 
 import { RootPresenter } from "./root";
 import { ResourceState } from "../resources";
-import { ResourceId } from "@/_interfaces";
 import { EffectState } from "../effects";
 
 export interface Resource {
@@ -27,9 +26,9 @@ export class ResourcePresenter implements IResourcePresenter {
 
   constructor(private readonly root: RootPresenter) {
     this.all = computed(() =>
-      asEnumerable(Object.values(ResourceMetadata))
-        .Select((meta) => this.newResource(meta))
-        .ToArray(),
+      Array.from(Object.values(ResourceMetadata), (meta) =>
+        this.newResource(meta),
+      ),
     );
   }
 
