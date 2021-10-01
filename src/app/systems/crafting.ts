@@ -1,5 +1,6 @@
 import { WorkshopRecipeId } from "@/_interfaces";
-import { WorkshopRecipeMetadata } from "../core/metadata";
+import { WorkshopRecipeMetadata } from "@/_state";
+
 import { System } from "../ecs";
 import { EntityAdmin } from "../game/entity-admin";
 

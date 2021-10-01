@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 
 import { ResourceId } from "@/_interfaces";
+import { ResourceState } from "@/_state";
 
 import { Entity } from "../ecs";
 import { MutationComponent } from "./components";
@@ -15,16 +16,5 @@ export class ResourceEntity extends Entity {
 
     this.mutations = this.addComponent(new MutationComponent());
     this.state = reactive(new ResourceState());
-  }
-}
-
-export class ResourceState {
-  unlocked = false;
-  amount = 0;
-  change = 0;
-  capacity?: number;
-
-  get effectiveCapacity(): number {
-    return this.capacity ?? Number.POSITIVE_INFINITY;
   }
 }

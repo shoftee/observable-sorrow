@@ -30,3 +30,14 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     flags: {},
   },
 };
+
+export class ResourceState {
+  unlocked = false;
+  amount = 0;
+  change = 0;
+  capacity?: number;
+
+  get effectiveCapacity(): number {
+    return this.capacity ?? Number.POSITIVE_INFINITY;
+  }
+}

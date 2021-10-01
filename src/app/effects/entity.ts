@@ -1,9 +1,9 @@
 import { reactive } from "vue";
 
 import { EffectId } from "@/_interfaces";
-import { Entity } from "../ecs";
+import { EffectState } from "@/_state";
 
-export type EffectState = Partial<Record<EffectId, number>>;
+import { Entity } from "../ecs";
 
 export interface EffectEntry {
   get(): number | undefined;

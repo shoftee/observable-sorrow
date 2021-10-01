@@ -1,11 +1,14 @@
 import { computed, ComputedRef, reactive } from "vue";
 
 import { ResourceId } from "@/_interfaces";
-import { ResourceMetadata, ResourceMetadataType } from "@/_state";
+import {
+  EffectState,
+  ResourceMetadata,
+  ResourceMetadataType,
+  ResourceState,
+} from "@/_state";
 
 import { RootPresenter } from "./root";
-import { ResourceState } from "../resources";
-import { EffectState } from "../effects";
 
 export interface Resource {
   readonly id: ResourceId;
