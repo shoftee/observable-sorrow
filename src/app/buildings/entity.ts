@@ -1,8 +1,9 @@
-import { reactive } from "@vue/runtime-core";
+import { reactive } from "vue";
 
 import { BuildingId } from "@/_interfaces";
 import { BuildingState } from "@/_state";
-import { Entity } from "../ecs";
+import { Entity } from "@/app/ecs";
+
 import { BuildQueueComponent } from "./components";
 
 export class BuildingEntity extends Entity {

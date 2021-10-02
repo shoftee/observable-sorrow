@@ -1,6 +1,6 @@
-import { SimpleEntity } from "../ecs";
+import { SimpleEntity, TimerComponent } from "@/app/ecs";
+
 import { CalendarConstants } from "../constants/calendar";
-import { TimerComponent } from "../ecs/common";
 
 export class TimersEntity extends SimpleEntity {
   readonly ticks: TimerComponent;

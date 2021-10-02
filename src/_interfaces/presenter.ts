@@ -1,5 +1,5 @@
 export type PropertyBag = Record<string, unknown> | undefined;
 
-export interface IPresenter {
-  update(changes: Map<string, unknown>): void;
+export interface IPresenterSink {
+  update(changes: Map<string, PropertyBag>): void;
 }

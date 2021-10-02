@@ -12,8 +12,7 @@ import {
   ResourceState,
   WorkshopRecipeMetadata,
 } from "@/_state";
-
-import { mapReduce } from "../utils/collections";
+import { mapReduce } from "@/_utils/collections";
 
 import { RootPresenter } from "./root";
 

@@ -1,16 +1,17 @@
-import { ITimestampProvider } from "../core/timestamp-provider";
+import { ITimestamp } from "@/_utils/timestamp";
+
 import { TimeConstants } from "../constants";
 
 type UpdateFunction = (deltaTime: number) => void;
 
 export class GameUpdater {
   private readonly callback: UpdateFunction;
-  private readonly timestampProvider: ITimestampProvider;
+  private readonly timestampProvider: ITimestamp;
 
   private lastTimestamp = 0;
   private handle?: number;
 
-  constructor(callback: UpdateFunction, timestampProvider: ITimestampProvider) {
+  constructor(callback: UpdateFunction, timestampProvider: ITimestamp) {
     this.callback = callback;
     this.timestampProvider = timestampProvider;
   }

@@ -1,24 +1,32 @@
 import { IBonfireInteractor, IGameController } from "@/_interfaces";
 import { BuildingMetadata, ResourceMetadata } from "@/_state";
+import { NumberFormatter } from "@/_utils/notation";
+import { SystemTimestamp } from "@/_utils/timestamp";
+
 import {
+  EntityAdmin,
+  EntityWatcher,
   IPresenterSystem,
   GameUpdater,
   PresenterSystem,
   GameInteractor,
 } from ".";
-import { BonfireInteractor } from "../bonfire";
-import { BuildingEntity } from "../buildings";
-import { SystemTimestampProvider } from "../core";
+
 import { Entity } from "../ecs";
+import { BuildingEntity } from "../buildings";
 import { EffectPoolEntity } from "../effects";
 import { EnvironmentEntity } from "../environment";
+import { ResourceEntity } from "../resources";
+import { WorkshopEntity } from "../workshop";
+import { TimersEntity } from "./timers";
+
+import { BonfireInteractor } from "../bonfire";
 import {
   BonfirePresenter,
   EnvironmentPresenter,
   ResourcePresenter,
+  RootPresenter,
 } from "../presenters";
-import { RootPresenter } from "../presenters/root";
-import { ResourceEntity } from "../resources";
 import {
   BuildingSystem,
   BuildingEffectsSystem,
@@ -29,11 +37,6 @@ import {
   LockToggleSystem,
   ResourceProductionSystem,
 } from "../systems";
-import { NumberFormatter } from "../utils/notation";
-import { WorkshopEntity } from "../workshop";
-import { EntityAdmin } from "./entity-admin";
-import { EntityWatcher } from "./entity-watcher";
-import { TimersEntity } from "./timers";
 
 export interface IGame {
   readonly presenter: IPresenterSystem;
@@ -73,7 +76,7 @@ export class Game implements IGame {
 
     this.updater = new GameUpdater(
       (dt) => this.update(dt),
-      new SystemTimestampProvider(),
+      new SystemTimestamp(),
     );
 
     this._rootPresenter = new RootPresenter();

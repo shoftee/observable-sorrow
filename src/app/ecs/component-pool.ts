@@ -1,6 +1,7 @@
+import { Constructor } from "@/_interfaces";
+
 import { Entity } from "./entity";
 import { IComponent } from "./component";
-import { Constructor } from "../core";
 
 type FindComponentResult = { component: IComponent; index: number };
 

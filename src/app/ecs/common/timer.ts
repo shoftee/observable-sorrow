@@ -1,4 +1,4 @@
-import { round } from "../../utils/mathx";
+import { round } from "@/_utils/mathx";
 
 import { TimeConstants } from "../../constants";
 import { Component } from "..";

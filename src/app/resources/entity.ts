@@ -3,8 +3,7 @@ import { reactive } from "vue";
 import { ResourceId } from "@/_interfaces";
 import { ResourceState } from "@/_state";
 
-import { Entity } from "../ecs";
-import { MutationComponent } from "./components";
+import { Entity, MutationComponent } from "@/app/ecs";
 
 export class ResourceEntity extends Entity {
   readonly mutations: MutationComponent;

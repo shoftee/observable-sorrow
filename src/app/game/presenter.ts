@@ -1,10 +1,11 @@
+import { NumberFormatter } from "@/_utils/notation";
+
 import {
   RootPresenter,
   IBonfirePresenter,
   IEnvironmentPresenter,
   IResourcePresenter,
 } from "../presenters";
-import { NumberFormatter } from "../utils/notation";
 
 export interface IPresenterSystem {
   readonly root: RootPresenter;

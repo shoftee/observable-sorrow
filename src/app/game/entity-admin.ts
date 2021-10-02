@@ -1,6 +1,4 @@
-import { BuildingId, ResourceId } from "@/_interfaces";
-
-import { Constructor } from "../core";
+import { BuildingId, Constructor, ResourceId } from "@/_interfaces";
 
 import { Entity } from "../ecs/entity";
 import { ResourceEntity } from "../resources";

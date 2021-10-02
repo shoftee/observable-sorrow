@@ -1,6 +1,5 @@
 import { WorkshopRecipeId } from "@/_interfaces";
-import { Entity } from "../ecs";
-import { RawQueueComponent } from "../ecs/common";
+import { Entity, RawQueueComponent } from "@/app/ecs";
 
 export class WorkshopEntity extends Entity {
   readonly orders: RecipeOrdersComponent;

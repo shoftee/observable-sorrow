@@ -1,4 +1,4 @@
-import { QueueComponent } from "../ecs/common";
+import { QueueComponent } from "@/app/ecs";
 
 interface BuildingCommand {
   intent: "construct" | "deconstruct";

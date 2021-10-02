@@ -1,9 +1,9 @@
 import { SeasonId, WeatherId } from "@/_interfaces";
 import { WeatherMetadata } from "@/_state";
+import { DefaultChooser } from "@/_utils/probability";
 
 import { System } from "../ecs";
 import { CalendarConstants } from "../constants/calendar";
-import { DefaultChooser } from "../utils/probability";
 
 import { EnvironmentEntity } from "../environment";
 
