@@ -1,4 +1,5 @@
 @import "/node_modules/bootstrap/scss/bootstrap.scss";
+@import "/node_modules/bootstrap/scss/badge";
 
 // global changes
 .btn {
@@ -96,16 +97,21 @@ $tippy-border-color: $dark;
   }
 }
 
+.number {
+  @extend .font-monospace;
+}
+
+// resources
 ul.resources-list {
   @extend .list-group, .list-group-flush;
 
   & > li {
     @extend .p-1, .small, .list-group-item;
-  }
-}
 
-.number {
-  @extend .font-monospace;
+    & .resource-modifier {
+      @extend .ms-1, .p-1, .badge, .number;
+    }
+  }
 }
 
 // remove overflow from flexbox
@@ -128,6 +134,14 @@ footer {
 
 // controls
 .btn .structure-level {
-  @extend .number, .badge, .bg-secondary;
-  top: -2px;
+  &::before {
+    content: "(";
+  }
+  &::after {
+    content: ")";
+  }
+}
+
+.btn.capped {
+  @extend .text-danger, .text-opacity-75;
 }

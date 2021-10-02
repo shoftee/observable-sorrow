@@ -1,4 +1,4 @@
-export function mapReduce<T, TResult>(
+export function reduce<T, TResult>(
   iterable: IterableIterator<T>,
   map: (item: T) => TResult,
   reduce: (accumulator: TResult, current: TResult) => TResult,
@@ -10,4 +10,18 @@ export function mapReduce<T, TResult>(
     accumulator = reduce(accumulator, mapped);
   }
   return accumulator;
+}
+
+export function all<T>(
+  iterable: IterableIterator<T>,
+  map: (item: T) => boolean,
+): boolean {
+  return reduce(iterable, map, (acc, val) => acc && val, true);
+}
+
+export function any<T>(
+  iterable: IterableIterator<T>,
+  map: (item: T) => boolean,
+): boolean {
+  return reduce(iterable, map, (acc, val) => acc || val, false);
 }

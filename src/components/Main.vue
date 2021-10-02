@@ -2,38 +2,38 @@
   <div class="main-container d-flex flex-row scrollable">
     <div class="scrollable col p-2 pe-1">
       <div>
-        <os-resources />
+        <Resources />
       </div>
     </div>
     <div class="scrollable col-5 py-2 px-1">
       <div>
-        <os-controls />
+        <Controls />
       </div>
     </div>
     <div class="scrollable col p-2 ps-1 d-flex flex-column gap-2">
       <div>
-        <os-environment />
+        <Environment />
       </div>
       <div class="scrollable">
-        <os-history />
+        <History />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Resources from "./game/Resources.vue";
-import Controls from "./game/Controls.vue";
-import Environment from "./game/Environment.vue";
-import History from "./game/History.vue";
+import Resources from "./Resources.vue";
+import Controls from "./Controls.vue";
+import Environment from "./Environment.vue";
+import History from "./History.vue";
 
 import { defineComponent } from "vue";
 export default defineComponent({
   components: {
-    "os-resources": Resources,
-    "os-controls": Controls,
-    "os-environment": Environment,
-    "os-history": History,
+    Resources,
+    Controls,
+    Environment,
+    History,
   },
 });
 </script> 

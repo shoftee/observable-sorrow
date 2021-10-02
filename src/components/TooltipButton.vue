@@ -2,10 +2,8 @@
 import { defineComponent } from "vue";
 export default defineComponent({
   props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
+    disabled: { type: Boolean, default: false },
+    capped: { type: Boolean, default: false },
   },
   emits: ["click"],
   methods: {
@@ -23,6 +21,7 @@ export default defineComponent({
     <button
       type="button"
       class="btn btn-outline-secondary w-100"
+      :class="{ capped: capped }"
       :disabled="disabled"
       @click="clicked()"
     >

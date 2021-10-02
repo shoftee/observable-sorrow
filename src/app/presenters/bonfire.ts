@@ -8,11 +8,12 @@ import {
   BuildingMetadata,
   BuildingState,
   EffectState,
+  IngredientState,
   ResourceMetadata,
   ResourceState,
   WorkshopRecipeMetadata,
 } from "@/_state";
-import { mapReduce } from "@/_utils/collections";
+import { all, any } from "@/_utils/collections";
 
 import { IRootPresenter } from ".";
 
@@ -33,7 +34,7 @@ export class BonfirePresenter implements IBonfirePresenter {
   }
 }
 
-class BonfireItem {
+export class BonfireItem {
   id: BonfireItemId;
 
   label: string;
@@ -43,6 +44,7 @@ class BonfireItem {
   unlocked: ComputedRef<boolean> = computed(() => true);
   level: ComputedRef<number> = computed(() => 0);
   fulfilled: ComputedRef<boolean> = computed(() => true);
+  capped: ComputedRef<boolean> = computed(() => false);
 
   ingredients: IngredientItem[] = [];
   effects: EffectItem[] = [];
@@ -61,6 +63,7 @@ class BonfireItem {
           return this.newRecipeIngredient(id, amount, resource);
         }),
       );
+      this.capped = this.computeCapped(this.ingredients);
       this.fulfilled = this.computeFulfilled(this.ingredients);
     } else if (meta.intent.kind === "buy-building") {
       const buildingId = meta.intent.buildingId;
@@ -68,9 +71,9 @@ class BonfireItem {
       this.level = computed(() => building.level);
       this.unlocked = computed(() => building.unlocked);
       this.ingredients = reactive(
-        Array.from(building.ingredients.keys(), (id) => {
-          const resource = updater.get<ResourceState>(id);
-          return this.newBuildingIngredient(id, resource, building);
+        Array.from(building.ingredients.values(), (state) => {
+          updater.get < ResourceState;
+          return this.newBuildingIngredient(state);
         }),
       );
       this.effects = reactive(
@@ -78,6 +81,7 @@ class BonfireItem {
           this.newEffect(updater, meta),
         ),
       );
+      this.capped = this.computeCapped(this.ingredients);
       this.fulfilled = this.computeFulfilled(this.ingredients);
     }
   }
@@ -106,45 +110,46 @@ class BonfireItem {
       requirement: requirement,
       fulfillment: computed(() => resource.amount),
       fulfilled: computed(() => resource.amount >= requirement),
+      capped: computed(() => requirement > (resource.capacity ?? 0)),
     });
   }
 
   private newBuildingIngredient(
-    id: ResourceId,
+    ingredient: IngredientState,
     resource: ResourceState,
-    building: BuildingState,
   ): IngredientItem {
-    const requirement = computed(() => building.ingredients.get(id) ?? 0);
     return reactive({
-      id: id,
-      label: ResourceMetadata[id].label,
-      requirement: requirement,
-      fulfillment: computed(() => resource.amount),
-      fulfilled: computed(() => resource.amount >= requirement.value),
+      id: ingredient.resourceId,
+      label: ResourceMetadata[ingredient.resourceId].label,
+      requirement: computed(() => ingredient.requirement),
+      fulfillment: computed(() => ingredient.fulfillment),
+      fulfilled: computed(() => ingredient.fulfilled),
+      capped: computed(() => {
+        const capped = requirement.value > (resource.capacity ?? 0);
+        return capped;
+      }),
     });
   }
 
   private computeFulfilled(items: IngredientItem[]): ComputedRef<boolean> {
-    return computed(() =>
-      mapReduce(
-        items.values(),
-        (i) => i.fulfilled,
-        (acc, val) => acc && val,
-        true,
-      ),
-    );
+    return computed(() => all(items.values(), (i) => i.fulfilled));
+  }
+
+  private computeCapped(items: IngredientItem[]): ComputedRef<boolean> {
+    return computed(() => any(items.values(), (i) => i.capped));
   }
 }
 
-interface IngredientItem {
+export interface IngredientItem {
   id: ResourceId;
   label: string;
   requirement: number;
   fulfillment: number;
   fulfilled: boolean;
+  capped: boolean;
 }
 
-interface EffectItem {
+export interface EffectItem {
   id: EffectId;
   label: string;
   perLevelAmount: number;

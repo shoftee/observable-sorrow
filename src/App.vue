@@ -1,3 +1,22 @@
+<script lang="ts">
+import { defineComponent, provide } from "vue";
+
+import {
+  KeyboardEventsKey,
+  useKeyboardEvents,
+} from "./composables/keyboard-events";
+
+import Main from "./components/Main.vue";
+export default defineComponent({
+  components: { Main },
+  setup() {
+    const events = useKeyboardEvents();
+    provide(KeyboardEventsKey, events);
+    return { events };
+  },
+});
+</script>
+
 <template>
   <div class="w-100 h-100 d-flex flex-column">
     <header
@@ -7,7 +26,7 @@
       <div class="badge bg-success"><i class="bi bi-droplet"></i> &beta;</div>
     </header>
     <main class="h-100 scrollable d-flex justify-content-center">
-      <os-main class="w-100" />
+      <Main class="w-100" />
     </main>
     <footer class="d-flex flex-row justify-content-end">
       <div>
@@ -17,20 +36,3 @@
     </footer>
   </div>
 </template>
-
-<script lang="ts">
-import { defineComponent, provide } from "vue";
-
-import {
-  useKeyboardEvents,
-  KeyboardEventsKey,
-} from "./composables/keyboard-events";
-
-import Main from "./components/Main.vue";
-export default defineComponent({
-  components: { "os-main": Main },
-  setup() {
-    provide(KeyboardEventsKey, useKeyboardEvents());
-  },
-});
-</script>

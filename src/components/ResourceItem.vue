@@ -15,12 +15,8 @@ export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
 
-    const formatter = Presenters.numbers;
-    const res = (v: number) => formatter.number(v, "negative");
-    const eff = (v: number) => formatter.number(v, "always");
-    const per = (v: number) => formatter.percent(v, "always");
-
-    return { t, res, eff, per };
+    const formatter = Presenters.formatter;
+    return { t, formatter };
   },
 });
 </script>
@@ -31,24 +27,30 @@ export default defineComponent({
       <span>{{ t(item.label) }}</span>
       <span
         v-if="item.modifier"
-        class="ms-1 p-1 badge badge-light"
+        class="resource-modifier number"
         :class="{
           'bg-success': item.modifier > 0,
           'bg-danger': item.modifier < 0,
         }"
       >
-        {{ per(item.modifier) }}
+        {{ formatter.percent(item.modifier, "always") }}
       </span>
     </div>
-    <div class="col-3 number amount">{{ res(item.amount) }}</div>
+    <div class="col-3 number amount">
+      {{ formatter.number(item.amount, "negative") }}
+    </div>
     <template v-if="item.capacity">
-      <div class="col-3 number capacity">/ {{ res(item.capacity) }}</div>
+      <div class="col-3 number capacity">
+        / {{ formatter.number(item.capacity, "negative") }}
+      </div>
     </template>
     <template v-else>
       <div class="col-3 no-capacity"></div>
     </template>
     <template v-if="item.change">
-      <div class="col-3 number change">{{ eff(item.change, true) }}/t</div>
+      <div class="col-3 number change">
+        {{ formatter.number(item.change, "always") }}/t
+      </div>
     </template>
     <template v-else>
       <div class="col-3 no-change"></div>

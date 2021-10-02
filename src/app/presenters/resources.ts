@@ -24,7 +24,7 @@ export interface IResourcePresenter {
   readonly all: ComputedRef<Resource[]>;
 }
 
-export class ResourcePresenter implements IResourcePresenter {
+export class ResourcesPresenter implements IResourcePresenter {
   readonly all: ComputedRef<Resource[]>;
 
   constructor(private readonly root: IRootPresenter) {
