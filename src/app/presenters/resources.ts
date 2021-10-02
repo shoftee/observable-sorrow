@@ -8,7 +8,7 @@ import {
   ResourceState,
 } from "@/_state";
 
-import { RootPresenter } from "./root";
+import { IRootPresenter } from ".";
 
 export interface Resource {
   readonly id: ResourceId;
@@ -27,7 +27,7 @@ export interface IResourcePresenter {
 export class ResourcePresenter implements IResourcePresenter {
   readonly all: ComputedRef<Resource[]>;
 
-  constructor(private readonly root: RootPresenter) {
+  constructor(private readonly root: IRootPresenter) {
     this.all = computed(() =>
       Array.from(Object.values(ResourceMetadata), (meta) =>
         this.newResource(meta),

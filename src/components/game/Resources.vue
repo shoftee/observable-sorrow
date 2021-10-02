@@ -2,7 +2,7 @@
 import { defineComponent, computed, ref, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { Presenter } from "@/app/os";
+import { Presenters } from "@/app/os";
 
 import ResourceItem from "./ResourceItem.vue";
 export default defineComponent({
@@ -13,8 +13,8 @@ export default defineComponent({
     const { t } = { ...useI18n() };
 
     const show = ref(true);
-    const all = reactive(Presenter.resources.all.value);
-    const resources = computed(() => all.filter((m) => m.unlocked ?? true));
+    const all = reactive(Presenters.resources.all.value);
+    const resources = computed(() => all.filter((m) => m.unlocked));
     const isEmpty = computed(() => resources.value.length == 0);
 
     return {

@@ -3,7 +3,7 @@ import { defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { Resource } from "@/app/presenters/resources";
-import { Presenter } from "@/app/os";
+import { Presenters } from "@/app/os";
 
 export default defineComponent({
   props: {
@@ -15,7 +15,7 @@ export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
 
-    const formatter = Presenter.numbers;
+    const formatter = Presenters.numbers;
     const res = (v: number) => formatter.number(v, "negative");
     const eff = (v: number) => formatter.number(v, "always");
     const per = (v: number) => formatter.percent(v, "always");

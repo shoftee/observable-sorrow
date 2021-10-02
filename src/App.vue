@@ -19,20 +19,17 @@
 </template>
 
 <script lang="ts">
-import { Interactor } from "./app/os";
+import { defineComponent, provide } from "vue";
+
 import {
   useKeyboardEvents,
   KeyboardEventsKey,
 } from "./composables/keyboard-events";
 
-import { defineComponent, onMounted, provide } from "vue";
-
 import Main from "./components/Main.vue";
 export default defineComponent({
   components: { "os-main": Main },
   setup() {
-    onMounted(() => Interactor.gameController.start());
-
     provide(KeyboardEventsKey, useKeyboardEvents());
   },
 });

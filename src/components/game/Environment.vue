@@ -2,16 +2,16 @@
 import { defineComponent, readonly } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { Presenter } from "@/app/os";
+import { Presenters } from "@/app/os";
 
 export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
 
-    const formatter = Presenter.numbers;
+    const formatter = Presenters.numbers;
     const n = (v: number) => formatter.number(v, "negative");
 
-    const state = readonly(Presenter.environment.calendar);
+    const state = readonly(Presenters.environment.calendar);
     return { t, n, state };
   },
 });

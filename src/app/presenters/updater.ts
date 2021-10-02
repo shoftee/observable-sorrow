@@ -1,9 +1,13 @@
 import { reactive } from "vue";
 import { mergeWith } from "lodash";
 
-import { IPresenterSink, PropertyBag } from "@/_interfaces";
+import { IPresenterChangeSink, PropertyBag } from "@/_interfaces";
 
-export class RootPresenter implements IPresenterSink {
+export interface IRootPresenter {
+  get<T>(key: string): T;
+}
+
+export class Updater implements IPresenterChangeSink, IRootPresenter {
   private readonly values: Map<string, PropertyBag>;
 
   constructor() {

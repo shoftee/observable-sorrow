@@ -14,7 +14,7 @@ import {
 } from "@/_state";
 import { mapReduce } from "@/_utils/collections";
 
-import { RootPresenter } from "./root";
+import { IRootPresenter } from ".";
 
 export interface IBonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
@@ -23,7 +23,7 @@ export interface IBonfirePresenter {
 export class BonfirePresenter implements IBonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
 
-  constructor(private readonly root: RootPresenter) {
+  constructor(private readonly root: IRootPresenter) {
     this.all = computed(() => {
       return Array.from(
         Object.values(BonfireMetadata),
@@ -47,7 +47,7 @@ class BonfireItem {
   ingredients: IngredientItem[] = [];
   effects: EffectItem[] = [];
 
-  constructor(meta: BonfireMetadataType, root: RootPresenter) {
+  constructor(meta: BonfireMetadataType, updater: IRootPresenter) {
     this.id = meta.id;
     this.label = meta.label;
     this.description = meta.description;
@@ -57,32 +57,35 @@ class BonfireItem {
       const ingredients = WorkshopRecipeMetadata["refine-catnip"].ingredients;
       this.ingredients = reactive(
         Array.from(ingredients, ([id, amount]) => {
-          const resource = root.get<ResourceState>(id);
+          const resource = updater.get<ResourceState>(id);
           return this.newRecipeIngredient(id, amount, resource);
         }),
       );
       this.fulfilled = this.computeFulfilled(this.ingredients);
     } else if (meta.intent.kind === "buy-building") {
       const buildingId = meta.intent.buildingId;
-      const building = root.get<BuildingState>(buildingId);
+      const building = updater.get<BuildingState>(buildingId);
       this.level = computed(() => building.level);
       this.unlocked = computed(() => building.unlocked);
       this.ingredients = reactive(
         Array.from(building.ingredients.keys(), (id) => {
-          const resource = root.get<ResourceState>(id);
+          const resource = updater.get<ResourceState>(id);
           return this.newBuildingIngredient(id, resource, building);
         }),
       );
       this.effects = reactive(
         Array.from(BuildingMetadata[buildingId].effects.resources, (meta) =>
-          this.newEffect(root, meta),
+          this.newEffect(updater, meta),
         ),
       );
       this.fulfilled = this.computeFulfilled(this.ingredients);
     }
   }
 
-  private newEffect(root: RootPresenter, meta: BuildingEffectType): EffectItem {
+  private newEffect(
+    root: IRootPresenter,
+    meta: BuildingEffectType,
+  ): EffectItem {
     const effects = root.get<EffectState>("effects");
     return reactive({
       id: meta.total,

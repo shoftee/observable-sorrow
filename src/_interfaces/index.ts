@@ -1,4 +1,3 @@
 export * from "./constructor";
+export * from "./endpoint";
 export * from "./id";
-export * from "./interactors";
-export * from "./presenter";

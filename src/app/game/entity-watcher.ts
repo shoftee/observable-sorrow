@@ -1,5 +1,6 @@
-import { PropertyBag } from "@/_interfaces";
-import { isReactive, watch, WatchStopHandle } from "vue";
+import { isReactive, toRaw, watch, WatchStopHandle } from "vue";
+
+import { PropertyBag, OnTickedHandler } from "@/_interfaces";
 
 interface StatefulEntity {
   id: string;
@@ -40,10 +41,18 @@ export class EntityWatcher {
     }
   }
 
-  flush(handler: (changes: Map<string, PropertyBag>) => void): void {
+  flush(handler: OnTickedHandler): void {
     if (this.dirty.size > 0) {
-      handler(this.dirty);
+      handler(this.collectDirty());
       this.dirty.clear();
     }
+  }
+
+  private collectDirty(): Map<string, PropertyBag> {
+    const raw = new Map<string, PropertyBag>();
+    for (const [key, value] of this.dirty.entries()) {
+      raw.set(key, toRaw(value));
+    }
+    return raw;
   }
 }

@@ -2,6 +2,7 @@ import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
 import "./styles/main.scss";
 
 import { App, createApp } from "vue";
+
 import AppComponent from "./App.vue";
 const app: App<Element> = createApp(AppComponent);
 
@@ -13,8 +14,17 @@ applyTippy(app);
 import applyI18n from "./plugins/vue-i18n";
 applyI18n(app);
 
-import { Interactor } from "./app/os";
-Interactor.gameController.init();
+import { proxy } from "comlink";
+import { Interactor, Presenters } from "./app/os";
+import { OnTickedHandler } from "./_interfaces";
 
-// mount app to page
-app.mount("#app");
+const handler: OnTickedHandler = function (changes) {
+  return Presenters.root.update(changes);
+};
+
+// intialize game
+Interactor.onTicked(proxy(handler))
+  // start game
+  .then(async () => await Interactor.start())
+  // mount app to page
+  .then(() => app.mount("#app"));

@@ -1,6 +1,9 @@
-import { Game } from "./game";
+import { wrap } from "comlink";
 
-const game = new Game();
+import { IRootInteractor } from "@/_interfaces";
 
-export const Interactor = game.interactor;
-export const Presenter = game.presenter;
+import { PresenterFacade, Updater } from "./presenters";
+
+const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
+export const Interactor = wrap<IRootInteractor>(worker);
+export const Presenters = new PresenterFacade(new Updater());

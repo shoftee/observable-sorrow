@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 
 import { BonfireItemId } from "@/_interfaces";
 
-import { Presenter, Interactor } from "@/app/os";
+import { Presenters, Interactor } from "@/app/os";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
 import TooltipButton from "../global/TooltipButton.vue";
@@ -15,18 +15,18 @@ export default defineComponent({
 
     const { t } = { ...useI18n() };
 
-    const formatter = Presenter.numbers;
+    const formatter = Presenters.numbers;
     const res = (v: number) => formatter.number(v, "negative");
     const eff = (v: number) => formatter.number(v, "always");
 
-    const all = reactive(Presenter.bonfire.all.value);
+    const all = reactive(Presenters.bonfire.all.value);
     const items = computed(() => all.filter((m) => m.unlocked));
 
     return { t, res, eff, items, events };
   },
   methods: {
-    buildItem(id: BonfireItemId) {
-      Interactor.bonfire.buildItem(id);
+    async buildItem(id: BonfireItemId) {
+      await Interactor.buildItem(id);
     },
   },
 });

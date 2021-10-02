@@ -1,9 +1,9 @@
 import { computed, ComputedRef, reactive } from "vue";
 
 import { EnvironmentState, SeasonsMetadata, WeatherMetadata } from "@/_state";
-
-import { RootPresenter } from "./root";
 import { SeasonId, WeatherId } from "@/_interfaces";
+
+import { IRootPresenter } from ".";
 
 export interface Calendar {
   day: number;
@@ -24,7 +24,7 @@ export interface IEnvironmentPresenter {
 export class EnvironmentPresenter implements IEnvironmentPresenter {
   readonly calendar: ComputedRef<Calendar>;
 
-  constructor(private readonly root: RootPresenter) {
+  constructor(private readonly root: IRootPresenter) {
     this.calendar = computed(() => this.newCalendar());
   }
 

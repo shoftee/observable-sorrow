@@ -1,16 +1,12 @@
-import { IBonfireInteractor, IGameController } from "@/_interfaces";
 import { BuildingMetadata, ResourceMetadata } from "@/_state";
-import { NumberFormatter } from "@/_utils/notation";
 import { SystemTimestamp } from "@/_utils/timestamp";
-
 import {
-  EntityAdmin,
-  EntityWatcher,
-  IPresenterSystem,
-  GameUpdater,
-  PresenterSystem,
   GameInteractor,
-} from ".";
+  IGameController,
+  OnTickedHandler,
+} from "@/_interfaces";
+
+import { EntityAdmin, EntityWatcher, GameUpdater } from ".";
 
 import { Entity } from "../ecs";
 import { BuildingEntity } from "../buildings";
@@ -22,12 +18,6 @@ import { TimersEntity } from "./timers";
 
 import { BonfireInteractor } from "../bonfire";
 import {
-  BonfirePresenter,
-  EnvironmentPresenter,
-  ResourcePresenter,
-  RootPresenter,
-} from "../presenters";
-import {
   BuildingSystem,
   BuildingEffectsSystem,
   CraftingSystem,
@@ -38,23 +28,33 @@ import {
   ResourceProductionSystem,
 } from "../systems";
 
-export interface IGame {
-  readonly presenter: IPresenterSystem;
-  readonly interactor: {
-    bonfire: IBonfireInteractor;
-    gameController: IGameController;
-  };
+class GameController implements IGameController {
+  constructor(
+    private readonly updater: GameUpdater,
+    private readonly setter: (handler: OnTickedHandler) => void,
+  ) {}
+
+  start(): void {
+    this.updater.start();
+  }
+  stop(): void {
+    this.updater.stop();
+  }
+
+  onTicked(handler: OnTickedHandler): void {
+    this.setter(handler);
+  }
 }
 
-export class Game implements IGame {
+export class Game {
   private readonly admin: EntityAdmin = new EntityAdmin();
   private readonly watcher: EntityWatcher = new EntityWatcher();
   private readonly updater: GameUpdater;
 
   private readonly _systems: GameSystems;
   private readonly _interactor: GameInteractor;
-  private readonly _presenter: PresenterSystem;
-  private readonly _rootPresenter: RootPresenter;
+
+  private onTickedHandler?: OnTickedHandler;
 
   constructor() {
     for (const entity of this.createEntities()) {
@@ -79,21 +79,13 @@ export class Game implements IGame {
       new SystemTimestamp(),
     );
 
-    this._rootPresenter = new RootPresenter();
-
-    this._presenter = new PresenterSystem(
-      this._rootPresenter,
-      new BonfirePresenter(this._rootPresenter),
-      new EnvironmentPresenter(this._rootPresenter),
-      new ResourcePresenter(this._rootPresenter),
-      new NumberFormatter(3),
+    this._interactor = new GameInteractor(
+      new BonfireInteractor(this.admin),
+      new GameController(this.updater, (handler) => {
+        this.onTickedHandler = handler;
+        this.update(0);
+      }),
     );
-
-    this._interactor = new GameInteractor(new BonfireInteractor(this.admin), {
-      init: () => this.flushChanges(),
-      start: () => this.updater.start(),
-      stop: () => this.updater.stop(),
-    });
   }
 
   *createEntities(): IterableIterator<Entity> {
@@ -109,10 +101,6 @@ export class Game implements IGame {
     for (const resource of Object.values(ResourceMetadata)) {
       yield new ResourceEntity(resource.id);
     }
-  }
-
-  get presenter(): IPresenterSystem {
-    return this._presenter;
   }
 
   get interactor(): GameInteractor {
@@ -145,6 +133,12 @@ export class Game implements IGame {
   }
 
   private flushChanges() {
-    this.watcher.flush((changes) => this._rootPresenter.update(changes));
+    this.watcher.flush((changes) => {
+      if (!this.onTickedHandler)
+        throw new Error(
+          "undefined ticked handler, make sure you call gameController.onTicked(options) before gameController.start()",
+        );
+      this.onTickedHandler(changes);
+    });
   }
 }
