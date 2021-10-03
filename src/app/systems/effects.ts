@@ -1,8 +1,9 @@
-import { System } from "@/_ecs";
 import { EffectId } from "@/_interfaces";
 import { EffectExpressions } from "@/_state";
 
-import { EffectPoolEntity } from "../effects";
+import { EffectPoolEntity } from "../entity";
+
+import { System } from ".";
 
 export class EffectsSystem extends System {
   init(): void {

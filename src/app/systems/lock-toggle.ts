@@ -1,8 +1,7 @@
-import { System } from "@/_ecs";
 import { Flag, ResourceMetadata } from "@/_state";
 
-import { BuildingEntity } from "../buildings";
-import { ResourceEntity } from "../resources";
+import { ResourceEntity, BuildingEntity } from "../entity";
+import { System } from ".";
 
 export class LockToggleSystem extends System {
   update(): void {

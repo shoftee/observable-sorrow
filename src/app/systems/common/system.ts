@@ -1,4 +1,4 @@
-import { EntityAdmin } from "../app/game/entity-admin";
+import { EntityAdmin } from "../../entity";
 
 export abstract class System {
   constructor(protected readonly admin: EntityAdmin) {}

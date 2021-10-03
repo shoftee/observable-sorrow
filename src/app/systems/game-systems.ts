@@ -1,6 +1,5 @@
-import { System } from "@/_ecs";
-
 import {
+  System,
   BuildingSystem,
   BuildingEffectsSystem,
   CraftingSystem,

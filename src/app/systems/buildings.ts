@@ -1,9 +1,8 @@
-import { System } from "@/_ecs";
 import { BuildingId } from "@/_interfaces";
 
-import { EntityAdmin } from "../game/entity-admin";
+import { EntityAdmin } from "../entity";
 
-import { OrderContext, OrderHandler, OrderResult } from "./_orders";
+import { OrderContext, OrderHandler, OrderResult, System } from ".";
 
 export class BuildingSystem extends System {
   private readonly orders: OrderHandler<BuildingId>;

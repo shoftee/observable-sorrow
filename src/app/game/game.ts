@@ -9,11 +9,14 @@ import { SystemTimestamp } from "@/_utils/timestamp";
 
 import { EntityAdmin, EntityWatcher, GameUpdater } from ".";
 
-import { BuildingEntity } from "../buildings";
-import { EffectPoolEntity } from "../effects";
-import { EnvironmentEntity } from "../environment";
-import { ResourceEntity } from "../resources";
-import { TimersEntity } from "./timers";
+import {
+  BuildingEntity,
+  EffectPoolEntity,
+  EnvironmentEntity,
+  TimersEntity,
+  RecipeEntity,
+  ResourceEntity,
+} from "../entity";
 
 import { BonfireInteractor } from "../bonfire";
 import {
@@ -27,7 +30,6 @@ import {
   ResourceProductionSystem,
   IngredientsSystem,
 } from "../systems";
-import { RecipeEntity } from "../workshop";
 
 class GameController implements IGameController {
   constructor(

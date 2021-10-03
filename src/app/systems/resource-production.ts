@@ -1,8 +1,7 @@
-import { System } from "@/_ecs";
 import { ResourceMetadata } from "@/_state";
 
-import { EntityAdmin } from "../game/entity-admin";
-import { ResourceEntity } from "../resources";
+import { EntityAdmin, ResourceEntity } from "../entity";
+import { System } from ".";
 
 export class ResourceProductionSystem extends System {
   constructor(admin: EntityAdmin) {

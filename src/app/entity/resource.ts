@@ -8,7 +8,7 @@ import {
   ResourceState,
 } from "@/_state";
 
-import { ResourceDelta } from "./state";
+import { ResourceDelta } from "./common/state";
 
 export class ResourceEntity extends Entity {
   readonly meta: ResourceMetadataType;

@@ -1,14 +1,15 @@
 import { Entity } from "@/_ecs";
 import { BuildingId, Constructor, RecipeId, ResourceId } from "@/_interfaces";
 
-import { ResourceEntity } from "../resources";
-import { RecipeEntity } from "../workshop";
-import { BuildingEntity } from "../buildings";
-import { EnvironmentEntity } from "../environment";
-import { EffectPoolEntity } from "../effects";
-
-import { EntityId } from "./_common";
-import { TimersEntity } from "./timers";
+import {
+  EntityId,
+  RecipeEntity,
+  ResourceEntity,
+  BuildingEntity,
+  EffectPoolEntity,
+  EnvironmentEntity,
+  TimersEntity,
+} from ".";
 
 export class EntityAdmin {
   private readonly pool = new Map<EntityId, Entity>();

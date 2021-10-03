@@ -1,6 +1,7 @@
-import { System } from "@/_ecs";
 import { IngredientState } from "@/_state";
 import { all, any } from "@/_utils/collections";
+
+import { System } from ".";
 
 export class IngredientsSystem extends System {
   update(): void {

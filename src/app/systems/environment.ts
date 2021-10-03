@@ -1,11 +1,11 @@
-import { System } from "@/_ecs";
 import { SeasonId, WeatherId } from "@/_interfaces";
 import { WeatherMetadata } from "@/_state";
 import { DefaultChooser } from "@/_utils/probability";
 
-import { CalendarConstants } from "../constants/calendar";
+import { CalendarConstants } from "../constants";
+import { EnvironmentEntity } from "../entity";
 
-import { EnvironmentEntity } from "../environment";
+import { System } from ".";
 
 export class EnvironmentSystem extends System {
   get environment(): EnvironmentEntity {

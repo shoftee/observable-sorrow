@@ -1,6 +1,6 @@
-import { System } from "@/_ecs";
+import { EntityAdmin } from "../entity";
 
-import { EntityAdmin } from "../game/entity-admin";
+import { System } from ".";
 
 export class BuildingEffectsSystem extends System {
   constructor(admin: EntityAdmin) {
