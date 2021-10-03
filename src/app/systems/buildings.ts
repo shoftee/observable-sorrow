@@ -1,6 +1,6 @@
+import { System } from "@/_ecs";
 import { BuildingId } from "@/_interfaces";
 
-import { System } from "../ecs/system";
 import { EntityAdmin } from "../game/entity-admin";
 
 import { OrderContext, OrderHandler, OrderResult } from "./_orders";

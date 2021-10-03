@@ -1,5 +1,7 @@
 import { expect } from "chai";
-import { TimerComponent } from "@/app/ecs";
+
+import { TimerComponent } from "@/_ecs";
+
 import { TimeConstants } from "@/app/constants";
 
 describe("timer component", () => {

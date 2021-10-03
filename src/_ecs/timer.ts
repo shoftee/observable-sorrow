@@ -1,7 +1,7 @@
 import { round } from "@/_utils/mathx";
 
-import { TimeConstants } from "../../constants";
-import { Component } from "..";
+import { TimeConstants } from "../app/constants";
+import { Component } from ".";
 
 export class TimerComponent extends Component {
   /** Fractional ticks (0.001 precision) */

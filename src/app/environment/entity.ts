@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 
+import { Entity } from "@/_ecs";
 import { EnvironmentState } from "@/_state";
-import { Entity } from "../ecs";
 
 export class EnvironmentEntity extends Entity {
   readonly state: EnvironmentState;

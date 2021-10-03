@@ -1,4 +1,5 @@
-import { System } from "../ecs";
+import { System } from "@/_ecs";
+
 import { EntityAdmin } from "../game/entity-admin";
 
 export class BuildingEffectsSystem extends System {

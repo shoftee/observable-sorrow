@@ -1,4 +1,4 @@
-import { System } from "../ecs";
+import { System } from "@/_ecs";
 
 import {
   BuildingSystem,

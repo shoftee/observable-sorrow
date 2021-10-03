@@ -1,9 +1,8 @@
 import { reactive } from "vue";
 
+import { Entity } from "@/_ecs";
 import { EffectId } from "@/_interfaces";
 import { EffectState } from "@/_state";
-
-import { Entity } from "../ecs";
 
 export interface EffectEntry {
   get(): number | undefined;

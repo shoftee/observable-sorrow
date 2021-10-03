@@ -1,14 +1,14 @@
-import { BuildingMetadata, RecipeMetadata, ResourceMetadata } from "@/_state";
-import { SystemTimestamp } from "@/_utils/timestamp";
+import { Entity } from "@/_ecs";
 import {
   GameInteractor,
   IGameController,
   OnTickedHandler,
 } from "@/_interfaces";
+import { BuildingMetadata, RecipeMetadata, ResourceMetadata } from "@/_state";
+import { SystemTimestamp } from "@/_utils/timestamp";
 
 import { EntityAdmin, EntityWatcher, GameUpdater } from ".";
 
-import { Entity } from "../ecs";
 import { BuildingEntity } from "../buildings";
 import { EffectPoolEntity } from "../effects";
 import { EnvironmentEntity } from "../environment";

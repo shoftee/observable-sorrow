@@ -1,5 +1,6 @@
+import { System } from "@/_ecs";
 import { RecipeId } from "@/_interfaces";
-import { System } from "../ecs";
+
 import { EntityAdmin } from "../game/entity-admin";
 
 import { OrderContext, OrderHandler, OrderResult } from "./_orders";

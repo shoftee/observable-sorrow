@@ -1,6 +1,7 @@
-import { RecipeId } from "@/_interfaces";
-import { Entity } from "@/app/ecs";
 import { reactive } from "vue";
+
+import { Entity } from "@/_ecs";
+import { RecipeId } from "@/_interfaces";
 import { RecipeState } from "@/_state";
 
 export class RecipeEntity extends Entity {

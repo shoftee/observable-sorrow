@@ -1,6 +1,6 @@
+import { Entity } from "@/_ecs";
 import { BuildingId, Constructor, RecipeId, ResourceId } from "@/_interfaces";
 
-import { Entity } from "../ecs/entity";
 import { ResourceEntity } from "../resources";
 import { RecipeEntity } from "../workshop";
 import { BuildingEntity } from "../buildings";

@@ -1,4 +1,4 @@
-import { SimpleEntity, TimerComponent } from "@/app/ecs";
+import { SimpleEntity, TimerComponent } from "@/_ecs";
 
 import { CalendarConstants } from "../constants/calendar";
 

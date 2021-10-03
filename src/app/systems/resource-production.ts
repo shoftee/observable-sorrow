@@ -1,6 +1,6 @@
+import { System } from "@/_ecs";
 import { ResourceMetadata } from "@/_state";
 
-import { System } from "../ecs";
 import { EntityAdmin } from "../game/entity-admin";
 import { ResourceEntity } from "../resources";
 
