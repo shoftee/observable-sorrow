@@ -7,12 +7,11 @@ import { BonfireItemId } from "@/_interfaces";
 import { Presenters, Interactor } from "@/app/os";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
-import TooltipButton from "./TooltipButton.vue";
 import Ingredients from "./Ingredients.vue";
 import Effects from "./Effects.vue";
 
 export default defineComponent({
-  components: { TooltipButton, Ingredients, Effects },
+  components: { Ingredients, Effects },
   setup() {
     const { t } = { ...useI18n() };
     const events = inject(KeyboardEventsKey);
@@ -37,18 +36,24 @@ export default defineComponent({
   <div class="controls d-flex flex-column">
     <section class="row row-cols-1 row-cols-xl-2 g-2">
       <div class="col" v-for="item in items" :key="item.id">
-        <TooltipButton
-          :disabled="!item.fulfilled"
-          :capped="item.capped"
-          @click="buildItem(item.id)"
-        >
-          <template #default>
-            {{ t(item.label) }}
-            <span v-if="item.level > 0" class="structure-level">
-              {{ item.level }}
-            </span>
-          </template>
-          <template #tooltip>
+        <tippy>
+          <div>
+            <!-- We need a container div because tippy listens to hover events to trigger and buttons don't fire events when disabled.-->
+            <button
+              type="button"
+              class="btn btn-outline-secondary w-100"
+              :class="{ capped: item.capped }"
+              :disabled="!item.fulfilled"
+              @click="buildItem(item.id)"
+            >
+              {{ t(item.label) }}
+              <span v-if="item.level > 0" class="structure-level">
+                {{ item.level }}
+              </span>
+            </button>
+          </div>
+
+          <template #content>
             <div>
               <div class="card-header">
                 <p class="description">{{ t(item.description) }}</p>
@@ -63,7 +68,7 @@ export default defineComponent({
               <Effects v-if="item.effects.length > 0" :items="item.effects" />
             </div>
           </template>
-        </TooltipButton>
+        </tippy>
       </div>
     </section>
   </div>
