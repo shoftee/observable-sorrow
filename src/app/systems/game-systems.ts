@@ -1,7 +1,6 @@
 import {
   System,
   BuildingSystem,
-  BuildingEffectsSystem,
   CraftingSystem,
   EffectsSystem,
   EnvironmentSystem,
@@ -13,7 +12,6 @@ import {
 export class GameSystems {
   constructor(
     readonly buildings: BuildingSystem,
-    readonly buildingEffects: BuildingEffectsSystem,
     readonly crafting: CraftingSystem,
     readonly effects: EffectsSystem,
     readonly environment: EnvironmentSystem,

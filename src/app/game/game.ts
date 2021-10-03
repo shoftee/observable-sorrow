@@ -21,7 +21,6 @@ import {
 import { BonfireInteractor } from "../bonfire";
 import {
   BuildingSystem,
-  BuildingEffectsSystem,
   CraftingSystem,
   GameSystems,
   EnvironmentSystem,
@@ -67,7 +66,6 @@ export class Game {
 
     this._systems = new GameSystems(
       new BuildingSystem(this.admin),
-      new BuildingEffectsSystem(this.admin),
       new CraftingSystem(this.admin),
       new EffectsSystem(this.admin),
       new EnvironmentSystem(this.admin),
@@ -120,18 +118,17 @@ export class Game {
     // Update environment.
     this._systems.environment.update();
 
-    // Handle buildings and building effects.
+    // Handle orders.
     this._systems.buildings.update();
-    this._systems.buildingEffects.update();
+    this._systems.crafting.update();
 
     // Update effects pool.
     this._systems.effects.update();
 
-    // Handle resources
-    this._systems.crafting.update();
+    // Handle resource deltas.
     this._systems.resourceProduction.update();
 
-    // Handle ingredient counts
+    // Handle ingredient counts.
     this._systems.ingredients.update();
 
     // Lock/unlock elements.

@@ -2,7 +2,6 @@ export * from "./common/orders";
 export * from "./common/system";
 
 export * from "./buildings";
-export * from "./building-effects";
 export * from "./crafting";
 export * from "./environment";
 export * from "./effects";

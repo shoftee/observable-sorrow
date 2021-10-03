@@ -7,14 +7,20 @@ import { System } from ".";
 
 export class EffectsSystem extends System {
   init(): void {
-    this.calculateEffects();
+    this.resolveEffectValues();
   }
 
   update(): void {
-    this.calculateEffects();
+    // recalculate production effects from buildings
+    const effects = this.admin.effects();
+    for (const building of this.admin.buildings()) {
+      effects.set(building.meta.effects.count, building.state.level);
+    }
+
+    this.resolveEffectValues();
   }
 
-  private calculateEffects() {
+  private resolveEffectValues() {
     const effects = this.admin.effects();
     const resolved = new Set<EffectId>();
     for (const id of Object.keys(EffectExpressions)) {
