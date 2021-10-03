@@ -1,13 +1,16 @@
-import { WorkshopRecipeId } from "@/_interfaces";
-import { Entity, RawQueueComponent } from "@/app/ecs";
+import { RecipeId } from "@/_interfaces";
+import { Entity } from "@/app/ecs";
+import { reactive } from "vue";
+import { RecipeState } from "@/_state";
 
-export class WorkshopEntity extends Entity {
-  readonly orders: RecipeOrdersComponent;
+export class RecipeEntity extends Entity {
+  readonly state: RecipeState;
 
-  constructor() {
-    super("workshop");
-    this.orders = this.addComponent(new RecipeOrdersComponent());
+  manualCraft: boolean;
+
+  constructor(readonly id: RecipeId) {
+    super(id);
+    this.manualCraft = false;
+    this.state = reactive(new RecipeState(id));
   }
 }
-
-export class RecipeOrdersComponent extends RawQueueComponent<WorkshopRecipeId> {}

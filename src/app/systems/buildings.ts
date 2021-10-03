@@ -1,45 +1,71 @@
-import { BuildingMetadata } from "@/_state";
+import { BuildingId } from "@/_interfaces";
+
 import { System } from "../ecs/system";
 import { EntityAdmin } from "../game/entity-admin";
-import { BuildingEntity } from "../buildings/entity";
+
+import { OrderContext, OrderHandler, OrderResult } from "./_orders";
 
 export class BuildingSystem extends System {
+  private readonly orders: OrderHandler<BuildingId>;
+
   constructor(admin: EntityAdmin) {
     super(admin);
+
+    this.orders = new OrderHandler<BuildingId>(admin);
   }
 
-  // update method
   update(): void {
     for (const building of this.admin.buildings()) {
-      this.processBuildQueue(building);
-      this.updatePrices(building);
-    }
-  }
+      if (building.manualConstruct) {
+        this.orders.build(building.id);
 
-  // specific update behaviors
-  private processBuildQueue(building: BuildingEntity): void {
-    let level = building.state.level;
-    building.buildQueue.consume((item) => {
-      if (item.intent == "construct") {
-        for (const [resourceId, amount] of building.state.ingredients) {
-          const resource = this.admin.resource(resourceId);
-          resource.mutations.take(amount);
-        }
-        level++;
+        building.manualConstruct = false;
       }
-    });
+    }
 
-    building.state.level = level;
+    this.orders.consume({
+      pipeline: [(ctx) => this.applyBuyBuilding(ctx)],
+      success: (ctx) => this.updateRequirements(ctx),
+    });
   }
 
-  private updatePrices(building: BuildingEntity): void {
-    const buildingMetadata = BuildingMetadata[building.id];
-    const prices = buildingMetadata.prices;
-    const level = building.state.level;
-    const priceMultiplier = Math.pow(prices.ratio, level);
+  private applyBuyBuilding(context: OrderContext<BuildingId>): OrderResult {
+    const { order, transaction, admin } = { ...context };
 
-    for (const [id, amount] of prices.baseIngredients) {
-      building.state.ingredients.set(id, amount * priceMultiplier);
+    const building = admin.building(order);
+    const ingredients = building.state.ingredients;
+    for (const { resourceId, requirement } of ingredients) {
+      transaction.addCredit(resourceId, requirement);
+
+      const state = admin.resource(resourceId).state;
+      const debit = transaction.getDebit(resourceId);
+      const credit = transaction.getCredit(resourceId);
+      const total = state.amount + debit - credit;
+      if (total < 0) {
+        return {
+          success: false,
+          ErrorMessage: `Could not craft '${order}' because we needed more '${resourceId}' to satisfy it.`,
+        };
+      }
+    }
+
+    return { success: true };
+  }
+
+  private updateRequirements(context: OrderContext<BuildingId>): void {
+    const { order } = { ...context };
+
+    const building = context.admin.building(order);
+    const meta = building.meta;
+    const state = building.state;
+
+    state.level++;
+
+    const multiplier = Math.pow(meta.prices.ratio, state.level);
+
+    for (const ingredient of state.ingredients) {
+      const base = meta.prices.baseIngredients[ingredient.resourceId] ?? 0;
+      ingredient.requirement = base * multiplier;
     }
   }
 }

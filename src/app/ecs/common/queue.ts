@@ -24,20 +24,6 @@ export class QueueComponent<T> extends Component {
   }
 }
 
-export class RawQueueComponent<T> extends QueueComponent<T> {
-  enqueue(c: T): void {
-    super.enqueue(c);
-  }
-
-  dequeue(): T | undefined {
-    return super.dequeue();
-  }
-
-  consume(callback: (item: T) => void): void {
-    super.consume(callback);
-  }
-}
-
 export class MutationComponent extends QueueComponent<number> {
   give(n: number): void {
     this.enqueue(n);

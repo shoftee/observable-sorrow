@@ -1,20 +1,24 @@
 import { reactive } from "vue";
 
 import { BuildingId } from "@/_interfaces";
-import { BuildingState } from "@/_state";
+import {
+  BuildingMetadata,
+  BuildingMetadataType,
+  BuildingState,
+} from "@/_state";
 import { Entity } from "@/app/ecs";
 
-import { BuildQueueComponent } from "./components";
-
 export class BuildingEntity extends Entity {
-  readonly buildQueue: BuildQueueComponent;
-
+  readonly meta: BuildingMetadataType;
   readonly state: BuildingState;
+
+  manualConstruct: boolean;
 
   constructor(readonly id: BuildingId) {
     super(id);
-    this.buildQueue = this.addComponent(new BuildQueueComponent());
-
+    this.meta = BuildingMetadata[id];
     this.state = reactive(new BuildingState(this.id));
+
+    this.manualConstruct = false;
   }
 }

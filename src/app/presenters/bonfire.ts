@@ -10,8 +10,7 @@ import {
   EffectState,
   IngredientState,
   ResourceMetadata,
-  ResourceState,
-  WorkshopRecipeMetadata,
+  RecipeState,
 } from "@/_state";
 import { all, any } from "@/_utils/collections";
 
@@ -56,11 +55,10 @@ export class BonfireItem {
     this.flavor = meta.flavor;
 
     if (meta.intent.kind === "refine-catnip") {
-      const ingredients = WorkshopRecipeMetadata["refine-catnip"].ingredients;
+      const state = updater.get<RecipeState>(meta.intent.recipeId);
       this.ingredients = reactive(
-        Array.from(ingredients, ([id, amount]) => {
-          const resource = updater.get<ResourceState>(id);
-          return this.newRecipeIngredient(id, amount, resource);
+        Array.from(state.ingredients, (item) => {
+          return this.newIngredientItem(item);
         }),
       );
       this.capped = this.computeCapped(this.ingredients);
@@ -72,17 +70,16 @@ export class BonfireItem {
       this.unlocked = computed(() => building.unlocked);
       this.ingredients = reactive(
         Array.from(building.ingredients.values(), (state) => {
-          updater.get < ResourceState;
-          return this.newBuildingIngredient(state);
+          return this.newIngredientItem(state);
         }),
       );
+      this.capped = computed(() => building.capped);
+      this.fulfilled = computed(() => building.fulfilled);
       this.effects = reactive(
         Array.from(BuildingMetadata[buildingId].effects.resources, (meta) =>
           this.newEffect(updater, meta),
         ),
       );
-      this.capped = this.computeCapped(this.ingredients);
-      this.fulfilled = this.computeFulfilled(this.ingredients);
     }
   }
 
@@ -99,35 +96,14 @@ export class BonfireItem {
     });
   }
 
-  private newRecipeIngredient(
-    id: ResourceId,
-    requirement: number,
-    resource: ResourceState,
-  ): IngredientItem {
+  private newIngredientItem(state: IngredientState): IngredientItem {
     return reactive({
-      id: id,
-      label: ResourceMetadata[id].label,
-      requirement: requirement,
-      fulfillment: computed(() => resource.amount),
-      fulfilled: computed(() => resource.amount >= requirement),
-      capped: computed(() => requirement > (resource.capacity ?? 0)),
-    });
-  }
-
-  private newBuildingIngredient(
-    ingredient: IngredientState,
-    resource: ResourceState,
-  ): IngredientItem {
-    return reactive({
-      id: ingredient.resourceId,
-      label: ResourceMetadata[ingredient.resourceId].label,
-      requirement: computed(() => ingredient.requirement),
-      fulfillment: computed(() => ingredient.fulfillment),
-      fulfilled: computed(() => ingredient.fulfilled),
-      capped: computed(() => {
-        const capped = requirement.value > (resource.capacity ?? 0);
-        return capped;
-      }),
+      id: state.resourceId,
+      label: ResourceMetadata[state.resourceId].label,
+      requirement: computed(() => state.requirement),
+      fulfillment: computed(() => state.fulfillment),
+      fulfilled: computed(() => state.fulfilled),
+      capped: computed(() => state.capped),
     });
   }
 

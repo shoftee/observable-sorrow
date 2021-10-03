@@ -33,5 +33,4 @@ export type EffectId =
 
 export type RecipeId = "refine-catnip";
 export type SeasonId = "spring" | "summer" | "autumn" | "winter";
-export type WorkshopRecipeId = "refine-catnip";
 export type WeatherId = "neutral" | "warm" | "cold";

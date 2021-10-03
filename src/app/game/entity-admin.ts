@@ -1,9 +1,9 @@
-import { BuildingId, Constructor, ResourceId } from "@/_interfaces";
+import { BuildingId, Constructor, RecipeId, ResourceId } from "@/_interfaces";
 
 import { Entity } from "../ecs/entity";
 import { ResourceEntity } from "../resources";
-import { WorkshopEntity } from "../workshop";
-import { BuildingEntity } from "../buildings/entity";
+import { RecipeEntity } from "../workshop";
+import { BuildingEntity } from "../buildings";
 import { EnvironmentEntity } from "../environment";
 import { EffectPoolEntity } from "../effects";
 
@@ -60,6 +60,14 @@ export class EntityAdmin {
     }
   }
 
+  recipe(id: RecipeId): RecipeEntity {
+    return this.entity<RecipeEntity>(id, RecipeEntity);
+  }
+
+  recipes(): Iterable<RecipeEntity> {
+    return this.entities(RecipeEntity);
+  }
+
   resource(id: ResourceId): ResourceEntity {
     return this.entity<ResourceEntity>(id, ResourceEntity);
   }
@@ -78,10 +86,6 @@ export class EntityAdmin {
 
   effects(): EffectPoolEntity {
     return this.entity("effects", EffectPoolEntity);
-  }
-
-  workshop(): WorkshopEntity {
-    return this.entity("workshop", WorkshopEntity);
   }
 
   environment(): EnvironmentEntity {

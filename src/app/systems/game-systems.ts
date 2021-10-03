@@ -6,6 +6,7 @@ import {
   CraftingSystem,
   EffectsSystem,
   EnvironmentSystem,
+  IngredientsSystem,
   LockToggleSystem,
   ResourceProductionSystem,
 } from ".";
@@ -17,6 +18,7 @@ export class GameSystems {
     readonly crafting: CraftingSystem,
     readonly effects: EffectsSystem,
     readonly environment: EnvironmentSystem,
+    readonly ingredients: IngredientsSystem,
     readonly lockToggle: LockToggleSystem,
     readonly resourceProduction: ResourceProductionSystem,
   ) {}

@@ -1,4 +1,4 @@
-import { BuildingMetadata, Flag, ResourceMetadata } from "@/_state";
+import { Flag, ResourceMetadata } from "@/_state";
 import { BuildingEntity } from "../buildings";
 import { System } from "../ecs";
 import { ResourceEntity } from "../resources";
@@ -29,10 +29,10 @@ export class LockToggleSystem extends System {
 
   private updateBuildingUnlocked(building: BuildingEntity): void {
     if (!building.state.unlocked) {
-      const metadata = BuildingMetadata[building.id];
-      for (const [id, amount] of building.state.ingredients) {
-        const resource = this.admin.resource(id);
-        if (resource.state.amount >= amount * metadata.unlockRatio) {
+      for (const ingredient of building.state.ingredients) {
+        const unlockThreshold =
+          ingredient.requirement * building.meta.unlockRatio;
+        if (ingredient.fulfillment >= unlockThreshold) {
           building.state.unlocked = true;
           return;
         }

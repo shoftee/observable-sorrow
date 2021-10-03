@@ -1,10 +1,10 @@
+import { IngredientState } from "./_types";
 import {
   EffectId,
   BuildingId,
   BuildingCountId,
   ResourceId,
 } from "@/_interfaces";
-import { ResourceMap } from "./_types";
 
 export type BuildingEffectType = {
   per: EffectId;
@@ -17,7 +17,7 @@ export type BuildingMetadataType = {
   unlockRatio: number;
   prices: {
     ratio: number;
-    baseIngredients: ResourceMap;
+    baseIngredients: { [K in ResourceId]?: number };
   };
   effects: {
     count: BuildingCountId;
@@ -30,7 +30,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     id: "catnip-field",
     prices: {
       ratio: 1.12,
-      baseIngredients: new ResourceMap([["catnip", 10]]),
+      baseIngredients: { catnip: 10 },
     },
     unlockRatio: 0.3,
     effects: {
@@ -47,12 +47,18 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
 };
 
 export class BuildingState {
-  readonly ingredients: Map<ResourceId, number>;
+  readonly ingredients: IngredientState[];
   unlocked = false;
   level = 0;
+  capped = false;
+  fulfilled = false;
 
   constructor(id: BuildingId) {
     const meta = BuildingMetadata[id];
-    this.ingredients = new ResourceMap(meta.prices.baseIngredients);
+    this.ingredients = Object.entries(meta.prices.baseIngredients).map(
+      ([id, requirement]) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        new IngredientState(id as ResourceId, requirement!),
+    );
   }
 }

@@ -18,13 +18,16 @@ export class ResourceProductionSystem extends System {
 
     const dt = this.admin.timers().ticks.delta;
     for (const resource of this.admin.resources()) {
-      if (
-        resource.state.change &&
-        resource.state.amount < resource.state.effectiveCapacity
-      ) {
+      if (resource.state.change) {
         // calculate new amounts based on fractional ticks
         const change = dt * resource.state.change;
-        resource.mutations.give(change);
+
+        if (change > 0) {
+          resource.delta.addDebit(change);
+        } else if (change < 0) {
+          // change is negative, add abs to credit
+          resource.delta.addCredit(Math.abs(change));
+        }
       }
 
       this.updateAmount(resource);
@@ -45,17 +48,24 @@ export class ResourceProductionSystem extends System {
 
   private updateAmount(resource: ResourceEntity): void {
     const currentValue = resource.state.amount;
-    const capacity = resource.state.effectiveCapacity;
+    const capacity = resource.state.capacity ?? Number.POSITIVE_INFINITY;
 
-    // calculate delta from mutations
-    const delta = resource.mutations.sum();
+    // subtract losses first
+    let newValue = currentValue - resource.delta.credit;
+    if (newValue < capacity) {
+      // new resources are gained only when under capacity
+      newValue = newValue + resource.delta.debit;
+      // but they only go up to capacity at most
+      newValue = Math.min(newValue, capacity);
+    }
 
-    // determine new value, truncate
-    let newValue = currentValue + delta;
+    // negative resource amount is non-sense (for now)
     newValue = Math.max(newValue, 0);
-    newValue = Math.min(newValue, capacity);
 
     // set newly calculated value
     resource.state.amount = newValue;
+
+    // clear delta
+    resource.delta.reset();
   }
 }

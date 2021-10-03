@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, inject, reactive, watch } from "vue";
+import { computed, defineComponent, inject, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { BonfireItemId } from "@/_interfaces";
@@ -22,10 +22,6 @@ export default defineComponent({
 
     const all = reactive(Presenters.bonfire.all.value);
     const items = computed(() => all.filter((m) => m.unlocked));
-    watch(
-      () => items.value.map((x) => x.capped),
-      () => console.log(items),
-    );
 
     return { t, events, eff, items };
   },

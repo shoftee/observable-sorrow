@@ -10,15 +10,15 @@ export class BonfireInteractor implements IBonfireInteractor {
     const metadata = BonfireMetadata[id];
     switch (metadata.intent.kind) {
       case "gather-catnip":
-        this.admin.resource("catnip").mutations.give(metadata.intent.amount);
+        this.admin.resource("catnip").delta.addDebit(metadata.intent.amount);
         break;
 
       case "refine-catnip":
-        this.admin.workshop().orders.enqueue("refine-catnip");
+        this.admin.recipe("refine-catnip").manualCraft = true;
         break;
 
       case "buy-building":
-        this.admin.building(metadata.intent.buildingId).buildQueue.construct();
+        this.admin.building(metadata.intent.buildingId).manualConstruct = true;
         break;
     }
   }

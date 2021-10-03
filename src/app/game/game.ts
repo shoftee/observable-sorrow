@@ -1,4 +1,4 @@
-import { BuildingMetadata, ResourceMetadata } from "@/_state";
+import { BuildingMetadata, RecipeMetadata, ResourceMetadata } from "@/_state";
 import { SystemTimestamp } from "@/_utils/timestamp";
 import {
   GameInteractor,
@@ -13,7 +13,6 @@ import { BuildingEntity } from "../buildings";
 import { EffectPoolEntity } from "../effects";
 import { EnvironmentEntity } from "../environment";
 import { ResourceEntity } from "../resources";
-import { WorkshopEntity } from "../workshop";
 import { TimersEntity } from "./timers";
 
 import { BonfireInteractor } from "../bonfire";
@@ -26,7 +25,9 @@ import {
   EffectsSystem,
   LockToggleSystem,
   ResourceProductionSystem,
+  IngredientsSystem,
 } from "../systems";
+import { RecipeEntity } from "../workshop";
 
 class GameController implements IGameController {
   constructor(
@@ -68,6 +69,7 @@ export class Game {
       new CraftingSystem(this.admin),
       new EffectsSystem(this.admin),
       new EnvironmentSystem(this.admin),
+      new IngredientsSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
     );
@@ -94,10 +96,12 @@ export class Game {
     }
 
     yield new EffectPoolEntity();
-    yield new WorkshopEntity();
     yield new EnvironmentEntity();
     yield new TimersEntity();
 
+    for (const recipe of Object.values(RecipeMetadata)) {
+      yield new RecipeEntity(recipe.id);
+    }
     for (const resource of Object.values(ResourceMetadata)) {
       yield new ResourceEntity(resource.id);
     }
@@ -118,15 +122,18 @@ export class Game {
     this._systems.buildings.update();
     this._systems.buildingEffects.update();
 
-    // Lock/unlock elements.
-    this._systems.lockToggle.update();
-
     // Update effects pool.
     this._systems.effects.update();
 
     // Handle resources
     this._systems.crafting.update();
     this._systems.resourceProduction.update();
+
+    // Handle ingredient counts
+    this._systems.ingredients.update();
+
+    // Lock/unlock elements.
+    this._systems.lockToggle.update();
 
     // Push changes to presenter.
     this.flushChanges();
