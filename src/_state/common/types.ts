@@ -1,4 +1,4 @@
-import { ResourceId } from "@/_interfaces";
+import { EffectId, ResourceId } from "@/_interfaces";
 
 export class ResourceMap extends Map<ResourceId, number> {}
 
@@ -19,4 +19,9 @@ export class IngredientState {
 export type ResourceQuantityType = {
   id: ResourceId;
   quantity: number;
+};
+
+export type EffectQuantityType = {
+  id: EffectId;
+  amount: number;
 };

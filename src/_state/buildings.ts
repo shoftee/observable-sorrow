@@ -1,10 +1,10 @@
-import { IngredientState } from "./_types";
 import {
   EffectId,
   BuildingId,
   BuildingCountId,
   ResourceId,
 } from "@/_interfaces";
+import { IngredientState } from "./common/types";
 
 export type BuildingEffectType = {
   per: EffectId;
