@@ -13,7 +13,7 @@ import {
 } from "@/_state";
 import { SystemTimestamp } from "@/_utils/timestamp";
 
-import { EntityAdmin, EntityWatcher, GameUpdater } from ".";
+import { GameUpdater } from ".";
 
 import {
   BuildingEntity,
@@ -22,9 +22,10 @@ import {
   RecipeEntity,
   ResourceEntity,
   EffectEntity,
+  EntityAdmin,
+  EntityWatcher,
 } from "../entity";
-
-import { BonfireInteractor } from "../bonfire";
+import { BonfireInteractor } from "../interactors";
 import {
   BuildingSystem,
   CraftingSystem,
@@ -126,24 +127,8 @@ export class Game {
     // Advance timers
     this.admin.timers().update(dt);
 
-    // Update environment.
-    this._systems.environment.update();
-
-    // Handle orders.
-    this._systems.buildings.update();
-    this._systems.crafting.update();
-
-    // Update effects pool.
-    this._systems.effects.update();
-
-    // Handle resource deltas.
-    this._systems.resourceProduction.update();
-
-    // Handle ingredient counts.
-    this._systems.ingredients.update();
-
-    // Lock/unlock elements.
-    this._systems.lockToggle.update();
+    // Run updates on all systems.
+    this._systems.update();
 
     // Push changes to presenter.
     this.flushChanges();

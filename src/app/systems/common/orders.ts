@@ -1,7 +1,8 @@
 import { Queue } from "queue-typescript";
 
-import { EntityAdmin } from "../../game";
-import { DeltaSet } from "../../entity/common/state";
+import { EntityAdmin } from "@/app/entity";
+
+import { DeltaSet } from "./delta-set";
 
 export type OrderResult =
   | { success: false; ErrorMessage: string }

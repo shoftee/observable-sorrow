@@ -3,12 +3,11 @@ import { reactive } from "vue";
 import { Entity } from "@/_ecs";
 import { ResourceId } from "@/_interfaces";
 import {
+  ResourceDelta,
   ResourceMetadata,
   ResourceMetadataType,
   ResourceState,
 } from "@/_state";
-
-import { ResourceDelta } from "./common/state";
 
 export class ResourceEntity extends Entity {
   readonly meta: ResourceMetadataType;

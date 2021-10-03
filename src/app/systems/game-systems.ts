@@ -28,6 +28,27 @@ export class GameSystems {
     }
   }
 
+  update(): void {
+    // Update environment.
+    this.environment.update();
+
+    // Handle orders.
+    this.buildings.update();
+    this.crafting.update();
+
+    // Update effects pool.
+    this.effects.update();
+
+    // Handle resource deltas.
+    this.resourceProduction.update();
+
+    // Handle ingredient counts.
+    this.ingredients.update();
+
+    // Lock/unlock elements.
+    this.lockToggle.update();
+  }
+
   private *systems(): IterableIterator<System> {
     for (const key of Object.keys(this)) {
       const property = this[key as keyof GameSystems];

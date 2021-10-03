@@ -1,7 +1,7 @@
 import { BonfireItemId, IBonfireInteractor } from "@/_interfaces";
 
-import { BonfireMetadata } from "../../_state/bonfire";
-import { EntityAdmin } from "../entity/admin";
+import { BonfireMetadata } from "@/_state/bonfire";
+import { EntityAdmin } from "../entity";
 
 export class BonfireInteractor implements IBonfireInteractor {
   constructor(private readonly admin: EntityAdmin) {}

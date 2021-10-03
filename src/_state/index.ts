@@ -1,5 +1,6 @@
-export * from "./common/types";
+export * from "./common/delta";
 export * from "./common/expr";
+export * from "./common/types";
 
 export * from "./bonfire";
 export * from "./buildings";
