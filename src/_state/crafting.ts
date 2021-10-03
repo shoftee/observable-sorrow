@@ -22,7 +22,7 @@ export class RecipeState {
   capped = false;
   fulfilled = false;
 
-  constructor(readonly id: RecipeId) {
+  constructor(id: RecipeId) {
     this.ingredients = Array.from(
       RecipeMetadata[id].ingredients.entries(),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -1,18 +1,27 @@
 import { Entity } from "@/_ecs";
-import { BuildingId, Constructor, RecipeId, ResourceId } from "@/_interfaces";
+import {
+  BuildingId,
+  Constructor,
+  EffectId,
+  RecipeId,
+  ResourceId,
+} from "@/_interfaces";
 
 import {
   EntityId,
   RecipeEntity,
   ResourceEntity,
   BuildingEntity,
-  EffectPoolEntity,
   EnvironmentEntity,
+  EntityWatcher,
   TimersEntity,
+  EffectEntity,
 } from ".";
 
 export class EntityAdmin {
   private readonly pool = new Map<EntityId, Entity>();
+
+  constructor(private readonly watcher: EntityWatcher) {}
 
   add<TEntity extends Entity>(entity: TEntity): void {
     if (this.pool.has(entity.id as EntityId)) {
@@ -22,6 +31,7 @@ export class EntityAdmin {
     }
 
     this.pool.set(entity.id as EntityId, entity);
+    this.watcher.watch(entity);
   }
 
   remove(id: EntityId): void {
@@ -30,6 +40,7 @@ export class EntityAdmin {
     }
 
     this.pool.delete(id);
+    this.watcher.unwatch(id);
   }
 
   protected entity<E extends Entity>(
@@ -85,8 +96,12 @@ export class EntityAdmin {
     return this.entities(BuildingEntity);
   }
 
-  effects(): EffectPoolEntity {
-    return this.entity("effects", EffectPoolEntity);
+  effect(id: EffectId): EffectEntity {
+    return this.entity(id, EffectEntity);
+  }
+
+  effects(): Iterable<EffectEntity> {
+    return this.entities(EffectEntity);
   }
 
   environment(): EnvironmentEntity {

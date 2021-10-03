@@ -43,8 +43,7 @@ export class EnvironmentSystem extends System {
   }
 
   private updateWeather(season: string) {
-    const effects = this.admin.effects();
-    const seasonModifier = effects.entry("weather-season-modifier");
+    const seasonModifier = this.admin.effect("weather.modifier.season");
     if (season === "spring") {
       seasonModifier.set(0.5);
     } else if (season === "winter") {
@@ -56,7 +55,7 @@ export class EnvironmentSystem extends System {
     const weatherId: WeatherId = this.chooseWeather();
     this.environment.state.weatherId = weatherId;
 
-    const severityModifier = effects.entry("weather-severity-modifier");
+    const severityModifier = this.admin.effect("weather.modifier.severity");
     severityModifier.set(WeatherMetadata[weatherId].adjustment);
   }
 

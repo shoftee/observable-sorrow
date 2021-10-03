@@ -1,51 +1,44 @@
 import { EffectId } from "@/_interfaces";
-import { EffectExpressions } from "@/_state";
-
-import { EffectPoolEntity } from "../entity";
+import { EffectExpressions, ExprValueStore, Resolver } from "@/_state";
 
 import { System } from ".";
+import { EntityAdmin } from "../entity";
 
 export class EffectsSystem extends System {
+  private readonly store: Store;
+
+  constructor(admin: EntityAdmin) {
+    super(admin);
+    this.store = new Store(this.admin);
+  }
+
   init(): void {
     this.resolveEffectValues();
   }
 
   update(): void {
     // recalculate production effects from buildings
-    const effects = this.admin.effects();
     for (const building of this.admin.buildings()) {
-      effects.set(building.meta.effects.count, building.state.level);
+      this.admin.effect(building.meta.effects.count).set(building.state.level);
     }
 
     this.resolveEffectValues();
   }
 
   private resolveEffectValues() {
-    const effects = this.admin.effects();
-    const resolved = new Set<EffectId>();
-    for (const id of Object.keys(EffectExpressions)) {
-      this.resolveEffect(effects, resolved, id as EffectId);
-    }
+    const resolver = new Resolver();
+    resolver.resolveExprs(this.store, EffectExpressions.values());
+  }
+}
+
+class Store implements ExprValueStore {
+  constructor(private readonly admin: EntityAdmin) {}
+
+  get(id: string): number | undefined {
+    return this.admin.effect(id as EffectId)?.get();
   }
 
-  private resolveEffect(
-    values: EffectPoolEntity,
-    resolved: Set<EffectId>,
-    id: EffectId,
-  ) {
-    if (resolved.has(id)) {
-      return;
-    }
-
-    resolved.add(id);
-
-    const effectValue = EffectExpressions[id];
-    if (effectValue) {
-      for (const dep of effectValue.deps()) {
-        this.resolveEffect(values, resolved, dep);
-      }
-      const calculated = effectValue.resolve(values);
-      values.set(id, calculated);
-    }
+  set(id: string, val: number | undefined): void {
+    this.admin.effect(id as EffectId)?.set(val);
   }
 }

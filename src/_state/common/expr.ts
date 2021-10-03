@@ -1,87 +1,34 @@
-import { EffectId } from "@/_interfaces";
-
-export interface EffectValueStore {
-  get(id: EffectId): number | undefined;
+export interface ExprValueStore {
+  get(id: string): number | undefined;
+  set(id: string, val: number | undefined): void;
 }
 
 export interface Expr {
-  deps(): IterableIterator<EffectId>;
-  resolve(store: EffectValueStore): number;
+  readonly id: string;
+  deps(): IterableIterator<Expr>;
+  resolve(store: ExprValueStore): void;
 }
 
-class ConstExpr implements Expr {
-  constructor(readonly constant: number) {}
+export class Resolver {
+  private readonly resolved: Set<string> = new Set<string>();
 
-  deps(): IterableIterator<EffectId> {
-    return [].values();
+  resolveExprs(store: ExprValueStore, exprs: Iterable<Expr>): void {
+    this.resolved.clear();
+    for (const expr of exprs) {
+      this.resolveExpr(store, expr);
+    }
   }
 
-  resolve(_: EffectValueStore): number {
-    return this.constant;
+  private resolveExpr(store: ExprValueStore, expr: Expr) {
+    if (this.resolved.has(expr.id)) {
+      return;
+    }
+
+    for (const dep of expr.deps()) {
+      this.resolveExpr(store, dep);
+    }
+
+    expr.resolve(store);
+    this.resolved.add(expr.id);
   }
-}
-
-class SumExpr implements Expr {
-  readonly operands: EffectId[];
-  constructor(...operands: EffectId[]) {
-    this.operands = operands;
-  }
-
-  deps(): IterableIterator<EffectId> {
-    return this.operands.values();
-  }
-
-  resolve(store: EffectValueStore): number {
-    return this.operands
-      .map((id) => store.get(id) ?? 0)
-      .reduce((acc, v) => acc + v, 0);
-  }
-}
-
-class RatioExpr implements Expr {
-  constructor(readonly base: EffectId, readonly ratio: EffectId) {}
-
-  *deps(): IterableIterator<EffectId> {
-    yield this.base;
-    yield this.ratio;
-  }
-
-  resolve(store: EffectValueStore): number {
-    const base = store.get(this.base) ?? 0;
-    const ratio = store.get(this.ratio) ?? 0;
-    return base * (1 + ratio);
-  }
-}
-
-class ProductExpr implements Expr {
-  readonly operands: EffectId[];
-  constructor(...operands: EffectId[]) {
-    this.operands = operands;
-  }
-
-  deps(): IterableIterator<EffectId> {
-    return this.operands.values();
-  }
-
-  resolve(store: EffectValueStore): number {
-    return this.operands
-      .map((id) => store.get(id) ?? 0)
-      .reduce((acc, v) => acc * v, 1);
-  }
-}
-
-export function constant(constant: number): Expr {
-  return new ConstExpr(constant);
-}
-
-export function sum(...operands: EffectId[]): Expr {
-  return new SumExpr(...operands);
-}
-
-export function ratio(base: EffectId, ratio: EffectId): Expr {
-  return new RatioExpr(base, ratio);
-}
-
-export function product(...operands: EffectId[]): Expr {
-  return new ProductExpr(...operands);
 }

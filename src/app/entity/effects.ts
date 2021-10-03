@@ -2,33 +2,25 @@ import { reactive } from "vue";
 
 import { Entity } from "@/_ecs";
 import { EffectId } from "@/_interfaces";
-import { EffectState } from "@/_state";
 
 export interface EffectEntry {
   get(): number | undefined;
   set(value: number | undefined): void;
 }
 
-export class EffectPoolEntity extends Entity {
-  readonly state: EffectState;
+export class EffectEntity extends Entity {
+  readonly state: { value?: number };
 
-  constructor() {
-    super("effects");
-    this.state = reactive({});
+  constructor(readonly id: EffectId) {
+    super(id);
+    this.state = reactive({ value: undefined });
   }
 
-  get(id: EffectId): number | undefined {
-    return Reflect.get(this.state, id);
+  get(): number | undefined {
+    return this.state.value;
   }
 
-  set(id: EffectId, value: number | undefined): void {
-    Reflect.set(this.state, id, value);
-  }
-
-  entry(id: EffectId): EffectEntry {
-    return {
-      get: () => this.get(id),
-      set: (value) => this.set(id, value),
-    };
+  set(value: number | undefined): void {
+    this.state.value = value;
   }
 }

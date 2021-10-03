@@ -1,21 +1,27 @@
 import { Entity } from "@/_ecs";
 import {
+  EffectId,
   GameInteractor,
   IGameController,
   OnTickedHandler,
 } from "@/_interfaces";
-import { BuildingMetadata, RecipeMetadata, ResourceMetadata } from "@/_state";
+import {
+  BuildingMetadata,
+  EffectIds,
+  RecipeMetadata,
+  ResourceMetadata,
+} from "@/_state";
 import { SystemTimestamp } from "@/_utils/timestamp";
 
 import { EntityAdmin, EntityWatcher, GameUpdater } from ".";
 
 import {
   BuildingEntity,
-  EffectPoolEntity,
   EnvironmentEntity,
   TimersEntity,
   RecipeEntity,
   ResourceEntity,
+  EffectEntity,
 } from "../entity";
 
 import { BonfireInteractor } from "../bonfire";
@@ -49,8 +55,8 @@ class GameController implements IGameController {
 }
 
 export class Game {
-  private readonly admin: EntityAdmin = new EntityAdmin();
-  private readonly watcher: EntityWatcher = new EntityWatcher();
+  private readonly admin: EntityAdmin;
+  private readonly watcher: EntityWatcher;
   private readonly updater: GameUpdater;
 
   private readonly _systems: GameSystems;
@@ -59,9 +65,11 @@ export class Game {
   private onTickedHandler?: OnTickedHandler;
 
   constructor() {
+    this.watcher = new EntityWatcher();
+    this.admin = new EntityAdmin(this.watcher);
+
     for (const entity of this.createEntities()) {
       this.admin.add(entity);
-      this.watcher.watch(entity);
     }
 
     this._systems = new GameSystems(
@@ -91,13 +99,16 @@ export class Game {
   }
 
   *createEntities(): IterableIterator<Entity> {
+    yield new EnvironmentEntity();
+    yield new TimersEntity();
+
     for (const building of Object.values(BuildingMetadata)) {
       yield new BuildingEntity(building.id);
     }
 
-    yield new EffectPoolEntity();
-    yield new EnvironmentEntity();
-    yield new TimersEntity();
+    for (const id of EffectIds()) {
+      yield new EffectEntity(id as EffectId);
+    }
 
     for (const recipe of Object.values(RecipeMetadata)) {
       yield new RecipeEntity(recipe.id);

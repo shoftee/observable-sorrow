@@ -6,30 +6,29 @@ export type BonfireItemId =
   | BonfireBuildingId;
 
 export type ResourceId = "catnip" | "wood";
+export type ProductionEffectId = `${ResourceId}.production`;
 
-export type BuildingId = "catnip-field";
-export type BuildingCountId = `${BuildingId}-count`;
-
-export type ProductionEffectId = "catnip-production" | "wood-production";
+export type BuildingId = BonfireBuildingId;
+export type BuildingCountId = `${BuildingId}.count`;
 
 export type LimitEffectId =
-  | "catnip-limit"
-  | "catnip-limit-base"
-  | "wood-limit"
-  | "wood-limit-base";
+  | "catnip.limit"
+  | "catnip.limit.base"
+  | "wood.limit"
+  | "wood.limit.base";
 
 export type CatnipFieldEffectId =
-  | "catnip-field-production"
-  | "catnip-field-weather"
-  | "catnip-field-base-catnip";
+  | "catnip-field.weather"
+  | "catnip-field.production.catnip"
+  | "catnip-field.production.catnip.base";
 
 export type EffectId =
   | ProductionEffectId
   | LimitEffectId
   | BuildingCountId
   | CatnipFieldEffectId
-  | "weather-season-modifier"
-  | "weather-severity-modifier";
+  | "weather.modifier.season"
+  | "weather.modifier.severity";
 
 export type RecipeId = "refine-catnip";
 export type SeasonId = "spring" | "summer" | "autumn" | "winter";

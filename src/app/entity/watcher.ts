@@ -33,11 +33,11 @@ export class EntityWatcher {
     }
   }
 
-  unwatch(entity: StatefulEntity): void {
-    const handle = this.handles.get(entity.id);
+  unwatch(id: string): void {
+    const handle = this.handles.get(id);
     if (handle) {
       handle();
-      this.handles.delete(entity.id);
+      this.handles.delete(id);
     }
   }
 

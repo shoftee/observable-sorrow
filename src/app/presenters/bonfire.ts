@@ -6,11 +6,8 @@ import {
   BonfireMetadataType,
   BuildingEffectType,
   BuildingMetadata,
-  BuildingState,
-  EffectState,
   IngredientState,
   ResourceMetadata,
-  RecipeState,
 } from "@/_state";
 import { all, any } from "@/_utils/collections";
 
@@ -55,7 +52,7 @@ export class BonfireItem {
     this.flavor = meta.flavor;
 
     if (meta.intent.kind === "refine-catnip") {
-      const state = updater.get<RecipeState>(meta.intent.recipeId);
+      const state = updater.recipe(meta.intent.recipeId);
       this.ingredients = reactive(
         Array.from(state.ingredients, (item) => {
           return this.newIngredientItem(item);
@@ -65,7 +62,7 @@ export class BonfireItem {
       this.fulfilled = this.computeFulfilled(this.ingredients);
     } else if (meta.intent.kind === "buy-building") {
       const buildingId = meta.intent.buildingId;
-      const building = updater.get<BuildingState>(buildingId);
+      const building = updater.building(buildingId);
       this.level = computed(() => building.level);
       this.unlocked = computed(() => building.unlocked);
       this.ingredients = reactive(
@@ -87,12 +84,13 @@ export class BonfireItem {
     root: IRootPresenter,
     meta: BuildingEffectType,
   ): EffectItem {
-    const effects = root.get<EffectState>("effects");
+    const per = root.effect(meta.per);
+    const total = root.effect(meta.total);
     return reactive({
       id: meta.total,
       label: meta.label,
-      perLevelAmount: computed(() => effects[meta.per] ?? 0),
-      totalAmount: computed(() => effects[meta.total] ?? 0),
+      perLevelAmount: computed(() => per.value ?? 0),
+      totalAmount: computed(() => total.value ?? 0),
     });
   }
 

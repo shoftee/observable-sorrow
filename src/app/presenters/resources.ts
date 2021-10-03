@@ -1,12 +1,7 @@
 import { computed, ComputedRef, reactive } from "vue";
 
 import { ResourceId } from "@/_interfaces";
-import {
-  EffectState,
-  ResourceMetadata,
-  ResourceMetadataType,
-  ResourceState,
-} from "@/_state";
+import { ResourceMetadata, ResourceMetadataType } from "@/_state";
 
 import { IRootPresenter } from ".";
 
@@ -36,8 +31,7 @@ export class ResourcesPresenter implements IResourcePresenter {
   }
 
   private newResource(meta: ResourceMetadataType): Resource {
-    const res = this.root.get<ResourceState>(meta.id);
-    const eff = this.root.get<EffectState>("effects");
+    const res = this.root.resource(meta.id);
 
     return reactive({
       id: meta.id,
@@ -49,15 +43,21 @@ export class ResourcesPresenter implements IResourcePresenter {
       modifier:
         meta.id !== "catnip"
           ? undefined
-          : computed(() => {
-              const catnipProduction = eff["catnip-field-production"] ?? 0;
-              const weatherModifier = eff["catnip-field-weather"] ?? 0;
-              if (catnipProduction === 0 || weatherModifier === 0) {
-                return undefined;
-              } else {
-                return weatherModifier;
-              }
-            }),
+          : computed(() => this.computeCatnipModifier()),
     });
+  }
+
+  private computeCatnipModifier() {
+    const production = this.root.effect("catnip-field.production.catnip");
+    const catnipProduction = production.value ?? 0;
+
+    const weather = this.root.effect("catnip-field.weather");
+    const weatherModifier = weather.value ?? 0;
+
+    if (catnipProduction === 0 || weatherModifier === 0) {
+      return undefined;
+    } else {
+      return weatherModifier;
+    }
   }
 }

@@ -1,3 +1,1 @@
-import { EffectId } from "@/_interfaces";
-
-export type EffectState = Partial<Record<EffectId, number>>;
+export type EffectState = { value: number | undefined };

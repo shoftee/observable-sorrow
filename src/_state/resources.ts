@@ -18,15 +18,15 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   catnip: {
     id: "catnip",
     label: "resources.catnip.label",
-    limitEffect: "catnip-limit",
-    productionEffect: "catnip-production",
+    limitEffect: "catnip.limit",
+    productionEffect: "catnip.production",
     flags: {},
   },
   wood: {
     id: "wood",
     label: "resources.wood.label",
-    limitEffect: "wood-limit",
-    productionEffect: "wood-production",
+    limitEffect: "wood.limit",
+    productionEffect: "wood.production",
     flags: {},
   },
 };

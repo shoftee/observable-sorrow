@@ -34,11 +34,11 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     },
     unlockRatio: 0.3,
     effects: {
-      count: "catnip-field-count",
+      count: "catnip-field.count",
       resources: [
         {
-          per: "catnip-field-base-catnip",
-          total: "catnip-field-production",
+          per: "catnip-field.production.catnip.base",
+          total: "catnip-field.production.catnip",
           label: "building-effects.catnip-field.catnip-production.label",
         },
       ],

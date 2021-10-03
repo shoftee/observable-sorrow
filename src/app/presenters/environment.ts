@@ -1,6 +1,6 @@
 import { computed, ComputedRef, reactive } from "vue";
 
-import { EnvironmentState, SeasonsMetadata, WeatherMetadata } from "@/_state";
+import { SeasonsMetadata, WeatherMetadata } from "@/_state";
 import { SeasonId, WeatherId } from "@/_interfaces";
 
 import { IRootPresenter } from ".";
@@ -29,7 +29,7 @@ export class EnvironmentPresenter implements IEnvironmentPresenter {
   }
 
   private newCalendar(): Calendar {
-    const state = this.root.get<EnvironmentState>("environment");
+    const state = this.root.environment();
 
     return reactive({
       day: computed(() => state.day),

@@ -38,10 +38,10 @@ export class ResourceProductionSystem extends System {
       const meta = ResourceMetadata[resource.id];
 
       const limitEffect = meta.limitEffect;
-      resource.state.capacity = this.admin.effects().get(limitEffect);
+      resource.state.capacity = this.admin.effect(limitEffect).get();
 
       const productionEffect = meta.productionEffect;
-      resource.state.change = this.admin.effects().get(productionEffect) ?? 0;
+      resource.state.change = this.admin.effect(productionEffect).get() ?? 0;
     }
   }
 

@@ -1,9 +1,9 @@
-import { BuildingId, RecipeId, ResourceId } from "@/_interfaces/id";
+import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces/id";
 
 export type EntityId =
   | ResourceId
   | BuildingId
   | RecipeId
-  | "effects"
+  | EffectId
   | "environment"
   | "timers";
