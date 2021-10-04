@@ -1,7 +1,7 @@
 import { EffectId } from "../_interfaces/id";
 
 import { ExprValueStore, Expr } from ".";
-import { mapReduce } from "@/app/utils/collections";
+import { reduce } from "@/_utils/collections";
 
 export abstract class EffectExpr implements Expr {
   constructor(readonly id: EffectId) {}
@@ -55,7 +55,7 @@ class SumExpr extends EffectExpr {
   resolve(store: ExprValueStore): void {
     store.set(
       this.id,
-      mapReduce(
+      reduce(
         this.operands.values(),
         (expr: Expr) => store.get(expr.id) ?? 0,
         (acc, val) => acc + val,
@@ -96,7 +96,7 @@ class ProductExpr extends EffectExpr {
   resolve(store: ExprValueStore): void {
     store.set(
       this.id,
-      mapReduce(
+      reduce(
         this.operands.values(),
         (expr: Expr) => store.get(expr.id) ?? 0,
         (acc, val) => acc * val,
