@@ -11,7 +11,7 @@ import {
 } from "@/_state";
 import { all, any } from "@/_utils/collections";
 
-import { IRootPresenter } from ".";
+import { EffectView, IRootPresenter } from ".";
 
 export interface IBonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
@@ -20,11 +20,11 @@ export interface IBonfirePresenter {
 export class BonfirePresenter implements IBonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
 
-  constructor(private readonly root: IRootPresenter) {
+  constructor(root: IRootPresenter) {
     this.all = computed(() => {
       return Array.from(
         Object.values(BonfireMetadata),
-        (item) => new BonfireItem(item, this.root),
+        (item) => new BonfireItem(item, root),
       );
     });
   }
@@ -45,14 +45,14 @@ export class BonfireItem {
   ingredients: IngredientItem[] = [];
   effects: EffectItem[] = [];
 
-  constructor(meta: BonfireMetadataType, updater: IRootPresenter) {
+  constructor(meta: BonfireMetadataType, root: IRootPresenter) {
     this.id = meta.id;
     this.label = meta.label;
     this.description = meta.description;
     this.flavor = meta.flavor;
 
     if (meta.intent.kind === "refine-catnip") {
-      const state = updater.recipe(meta.intent.recipeId);
+      const state = root.recipe(meta.intent.recipeId);
       this.ingredients = reactive(
         Array.from(state.ingredients, (item) => {
           return this.newIngredientItem(item);
@@ -62,7 +62,7 @@ export class BonfireItem {
       this.fulfilled = this.computeFulfilled(this.ingredients);
     } else if (meta.intent.kind === "buy-building") {
       const buildingId = meta.intent.buildingId;
-      const building = updater.building(buildingId);
+      const building = root.building(buildingId);
       this.level = computed(() => building.level);
       this.unlocked = computed(() => building.unlocked);
       this.ingredients = reactive(
@@ -74,7 +74,7 @@ export class BonfireItem {
       this.fulfilled = computed(() => building.fulfilled);
       this.effects = reactive(
         Array.from(BuildingMetadata[buildingId].effects.resources, (meta) =>
-          this.newEffect(updater, meta),
+          this.newEffect(root, meta),
         ),
       );
     }
@@ -84,13 +84,11 @@ export class BonfireItem {
     root: IRootPresenter,
     meta: BuildingEffectType,
   ): EffectItem {
-    const per = root.effect(meta.per);
-    const total = root.effect(meta.total);
     return reactive({
       id: meta.total,
       label: meta.label,
-      perLevelAmount: computed(() => per.value ?? 0),
-      totalAmount: computed(() => total.value ?? 0),
+      perLevelAmount: root.effectView(meta.per),
+      totalAmount: root.effectView(meta.total),
     });
   }
 
@@ -126,6 +124,6 @@ export interface IngredientItem {
 export interface EffectItem {
   id: EffectId;
   label: string;
-  perLevelAmount: number;
-  totalAmount: number;
+  perLevelAmount: EffectView;
+  totalAmount: EffectView;
 }

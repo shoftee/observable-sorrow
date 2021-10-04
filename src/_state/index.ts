@@ -7,5 +7,6 @@ export * from "./buildings";
 export * from "./crafting";
 export * from "./effects";
 export * from "./effect-exprs";
+export * from "./effect-units";
 export * from "./environment";
 export * from "./resources";

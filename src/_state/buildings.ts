@@ -37,9 +37,32 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
       count: "catnip-field.count",
       resources: [
         {
-          per: "catnip-field.production.catnip.base",
-          total: "catnip-field.production.catnip",
-          label: "building-effects.catnip-field.catnip-production.label",
+          per: "catnip-field.catnip.base",
+          total: "catnip-field.catnip",
+          label: "building-effects.catnip-field.catnip.label",
+        },
+      ],
+    },
+  },
+  hut: {
+    id: "hut",
+    prices: {
+      ratio: 2.5,
+      base: { wood: 5 },
+    },
+    unlockRatio: 0.3,
+    effects: {
+      count: "hut.count",
+      resources: [
+        {
+          per: "hut.catpower.base",
+          total: "hut.catpower",
+          label: "building-effects.hut.catpower.label",
+        },
+        {
+          per: "hut.kittens.base",
+          total: "hut.kittens",
+          label: "building-effects.hut.kittens.label",
         },
       ],
     },

@@ -31,7 +31,22 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     label: "resources.wood.label",
     effects: {
       limit: "wood.limit",
-      production: "wood.production",
+    },
+    flags: {},
+  },
+  kittens: {
+    id: "kittens",
+    label: "resources.kittens.label",
+    effects: {
+      limit: "kittens.limit",
+    },
+    flags: {},
+  },
+  catpower: {
+    id: "catpower",
+    label: "resources.catpower.label",
+    effects: {
+      limit: "catpower.limit",
     },
     flags: {},
   },

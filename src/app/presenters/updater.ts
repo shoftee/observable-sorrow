@@ -1,5 +1,5 @@
-import { reactive } from "vue";
 import { mergeWith } from "lodash";
+import { computed, ComputedRef, reactive } from "vue";
 
 import {
   BuildingId,
@@ -12,9 +12,11 @@ import {
 import {
   BuildingState,
   EffectState,
+  EffectUnits,
   EnvironmentState,
   RecipeState,
   ResourceState,
+  UnitKind,
 } from "@/_state";
 
 export interface IRootPresenter {
@@ -23,6 +25,13 @@ export interface IRootPresenter {
   environment(): EnvironmentState;
   recipe(id: RecipeId): RecipeState;
   resource(id: ResourceId): ResourceState;
+
+  effectView(id: EffectId): ComputedRef<EffectView>;
+}
+
+export interface EffectView {
+  value: number;
+  unit: UnitKind;
 }
 
 export class Updater implements IPresenterChangeSink, IRootPresenter {
@@ -57,6 +66,13 @@ export class Updater implements IPresenterChangeSink, IRootPresenter {
 
   resource(id: ResourceId): ResourceState {
     return this.values.get(id) as unknown as ResourceState;
+  }
+
+  effectView(id: EffectId): ComputedRef<EffectView> {
+    return computed(() => ({
+      value: this.effect(id).value ?? 0,
+      unit: EffectUnits[id] ?? UnitKind.None,
+    }));
   }
 }
 

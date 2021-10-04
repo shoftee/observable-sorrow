@@ -16,7 +16,7 @@ export type BonfireMetadataType = {
 export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   "gather-catnip": {
     id: "gather-catnip",
-    intent: { kind: "gather-catnip", amount: 1 },
+    intent: { kind: "gather-catnip", amount: 100 },
     label: "bonfire.gather-catnip.label",
     description: "bonfire.gather-catnip.description",
   },
@@ -28,9 +28,20 @@ export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   },
   "catnip-field": {
     id: "catnip-field",
-    intent: { kind: "buy-building", buildingId: "catnip-field" },
+    intent: buyBuildingIntent("catnip-field"),
     label: "bonfire.catnip-field.label",
     description: "bonfire.catnip-field.description",
     flavor: "bonfire.catnip-field.flavor",
   },
+  hut: {
+    id: "hut",
+    intent: buyBuildingIntent("hut"),
+    label: "bonfire.hut.label",
+    description: "bonfire.hut.description",
+    flavor: "bonfire.hut.flavor",
+  },
 };
+
+function buyBuildingIntent(buildingId: BonfireBuildingId): BonfireIntentType {
+  return { kind: "buy-building", buildingId };
+}

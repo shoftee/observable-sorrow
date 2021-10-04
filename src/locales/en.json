@@ -56,6 +56,11 @@
       "label": "Catnip field",
       "description": "Plant some catnip to grow in the village. Fields have increased production during Spring and decreased production during Winter.",
       "flavor": "‘Nip as far as the eye can see."
+    },
+    "hut": {
+      "label": "Hut",
+      "description": "A simple home with space for 2 kittens. Kittens consume catnip to stay alive.",
+      "flavor": "The Nation of Two"
     }
   },
 
@@ -65,8 +70,16 @@
       "total": "Effects (total)"
     },
     "catnip-field": {
-      "catnip-production": {
+      "catnip": {
         "label": "Catnip production {amount}"
+      }
+    },
+    "hut": {
+      "catpower": {
+        "label": "Maximum catpower {amount}"
+      },
+      "kittens": {
+        "label": "Maximum kittens {amount}"
       }
     }
   }

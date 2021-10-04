@@ -130,12 +130,24 @@ export const EffectExpressions: EffectExpr[] = [
   // Limits
   sum("catnip.limit", [constant("catnip.limit.base", 5000)]),
   sum("wood.limit", [constant("wood.limit.base", 200)]),
+  sum("kittens.limit", [
+    product("hut.kittens", [
+      constant("hut.kittens.base", 2),
+      variable("hut.count"),
+    ]),
+  ]),
+  sum("catpower.limit", [
+    product("hut.catpower", [
+      constant("hut.catpower.base", 75),
+      variable("hut.count"),
+    ]),
+  ]),
 
   // Catnip Production
   ratio(
     "catnip.production",
-    product("catnip-field.production.catnip", [
-      constant("catnip-field.production.catnip.base", 0.125),
+    product("catnip-field.catnip", [
+      constant("catnip-field.catnip.base", 0.125),
       variable("catnip-field.count"),
     ]),
     sum("catnip-field.weather", [
@@ -143,7 +155,6 @@ export const EffectExpressions: EffectExpr[] = [
       variable("weather.modifier.severity"),
     ]),
   ),
-  variable("wood.production"),
 ];
 
 export function EffectIds(): Set<string> {

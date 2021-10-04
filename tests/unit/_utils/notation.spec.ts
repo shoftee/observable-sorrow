@@ -65,26 +65,4 @@ describe("sandcastle builder notation", () => {
       );
     });
   });
-  describe("percent", () => {
-    describe("sign formatting", () => {
-      it("should format positive numbers correctly", () => {
-        expect(n.percent(0.12, 0, "negative")).to.equal("12%");
-        expect(n.percent(0.12, 0, "always")).to.equal("+12%");
-      });
-      it("should format negative numbers correctly", () => {
-        expect(n.percent(-0.12, 0, "negative")).to.equal("-12%");
-        expect(n.percent(-0.12, 0, "always")).to.equal("-12%");
-      });
-    });
-    describe("rounding", () => {
-      it("should round positive numbers correctly", () => {
-        expect(n.percent(0.123, 0, "negative")).to.equal("12%");
-        expect(n.percent(0.127, 0, "negative")).to.equal("13%");
-      });
-      it("should round negative numbers correctly", () => {
-        expect(n.percent(-0.123, 0, "negative")).to.equal("-12%");
-        expect(n.percent(-0.127, 0, "negative")).to.equal("-13%");
-      });
-    });
-  });
 });

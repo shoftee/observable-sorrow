@@ -1,8 +1,8 @@
 import { round } from "../mathx";
 
-import { INumberNotation, ShowSign } from ".";
+import { ShowSign } from ".";
 
-export class SandcastleBuilderNotation implements INumberNotation {
+export class SandcastleBuilderNotation {
   number(value: number, precision: number, showSign: ShowSign): string {
     const signString = getSignString(value, showSign);
     let valueString: string;
@@ -14,10 +14,6 @@ export class SandcastleBuilderNotation implements INumberNotation {
     }
 
     return signString + valueString;
-  }
-
-  percent(value: number, precision: number, showSign: ShowSign): string {
-    return this.number(value * 100, precision, showSign) + "%";
   }
 }
 
@@ -51,7 +47,7 @@ function getSignString(value: number, showSign: ShowSign): string {
       break;
 
     case "always":
-      if (sign > 0) return "+";
+      if (sign >= 0) return "+";
       if (sign < 0) return "-";
       break;
   }

@@ -1,8 +1,9 @@
-import { NumberFormatter } from "@/_utils/notation";
+import { SandcastleBuilderNotation } from "@/_utils/notation";
 
 import {
   BonfirePresenter,
   EnvironmentPresenter,
+  NumberFormatter,
   ResourcesPresenter,
   Updater,
 } from ".";
@@ -17,6 +18,6 @@ export class PresenterFacade {
     this.bonfire = new BonfirePresenter(this.root);
     this.environment = new EnvironmentPresenter(this.root);
     this.resources = new ResourcesPresenter(this.root);
-    this.formatter = new NumberFormatter(3);
+    this.formatter = new NumberFormatter(3, new SandcastleBuilderNotation());
   }
 }

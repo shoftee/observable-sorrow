@@ -48,7 +48,7 @@ export class ResourcesPresenter implements IResourcePresenter {
   }
 
   private computeCatnipModifier() {
-    const production = this.root.effect("catnip-field.production.catnip");
+    const production = this.root.effect("catnip-field.catnip");
     const catnipProduction = production.value ?? 0;
 
     const weather = this.root.effect("catnip-field.weather");
