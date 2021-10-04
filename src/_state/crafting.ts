@@ -1,11 +1,11 @@
 import { RecipeId } from "@/_interfaces";
 import { IngredientState, ResourceMap, ResourcesType } from "@/_state";
 
-export type RecipeType = {
+export type RecipeType = Readonly<{
   id: RecipeId;
   ingredients: ResourcesType;
   products: ResourcesType;
-};
+}>;
 
 export const RecipeMetadata: Record<RecipeId, RecipeType> = {
   "refine-catnip": {

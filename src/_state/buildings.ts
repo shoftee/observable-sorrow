@@ -6,13 +6,13 @@ import {
 } from "@/_interfaces";
 import { IngredientState, ResourcesType } from "./common/types";
 
-export type BuildingEffectType = {
+export type BuildingEffectType = Readonly<{
   per: EffectId;
   total: EffectId;
   label: string;
-};
+}>;
 
-export type BuildingMetadataType = {
+export type BuildingMetadataType = Readonly<{
   id: BuildingId;
   unlockRatio: number;
   prices: {
@@ -23,7 +23,7 @@ export type BuildingMetadataType = {
     count: BuildingCountId;
     resources: BuildingEffectType[];
   };
-};
+}>;
 
 export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   "catnip-field": {

@@ -6,27 +6,33 @@ export enum Flag {
 
 type Flags = Partial<{ [key in keyof typeof Flag]: boolean }>;
 
-export type ResourceMetadataType = {
-  readonly id: ResourceId;
-  readonly label: string;
-  readonly limitEffect: LimitEffectId;
-  readonly productionEffect: ProductionEffectId;
-  readonly flags: Flags;
-};
+export type ResourceMetadataType = Readonly<{
+  id: ResourceId;
+  label: string;
+  effects: {
+    limit?: LimitEffectId;
+    production?: ProductionEffectId;
+  };
+  flags: Flags;
+}>;
 
 export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   catnip: {
     id: "catnip",
     label: "resources.catnip.label",
-    limitEffect: "catnip.limit",
-    productionEffect: "catnip.production",
+    effects: {
+      limit: "catnip.limit",
+      production: "catnip.production",
+    },
     flags: {},
   },
   wood: {
     id: "wood",
     label: "resources.wood.label",
-    limitEffect: "wood.limit",
-    productionEffect: "wood.production",
+    effects: {
+      limit: "wood.limit",
+      production: "wood.production",
+    },
     flags: {},
   },
 };

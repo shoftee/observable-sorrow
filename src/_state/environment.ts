@@ -1,9 +1,9 @@
 import { SeasonId, WeatherId } from "@/_interfaces";
 
-type SeasonMetadataType = {
+type SeasonMetadataType = Readonly<{
   id: SeasonId;
   label: string;
-};
+}>;
 
 export const SeasonsMetadata: Record<SeasonId, SeasonMetadataType> = {
   spring: {
@@ -24,11 +24,11 @@ export const SeasonsMetadata: Record<SeasonId, SeasonMetadataType> = {
   },
 };
 
-export type WeatherMetadataType = {
+export type WeatherMetadataType = Readonly<{
   id: WeatherId;
   adjustment: number;
   label?: string;
-};
+}>;
 
 export const WeatherMetadata: Record<WeatherId, WeatherMetadataType> = {
   neutral: {
