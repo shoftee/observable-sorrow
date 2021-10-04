@@ -63,7 +63,7 @@ export class BuildingSystem extends System {
     const multiplier = Math.pow(meta.prices.ratio, state.level);
 
     for (const ingredient of state.ingredients) {
-      const base = meta.prices.baseIngredients[ingredient.resourceId] ?? 0;
+      const base = meta.prices.base[ingredient.resourceId] ?? 0;
       ingredient.requirement = base * multiplier;
     }
   }

@@ -1,17 +1,17 @@
-import { RecipeId, ResourceId } from "@/_interfaces";
-import { IngredientState, ResourceMap } from "@/_state";
+import { RecipeId } from "@/_interfaces";
+import { IngredientState, ResourceMap, ResourcesType } from "@/_state";
 
 export type RecipeType = {
   id: RecipeId;
-  ingredients: ResourceMap;
-  products: ResourceMap;
+  ingredients: ResourcesType;
+  products: ResourcesType;
 };
 
 export const RecipeMetadata: Record<RecipeId, RecipeType> = {
   "refine-catnip": {
     id: "refine-catnip",
-    ingredients: new ResourceMap([["catnip", 100]]),
-    products: new ResourceMap([["wood", 1]]),
+    ingredients: { catnip: 100 },
+    products: { wood: 1 },
   },
 };
 
@@ -23,11 +23,9 @@ export class RecipeState {
   fulfilled = false;
 
   constructor(id: RecipeId) {
-    this.ingredients = Array.from(
-      RecipeMetadata[id].ingredients.entries(),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      ([id, amount]) => new IngredientState(id as ResourceId, amount!),
+    this.ingredients = IngredientState.fromObject(
+      RecipeMetadata[id].ingredients,
     );
-    this.products = new ResourceMap(RecipeMetadata[id].products);
+    this.products = ResourceMap.fromObject(RecipeMetadata[id].products);
   }
 }

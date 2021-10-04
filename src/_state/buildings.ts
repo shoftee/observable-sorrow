@@ -4,7 +4,7 @@ import {
   BuildingCountId,
   ResourceId,
 } from "@/_interfaces";
-import { IngredientState } from "./common/types";
+import { IngredientState, ResourcesType } from "./common/types";
 
 export type BuildingEffectType = {
   per: EffectId;
@@ -17,7 +17,7 @@ export type BuildingMetadataType = {
   unlockRatio: number;
   prices: {
     ratio: number;
-    baseIngredients: { [K in ResourceId]?: number };
+    base: ResourcesType;
   };
   effects: {
     count: BuildingCountId;
@@ -30,7 +30,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     id: "catnip-field",
     prices: {
       ratio: 1.12,
-      baseIngredients: { catnip: 10 },
+      base: { catnip: 10 },
     },
     unlockRatio: 0.3,
     effects: {
@@ -55,7 +55,7 @@ export class BuildingState {
 
   constructor(id: BuildingId) {
     const meta = BuildingMetadata[id];
-    this.ingredients = Object.entries(meta.prices.baseIngredients).map(
+    this.ingredients = Object.entries(meta.prices.base).map(
       ([id, requirement]) =>
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         new IngredientState(id as ResourceId, requirement!),
