@@ -2,16 +2,13 @@ import { computed, ComputedRef, reactive } from "vue";
 
 import { BonfireItemId, ResourceId, EffectId } from "@/_interfaces";
 import {
-  BonfireMetadata,
   BonfireMetadataType,
   BuildingEffectType,
-  BuildingMetadata,
   IngredientState,
   ResourceMetadata,
 } from "@/_state";
-import { all, any } from "@/_utils/collections";
 
-import { EffectView, IRootPresenter } from ".";
+import { EffectView, IRootPresenter, Metadata } from ".";
 
 export interface IBonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
@@ -20,76 +17,79 @@ export interface IBonfirePresenter {
 export class BonfirePresenter implements IBonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
 
-  constructor(root: IRootPresenter) {
+  constructor(private readonly root: IRootPresenter) {
     this.all = computed(() => {
-      return Array.from(
-        Object.values(BonfireMetadata),
-        (item) => new BonfireItem(item, root),
-      );
+      return Metadata.bonfireItems()
+        .map((meta) => this.newBonfireItem(meta))
+        .toArray();
     });
   }
-}
 
-export class BonfireItem {
-  id: BonfireItemId;
+  private newBonfireItem(meta: BonfireMetadataType): BonfireItem {
+    if (meta.intent.kind === "gather-catnip") {
+      return reactive({
+        id: meta.id,
+        label: meta.label,
+        description: meta.description,
+        flavor: meta.flavor,
 
-  label: string;
-  description: string;
-  flavor?: string;
+        unlocked: true,
+        capped: false,
+        fulfilled: true,
+      });
+    } else if (meta.intent.kind === "refine-catnip") {
+      const state = this.root.recipe(meta.intent.recipeId);
+      return reactive({
+        id: meta.id,
+        label: meta.label,
+        description: meta.description,
+        flavor: meta.flavor,
 
-  unlocked: ComputedRef<boolean> = computed(() => true);
-  level: ComputedRef<number> = computed(() => 0);
-  fulfilled: ComputedRef<boolean> = computed(() => true);
-  capped: ComputedRef<boolean> = computed(() => false);
-
-  ingredients: IngredientItem[] = [];
-  effects: EffectItem[] = [];
-
-  constructor(meta: BonfireMetadataType, root: IRootPresenter) {
-    this.id = meta.id;
-    this.label = meta.label;
-    this.description = meta.description;
-    this.flavor = meta.flavor;
-
-    if (meta.intent.kind === "refine-catnip") {
-      const state = root.recipe(meta.intent.recipeId);
-      this.ingredients = reactive(
-        Array.from(state.ingredients, (item) => {
-          return this.newIngredientItem(item);
-        }),
-      );
-      this.capped = this.computeCapped(this.ingredients);
-      this.fulfilled = this.computeFulfilled(this.ingredients);
-    } else if (meta.intent.kind === "buy-building") {
+        unlocked: true,
+        capped: computed(() => state.capped),
+        fulfilled: computed(() => state.fulfilled),
+        ingredients: this.ingredients(state.ingredients),
+      });
+    } else {
       const buildingId = meta.intent.buildingId;
-      const building = root.building(buildingId);
-      this.level = computed(() => building.level);
-      this.unlocked = computed(() => building.unlocked);
-      this.ingredients = reactive(
-        Array.from(building.ingredients.values(), (state) => {
-          return this.newIngredientItem(state);
-        }),
-      );
-      this.capped = computed(() => building.capped);
-      this.fulfilled = computed(() => building.fulfilled);
-      this.effects = reactive(
-        Array.from(BuildingMetadata[buildingId].effects.resources, (meta) =>
-          this.newEffect(root, meta),
-        ),
-      );
+      const state = this.root.building(buildingId);
+      return reactive({
+        id: meta.id,
+        label: meta.label,
+        description: meta.description,
+        flavor: meta.flavor,
+
+        unlocked: computed(() => state.unlocked),
+        level: computed(() => state.level),
+        capped: computed(() => state.capped),
+        fulfilled: computed(() => state.fulfilled),
+        ingredients: this.ingredients(state.ingredients),
+        effects: this.effects(Metadata.building(buildingId).effects.items),
+      });
     }
   }
 
-  private newEffect(
-    root: IRootPresenter,
-    meta: BuildingEffectType,
-  ): EffectItem {
-    return reactive({
-      id: meta.total,
-      label: meta.label,
-      perLevelAmount: root.effectView(meta.per),
-      totalAmount: root.effectView(meta.total),
-    });
+  private effects(effects: BuildingEffectType[]): EffectItem[] | undefined {
+    return reactive(
+      Array.from(effects, (meta) =>
+        reactive({
+          id: meta.total,
+          label: meta.label,
+          perLevelAmount: this.root.effectView(meta.per),
+          totalAmount: this.root.effectView(meta.total),
+        }),
+      ),
+    );
+  }
+
+  private ingredients(
+    ingredients: IngredientState[],
+  ): IngredientItem[] | undefined {
+    return reactive(
+      Array.from(ingredients, (item) => {
+        return this.newIngredientItem(item);
+      }),
+    );
   }
 
   private newIngredientItem(state: IngredientState): IngredientItem {
@@ -99,17 +99,26 @@ export class BonfireItem {
       requirement: computed(() => state.requirement),
       fulfillment: computed(() => state.fulfillment),
       fulfilled: computed(() => state.fulfilled),
+      fulfillmentTime: computed(() => state.fulfillmentTime),
       capped: computed(() => state.capped),
     });
   }
+}
 
-  private computeFulfilled(items: IngredientItem[]): ComputedRef<boolean> {
-    return computed(() => all(items.values(), (i) => i.fulfilled));
-  }
+export interface BonfireItem {
+  id: BonfireItemId;
 
-  private computeCapped(items: IngredientItem[]): ComputedRef<boolean> {
-    return computed(() => any(items.values(), (i) => i.capped));
-  }
+  label: string;
+  description: string;
+  flavor?: string;
+
+  unlocked: boolean;
+  level?: number;
+  fulfilled: boolean;
+  capped: boolean;
+
+  ingredients?: IngredientItem[];
+  effects?: EffectItem[];
 }
 
 export interface IngredientItem {
@@ -118,6 +127,7 @@ export interface IngredientItem {
   requirement: number;
   fulfillment: number;
   fulfilled: boolean;
+  fulfillmentTime?: number | undefined;
   capped: boolean;
 }
 

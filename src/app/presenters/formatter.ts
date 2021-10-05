@@ -13,4 +13,12 @@ export class NumberFormatter {
   percent(v: number, showSign: ShowSign = "negative"): string {
     return this.notation.number(v * 100, this.precision, showSign) + "%";
   }
+
+  rounded(v: number, showSign: ShowSign = "negative"): string {
+    if (Math.abs(v) >= 1) {
+      return this.notation.number(v, 0, showSign);
+    } else {
+      return this.notation.number(v, this.precision, showSign);
+    }
+  }
 }

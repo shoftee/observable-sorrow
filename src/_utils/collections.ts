@@ -1,5 +1,5 @@
 export function reduce<T, TResult>(
-  iterable: IterableIterator<T>,
+  iterable: Iterable<T>,
   map: (item: T) => TResult,
   reduce: (accumulator: TResult, current: TResult) => TResult,
   initial: TResult,
@@ -12,16 +12,28 @@ export function reduce<T, TResult>(
   return accumulator;
 }
 
+// Returns true iff no provided entries map to false.
 export function all<T>(
-  iterable: IterableIterator<T>,
+  iterable: Iterable<T>,
   map: (item: T) => boolean,
 ): boolean {
-  return reduce(iterable, map, (acc, val) => acc && val, true);
+  for (const item of iterable) {
+    if (map(item) === false) {
+      return false;
+    }
+  }
+  return true;
 }
 
+// Returns true iff a provided entry maps to true.
 export function any<T>(
-  iterable: IterableIterator<T>,
+  iterable: Iterable<T>,
   map: (item: T) => boolean,
 ): boolean {
-  return reduce(iterable, map, (acc, val) => acc || val, false);
+  for (const item of iterable) {
+    if (map(item) === true) {
+      return true;
+    }
+  }
+  return false;
 }

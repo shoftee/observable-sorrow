@@ -1,8 +1,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
 
 import { Presenters } from "@/app/os";
-import { useI18n } from "vue-i18n";
 
 export default defineComponent({
   props: {
@@ -13,8 +13,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-    const formatter = Presenters.formatter;
-    return { t, formatter };
+    return { t, fmt: Presenters.formatter };
   },
 });
 </script>
@@ -31,10 +30,16 @@ export default defineComponent({
           {{ t(item.label) }}
         </div>
         <div class="ingredient-fulfillment number">
-          <span v-if="!item.fulfilled">
-            {{ formatter.number(item.fulfillment, "negative") }} /
-          </span>
-          {{ formatter.number(item.requirement, "negative") }}
+          <template v-if="!item.fulfilled">
+            {{ fmt.number(item.fulfillment) }} /
+            {{ fmt.number(item.requirement) }}
+            <template v-if="item.fulfillmentTime">
+              (≈{{ fmt.rounded(item.fulfillmentTime) }}t)
+            </template>
+          </template>
+          <template v-else>
+            {{ fmt.number(item.requirement) }}
+          </template>
         </div>
       </li>
     </ul>

@@ -10,6 +10,7 @@ export class IngredientState {
   readonly resourceId: ResourceId;
   requirement: number;
 
+  fulfillmentTime: number | undefined;
   fulfillment = 0;
   capped = false;
   fulfilled = true;

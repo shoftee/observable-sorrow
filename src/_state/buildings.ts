@@ -21,7 +21,7 @@ export type BuildingMetadataType = Readonly<{
   };
   effects: {
     count: BuildingCountId;
-    resources: BuildingEffectType[];
+    items: BuildingEffectType[];
   };
 }>;
 
@@ -35,7 +35,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     unlockRatio: 0.3,
     effects: {
       count: "catnip-field.count",
-      resources: [
+      items: [
         {
           per: "catnip-field.catnip.base",
           total: "catnip-field.catnip",
@@ -53,7 +53,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     unlockRatio: 0.3,
     effects: {
       count: "hut.count",
-      resources: [
+      items: [
         {
           per: "hut.catpower.base",
           total: "hut.catpower",

@@ -15,14 +15,14 @@ export default defineComponent({
     const { t } = { ...useI18n() };
     const events = inject(KeyboardEventsKey);
 
-    const formatter = Presenters.formatter;
+    const fmt = Presenters.formatter;
     const format = (v: EffectView) => {
       if (v.unit === UnitKind.Percent) {
-        return formatter.percent(v.value, "always");
+        return fmt.percent(v.value, "always");
       } else if (v.unit === UnitKind.PerTick) {
-        return formatter.number(v.value, "always") + "/t";
+        return fmt.number(v.value, "always") + "/t";
       } else {
-        return formatter.number(v.value, "always");
+        return fmt.number(v.value, "always");
       }
     };
 

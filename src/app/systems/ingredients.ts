@@ -36,7 +36,18 @@ export class IngredientsSystem extends System {
   private updateIngredient(ingredient: IngredientState) {
     const resource = this.admin.resource(ingredient.resourceId).state;
     ingredient.fulfillment = resource.amount;
-    ingredient.fulfilled = ingredient.fulfillment >= ingredient.requirement;
+
+    if (ingredient.fulfillment >= ingredient.requirement) {
+      ingredient.fulfilled = true;
+      ingredient.fulfillmentTime = undefined;
+    } else {
+      ingredient.fulfilled = false;
+      if (resource.change > 0) {
+        const remaining = ingredient.requirement - ingredient.fulfillment;
+        ingredient.fulfillmentTime = remaining / resource.change;
+      }
+    }
+
     ingredient.capped =
       !resource.capacity || ingredient.requirement > resource.capacity;
   }

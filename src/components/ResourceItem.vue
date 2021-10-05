@@ -14,9 +14,8 @@ export default defineComponent({
   },
   setup() {
     const { t } = { ...useI18n() };
-
-    const formatter = Presenters.formatter;
-    return { t, formatter };
+    const fmt = Presenters.formatter;
+    return { t, fmt };
   },
 });
 </script>
@@ -33,15 +32,15 @@ export default defineComponent({
           'bg-danger': item.modifier < 0,
         }"
       >
-        {{ formatter.percent(item.modifier, "always") }}
+        {{ fmt.percent(item.modifier, "always") }}
       </span>
     </div>
     <div class="col-3 number amount">
-      {{ formatter.number(item.amount, "negative") }}
+      {{ fmt.number(item.amount, "negative") }}
     </div>
     <template v-if="item.capacity">
       <div class="col-3 number capacity">
-        / {{ formatter.number(item.capacity, "negative") }}
+        / {{ fmt.number(item.capacity, "negative") }}
       </div>
     </template>
     <template v-else>
@@ -49,7 +48,7 @@ export default defineComponent({
     </template>
     <template v-if="item.change">
       <div class="col-3 number change">
-        {{ formatter.number(item.change, "always") }}/t
+        {{ fmt.number(item.change, "always") }}/t
       </div>
     </template>
     <template v-else>

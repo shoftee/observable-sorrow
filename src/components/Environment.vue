@@ -7,11 +7,11 @@ import { Presenters } from "@/app/os";
 export default defineComponent({
   setup() {
     const { t } = { ...useI18n() };
-    const formatter = Presenters.formatter;
 
+    const fmt = Presenters.formatter;
     const state = readonly(Presenters.environment.calendar.value);
 
-    return { t, formatter, state };
+    return { t, fmt, state };
   },
 });
 </script>
@@ -21,9 +21,7 @@ export default defineComponent({
     <div class="align-self-stretch">
       <i18n-t scope="global" :keypath="state.calendarLabel" tag="span">
         <template #year>
-          <span class="number">{{
-            formatter.number(state.year, "negative")
-          }}</span>
+          <span class="number">{{ fmt.number(state.year) }}</span>
         </template>
         <template #season>{{ t(state.seasonLabel) }}</template>
         <template #weather>
