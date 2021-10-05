@@ -2,13 +2,13 @@
 import { defineComponent, PropType } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { Resource } from "@/app/presenters/resources";
+import { ResourceItem } from "@/app/presenters/resources";
 import { Presenters } from "@/app/os";
 
 export default defineComponent({
   props: {
     item: {
-      type: Object as PropType<Resource>,
+      type: Object as PropType<ResourceItem>,
       required: true,
     },
   },

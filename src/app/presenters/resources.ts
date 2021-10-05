@@ -1,36 +1,22 @@
 import { computed, ComputedRef, reactive } from "vue";
 
 import { ResourceId } from "@/_interfaces";
-import { ResourceMetadata, ResourceMetadataType } from "@/_state";
+import { Meta, ResourceMetadataType } from "@/_state";
 
 import { IRootPresenter } from ".";
 
-export interface Resource {
-  readonly id: ResourceId;
-  label: string;
-  unlocked: boolean;
-  amount: number;
-  change: number;
-  capacity?: number;
-  modifier?: number;
-}
-
-export interface IResourcePresenter {
-  readonly all: ComputedRef<Resource[]>;
-}
-
-export class ResourcesPresenter implements IResourcePresenter {
-  readonly all: ComputedRef<Resource[]>;
+export class ResourcesPresenter {
+  readonly all: ComputedRef<ResourceItem[]>;
 
   constructor(private readonly root: IRootPresenter) {
     this.all = computed(() =>
-      Array.from(Object.values(ResourceMetadata), (meta) =>
-        this.newResource(meta),
-      ),
+      Meta.resources()
+        .map((meta) => this.newResource(meta))
+        .toArray(),
     );
   }
 
-  private newResource(meta: ResourceMetadataType): Resource {
+  private newResource(meta: ResourceMetadataType): ResourceItem {
     const res = this.root.resource(meta.id);
 
     return reactive({
@@ -60,4 +46,14 @@ export class ResourcesPresenter implements IResourcePresenter {
       return weatherModifier;
     }
   }
+}
+
+export interface ResourceItem {
+  readonly id: ResourceId;
+  label: string;
+  unlocked: boolean;
+  amount: number;
+  change: number;
+  capacity?: number;
+  modifier?: number;
 }

@@ -5,21 +5,17 @@ import {
   BonfireMetadataType,
   BuildingEffectType,
   IngredientState,
-  ResourceMetadata,
+  Meta,
 } from "@/_state";
 
-import { EffectView, IRootPresenter, Metadata } from ".";
+import { EffectView, IRootPresenter } from ".";
 
-export interface IBonfirePresenter {
-  readonly all: ComputedRef<BonfireItem[]>;
-}
-
-export class BonfirePresenter implements IBonfirePresenter {
+export class BonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
 
   constructor(private readonly root: IRootPresenter) {
     this.all = computed(() => {
-      return Metadata.bonfireItems()
+      return Meta.bonfireItems()
         .map((meta) => this.newBonfireItem(meta))
         .toArray();
     });
@@ -48,7 +44,8 @@ export class BonfirePresenter implements IBonfirePresenter {
         unlocked: true,
         capped: computed(() => state.capped),
         fulfilled: computed(() => state.fulfilled),
-        ingredients: this.ingredients(state.ingredients),
+
+        ingredients: computed(() => this.ingredients(state.ingredients)),
       });
     } else {
       const buildingId = meta.intent.buildingId;
@@ -63,45 +60,38 @@ export class BonfirePresenter implements IBonfirePresenter {
         level: computed(() => state.level),
         capped: computed(() => state.capped),
         fulfilled: computed(() => state.fulfilled),
-        ingredients: this.ingredients(state.ingredients),
-        effects: this.effects(Metadata.building(buildingId).effects.items),
+
+        ingredients: computed(() => this.ingredients(state.ingredients)),
+        effects: computed(() =>
+          this.effects(Meta.building(buildingId).effects.items),
+        ),
       });
     }
   }
 
-  private effects(effects: BuildingEffectType[]): EffectItem[] | undefined {
-    return reactive(
-      Array.from(effects, (meta) =>
-        reactive({
-          id: meta.total,
-          label: meta.label,
-          perLevelAmount: this.root.effectView(meta.per),
-          totalAmount: this.root.effectView(meta.total),
-        }),
-      ),
-    );
-  }
-
-  private ingredients(
-    ingredients: IngredientState[],
-  ): IngredientItem[] | undefined {
-    return reactive(
-      Array.from(ingredients, (item) => {
-        return this.newIngredientItem(item);
+  private effects(effects: BuildingEffectType[]): EffectItem[] {
+    return Array.from(effects, (meta) =>
+      reactive({
+        id: meta.total,
+        label: meta.label,
+        perLevelAmount: this.root.effectView(meta.per),
+        totalAmount: this.root.effectView(meta.total),
       }),
     );
   }
 
-  private newIngredientItem(state: IngredientState): IngredientItem {
-    return reactive({
-      id: state.resourceId,
-      label: ResourceMetadata[state.resourceId].label,
-      requirement: computed(() => state.requirement),
-      fulfillment: computed(() => state.fulfillment),
-      fulfilled: computed(() => state.fulfilled),
-      fulfillmentTime: computed(() => state.fulfillmentTime),
-      capped: computed(() => state.capped),
-    });
+  private ingredients(ingredients: IngredientState[]): IngredientItem[] {
+    return Array.from(ingredients, (state) =>
+      reactive({
+        id: state.resourceId,
+        label: Meta.resource(state.resourceId).label,
+        requirement: computed(() => state.requirement),
+        fulfillment: computed(() => state.fulfillment),
+        fulfilled: computed(() => state.fulfilled),
+        fulfillmentTime: computed(() => state.fulfillmentTime),
+        capped: computed(() => state.capped),
+      }),
+    );
   }
 }
 

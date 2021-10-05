@@ -1,6 +1,6 @@
 import { SeasonId, WeatherId } from "@/_interfaces";
 
-type SeasonMetadataType = Readonly<{
+export type SeasonMetadataType = Readonly<{
   id: SeasonId;
   label: string;
 }>;
