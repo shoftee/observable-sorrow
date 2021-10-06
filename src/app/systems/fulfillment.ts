@@ -3,7 +3,7 @@ import { all, any } from "@/_utils/collections";
 
 import { System } from ".";
 
-export class IngredientsSystem extends System {
+export class FulfillmentSystem extends System {
   update(): void {
     this.updateRecipeIngredients();
     this.updateBuildingIngredients();

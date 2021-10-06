@@ -5,7 +5,7 @@ export * from "./buildings";
 export * from "./crafting";
 export * from "./environment";
 export * from "./effects";
-export * from "./ingredients";
+export * from "./fulfillment";
 export * from "./lock-toggle";
 export * from "./resource-production";
 

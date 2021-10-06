@@ -4,7 +4,7 @@ import {
   CraftingSystem,
   EffectsSystem,
   EnvironmentSystem,
-  IngredientsSystem,
+  FulfillmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
 } from ".";
@@ -15,7 +15,7 @@ export class GameSystems {
     readonly crafting: CraftingSystem,
     readonly effects: EffectsSystem,
     readonly environment: EnvironmentSystem,
-    readonly ingredients: IngredientsSystem,
+    readonly fulfillment: FulfillmentSystem,
     readonly lockToggle: LockToggleSystem,
     readonly resourceProduction: ResourceProductionSystem,
   ) {}
@@ -43,7 +43,7 @@ export class GameSystems {
     this.resourceProduction.update();
 
     // Handle ingredient counts.
-    this.ingredients.update();
+    this.fulfillment.update();
 
     // Lock/unlock elements.
     this.lockToggle.update();

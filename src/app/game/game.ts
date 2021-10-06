@@ -30,11 +30,11 @@ import {
   BuildingSystem,
   CraftingSystem,
   GameSystems,
-  EnvironmentSystem,
   EffectsSystem,
+  EnvironmentSystem,
+  FulfillmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
-  IngredientsSystem,
 } from "../systems";
 
 class GameController implements IGameController {
@@ -78,7 +78,7 @@ export class Game {
       new CraftingSystem(this.admin),
       new EffectsSystem(this.admin),
       new EnvironmentSystem(this.admin),
-      new IngredientsSystem(this.admin),
+      new FulfillmentSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
     );
