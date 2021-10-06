@@ -25,6 +25,7 @@ export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
     intent: { kind: "refine-catnip", recipeId: "refine-catnip" },
     label: "bonfire.refine-catnip.label",
     description: "bonfire.refine-catnip.description",
+    flavor: "bonfire.refine-catnip.flavor",
   },
   "catnip-field": {
     id: "catnip-field",

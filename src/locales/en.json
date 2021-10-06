@@ -50,7 +50,8 @@
     },
     "refine-catnip": {
       "label": "Refine catnip",
-      "description": "Refine catnip into catnip wood."
+      "description": "Use your mystical kitten powers to convert catnip into wood.",
+      "flavor": "So… tired…"
     },
     "catnip-field": {
       "label": "Catnip field",
