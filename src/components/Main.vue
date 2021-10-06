@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Resources from "./Resources.vue";
-import Controls from "./Controls.vue";
+import Resources from "./Resource/List.vue";
+import BonfireControls from "./Controls/Bonfire.vue";
 import Environment from "./Environment.vue";
 import History from "./History.vue";
 </script> 
@@ -14,7 +14,7 @@ import History from "./History.vue";
     </div>
     <div class="scrollable col-5 py-2 px-1">
       <div>
-        <Controls />
+        <BonfireControls />
       </div>
     </div>
     <div class="scrollable col p-2 ps-1 d-flex flex-column gap-2">

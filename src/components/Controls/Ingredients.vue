@@ -4,8 +4,9 @@ import { useI18n } from "vue-i18n";
 import { IngredientItem } from "@/app/presenters";
 import { useFormatter } from "@/composables/presenters";
 
-const { t } = { ...useI18n() };
 const { items } = defineProps<{ items: IngredientItem[] }>();
+
+const { t } = { ...useI18n() };
 const fmt = useFormatter();
 </script>
 
@@ -20,7 +21,7 @@ const fmt = useFormatter();
             {{ fmt.number(item.requirement) }}
             <template
               v-if="item.fulfillmentTime"
-            >(≈{{ fmt.rounded(item.fulfillmentTime) }}t)</template>
+            >({{ fmt.rounded(item.fulfillmentTime) }}t)</template>
           </template>
           <template v-else>{{ fmt.number(item.requirement) }}</template>
         </div>

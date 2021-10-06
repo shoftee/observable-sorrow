@@ -2,14 +2,15 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+import Item from "./Item.vue";
+
 import { getUnlockedResources } from "@/composables/presenters";
 
 const { t } = { ...useI18n() };
+
 const show = ref(true);
 const resources = getUnlockedResources()
 const isEmpty = computed(() => resources.value.length == 0);
-
-import ResourceItem from "./ResourceItem.vue";
 </script>
 
 <template>
@@ -26,7 +27,7 @@ import ResourceItem from "./ResourceItem.vue";
       </button>
       <ul v-if="show" class="resources-list">
         <li v-for="resource in resources" :key="resource.id">
-          <ResourceItem :item="resource" class="w-100" />
+          <Item :item="resource" class="w-100" />
         </li>
       </ul>
     </div>

@@ -15,10 +15,6 @@ export class NumberFormatter {
   }
 
   rounded(v: number, showSign: ShowSign = "negative"): string {
-    if (Math.abs(v) >= 1) {
-      return this.notation.number(v, 0, showSign);
-    } else {
-      return this.notation.number(v, this.precision, showSign);
-    }
+    return this.notation.number(v, 0, showSign);
   }
 }

@@ -3,20 +3,19 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
+import Ingredients from "./Ingredients.vue";
+import Effects from "./Effects.vue";
+
 import { BonfireItemId } from "@/_interfaces";
 import { Interactor } from "@/app/os";
 import { BonfireItem } from "@/app/presenters";
 
-import Ingredients from "./Ingredients.vue";
-import Effects from "./Effects.vue";
-
 const { item } = defineProps<{ item: BonfireItem }>();
 
+const { t } = { ...useI18n() };
 const level = computed(() => item.level ?? 0)
 const ingredients = computed(() => item.ingredients ?? []);
 const effects = computed(() => item.effects ?? []);
-
-const { t } = { ...useI18n() };
 
 async function buildItem(id: BonfireItemId): Promise<void> {
   await Interactor.buildItem(id);
@@ -38,7 +37,6 @@ async function buildItem(id: BonfireItemId): Promise<void> {
         <span v-if="level > 0" class="structure-level">{{ level }}</span>
       </button>
     </div>
-
     <template #content>
       <div>
         <div class="card-header">

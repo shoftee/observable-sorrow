@@ -1,13 +1,17 @@
 @import "/node_modules/bootstrap/scss/bootstrap.scss";
 @import "/node_modules/bootstrap/scss/badge";
 
-// global changes
+// Global changes
 .btn {
   @extend .btn-light;
 }
 
 body {
   @extend .user-select-none;
+}
+
+.badge {
+  @extend .p-1;
 }
 
 // tippy changes
@@ -109,7 +113,7 @@ ul.resources-list {
     @extend .p-1, .small, .list-group-item;
 
     & .resource-modifier {
-      @extend .ms-1, .p-1, .badge, .number;
+      @extend .ms-1, .badge, .number;
     }
   }
 }

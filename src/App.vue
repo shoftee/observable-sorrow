@@ -1,29 +1,19 @@
-<script lang="ts">
-import { defineComponent, provide } from "vue";
-
-import {
-  KeyboardEventsKey,
-  useKeyboardEvents,
-} from "./composables/keyboard-events";
-
+<script setup lang="ts">
+import { provide } from "vue";
 import Main from "./components/Main.vue";
-export default defineComponent({
-  components: { Main },
-  setup() {
-    const events = useKeyboardEvents();
-    provide(KeyboardEventsKey, events);
-    return { events };
-  },
-});
+import { KeyboardEventsKey, useKeyboardEvents } from "./composables/keyboard-events";
+
+const events = useKeyboardEvents()
+provide(KeyboardEventsKey, events);
 </script>
 
 <template>
   <div class="w-100 h-100 d-flex flex-column">
-    <header
-      class="d-flex flex-row align-items-center justify-content-start gap-1"
-    >
+    <header class="d-flex flex-row align-items-center justify-content-start gap-1">
       <div>Observable Sorrow</div>
-      <div class="badge bg-success"><i class="bi bi-droplet"></i> &beta;</div>
+      <div class="badge bg-success">
+        <i class="bi bi-droplet"></i> &beta;
+      </div>
     </header>
     <main class="h-100 scrollable d-flex justify-content-center">
       <Main class="w-100" />

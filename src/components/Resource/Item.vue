@@ -6,8 +6,10 @@ import { ResourceItem } from "@/app/presenters/resources";
 import { useFormatter } from "@/composables/presenters";
 
 const { item } = defineProps<{ item: ResourceItem }>();
-const { amount, capacity, change, modifier } = toRefs(item);
+
 const { t } = { ...useI18n() };
+
+const { amount, capacity, change, modifier } = toRefs(item);
 const fmt = useFormatter();
 </script>
 
@@ -26,7 +28,9 @@ const fmt = useFormatter();
     </div>
     <div class="col-3 number amount">{{ fmt.number(amount, "negative") }}</div>
     <template v-if="capacity">
-      <div class="col-3 number capacity">/ {{ fmt.number(capacity, "negative") }}</div>
+      <div class="col-3 number capacity">
+        <span>/{{ fmt.number(capacity, "negative") }}</span>
+      </div>
     </template>
     <template v-else>
       <div class="col-3 no-capacity"></div>
