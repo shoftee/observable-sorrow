@@ -1,19 +1,12 @@
-<script lang="ts">
-import { defineComponent, readonly } from "vue";
+<script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import { Presenters } from "@/app/os";
+import { getCalendar, useFormatter } from "@/composables/presenters";
 
-export default defineComponent({
-  setup() {
-    const { t } = { ...useI18n() };
+const { t } = { ...useI18n() };
 
-    const fmt = Presenters.formatter;
-    const state = readonly(Presenters.environment.calendar.value);
-
-    return { t, fmt, state };
-  },
-});
+const state = getCalendar();
+const fmt = useFormatter();
 </script>
 
 <template>
@@ -25,9 +18,7 @@ export default defineComponent({
         </template>
         <template #season>{{ t(state.seasonLabel) }}</template>
         <template #weather>
-          <span v-if="state.weatherLabel">
-            {{ t(state.weatherLabel) }}
-          </span>
+          <span v-if="state.weatherLabel">{{ t(state.weatherLabel) }}</span>
         </template>
         <template #day>
           <span class="number">{{ state.day }}</span>

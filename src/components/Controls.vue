@@ -1,18 +1,8 @@
-<script lang="ts">
-import { computed, defineComponent, reactive } from "vue";
-
-import { Presenters } from "@/app/os";
-
+<script setup lang="ts">
 import BuildingButton from "./BuildingButton.vue";
 
-export default defineComponent({
-  components: { BuildingButton },
-  setup() {
-    const all = reactive(Presenters.bonfire.all.value);
-    const items = computed(() => all.filter((m) => m.unlocked));
-    return { items };
-  },
-});
+import { getUnlockedBonfireItems } from "@/composables/presenters";
+const items = getUnlockedBonfireItems();
 </script>
 
 <template>

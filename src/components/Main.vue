@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import Resources from "./Resources.vue";
+import Controls from "./Controls.vue";
+import Environment from "./Environment.vue";
+import History from "./History.vue";
+</script> 
+
 <template>
   <div class="main-container d-flex flex-row scrollable">
     <div class="scrollable col p-2 pe-1">
@@ -20,20 +27,3 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Resources from "./Resources.vue";
-import Controls from "./Controls.vue";
-import Environment from "./Environment.vue";
-import History from "./History.vue";
-
-import { defineComponent } from "vue";
-export default defineComponent({
-  components: {
-    Resources,
-    Controls,
-    Environment,
-    History,
-  },
-});
-</script> 

@@ -1,6 +1,6 @@
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { BonfireItemId } from "@/_interfaces";
@@ -10,21 +10,17 @@ import { BonfireItem } from "@/app/presenters";
 import Ingredients from "./Ingredients.vue";
 import Effects from "./Effects.vue";
 
-export default defineComponent({
-  props: {
-    item: Object as PropType<BonfireItem>,
-  },
-  components: { Ingredients, Effects },
-  setup() {
-    const { t } = { ...useI18n() };
-    return { t };
-  },
-  methods: {
-    async buildItem(id: BonfireItemId) {
-      await Interactor.buildItem(id);
-    },
-  },
-});
+const { item } = defineProps<{ item: BonfireItem }>();
+
+const level = computed(() => item.level ?? 0)
+const ingredients = computed(() => item.ingredients ?? []);
+const effects = computed(() => item.effects ?? []);
+
+const { t } = { ...useI18n() };
+
+async function buildItem(id: BonfireItemId): Promise<void> {
+  await Interactor.buildItem(id);
+}
 </script>
 
 <template>
@@ -39,9 +35,7 @@ export default defineComponent({
         @click="buildItem(item.id)"
       >
         {{ t(item.label) }}
-        <span v-if="item.level > 0" class="structure-level">
-          {{ item.level }}
-        </span>
+        <span v-if="level > 0" class="structure-level">{{ level }}</span>
       </button>
     </div>
 
@@ -49,15 +43,10 @@ export default defineComponent({
       <div>
         <div class="card-header">
           <p class="description">{{ t(item.description) }}</p>
-          <p class="flavor" v-if="item.flavor">
-            {{ t(item.flavor) }}
-          </p>
+          <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
         </div>
-        <Ingredients
-          v-if="item.ingredients?.length > 0"
-          :items="item.ingredients"
-        />
-        <Effects v-if="item.effects?.length > 0" :items="item.effects" />
+        <Ingredients v-if="ingredients.length > 0" :items="ingredients" />
+        <Effects v-if="effects.length > 0" :items="effects" />
       </div>
     </template>
   </tippy>

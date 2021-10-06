@@ -1,23 +1,14 @@
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { ResourceItem } from "@/app/presenters/resources";
-import { Presenters } from "@/app/os";
+import { useFormatter } from "@/composables/presenters";
 
-export default defineComponent({
-  props: {
-    item: {
-      type: Object as PropType<ResourceItem>,
-      required: true,
-    },
-  },
-  setup() {
-    const { t } = { ...useI18n() };
-    const fmt = Presenters.formatter;
-    return { t, fmt };
-  },
-});
+const { item } = defineProps<{ item: ResourceItem }>();
+const { amount, capacity, change, modifier } = toRefs(item);
+const { t } = { ...useI18n() };
+const fmt = useFormatter();
 </script>
 
 <template>
@@ -25,31 +16,23 @@ export default defineComponent({
     <div class="name col-3">
       <span>{{ t(item.label) }}</span>
       <span
-        v-if="item.modifier"
+        v-if="modifier"
         class="resource-modifier number"
         :class="{
-          'bg-success': item.modifier > 0,
-          'bg-danger': item.modifier < 0,
+          'bg-success': modifier > 0,
+          'bg-danger': modifier < 0,
         }"
-      >
-        {{ fmt.percent(item.modifier, "always") }}
-      </span>
+      >{{ fmt.percent(modifier, "always") }}</span>
     </div>
-    <div class="col-3 number amount">
-      {{ fmt.number(item.amount, "negative") }}
-    </div>
-    <template v-if="item.capacity">
-      <div class="col-3 number capacity">
-        / {{ fmt.number(item.capacity, "negative") }}
-      </div>
+    <div class="col-3 number amount">{{ fmt.number(amount, "negative") }}</div>
+    <template v-if="capacity">
+      <div class="col-3 number capacity">/ {{ fmt.number(capacity, "negative") }}</div>
     </template>
     <template v-else>
       <div class="col-3 no-capacity"></div>
     </template>
-    <template v-if="item.change">
-      <div class="col-3 number change">
-        {{ fmt.number(item.change, "always") }}/t
-      </div>
+    <template v-if="change">
+      <div class="col-3 number change">{{ fmt.number(change, "always") }}/t</div>
     </template>
     <template v-else>
       <div class="col-3 no-change"></div>
