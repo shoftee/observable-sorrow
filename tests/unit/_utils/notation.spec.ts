@@ -20,7 +20,7 @@ describe("sandcastle builder notation", () => {
     it("should format sign correctly", () => {
       expect(n.number(1234.567, 3, "always")).to.equal("+1234.567");
       expect(n.number(-1234.567, 3, "always")).to.equal("-1234.567");
-      expect(n.number(0, 3, "always")).to.equal("0");
+      expect(n.number(0, 3, "always")).to.equal("+0");
     });
     it("should format numbers less than 9e3", () => {
       expect(n.number(1234.56789, 3, "negative")).to.equal("1234.568");
@@ -56,6 +56,9 @@ describe("sandcastle builder notation", () => {
     it("should format Infinity correctly", () => {
       expect(n.number(Number.POSITIVE_INFINITY, 3, "negative")).to.equal(
         "Infinity",
+      );
+      expect(n.number(Number.NEGATIVE_INFINITY, 3, "negative")).to.equal(
+        "-Infinity",
       );
       expect(n.number(Number.POSITIVE_INFINITY, 3, "always")).to.equal(
         "+Infinity",
