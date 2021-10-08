@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { provide } from "vue";
 import Main from "./components/Main.vue";
-import { KeyboardEventsKey, useKeyboardEvents } from "./composables/keyboard-events";
+import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
 
-const events = useKeyboardEvents()
-provide(KeyboardEventsKey, events);
+provide(KeyboardEventsKey, getKeyboardEvents());
 </script>
 
 <template>
@@ -15,7 +14,12 @@ provide(KeyboardEventsKey, events);
         <i class="bi bi-droplet"></i> &beta;
       </div>
     </header>
-    <main class="h-100 scrollable d-flex justify-content-center">
+    <main class="h-100 scrollable d-flex flex-column">
+      <ul class="nav nav-tabs justify-content-center">
+        <li class="nav-item">
+          <button class="nav-link active">Bonfire</button>
+        </li>
+      </ul>
       <Main class="w-100" />
     </main>
     <footer class="d-flex flex-row justify-content-end">

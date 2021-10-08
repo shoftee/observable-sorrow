@@ -9,7 +9,7 @@ export interface KeyboardEvents {
 export const KeyboardEventsKey: InjectionKey<KeyboardEvents> =
   Symbol("KeyboardEvents");
 
-export function useKeyboardEvents(): KeyboardEvents {
+export function getKeyboardEvents(): KeyboardEvents {
   const keys = reactive({
     ctrl: false,
     shift: false,

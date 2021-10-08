@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import Resources from "./Resource/List.vue";
-import BonfireControls from "./Controls/Bonfire.vue";
 import Environment from "./Environment.vue";
 import History from "./History.vue";
+
+import BonfireControls from "./Controls/Bonfire.vue";
 </script> 
 
 <template>

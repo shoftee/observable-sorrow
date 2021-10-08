@@ -14,6 +14,16 @@ body {
   @extend .p-1;
 }
 
+// Tabs
+main .nav {
+  margin-top: calc(-2.5rem + 2px);
+
+  @extend .pt-1;
+  & .nav-item .nav-link {
+    @extend .py-1, .px-2, .mx-1;
+  }
+}
+
 // tippy changes
 $tippy-bg-color: $light;
 $tippy-border-color: $dark;
