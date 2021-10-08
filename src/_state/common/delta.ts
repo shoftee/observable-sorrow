@@ -23,10 +23,16 @@ export class ResourceDelta {
   }
 
   addDebit(n: number): void {
+    if (n < 0) {
+      throw new Error("the specified value must be non-negative");
+    }
     this._debit += n;
   }
 
   addCredit(n: number): void {
+    if (n < 0) {
+      throw new Error("the specified value must be non-negative");
+    }
     this._credit += n;
   }
 

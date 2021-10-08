@@ -1,7 +1,7 @@
 import { BonfireItemId, IBonfireInteractor } from "@/_interfaces";
 
 import { BonfireMetadata } from "@/_state/bonfire";
-import { EntityAdmin } from "../entity";
+import { EntityAdmin, OrderStatus } from "../entity";
 
 export class BonfireInteractor implements IBonfireInteractor {
   constructor(private readonly admin: EntityAdmin) {}
@@ -13,13 +13,21 @@ export class BonfireInteractor implements IBonfireInteractor {
         this.admin.resource("catnip").delta.addDebit(metadata.intent.amount);
         break;
 
-      case "refine-catnip":
-        this.admin.recipe("refine-catnip").manualCraft = true;
+      case "refine-catnip": {
+        const entity = this.admin.recipe("refine-catnip");
+        if (entity.status === OrderStatus.READY) {
+          entity.status = OrderStatus.ORDERED;
+        }
         break;
+      }
 
-      case "buy-building":
-        this.admin.building(metadata.intent.buildingId).manualConstruct = true;
+      case "buy-building": {
+        const entity = this.admin.building(metadata.intent.buildingId);
+        if (entity.status === OrderStatus.READY) {
+          entity.status = OrderStatus.ORDERED;
+        }
         break;
+      }
     }
   }
 }

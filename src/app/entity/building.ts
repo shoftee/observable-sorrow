@@ -7,18 +7,19 @@ import {
   BuildingMetadataType,
   BuildingState,
 } from "@/_state";
+import { OrderStatus } from ".";
 
 export class BuildingEntity extends Entity {
   readonly meta: BuildingMetadataType;
   readonly state: BuildingState;
 
-  manualConstruct: boolean;
+  status: OrderStatus;
 
   constructor(readonly id: BuildingId) {
     super(id);
     this.meta = BuildingMetadata[id];
     this.state = reactive(new BuildingState(this.id));
 
-    this.manualConstruct = false;
+    this.status = OrderStatus.READY;
   }
 }

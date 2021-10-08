@@ -1,6 +1,7 @@
-import { ResourceMetadata } from "@/_state";
+import { ResourceDelta, ResourceMetadata, ResourceState } from "@/_state";
 
-import { EntityAdmin, ResourceEntity } from "../entity";
+import { EntityAdmin } from "../entity";
+
 import { System } from ".";
 
 export class ResourceProductionSystem extends System {
@@ -29,7 +30,7 @@ export class ResourceProductionSystem extends System {
         }
       }
 
-      this.updateAmount(resource);
+      this.updateAmount(resource.state, resource.delta);
     }
   }
 
@@ -49,15 +50,36 @@ export class ResourceProductionSystem extends System {
     }
   }
 
-  private updateAmount(resource: ResourceEntity): void {
-    const currentValue = resource.state.amount;
-    const capacity = resource.state.capacity ?? Number.POSITIVE_INFINITY;
+  private updateAmount(state: ResourceState, delta: ResourceDelta): void {
+    const newValue = this.calculateAmount(
+      state.amount,
+      state.capacity,
+      delta.debit,
+      delta.credit,
+    );
+
+    // set newly calculated value
+    state.amount = newValue;
+
+    // clear delta
+    delta.reset();
+  }
+
+  private calculateAmount(
+    currentValue: number,
+    capacity: number | undefined,
+    debit: number,
+    credit: number,
+  ): number {
+    // Assume capacity is infinite when undefined
+    capacity = capacity ?? Number.POSITIVE_INFINITY;
 
     // subtract losses first
-    let newValue = currentValue - resource.delta.credit;
+    let newValue = currentValue - credit;
     if (newValue < capacity) {
       // new resources are gained only when under capacity
-      newValue = newValue + resource.delta.debit;
+      newValue = newValue + debit;
+
       // but they only go up to capacity at most
       newValue = Math.min(newValue, capacity);
     }
@@ -65,10 +87,7 @@ export class ResourceProductionSystem extends System {
     // negative resource amount is non-sense (for now)
     newValue = Math.max(newValue, 0);
 
-    // set newly calculated value
-    resource.state.amount = newValue;
-
-    // clear delta
-    resource.delta.reset();
+    // return calculated value
+    return newValue;
   }
 }

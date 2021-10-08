@@ -1,6 +1,6 @@
 import { BuildingId } from "@/_interfaces";
 
-import { EntityAdmin } from "../entity";
+import { EntityAdmin, OrderStatus } from "../entity";
 
 import { OrderContext, OrderHandler, OrderResult, System } from ".";
 
@@ -15,10 +15,18 @@ export class BuildingSystem extends System {
 
   update(): void {
     for (const building of this.admin.buildings()) {
-      if (building.manualConstruct) {
-        this.orders.build(building.id);
-
-        building.manualConstruct = false;
+      switch (building.status) {
+        case OrderStatus.ORDERED: {
+          this.orders.build(building.id);
+          building.status = OrderStatus.WAITING;
+          break;
+        }
+        case OrderStatus.WAITING: {
+          if (this.admin.timers().ticks.wholeTicks > 0) {
+            building.status = OrderStatus.READY;
+          }
+          break;
+        }
       }
     }
 
@@ -29,7 +37,7 @@ export class BuildingSystem extends System {
   }
 
   private applyBuyBuilding(context: OrderContext<BuildingId>): OrderResult {
-    const { order, transaction, admin } = { ...context };
+    const { order, transaction, admin } = context;
 
     const building = admin.building(order);
     const ingredients = building.state.ingredients;
@@ -52,7 +60,7 @@ export class BuildingSystem extends System {
   }
 
   private updateRequirements(context: OrderContext<BuildingId>): void {
-    const { order } = { ...context };
+    const { order } = context;
 
     const building = context.admin.building(order);
     const meta = building.meta;

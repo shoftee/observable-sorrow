@@ -22,13 +22,6 @@ export class OrderHandler<T> {
 
   constructor(readonly admin: EntityAdmin) {}
 
-  private *orders(): IterableIterator<T> {
-    let order;
-    while ((order = this.queue.dequeue())) {
-      yield order;
-    }
-  }
-
   build(order: T): void {
     this.queue.enqueue(order);
   }
@@ -44,7 +37,7 @@ export class OrderHandler<T> {
       ambient.addDelta(id, delta);
     }
 
-    for (const order of this.orders()) {
+    for (const order of this.consumeOrders()) {
       // Create delta layer for this order.
       // If the order fails, we can safely discard the whole layer.
       const transaction = new DeltaSet(ambient);
@@ -75,18 +68,32 @@ export class OrderHandler<T> {
     // Clear ambient values.
     ambient.clear();
   }
+  private *consumeOrders(): IterableIterator<T> {
+    let order;
+    while ((order = this.queue.dequeue())) {
+      yield order;
+    }
+  }
 
   private runPipeline(
     context: OrderContext<T>,
     pipeline: OrderApplierFn<T>[],
   ): OrderResult {
-    for (const applier of pipeline) {
-      const result = applier(context);
-      if (!result.success) {
-        return result;
+    try {
+      for (const applier of pipeline) {
+        const result = applier(context);
+        if (!result.success) {
+          return result;
+        }
       }
-    }
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      if (typeof error === "string") {
+        return { success: false, ErrorMessage: error };
+      }
 
-    return { success: true };
+      return { success: false, ErrorMessage: `Internal error: ${error}` };
+    }
   }
 }

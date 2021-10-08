@@ -16,7 +16,7 @@ export type BonfireMetadataType = {
 export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   "gather-catnip": {
     id: "gather-catnip",
-    intent: { kind: "gather-catnip", amount: 100 },
+    intent: { kind: "gather-catnip", amount: 1 },
     label: "bonfire.gather-catnip.label",
     description: "bonfire.gather-catnip.description",
   },

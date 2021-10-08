@@ -4,14 +4,17 @@ import { Entity } from "@/_ecs";
 import { RecipeId } from "@/_interfaces";
 import { RecipeState } from "@/_state";
 
+import { OrderStatus } from ".";
+
 export class RecipeEntity extends Entity {
   readonly state: RecipeState;
 
-  manualCraft: boolean;
+  status: OrderStatus;
 
   constructor(readonly id: RecipeId) {
     super(id);
-    this.manualCraft = false;
     this.state = reactive(new RecipeState(id));
+
+    this.status = OrderStatus.READY;
   }
 }

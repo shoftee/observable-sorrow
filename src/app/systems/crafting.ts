@@ -1,6 +1,6 @@
-import { RecipeId } from "@/_interfaces";
+import { RecipeId, ResourceId } from "@/_interfaces";
 
-import { EntityAdmin } from "../entity";
+import { EntityAdmin, OrderStatus } from "../entity";
 
 import { OrderContext, OrderHandler, OrderResult, System } from ".";
 
@@ -14,9 +14,18 @@ export class CraftingSystem extends System {
 
   update(): void {
     for (const recipe of this.admin.recipes()) {
-      if (recipe.manualCraft) {
-        this.orders.build(recipe.id);
-        recipe.manualCraft = false;
+      switch (recipe.status) {
+        case OrderStatus.ORDERED: {
+          this.orders.build(recipe.id);
+          recipe.status = OrderStatus.WAITING;
+          break;
+        }
+        case OrderStatus.WAITING: {
+          if (this.admin.timers().ticks.wholeTicks > 0) {
+            recipe.status = OrderStatus.READY;
+          }
+          break;
+        }
       }
     }
 
@@ -29,19 +38,14 @@ export class CraftingSystem extends System {
   }
 
   private applyIngredients(context: OrderContext<RecipeId>): OrderResult {
-    const { order, transaction, admin } = { ...context };
+    const { order, transaction, admin } = context;
 
     const entity = admin.recipe(order);
     const ingredients = entity.state.ingredients;
     for (const { resourceId, requirement } of ingredients.values()) {
       transaction.addCredit(resourceId, requirement);
 
-      const state = admin.resource(resourceId).state;
-      const debit = transaction.getDebit(resourceId);
-      const credit = transaction.getCredit(resourceId);
-      const total = state.amount + debit - credit;
-
-      if (total < 0) {
+      if (!this.satisfiesRequirementAfterDelta(context, resourceId)) {
         return {
           success: false,
           ErrorMessage: `Could not craft '${order}' because we needed more '${resourceId}' to satisfy it.`,
@@ -52,26 +56,31 @@ export class CraftingSystem extends System {
     return { success: true };
   }
 
+  private satisfiesRequirementAfterDelta(
+    context: OrderContext<RecipeId>,
+    resourceId: ResourceId,
+  ): boolean {
+    const { transaction, admin } = context;
+
+    const { amount } = admin.resource(resourceId).state;
+    const debit = transaction.getDebit(resourceId);
+    const credit = transaction.getCredit(resourceId);
+
+    return amount + debit - credit >= 0;
+  }
+
   private applyProducts(context: OrderContext<RecipeId>): OrderResult {
-    const { order, transaction, admin } = { ...context };
+    const { order, transaction, admin } = context;
     const entity = admin.recipe(order);
 
     let capped = true;
     const products = entity.state.products;
-    for (const [resourceId, amount] of products.entries()) {
-      transaction.addDebit(resourceId, amount);
+    for (const [resourceId, producedAmount] of products.entries()) {
+      transaction.addDebit(resourceId, producedAmount);
 
-      // We only need to check the following
-      // until we find at least one uncapped product.
-      if (capped) {
-        const state = admin.resource(resourceId).state;
-        const debit = transaction.getDebit(resourceId);
-        const credit = transaction.getCredit(resourceId);
-        const total = state.amount + debit - credit;
-
-        const effectiveCapacity = state.capacity ?? Number.POSITIVE_INFINITY;
-        capped = capped && total > effectiveCapacity;
-      }
+      // For a order to be considered 'capped',
+      // all products need to be capped.
+      capped = capped && this.isCappedAfterDelta(context, resourceId);
     }
 
     if (capped) {
@@ -82,5 +91,23 @@ export class CraftingSystem extends System {
     }
 
     return { success: true };
+  }
+
+  private isCappedAfterDelta(
+    context: OrderContext<RecipeId>,
+    resourceId: ResourceId,
+  ): boolean {
+    const { transaction, admin } = context;
+
+    const { amount, capacity } = admin.resource(resourceId).state;
+    if (!capacity) {
+      return false;
+    }
+
+    const debit = transaction.getDebit(resourceId);
+    const credit = transaction.getCredit(resourceId);
+
+    const total = amount + debit - credit;
+    return total >= capacity && amount >= capacity;
   }
 }
