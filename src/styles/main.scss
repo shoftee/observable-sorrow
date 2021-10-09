@@ -194,7 +194,7 @@ $tippy-border-color: $dark;
 }
 
 .number {
-  @extend .font-monospace;
+  font-family: var(--bs-font-monospace);
 }
 
 // resources
@@ -212,12 +212,7 @@ ul.resources-list {
 
 // controls
 .btn .structure-level {
-  &::before {
-    content: "(";
-  }
-  &::after {
-    content: ")";
-  }
+  @extend .badge, .bg-light, .text-dark, .border;
 }
 
 .btn.capped {
