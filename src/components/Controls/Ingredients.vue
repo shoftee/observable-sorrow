@@ -2,7 +2,6 @@
 import { useI18n } from "vue-i18n";
 
 import { IngredientItem } from "@/app/presenters";
-import { useFormatter } from "@/composables/presenters";
 import { injectChannel } from "@/composables/game-channel";
 
 const { items } = defineProps<{ items: IngredientItem[] }>();
@@ -10,7 +9,7 @@ const { items } = defineProps<{ items: IngredientItem[] }>();
 const { t } = useI18n();
 
 const { presenters } = injectChannel();
-const fmt = useFormatter(presenters);
+const fmt = presenters.formatter;
 </script>
 
 <template>

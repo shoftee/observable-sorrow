@@ -3,7 +3,6 @@ import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { ResourceItem } from "@/app/presenters/resources";
-import { useFormatter } from "@/composables/presenters";
 import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: ResourceItem }>();
@@ -11,8 +10,9 @@ const { item } = defineProps<{ item: ResourceItem }>();
 const { t } = useI18n();
 
 const { presenters } = injectChannel();
+const fmt = presenters.formatter;
+
 const { amount, capacity, change, modifier } = toRefs(item);
-const fmt = useFormatter(presenters);
 </script>
 
 <template>

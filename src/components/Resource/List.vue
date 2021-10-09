@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
 import { injectChannel } from "@/composables/game-channel";
-import { getResources } from "@/composables/presenters";
 
 const { t } = useI18n();
 
 const show = ref(true);
 const { presenters } = injectChannel();
-const resources = getResources(presenters);
+const resources = computed(() => {
+  return presenters.resources.all.filter((r) => r.unlocked);
+});
 </script>
 
 <template>

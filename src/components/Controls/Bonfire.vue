@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import BuildingButton from "./BuildingButton.vue";
+import { computed } from "vue";
 
-import { getBonfireItems } from "@/composables/presenters";
+import BuildingButton from "./BuildingButton.vue";
 import { injectChannel } from "@/composables/game-channel";
 
 const { presenters } = injectChannel();
-const items = getBonfireItems(presenters);
+const items = computed(() => {
+  return presenters.bonfire.all.filter((b) => b.unlocked);
+});
 </script>
 
 <template>
