@@ -14,7 +14,7 @@ import {
   BuildingEntity,
   EnvironmentEntity,
   EntityWatcher,
-  TimersEntity,
+  TimeEntity,
   EffectEntity,
 } from ".";
 
@@ -108,7 +108,7 @@ export class EntityAdmin {
     return this.entity("environment", EnvironmentEntity);
   }
 
-  timers(): TimersEntity {
-    return this.entity("timers", TimersEntity);
+  time(): TimeEntity {
+    return this.entity("time", TimeEntity);
   }
 }

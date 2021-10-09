@@ -16,7 +16,7 @@ export class ResourceProductionSystem extends System {
   update(): void {
     this.updateEffectValues();
 
-    const dt = this.admin.timers().ticks.delta;
+    const dt = this.admin.time().ticks.delta;
     for (const resource of this.admin.resources()) {
       if (resource.state.change) {
         // calculate new amounts based on fractional ticks

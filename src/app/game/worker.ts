@@ -5,7 +5,7 @@ import { BonfireItemId, IRootInteractor, OnTickedHandler } from "@/_interfaces";
 import { Game } from ".";
 const game = new Game();
 
-const interactor: IRootInteractor = {
+expose(<IRootInteractor>{
   onTicked(handler: OnTickedHandler) {
     game.interactor.gameController.onTicked(handler);
   },
@@ -18,6 +18,4 @@ const interactor: IRootInteractor = {
   buildItem(id: BonfireItemId) {
     game.interactor.bonfire.buildItem(id);
   },
-};
-
-expose(interactor);
+});

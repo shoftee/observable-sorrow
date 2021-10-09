@@ -19,7 +19,7 @@ export class EnvironmentSystem extends System {
   update(): void {
     const environment = this.environment;
 
-    const days = this.admin.timers().days;
+    const days = this.admin.time().days;
     if (days.wholeTicks > 0) {
       environment.state.day += days.wholeTicks;
 

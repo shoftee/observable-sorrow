@@ -7,6 +7,7 @@ import {
   FulfillmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
+  TimeSystem,
 } from ".";
 
 export class GameSystems {
@@ -18,6 +19,7 @@ export class GameSystems {
     readonly fulfillment: FulfillmentSystem,
     readonly lockToggle: LockToggleSystem,
     readonly resourceProduction: ResourceProductionSystem,
+    readonly time: TimeSystem,
   ) {}
 
   init(): void {
@@ -28,7 +30,10 @@ export class GameSystems {
     }
   }
 
-  update(): void {
+  update(dt: number): void {
+    // Advance timers
+    this.time.update(dt);
+
     // Update environment.
     this.environment.update();
 

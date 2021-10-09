@@ -5,12 +5,7 @@ import {
   IGameController,
   OnTickedHandler,
 } from "@/_interfaces";
-import {
-  BuildingMetadata,
-  EffectIds,
-  RecipeMetadata,
-  ResourceMetadata,
-} from "@/_state";
+import { EffectIds, Meta } from "@/_state";
 import { SystemTimestamp } from "@/_utils/timestamp";
 
 import { GameUpdater } from ".";
@@ -18,7 +13,7 @@ import { GameUpdater } from ".";
 import {
   BuildingEntity,
   EnvironmentEntity,
-  TimersEntity,
+  TimeEntity,
   RecipeEntity,
   ResourceEntity,
   EffectEntity,
@@ -35,45 +30,27 @@ import {
   FulfillmentSystem,
   LockToggleSystem,
   ResourceProductionSystem,
+  TimeSystem,
 } from "../systems";
-
-class GameController implements IGameController {
-  constructor(
-    private readonly updater: GameUpdater,
-    private readonly setter: (handler: OnTickedHandler) => void,
-  ) {}
-
-  start(): void {
-    this.updater.start();
-  }
-  stop(): void {
-    this.updater.stop();
-  }
-
-  onTicked(handler: OnTickedHandler): void {
-    this.setter(handler);
-  }
-}
 
 export class Game {
   private readonly admin: EntityAdmin;
   private readonly watcher: EntityWatcher;
   private readonly updater: GameUpdater;
-
-  private readonly _systems: GameSystems;
-  private readonly _interactor: GameInteractor;
-
+  private readonly systems: GameSystems;
   private onTickedHandler?: OnTickedHandler;
+
+  readonly interactor: GameInteractor;
 
   constructor() {
     this.watcher = new EntityWatcher();
     this.admin = new EntityAdmin(this.watcher);
 
-    for (const entity of this.createEntities()) {
+    for (const entity of createEntities()) {
       this.admin.add(entity);
     }
 
-    this._systems = new GameSystems(
+    this.systems = new GameSystems(
       new BuildingSystem(this.admin),
       new CraftingSystem(this.admin),
       new EffectsSystem(this.admin),
@@ -81,16 +58,17 @@ export class Game {
       new FulfillmentSystem(this.admin),
       new LockToggleSystem(this.admin),
       new ResourceProductionSystem(this.admin),
+      new TimeSystem(this.admin),
     );
 
-    this._systems.init();
+    this.systems.init();
 
     this.updater = new GameUpdater(
       (dt) => this.update(dt),
       new SystemTimestamp(),
     );
 
-    this._interactor = new GameInteractor(
+    this.interactor = new GameInteractor(
       new BonfireInteractor(this.admin),
       new GameController(this.updater, (handler) => {
         this.onTickedHandler = handler;
@@ -99,36 +77,9 @@ export class Game {
     );
   }
 
-  *createEntities(): IterableIterator<Entity> {
-    yield new EnvironmentEntity();
-    yield new TimersEntity();
-
-    for (const building of Object.values(BuildingMetadata)) {
-      yield new BuildingEntity(building.id);
-    }
-
-    for (const id of EffectIds()) {
-      yield new EffectEntity(id as EffectId);
-    }
-
-    for (const recipe of Object.values(RecipeMetadata)) {
-      yield new RecipeEntity(recipe.id);
-    }
-    for (const resource of Object.values(ResourceMetadata)) {
-      yield new ResourceEntity(resource.id);
-    }
-  }
-
-  get interactor(): GameInteractor {
-    return this._interactor;
-  }
-
   private update(dt: number): void {
-    // Advance timers
-    this.admin.timers().update(dt);
-
     // Run updates on all systems.
-    this._systems.update();
+    this.systems.update(dt);
 
     // Push changes to presenter.
     this.flushChanges();
@@ -142,5 +93,44 @@ export class Game {
         );
       this.onTickedHandler(changes);
     });
+  }
+}
+
+function* createEntities(): IterableIterator<Entity> {
+  yield new EnvironmentEntity();
+  yield new TimeEntity();
+
+  for (const building of Meta.buildings()) {
+    yield new BuildingEntity(building.id);
+  }
+
+  for (const id of EffectIds()) {
+    yield new EffectEntity(id as EffectId);
+  }
+
+  for (const recipe of Meta.recipes()) {
+    yield new RecipeEntity(recipe.id);
+  }
+  for (const resource of Meta.resources()) {
+    yield new ResourceEntity(resource.id);
+  }
+}
+
+class GameController implements IGameController {
+  constructor(
+    private readonly updater: GameUpdater,
+    private readonly setter: (handler: OnTickedHandler) => void,
+  ) {}
+
+  start(): void {
+    this.updater.start();
+  }
+
+  stop(): void {
+    this.updater.stop();
+  }
+
+  onTicked(handler: OnTickedHandler): void {
+    this.setter(handler);
   }
 }

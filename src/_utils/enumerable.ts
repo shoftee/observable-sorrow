@@ -13,7 +13,7 @@ export class Enumerable<T> implements Iterable<T> {
 
   map<TResult>(selector: (item: T) => TResult): Enumerable<TResult> {
     const that = this as Iterable<T>;
-    return Enumerable.fromIterable(
+    return new Enumerable(
       (function* () {
         for (const item of that) {
           yield selector(item);
@@ -29,18 +29,14 @@ export class Enumerable<T> implements Iterable<T> {
   any(selector: (item: T) => boolean): boolean {
     return any(this, selector);
   }
+}
 
-  static fromArray<T>(items: T[]): Enumerable<T> {
-    return new Enumerable<T>(items.values());
-  }
-
-  static fromIterable<T>(iterable: Iterable<T>): Enumerable<T> {
-    function* iterator() {
-      for (const item of iterable) {
-        yield item;
-      }
+export function asEnumerable<T>(iterable: Iterable<T>): Enumerable<T> {
+  function* iterator() {
+    for (const item of iterable) {
+      yield item;
     }
-
-    return new Enumerable(iterator());
   }
+
+  return new Enumerable(iterator());
 }

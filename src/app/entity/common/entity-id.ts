@@ -6,4 +6,4 @@ export type EntityId =
   | RecipeId
   | EffectId
   | "environment"
-  | "timers";
+  | "time";

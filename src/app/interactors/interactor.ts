@@ -15,7 +15,7 @@ export class BonfireInteractor implements IBonfireInteractor {
 
       case "refine-catnip": {
         const entity = this.admin.recipe("refine-catnip");
-        if (entity.status === OrderStatus.READY) {
+        if (entity.status === OrderStatus.EMPTY) {
           entity.status = OrderStatus.ORDERED;
         }
         break;
@@ -23,7 +23,7 @@ export class BonfireInteractor implements IBonfireInteractor {
 
       case "buy-building": {
         const entity = this.admin.building(metadata.intent.buildingId);
-        if (entity.status === OrderStatus.READY) {
+        if (entity.status === OrderStatus.EMPTY) {
           entity.status = OrderStatus.ORDERED;
         }
         break;

@@ -18,12 +18,12 @@ export class BuildingSystem extends System {
       switch (building.status) {
         case OrderStatus.ORDERED: {
           this.orders.build(building.id);
-          building.status = OrderStatus.WAITING;
+          building.status = OrderStatus.READY;
           break;
         }
-        case OrderStatus.WAITING: {
-          if (this.admin.timers().ticks.wholeTicks > 0) {
-            building.status = OrderStatus.READY;
+        case OrderStatus.READY: {
+          if (this.admin.time().ticks.wholeTicks > 0) {
+            building.status = OrderStatus.EMPTY;
           }
           break;
         }

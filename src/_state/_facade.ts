@@ -4,6 +4,8 @@ import {
   BonfireMetadataType,
   BuildingMetadata,
   BuildingMetadataType,
+  RecipeMetadata,
+  RecipeMetadataType,
   ResourceMetadata,
   ResourceMetadataType,
   SeasonMetadataType,
@@ -11,39 +13,38 @@ import {
   WeatherMetadata,
   WeatherMetadataType,
 } from "@/_state";
-import { Enumerable } from "@/_utils/enumerable";
+import { asEnumerable, Enumerable } from "@/_utils/enumerable";
 
-class AllMetadata {
+export const Meta = {
   bonfireItems(): Enumerable<BonfireMetadataType> {
-    const values = Object.values(BonfireMetadata);
-    return Enumerable.fromIterable(values);
-  }
+    return asEnumerable(Object.values(BonfireMetadata));
+  },
 
   buildings(): Enumerable<BuildingMetadataType> {
-    const values = Object.values(BuildingMetadata);
-    return Enumerable.fromIterable(values);
-  }
+    return asEnumerable(Object.values(BuildingMetadata));
+  },
 
   building(id: BuildingId): BuildingMetadataType {
     return BuildingMetadata[id];
-  }
+  },
+
+  recipes(): Enumerable<RecipeMetadataType> {
+    return asEnumerable(Object.values(RecipeMetadata));
+  },
 
   resources(): Enumerable<ResourceMetadataType> {
-    const values = Object.values(ResourceMetadata);
-    return Enumerable.fromIterable(values);
-  }
+    return asEnumerable(Object.values(ResourceMetadata));
+  },
 
   resource(id: ResourceId): ResourceMetadataType {
     return ResourceMetadata[id];
-  }
+  },
 
   season(id: SeasonId): SeasonMetadataType {
     return SeasonsMetadata[id];
-  }
+  },
 
   weather(id: WeatherId): WeatherMetadataType {
     return WeatherMetadata[id];
-  }
-}
-
-export const Meta = new AllMetadata();
+  },
+};

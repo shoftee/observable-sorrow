@@ -20,6 +20,6 @@ export class BuildingEntity extends Entity {
     this.meta = BuildingMetadata[id];
     this.state = reactive(new BuildingState(this.id));
 
-    this.status = OrderStatus.READY;
+    this.status = OrderStatus.EMPTY;
   }
 }

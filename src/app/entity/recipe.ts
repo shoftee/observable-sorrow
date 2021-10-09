@@ -15,6 +15,6 @@ export class RecipeEntity extends Entity {
     super(id);
     this.state = reactive(new RecipeState(id));
 
-    this.status = OrderStatus.READY;
+    this.status = OrderStatus.EMPTY;
   }
 }

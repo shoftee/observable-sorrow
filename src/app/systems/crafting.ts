@@ -17,12 +17,12 @@ export class CraftingSystem extends System {
       switch (recipe.status) {
         case OrderStatus.ORDERED: {
           this.orders.build(recipe.id);
-          recipe.status = OrderStatus.WAITING;
+          recipe.status = OrderStatus.READY;
           break;
         }
-        case OrderStatus.WAITING: {
-          if (this.admin.timers().ticks.wholeTicks > 0) {
-            recipe.status = OrderStatus.READY;
+        case OrderStatus.READY: {
+          if (this.admin.time().ticks.wholeTicks > 0) {
+            recipe.status = OrderStatus.EMPTY;
           }
           break;
         }

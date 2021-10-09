@@ -1,5 +1,5 @@
 export enum OrderStatus {
-  READY,
+  EMPTY,
   ORDERED,
-  WAITING,
+  READY,
 }
