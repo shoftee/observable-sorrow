@@ -97,6 +97,9 @@ footer {
 // Tabs
 main .nav {
   margin-top: calc(-2.5rem + 2px);
+  width: 100%;
+
+  justify-content: center;
 
   @extend .pt-1;
   & .nav-item .nav-link {
