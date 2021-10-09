@@ -8,6 +8,6 @@ export * from "./effects";
 export * from "./fulfillment";
 export * from "./lock-toggle";
 export * from "./resource-production";
-export * from "./timers";
+export * from "./time";
 
 export * from "./game-systems";

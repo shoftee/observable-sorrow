@@ -25,7 +25,7 @@ export class ResourceProductionSystem extends System {
         if (change > 0) {
           resource.delta.addDebit(change);
         } else if (change < 0) {
-          // change is negative, add abs to credit
+          // change is negative, add absolute value as credit
           resource.delta.addCredit(Math.abs(change));
         }
       }
