@@ -3,12 +3,13 @@ import { useI18n } from "vue-i18n";
 
 import { IngredientItem } from "@/app/presenters";
 import { useFormatter } from "@/composables/presenters";
-import { usePresenters } from "@/composables/game-channel";
+import { injectChannel } from "@/composables/game-channel";
 
 const { items } = defineProps<{ items: IngredientItem[] }>();
 
 const { t } = { ...useI18n() };
-const presenters = await usePresenters();
+
+const { presenters } = injectChannel();
 const fmt = useFormatter(presenters);
 </script>
 

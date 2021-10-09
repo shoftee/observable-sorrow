@@ -8,7 +8,7 @@ import Effects from "./Effects.vue";
 
 import { BonfireItemId } from "@/_interfaces";
 import { BonfireItem } from "@/app/presenters";
-import { useInteractors } from "@/composables/game-channel";
+import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: BonfireItem }>();
 
@@ -17,7 +17,7 @@ const level = computed(() => item.level ?? 0)
 const ingredients = computed(() => item.ingredients ?? []);
 const effects = computed(() => item.effects ?? []);
 
-const interactors = await useInteractors();
+const interactors = injectChannel().interactors;
 
 async function buildItem(id: BonfireItemId): Promise<void> {
   await interactors.bonfire.buildItem(id)

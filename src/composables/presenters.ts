@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, unref } from "vue";
 
 import {
   BonfireItem,
@@ -12,18 +12,18 @@ type Presenters = Channel["presenters"];
 
 export function getResources(p: Presenters): ComputedRef<ResourceItem[]> {
   return computed(() => {
-    return p.resources.all.value.filter((m) => m.unlocked);
+    return unref(p.resources.all).filter((r) => r.unlocked);
   });
 }
 
 export function getBonfireItems(p: Presenters): ComputedRef<BonfireItem[]> {
   return computed(() => {
-    return p.bonfire.all.value.filter((b) => b.unlocked);
+    return unref(p.bonfire.all).filter((b) => b.unlocked);
   });
 }
 
-export function getCalendar(p: Presenters): ComputedRef<Calendar> {
-  return p.environment.calendar;
+export function getCalendar(p: Presenters): Calendar {
+  return unref(p.environment.calendar);
 }
 
 export function useFormatter(p: Presenters): NumberFormatter {

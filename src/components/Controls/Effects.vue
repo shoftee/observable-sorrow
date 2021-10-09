@@ -7,14 +7,14 @@ import { UnitKind } from "@/_state";
 import { EffectItem, EffectView } from "@/app/presenters";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 import { useFormatter } from "@/composables/presenters";
-import { usePresenters } from "@/composables/game-channel";
+import { injectChannel } from "@/composables/game-channel";
 
 const { items } = defineProps<{ items: EffectItem[] }>()
 
 const { t } = { ...useI18n() };
 const events = inject(KeyboardEventsKey);
 
-const presenters = await usePresenters();
+const { presenters } = injectChannel();
 const fmt = useFormatter(presenters);
 
 const format = (v: EffectView) => {

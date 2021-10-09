@@ -19,7 +19,7 @@ import {
 const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
 const root = wrap<IRootInteractor>(worker);
 
-export type Channel = Readonly<{
+export type Channel = {
   interactors: {
     controller: RemoteObject<IGameController>;
     bonfire: RemoteObject<IBonfireInteractor>;
@@ -30,7 +30,7 @@ export type Channel = Readonly<{
     environment: EnvironmentPresenter;
     formatter: NumberFormatter;
   };
-}>;
+};
 
 const stateManager = new StateManager();
 

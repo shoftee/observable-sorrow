@@ -1,15 +1,14 @@
-import { Channel, Setup } from "@/app/os";
+import { inject, InjectionKey, Ref } from "vue";
 
-const channel = Setup();
+import { Channel } from "@/app/os";
 
-export async function useGameChannel(): Promise<Channel> {
-  return channel;
-}
+export const ChannelKey: InjectionKey<Ref<Channel>> = Symbol("GameChannel");
 
-export async function usePresenters(): Promise<Channel["presenters"]> {
-  return (await useGameChannel()).presenters;
-}
+export function injectChannel(): Channel {
+  const channel = inject(ChannelKey);
+  if (!channel?.value) {
+    throw new Error("Could not inject channel, maybe you didn't set it up?");
+  }
 
-export async function useInteractors(): Promise<Channel["interactors"]> {
-  return (await useGameChannel()).interactors;
+  return channel.value;
 }

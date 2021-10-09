@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
+import { injectChannel } from "@/composables/game-channel";
 import { getResources } from "@/composables/presenters";
-import { usePresenters } from "@/composables/game-channel";
 
 const { t } = { ...useI18n() };
 
 const show = ref(true);
-const presenters = await usePresenters();
-const resources = getResources(presenters)
-const isEmpty = computed(() => resources.value.length == 0);
+const { presenters } = injectChannel();
+const resources = getResources(presenters);
 </script>
 
 <template>
   <div class="card">
-    <div v-if="isEmpty" class="text-start p-2">{{ t("resources.section.empty") }}</div>
+    <div v-if="resources.length === 0" class="text-start p-2">{{ t("resources.section.empty") }}</div>
     <div v-else class="d-flex flex-column">
       <button class="btn shadow-none" @click="show = !show">
         <div class="clearfix">

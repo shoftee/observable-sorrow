@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import { defineAsyncComponent, provide } from "vue";
+import { provide, ref } from "vue";
+import { Channel } from "./app/os";
 
+import GameLoader from "./components/GameLoader.vue";
+import Main from "./components/Main.vue"
+
+import { ChannelKey } from "./composables/game-channel";
 import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
 provide(KeyboardEventsKey, getKeyboardEvents());
 
-const Main = defineAsyncComponent(() => import("./components/Main.vue"))
+let channel = ref<Channel>();
+provide(ChannelKey, channel);
+
+let loaded = ref(false);
+function onLoaded(c: Channel) {
+  loaded.value = true;
+  channel.value = c;
+}
 </script>
 
 <template>
@@ -15,25 +27,10 @@ const Main = defineAsyncComponent(() => import("./components/Main.vue"))
         <i class="bi bi-droplet"></i> &beta;
       </div>
     </header>
-    <Suspense>
-      <template #default>
-        <main class="h-100 scrollable d-flex flex-column align-items-center">
-          <ul class="nav nav-tabs justify-content-center">
-            <li class="nav-item">
-              <button class="nav-link active">Bonfire</button>
-            </li>
-          </ul>
-          <Main class="w-100" />
-        </main>
-      </template>
-      <template #fallback>
-        <div class="h-100 scrollable d-flex align-items-center justify-content-center">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      </template>
-    </Suspense>
+    <main class="h-100 scrollable d-flex flex-column align-items-center">
+      <GameLoader v-if="!loaded" @loaded="onLoaded" />
+      <Main v-else class="w-100 h-100" />
+    </main>
     <footer class="d-flex flex-row justify-content-end">
       <div>
         Observable Sorrow is a clone of

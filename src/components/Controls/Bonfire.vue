@@ -2,9 +2,9 @@
 import BuildingButton from "./BuildingButton.vue";
 
 import { getBonfireItems } from "@/composables/presenters";
-import { usePresenters } from "@/composables/game-channel";
+import { injectChannel } from "@/composables/game-channel";
 
-const presenters = await usePresenters();
+const { presenters } = injectChannel();
 const items = getBonfireItems(presenters);
 </script>
 

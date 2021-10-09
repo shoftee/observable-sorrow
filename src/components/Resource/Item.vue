@@ -4,14 +4,14 @@ import { useI18n } from "vue-i18n";
 
 import { ResourceItem } from "@/app/presenters/resources";
 import { useFormatter } from "@/composables/presenters";
-import { usePresenters } from "@/composables/game-channel";
+import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: ResourceItem }>();
 
 const { t } = { ...useI18n() };
 
+const { presenters } = injectChannel();
 const { amount, capacity, change, modifier } = toRefs(item);
-const presenters = await usePresenters();
 const fmt = useFormatter(presenters);
 </script>
 
