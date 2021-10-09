@@ -7,13 +7,16 @@ import { UnitKind } from "@/_state";
 import { EffectItem, EffectView } from "@/app/presenters";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 import { useFormatter } from "@/composables/presenters";
+import { usePresenters } from "@/composables/game-channel";
 
 const { items } = defineProps<{ items: EffectItem[] }>()
 
 const { t } = { ...useI18n() };
 const events = inject(KeyboardEventsKey);
 
-const fmt = useFormatter();
+const presenters = await usePresenters();
+const fmt = useFormatter(presenters);
+
 const format = (v: EffectView) => {
   if (v.unit === UnitKind.Percent) {
     return fmt.percent(v.value, "always");

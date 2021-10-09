@@ -8,12 +8,12 @@ import {
   Meta,
 } from "@/_state";
 
-import { EffectView, IRootPresenter } from ".";
+import { EffectView, IStateManager } from ".";
 
 export class BonfirePresenter {
   readonly all: ComputedRef<BonfireItem[]>;
 
-  constructor(private readonly root: IRootPresenter) {
+  constructor(private readonly manager: IStateManager) {
     this.all = computed(() => {
       return Meta.bonfireItems()
         .map((meta) => this.newBonfireItem(meta))
@@ -34,7 +34,7 @@ export class BonfirePresenter {
         fulfilled: true,
       });
     } else if (meta.intent.kind === "refine-catnip") {
-      const state = this.root.recipe(meta.intent.recipeId);
+      const state = this.manager.recipe(meta.intent.recipeId);
       return reactive({
         id: meta.id,
         label: meta.label,
@@ -49,7 +49,7 @@ export class BonfirePresenter {
       });
     } else {
       const buildingId = meta.intent.buildingId;
-      const state = this.root.building(buildingId);
+      const state = this.manager.building(buildingId);
       return reactive({
         id: meta.id,
         label: meta.label,
@@ -74,8 +74,8 @@ export class BonfirePresenter {
       reactive({
         id: meta.total,
         label: meta.label,
-        perLevelAmount: this.root.effectView(meta.per),
-        totalAmount: this.root.effectView(meta.total),
+        perLevelAmount: this.manager.effectView(meta.per),
+        totalAmount: this.manager.effectView(meta.total),
       }),
     );
   }

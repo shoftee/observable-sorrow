@@ -19,7 +19,7 @@ import {
   UnitKind,
 } from "@/_state";
 
-export interface IRootPresenter {
+export interface IStateManager {
   building(id: BuildingId): BuildingState;
   effect(id: EffectId): EffectState;
   environment(): EnvironmentState;
@@ -34,7 +34,7 @@ export interface EffectView {
   unit: UnitKind;
 }
 
-export class Updater implements IPresenterChangeSink, IRootPresenter {
+export class StateManager implements IPresenterChangeSink, IStateManager {
   private readonly values: Map<string, PropertyBag>;
 
   constructor() {

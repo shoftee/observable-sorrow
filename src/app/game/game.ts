@@ -3,6 +3,7 @@ import {
   EffectId,
   GameInteractor,
   IGameController,
+  InitializeOptions,
   OnTickedHandler,
 } from "@/_interfaces";
 import { EffectIds, Meta } from "@/_state";
@@ -70,11 +71,13 @@ export class Game {
 
     this.interactor = new GameInteractor(
       new BonfireInteractor(this.admin),
-      new GameController(this.updater, (handler) => {
-        this.onTickedHandler = handler;
-        this.update(0);
-      }),
+      new GameController(this.updater),
     );
+  }
+
+  public initialize(options: InitializeOptions): void {
+    this.onTickedHandler = options.onTicked;
+    this.update(0);
   }
 
   private update(dt: number): void {
@@ -117,10 +120,7 @@ function* createEntities(): IterableIterator<Entity> {
 }
 
 class GameController implements IGameController {
-  constructor(
-    private readonly updater: GameUpdater,
-    private readonly setter: (handler: OnTickedHandler) => void,
-  ) {}
+  constructor(private readonly updater: GameUpdater) {}
 
   start(): void {
     this.updater.start();
@@ -128,9 +128,5 @@ class GameController implements IGameController {
 
   stop(): void {
     this.updater.stop();
-  }
-
-  onTicked(handler: OnTickedHandler): void {
-    this.setter(handler);
   }
 }

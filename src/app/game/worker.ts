@@ -1,13 +1,17 @@
 import { expose } from "comlink";
 
-import { BonfireItemId, IRootInteractor, OnTickedHandler } from "@/_interfaces";
+import {
+  BonfireItemId,
+  InitializeOptions,
+  IRootInteractor,
+} from "@/_interfaces";
 
 import { Game } from ".";
 const game = new Game();
 
 expose(<IRootInteractor>{
-  onTicked(handler: OnTickedHandler) {
-    game.interactor.gameController.onTicked(handler);
+  initialize(options: InitializeOptions) {
+    game.initialize(options);
   },
   start() {
     game.interactor.gameController.start();

@@ -2,9 +2,14 @@
 import Resources from "./Resource/List.vue";
 import Environment from "./Environment.vue";
 import History from "./History.vue";
-
 import BonfireControls from "./Controls/Bonfire.vue";
-</script> 
+
+import { useGameChannel } from "@/composables/game-channel";
+const channel = await useGameChannel()
+
+// Start the game
+await channel.interactors.controller.start();
+</script>
 
 <template>
   <div class="main-container d-flex flex-row scrollable">

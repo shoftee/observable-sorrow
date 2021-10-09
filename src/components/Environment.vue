@@ -2,11 +2,13 @@
 import { useI18n } from "vue-i18n";
 
 import { getCalendar, useFormatter } from "@/composables/presenters";
+import { usePresenters } from "@/composables/game-channel";
 
 const { t } = { ...useI18n() };
 
-const state = getCalendar();
-const fmt = useFormatter();
+const presenters = await usePresenters();
+const state = getCalendar(presenters);
+const fmt = useFormatter(presenters);
 </script>
 
 <template>

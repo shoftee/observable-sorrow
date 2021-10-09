@@ -1,27 +1,31 @@
 import { computed, ComputedRef } from "vue";
 
-import { Presenters } from "@/app/os";
 import {
   BonfireItem,
   Calendar,
   NumberFormatter,
   ResourceItem,
 } from "@/app/presenters";
+import { Channel } from "@/app/os";
 
-export function getUnlockedResources(): ComputedRef<ResourceItem[]> {
+type Presenters = Channel["presenters"];
+
+export function getResources(p: Presenters): ComputedRef<ResourceItem[]> {
   return computed(() => {
-    return Presenters.resources.all.value.filter((m) => m.unlocked);
+    return p.resources.all.value.filter((m) => m.unlocked);
   });
 }
 
-export function getUnlockedBonfireItems(): ComputedRef<BonfireItem[]> {
-  return computed(() => Presenters.bonfire.all.value.filter((b) => b.unlocked));
+export function getBonfireItems(p: Presenters): ComputedRef<BonfireItem[]> {
+  return computed(() => {
+    return p.bonfire.all.value.filter((b) => b.unlocked);
+  });
 }
 
-export function getCalendar(): ComputedRef<Calendar> {
-  return Presenters.environment.calendar;
+export function getCalendar(p: Presenters): ComputedRef<Calendar> {
+  return p.environment.calendar;
 }
 
-export function useFormatter(): NumberFormatter {
-  return Presenters.formatter;
+export function useFormatter(p: Presenters): NumberFormatter {
+  return p.formatter;
 }

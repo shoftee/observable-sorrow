@@ -3,12 +3,12 @@ import { computed, ComputedRef, reactive } from "vue";
 import { ResourceId } from "@/_interfaces";
 import { Meta, ResourceMetadataType } from "@/_state";
 
-import { IRootPresenter } from ".";
+import { IStateManager } from ".";
 
 export class ResourcesPresenter {
   readonly all: ComputedRef<ResourceItem[]>;
 
-  constructor(private readonly root: IRootPresenter) {
+  constructor(private readonly manager: IStateManager) {
     this.all = computed(() =>
       Meta.resources()
         .map((meta) => this.newResource(meta))
@@ -17,7 +17,7 @@ export class ResourcesPresenter {
   }
 
   private newResource(meta: ResourceMetadataType): ResourceItem {
-    const res = this.root.resource(meta.id);
+    const res = this.manager.resource(meta.id);
 
     return reactive({
       id: meta.id,
@@ -34,10 +34,10 @@ export class ResourcesPresenter {
   }
 
   private computeCatnipModifier() {
-    const production = this.root.effect("catnip-field.catnip");
+    const production = this.manager.effect("catnip-field.catnip");
     const catnipProduction = production.value ?? 0;
 
-    const weather = this.root.effect("catnip-field.weather");
+    const weather = this.manager.effect("catnip-field.weather");
     const weatherModifier = weather.value ?? 0;
 
     if (catnipProduction === 0 || weatherModifier === 0) {

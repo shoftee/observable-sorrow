@@ -3,17 +3,17 @@ import { computed, ComputedRef, reactive } from "vue";
 import { Meta } from "@/_state";
 import { SeasonId, WeatherId } from "@/_interfaces";
 
-import { IRootPresenter } from ".";
+import { IStateManager } from ".";
 
 export class EnvironmentPresenter {
   readonly calendar: ComputedRef<Calendar>;
 
-  constructor(private readonly root: IRootPresenter) {
+  constructor(private readonly manager: IStateManager) {
     this.calendar = computed(() => this.newCalendar());
   }
 
   private newCalendar(): Calendar {
-    const state = this.root.environment();
+    const state = this.manager.environment();
 
     return reactive({
       day: computed(() => state.day),

@@ -4,12 +4,14 @@ import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
-import { getUnlockedResources } from "@/composables/presenters";
+import { getResources } from "@/composables/presenters";
+import { usePresenters } from "@/composables/game-channel";
 
 const { t } = { ...useI18n() };
 
 const show = ref(true);
-const resources = getUnlockedResources()
+const presenters = await usePresenters();
+const resources = getResources(presenters)
 const isEmpty = computed(() => resources.value.length == 0);
 </script>
 

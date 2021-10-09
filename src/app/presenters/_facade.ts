@@ -5,7 +5,7 @@ import {
   EnvironmentPresenter,
   NumberFormatter,
   ResourcesPresenter,
-  Updater,
+  StateManager,
 } from ".";
 
 export class PresenterFacade {
@@ -14,10 +14,10 @@ export class PresenterFacade {
   readonly resources: ResourcesPresenter;
   readonly formatter: NumberFormatter;
 
-  constructor(readonly root: Updater) {
-    this.bonfire = new BonfirePresenter(this.root);
-    this.environment = new EnvironmentPresenter(this.root);
-    this.resources = new ResourcesPresenter(this.root);
+  constructor(private readonly manager: StateManager) {
+    this.bonfire = new BonfirePresenter(this.manager);
+    this.environment = new EnvironmentPresenter(this.manager);
+    this.resources = new ResourcesPresenter(this.manager);
     this.formatter = new NumberFormatter(3, new SandcastleBuilderNotation());
   }
 }

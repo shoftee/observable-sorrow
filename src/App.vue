@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { provide } from "vue";
-import Main from "./components/Main.vue";
-import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
+import { defineAsyncComponent, provide } from "vue";
 
+import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
 provide(KeyboardEventsKey, getKeyboardEvents());
+
+const Main = defineAsyncComponent(() => import("./components/Main.vue"))
 </script>
 
 <template>
@@ -14,14 +15,25 @@ provide(KeyboardEventsKey, getKeyboardEvents());
         <i class="bi bi-droplet"></i> &beta;
       </div>
     </header>
-    <main class="h-100 scrollable d-flex flex-column">
-      <ul class="nav nav-tabs justify-content-center">
-        <li class="nav-item">
-          <button class="nav-link active">Bonfire</button>
-        </li>
-      </ul>
-      <Main class="w-100" />
-    </main>
+    <Suspense>
+      <template #default>
+        <main class="h-100 scrollable d-flex flex-column align-items-center">
+          <ul class="nav nav-tabs justify-content-center">
+            <li class="nav-item">
+              <button class="nav-link active">Bonfire</button>
+            </li>
+          </ul>
+          <Main class="w-100" />
+        </main>
+      </template>
+      <template #fallback>
+        <div class="h-100 scrollable d-flex align-items-center justify-content-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </template>
+    </Suspense>
     <footer class="d-flex flex-row justify-content-end">
       <div>
         Observable Sorrow is a clone of

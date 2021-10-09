@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import BuildingButton from "./BuildingButton.vue";
 
-import { getUnlockedBonfireItems } from "@/composables/presenters";
-const items = getUnlockedBonfireItems();
+import { getBonfireItems } from "@/composables/presenters";
+import { usePresenters } from "@/composables/game-channel";
+
+const presenters = await usePresenters();
+const items = getBonfireItems(presenters);
 </script>
 
 <template>

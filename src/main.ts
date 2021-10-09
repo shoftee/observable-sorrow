@@ -14,17 +14,4 @@ applyTippy(app);
 import applyI18n from "./plugins/vue-i18n";
 applyI18n(app);
 
-import { proxy } from "comlink";
-import { Interactor, Presenters } from "./app/os";
-import { OnTickedHandler } from "./_interfaces";
-
-const handler: OnTickedHandler = function (changes) {
-  return Presenters.root.update(changes);
-};
-
-// intialize game
-Interactor.onTicked(proxy(handler))
-  // start game
-  .then(async () => await Interactor.start())
-  // mount app to page
-  .then(() => app.mount("#app"));
+app.mount("#app");
