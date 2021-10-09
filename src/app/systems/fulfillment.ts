@@ -42,7 +42,11 @@ export class FulfillmentSystem extends System {
       ingredient.fulfillmentTime = undefined;
     } else {
       ingredient.fulfilled = false;
-      if (resource.change > 0) {
+      if (resource.capacity && resource.capacity < ingredient.requirement) {
+        // requirement won't be fulfilled
+        ingredient.fulfillmentTime = Number.POSITIVE_INFINITY;
+      } else if (resource.change > 0) {
+        // calculate remaining time based on change
         const remaining = ingredient.requirement - ingredient.fulfillment;
         ingredient.fulfillmentTime = remaining / resource.change;
       }

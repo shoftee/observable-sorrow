@@ -23,7 +23,10 @@ const fmt = presenters.formatter;
             {{ fmt.number(item.requirement) }}
             <template
               v-if="item.fulfillmentTime"
-            >({{ fmt.rounded(item.fulfillmentTime) }}t)</template>
+            >
+              <template v-if="item.fulfillmentTime == Number.POSITIVE_INFINITY">(&infin;)</template>
+              <template v-else>({{ fmt.rounded(item.fulfillmentTime) }}t)</template>
+            </template>
           </template>
           <template v-else>{{ fmt.number(item.requirement) }}</template>
         </div>
