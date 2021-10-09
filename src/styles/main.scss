@@ -1,6 +1,22 @@
 @import "/node_modules/bootstrap/scss/bootstrap.scss";
 @import "/node_modules/bootstrap/scss/badge";
 
+// Useful mixins
+@mixin wh-100() {
+  width: 100%;
+  height: 100%;
+}
+
+@mixin flex-column() {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-row() {
+  display: flex;
+  flex-direction: row;
+}
+
 // Global changes
 .btn {
   @extend .btn-light;
@@ -10,6 +26,70 @@ body {
   @extend .user-select-none;
 }
 
+// main
+.app-container {
+  height: 100%;
+  @include flex-column();
+}
+
+header,
+footer {
+  @extend .px-2, .py-1, .bg-light;
+}
+
+header {
+  @include flex-row();
+  align-items: center;
+  justify-content: flex-start;
+}
+
+main {
+  @include wh-100();
+  @include flex-column();
+  align-items: center;
+
+  & .loader {
+    @include wh-100();
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & .nav-container {
+    @include flex-column();
+    align-items: center;
+
+    & nav {
+      justify-content: center;
+    }
+  }
+
+  & .main-container {
+    width: 100%;
+    @include flex-row();
+    max-width: 1920px;
+  }
+
+  & .env-container {
+    @include flex-column();
+  }
+
+  & .controls {
+    @include flex-column();
+  }
+}
+
+footer {
+  @include flex-row();
+  justify-content: flex-end;
+}
+
+// remove overflow from flexbox
+.scrollable {
+  overflow-y: auto;
+}
+
+// Badge
 .badge {
   @extend .p-1;
 }
@@ -126,24 +206,6 @@ ul.resources-list {
       @extend .ms-1, .badge, .number;
     }
   }
-}
-
-// remove overflow from flexbox
-.scrollable {
-  overflow-y: auto;
-  &.scrollable-overflow {
-    min-height: 0;
-  }
-}
-
-// main
-header,
-footer {
-  @extend .px-2, .py-1, .bg-light;
-}
-
-.main-container {
-  max-width: 1920px;
 }
 
 // controls

@@ -17,13 +17,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="d-flex flex-column scrollable align-items-center">
-    <ul class="nav nav-tabs justify-content-center">
+  <div class="nav-container scrollable">
+    <ul class="nav nav-tabs">
       <li class="nav-item">
         <button class="nav-link active">Bonfire</button>
       </li>
     </ul>
-    <div class="main-container w-100 d-flex flex-row scrollable">
+    <div class="main-container scrollable">
       <div class="scrollable col p-2 pe-1">
         <div>
           <Resources />
@@ -34,7 +34,7 @@ onMounted(async () => {
           <BonfireControls />
         </div>
       </div>
-      <div class="scrollable col p-2 ps-1 d-flex flex-column gap-2">
+      <div class="env-container scrollable col p-2 ps-1 gap-2">
         <div>
           <Environment />
         </div>

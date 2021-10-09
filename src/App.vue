@@ -20,18 +20,18 @@ function onLoaded(c: Channel) {
 </script>
 
 <template>
-  <div class="w-100 h-100 d-flex flex-column">
-    <header class="d-flex flex-row align-items-center justify-content-start gap-1">
+  <div class="app-container">
+    <header class="gap-1">
       <div>Observable Sorrow</div>
       <div class="badge bg-success">
         <i class="bi bi-droplet"></i> &beta;
       </div>
     </header>
-    <main class="h-100 scrollable d-flex flex-column align-items-center">
+    <main class="scrollable">
       <GameLoader v-if="!loaded" @loaded="onLoaded" />
       <Main v-else class="w-100 h-100" />
     </main>
-    <footer class="d-flex flex-row justify-content-end">
+    <footer class="gap-1">
       <div>
         Observable Sorrow is a clone of
         <a href="https://kittensgame.com/web/">Kittens Game</a>.

@@ -12,7 +12,7 @@ import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: BonfireItem }>();
 
-const { t } = { ...useI18n() };
+const { t } = useI18n();
 const level = computed(() => item.level ?? 0)
 const ingredients = computed(() => item.ingredients ?? []);
 const effects = computed(() => item.effects ?? []);

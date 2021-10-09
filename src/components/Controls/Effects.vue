@@ -11,7 +11,7 @@ import { injectChannel } from "@/composables/game-channel";
 
 const { items } = defineProps<{ items: EffectItem[] }>()
 
-const { t } = { ...useI18n() };
+const { t } = useI18n();
 const events = inject(KeyboardEventsKey);
 
 const { presenters } = injectChannel();

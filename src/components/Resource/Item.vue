@@ -8,7 +8,7 @@ import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: ResourceItem }>();
 
-const { t } = { ...useI18n() };
+const { t } = useI18n();
 
 const { presenters } = injectChannel();
 const { amount, capacity, change, modifier } = toRefs(item);

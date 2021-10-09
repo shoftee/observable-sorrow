@@ -7,7 +7,7 @@ import Item from "./Item.vue";
 import { injectChannel } from "@/composables/game-channel";
 import { getResources } from "@/composables/presenters";
 
-const { t } = { ...useI18n() };
+const { t } = useI18n();
 
 const show = ref(true);
 const { presenters } = injectChannel();
