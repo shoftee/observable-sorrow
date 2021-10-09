@@ -1,4 +1,4 @@
-import { computed, ComputedRef, reactive } from "vue";
+import { computed, reactive } from "vue";
 
 import { BonfireItemId, ResourceId, EffectId } from "@/_interfaces";
 import {
@@ -11,17 +11,18 @@ import {
 import { EffectView, IStateManager } from ".";
 
 export class BonfirePresenter {
-  readonly all: ComputedRef<BonfireItem[]>;
+  readonly all: BonfireItem[];
 
-  constructor(private readonly manager: IStateManager) {
-    this.all = computed(() => {
-      return Meta.bonfireItems()
-        .map((meta) => this.newBonfireItem(meta))
-        .toArray();
-    });
+  constructor(manager: IStateManager) {
+    this.all = Meta.bonfireItems()
+      .map((meta) => this.newBonfireItem(meta, manager))
+      .toArray();
   }
 
-  private newBonfireItem(meta: BonfireMetadataType): BonfireItem {
+  private newBonfireItem(
+    meta: BonfireMetadataType,
+    manager: IStateManager,
+  ): BonfireItem {
     if (meta.intent.kind === "gather-catnip") {
       return reactive({
         id: meta.id,
@@ -34,7 +35,7 @@ export class BonfirePresenter {
         fulfilled: true,
       });
     } else if (meta.intent.kind === "refine-catnip") {
-      const state = this.manager.recipe(meta.intent.recipeId);
+      const state = manager.recipe(meta.intent.recipeId);
       return reactive({
         id: meta.id,
         label: meta.label,
@@ -49,7 +50,7 @@ export class BonfirePresenter {
       });
     } else {
       const buildingId = meta.intent.buildingId;
-      const state = this.manager.building(buildingId);
+      const state = manager.building(buildingId);
       return reactive({
         id: meta.id,
         label: meta.label,
@@ -63,19 +64,22 @@ export class BonfirePresenter {
 
         ingredients: computed(() => this.ingredients(state.ingredients)),
         effects: computed(() =>
-          this.effects(Meta.building(buildingId).effects.items),
+          this.effects(Meta.building(buildingId).effects.items, manager),
         ),
       });
     }
   }
 
-  private effects(effects: BuildingEffectType[]): EffectItem[] {
+  private effects(
+    effects: BuildingEffectType[],
+    manager: IStateManager,
+  ): EffectItem[] {
     return Array.from(effects, (meta) =>
       reactive({
         id: meta.total,
         label: meta.label,
-        perLevelAmount: this.manager.effectView(meta.per),
-        totalAmount: this.manager.effectView(meta.total),
+        perLevelAmount: manager.effectView(meta.per),
+        totalAmount: manager.effectView(meta.total),
       }),
     );
   }
