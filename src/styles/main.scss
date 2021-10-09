@@ -166,17 +166,16 @@ $tippy-border-color: $dark;
     @extend .list-group, .list-group-flush;
 
     & > li {
-      @extend .clearfix, .list-group-item, .py-1;
+      display: inline-flex;
+      align-items: center;
+      @extend .list-group-item, .py-1;
 
-      & > .ingredient-label {
-        @extend .float-start;
+      & > .label {
+        margin-right: auto;
+        flex-grow: 1;
       }
 
-      & > .ingredient-fulfillment {
-        @extend .float-end;
-      }
-
-      &.unfulfilled > .ingredient-fulfillment {
+      &.unfulfilled > .fulfillment {
         @extend .text-danger;
       }
     }

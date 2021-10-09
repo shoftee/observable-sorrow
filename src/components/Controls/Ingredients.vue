@@ -17,8 +17,8 @@ const fmt = useFormatter(presenters);
   <div>
     <ul class="ingredients-list">
       <li v-for="item in items" :key="item.id" :class="{ unfulfilled: !item.fulfilled }">
-        <div class="ingredient-label">{{ t(item.label) }}</div>
-        <div class="ingredient-fulfillment number">
+        <div class="label">{{ t(item.label) }}</div>
+        <div class="fulfillment number">
           <template v-if="!item.fulfilled">
             {{ fmt.number(item.fulfillment) }} /
             {{ fmt.number(item.requirement) }}
