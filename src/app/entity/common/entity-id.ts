@@ -1,4 +1,4 @@
-import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces/id";
+import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces";
 
 export type EntityId =
   | ResourceId

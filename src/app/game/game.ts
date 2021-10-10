@@ -1,6 +1,7 @@
 import { Entity } from "@/_ecs";
 import { EffectId, InitializeOptions, OnTickedHandler } from "@/_interfaces";
-import { EffectIds, Meta } from "@/_state";
+import { Meta } from "@/_state";
+import { fromObject } from "@/_utils/enumerable";
 import { SystemTimestamp } from "@/_utils/timestamp";
 
 import {
@@ -13,6 +14,8 @@ import {
   EntityAdmin,
   EntityWatcher,
   PopulationEntity,
+  Expr,
+  Exprs,
 } from "../entity";
 import {
   BuildingSystem,
@@ -106,8 +109,8 @@ function* createEntities(): IterableIterator<Entity> {
     yield new BuildingEntity(building.id);
   }
 
-  for (const id of EffectIds()) {
-    yield new EffectEntity(id as EffectId);
+  for (const [id, expr] of fromObject<EffectId, Expr>(Exprs)) {
+    yield new EffectEntity(id, expr);
   }
 
   for (const recipe of Meta.recipes()) {

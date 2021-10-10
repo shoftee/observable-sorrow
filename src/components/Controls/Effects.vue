@@ -2,7 +2,7 @@
 import { computed, inject } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { UnitKind } from "@/_state";
+import { UnitKind } from "@/_interfaces";
 
 import { EffectItem, EffectView } from "@/app/presenters";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";

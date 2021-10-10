@@ -4,19 +4,19 @@ import { computed, ComputedRef, reactive } from "vue";
 import {
   BuildingId,
   EffectId,
+  EffectUnits,
   IPresenterChangeSink,
   PropertyBag,
   RecipeId,
   ResourceId,
+  UnitKind,
 } from "@/_interfaces";
 import {
   BuildingState,
   EffectState,
-  EffectUnits,
   EnvironmentState,
   RecipeState,
   ResourceState,
-  UnitKind,
 } from "@/_state";
 
 export interface IStateManager {

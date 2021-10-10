@@ -29,6 +29,17 @@ export class Enumerable<T> implements Iterable<T> {
   any(selector: (item: T) => boolean): boolean {
     return any(this, selector);
   }
+
+  reduce<TResult>(
+    seed: TResult,
+    accumulator: (acc: TResult, value: T) => TResult,
+  ): TResult {
+    let accumulate = seed;
+    for (const source of this) {
+      accumulate = accumulator(accumulate, source);
+    }
+    return accumulate;
+  }
 }
 
 export function asEnumerable<T>(iterable: Iterable<T>): Enumerable<T> {
@@ -39,4 +50,10 @@ export function asEnumerable<T>(iterable: Iterable<T>): Enumerable<T> {
   }
 
   return new Enumerable(iterator());
+}
+
+export function fromObject<K extends string, V>(
+  o: Record<string, unknown>,
+): Enumerable<[K, V]> {
+  return asEnumerable(Object.entries(o)).map(([k, v]) => [k as K, v as V]);
 }

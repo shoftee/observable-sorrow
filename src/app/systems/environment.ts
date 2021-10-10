@@ -1,5 +1,4 @@
 import { SeasonId, WeatherId } from "@/_interfaces";
-import { WeatherMetadata } from "@/_state";
 import { DefaultChooser } from "@/_utils/probability";
 
 import { CalendarConstants } from "../constants";
@@ -13,7 +12,7 @@ export class EnvironmentSystem extends System {
   }
 
   init(): void {
-    this.updateWeather("spring");
+    this.updateWeather();
   }
 
   update(): void {
@@ -39,24 +38,11 @@ export class EnvironmentSystem extends System {
       environment.state.year++;
     }
 
-    this.updateWeather(newSeason);
+    this.updateWeather();
   }
 
-  private updateWeather(season: string) {
-    const seasonModifier = this.admin.effect("weather.modifier.season");
-    if (season === "spring") {
-      seasonModifier.set(0.5);
-    } else if (season === "winter") {
-      seasonModifier.set(-0.75);
-    } else {
-      seasonModifier.set(0);
-    }
-
-    const weatherId: WeatherId = this.chooseWeather();
-    this.environment.state.weatherId = weatherId;
-
-    const severityModifier = this.admin.effect("weather.modifier.severity");
-    severityModifier.set(WeatherMetadata[weatherId].adjustment);
+  private updateWeather() {
+    this.environment.state.weatherId = this.chooseWeather();
   }
 
   private calculateNextSeason(currentSeason: SeasonId): SeasonId {

@@ -64,7 +64,7 @@ export class BonfirePresenter {
 
         ingredients: computed(() => this.ingredients(state.ingredients)),
         effects: computed(() =>
-          this.effects(Meta.building(buildingId).effects.items, manager),
+          this.effects(Meta.building(buildingId).effects, manager),
         ),
       });
     }

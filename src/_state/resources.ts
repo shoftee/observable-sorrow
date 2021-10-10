@@ -1,4 +1,4 @@
-import { ResourceId, LimitEffectId, DeltaEffectId } from "@/_interfaces";
+import { ResourceId, DeltaEffectId, LimitEffectId } from "@/_interfaces";
 
 export enum UnlockMode {
   FirstQuantity = 0,
@@ -12,8 +12,8 @@ export enum Flag {
 type Flags = Partial<{ [key in keyof typeof Flag]: boolean }>;
 
 type ResourceEffectsType = Readonly<{
-  limit?: LimitEffectId;
   delta?: DeltaEffectId;
+  limit?: LimitEffectId;
 }>;
 
 export type ResourceMetadataType = Readonly<{
@@ -29,8 +29,8 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     id: "catnip",
     label: "resources.catnip.label",
     effects: {
-      limit: "catnip.limit",
       delta: "catnip.delta",
+      limit: "catnip.limit",
     },
     flags: {},
   },
