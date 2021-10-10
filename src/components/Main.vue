@@ -25,9 +25,7 @@ onMounted(async () => {
     </ul>
     <div class="main-container scrollable">
       <div class="scrollable col p-2 pe-1">
-        <div>
-          <Resources />
-        </div>
+        <Resources />
       </div>
       <div class="scrollable col-5 py-2 px-1">
         <div>
