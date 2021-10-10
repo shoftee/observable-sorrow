@@ -88,7 +88,7 @@ export class OrderHandler<T> {
       }
       return { success: true };
     } catch (error) {
-      console.error(error);
+      console.log(error);
       if (typeof error === "string") {
         return { success: false, ErrorMessage: error };
       }

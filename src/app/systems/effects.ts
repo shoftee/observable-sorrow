@@ -54,9 +54,9 @@ class Resolver {
     }
 
     if (this.resolving.has(id)) {
-      console.error("detected cycle during calculation", this.resolving);
+      console.log("detected cycle during calculation", this.resolving);
       throw new Error(
-        `Could not calculate value for effect '${id}', please check error log.`,
+        `Could not calculate value for effect '${id}', please check log.`,
       );
     }
 
@@ -80,9 +80,9 @@ class Resolver {
           this.resolveExpr(this.admin.effect(id));
           const value = this.store.get(id);
           if (value === undefined) {
-            console.error(`value for effect ${id} is not present in store`);
+            console.log(`value for effect ${id} is not present in store`);
             throw new Error(
-              `Could not resolve value for effect '${id}', please check error log.`,
+              `Could not resolve value for effect '${id}', please check log.`,
             );
           }
           return value;
