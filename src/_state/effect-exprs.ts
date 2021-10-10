@@ -142,7 +142,6 @@ export const EffectExpressions: EffectExpr[] = [
       variable("hut.count"),
     ]),
   ]),
-
   // Catnip Production
   ratio(
     "catnip.production",
@@ -155,6 +154,13 @@ export const EffectExpressions: EffectExpr[] = [
       variable("weather.modifier.severity"),
     ]),
   ),
+
+  // Catnip delta
+  sum("catnip.delta", [variable("catnip.production")]),
+
+  // Ad-hoc variables
+  variable("population.growth", 0.01),
+  variable("population.starvation", 0.85),
 ];
 
 export function EffectIds(): Set<string> {

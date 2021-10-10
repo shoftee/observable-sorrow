@@ -12,6 +12,7 @@ import {
   EffectEntity,
   EntityAdmin,
   EntityWatcher,
+  PopulationEntity,
 } from "../entity";
 import {
   BuildingSystem,
@@ -21,6 +22,7 @@ import {
   EnvironmentSystem,
   FulfillmentSystem,
   LockToggleSystem,
+  PopulationSystem,
   ResourceProductionSystem,
   TimeSystem,
 } from "../systems";
@@ -54,6 +56,7 @@ export class Game {
       new EnvironmentSystem(this.admin),
       new FulfillmentSystem(this.admin),
       new LockToggleSystem(this.admin),
+      new PopulationSystem(this.admin),
       new ResourceProductionSystem(this.admin),
       new TimeSystem(this.admin),
     );
@@ -110,7 +113,10 @@ function* createEntities(): IterableIterator<Entity> {
   for (const recipe of Meta.recipes()) {
     yield new RecipeEntity(recipe.id);
   }
+
   for (const resource of Meta.resources()) {
     yield new ResourceEntity(resource.id);
   }
+
+  yield new PopulationEntity();
 }

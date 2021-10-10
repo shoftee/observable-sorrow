@@ -1,18 +1,26 @@
-import { ResourceId, LimitEffectId, ProductionEffectId } from "@/_interfaces";
+import { ResourceId, LimitEffectId, DeltaEffectId } from "@/_interfaces";
+
+export enum UnlockMode {
+  FirstQuantity = 0,
+  FirstCapacity = 1,
+}
 
 export enum Flag {
-  RelockedWhenDepleted,
+  RelockWhenDepleted,
 }
 
 type Flags = Partial<{ [key in keyof typeof Flag]: boolean }>;
 
+type ResourceEffectsType = Readonly<{
+  limit?: LimitEffectId;
+  delta?: DeltaEffectId;
+}>;
+
 export type ResourceMetadataType = Readonly<{
   id: ResourceId;
   label: string;
-  effects: {
-    limit?: LimitEffectId;
-    production?: ProductionEffectId;
-  };
+  unlockMode?: UnlockMode;
+  effects: ResourceEffectsType;
   flags: Flags;
 }>;
 
@@ -22,7 +30,7 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     label: "resources.catnip.label",
     effects: {
       limit: "catnip.limit",
-      production: "catnip.production",
+      delta: "catnip.delta",
     },
     flags: {},
   },
@@ -37,6 +45,7 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   kittens: {
     id: "kittens",
     label: "resources.kittens.label",
+    unlockMode: UnlockMode.FirstCapacity,
     effects: {
       limit: "kittens.limit",
     },

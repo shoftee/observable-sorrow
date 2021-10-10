@@ -22,6 +22,14 @@ onMounted(async () => {
       <li class="nav-item">
         <button class="nav-link active">Bonfire</button>
       </li>
+      <li class="nav-item">
+        <button class="nav-link">
+          Village
+          <div class="badge bg-primary">
+            <span class="number">123.456K</span>
+          </div>
+        </button>
+      </li>
     </ul>
     <div class="main-container scrollable">
       <div class="scrollable col p-2 pe-1">

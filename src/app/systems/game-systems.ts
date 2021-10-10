@@ -6,6 +6,7 @@ import {
   EnvironmentSystem,
   FulfillmentSystem,
   LockToggleSystem,
+  PopulationSystem,
   ResourceProductionSystem,
   TimeSystem,
 } from ".";
@@ -18,6 +19,7 @@ export class GameSystems {
     readonly environment: EnvironmentSystem,
     readonly fulfillment: FulfillmentSystem,
     readonly lockToggle: LockToggleSystem,
+    readonly population: PopulationSystem,
     readonly resourceProduction: ResourceProductionSystem,
     readonly time: TimeSystem,
   ) {}
@@ -43,6 +45,9 @@ export class GameSystems {
 
     // Update effects pool.
     this.effects.update();
+
+    // Update pops.
+    this.population.update();
 
     // Handle resource deltas.
     this.resourceProduction.update();

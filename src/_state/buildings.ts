@@ -12,17 +12,21 @@ export type BuildingEffectType = Readonly<{
   label: string;
 }>;
 
+type BuildingPricesType = Readonly<{
+  ratio: number;
+  base: ResourcesType;
+}>;
+
+type BuildingEffectsType = Readonly<{
+  count: BuildingCountId;
+  items: BuildingEffectType[];
+}>;
+
 export type BuildingMetadataType = Readonly<{
   id: BuildingId;
   unlockRatio: number;
-  prices: {
-    ratio: number;
-    base: ResourcesType;
-  };
-  effects: {
-    count: BuildingCountId;
-    items: BuildingEffectType[];
-  };
+  prices: BuildingPricesType;
+  effects: BuildingEffectsType;
 }>;
 
 export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {

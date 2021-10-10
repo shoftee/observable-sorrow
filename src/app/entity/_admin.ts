@@ -17,6 +17,7 @@ import {
   TimeEntity,
   EffectEntity,
 } from ".";
+import { PopulationEntity } from "./population";
 
 export class EntityAdmin {
   private readonly pool = new Map<EntityId, Entity>();
@@ -110,5 +111,9 @@ export class EntityAdmin {
 
   time(): TimeEntity {
     return this.entity("time", TimeEntity);
+  }
+
+  population(): PopulationEntity {
+    return this.entity("population", PopulationEntity);
   }
 }

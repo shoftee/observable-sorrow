@@ -39,16 +39,16 @@ export class IngredientState {
 }
 
 export type ResourceQuantityType = {
-  id: ResourceId;
-  quantity: number;
+  readonly id: ResourceId;
+  readonly quantity: number;
 };
 
 export type EffectQuantityType = {
-  id: EffectId;
-  amount: number;
+  readonly id: EffectId;
+  readonly amount: number;
 };
 
-export type ResourcesType = Partial<Record<ResourceId, number>>;
+export type ResourcesType = Readonly<Partial<Record<ResourceId, number>>>;
 
 export function toIterable(
   resources: ResourcesType,

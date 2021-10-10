@@ -6,7 +6,11 @@ export type BonfireItemId =
   | BonfireBuildingId;
 
 export type ResourceId = "catnip" | "wood" | "kittens" | "catpower";
-export type ProductionEffectId = `${ResourceId}.production`;
+export type ProductionEffectId =
+  | "catnip.production"
+  | "wood.production"
+  | "catpower.production";
+export type DeltaEffectId = "catnip.delta";
 
 export type BuildingId = BonfireBuildingId;
 export type BuildingCountId = `${BuildingId}.count`;
@@ -30,12 +34,16 @@ export type HutEffectId =
   | "hut.kittens"
   | "hut.kittens.base";
 
+export type PopulationEffectId = "population.growth" | "population.starvation";
+
 export type EffectId =
   | ProductionEffectId
+  | DeltaEffectId
   | LimitEffectId
   | BuildingCountId
   | CatnipFieldEffectId
   | HutEffectId
+  | PopulationEffectId
   | "weather.modifier.season"
   | "weather.modifier.severity";
 

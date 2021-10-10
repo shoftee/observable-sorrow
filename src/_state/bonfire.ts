@@ -5,13 +5,13 @@ type BonfireIntentType =
   | { kind: "refine-catnip"; recipeId: "refine-catnip" }
   | { kind: "buy-building"; buildingId: BonfireBuildingId };
 
-export type BonfireMetadataType = {
+export type BonfireMetadataType = Readonly<{
   id: BonfireItemId;
   intent: BonfireIntentType;
   label: string;
   description: string;
   flavor?: string;
-};
+}>;
 
 export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   "gather-catnip": {

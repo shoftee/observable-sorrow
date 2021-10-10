@@ -7,6 +7,7 @@ export * from "./environment";
 export * from "./effects";
 export * from "./fulfillment";
 export * from "./lock-toggle";
+export * from "./population";
 export * from "./resource-production";
 export * from "./time";
 

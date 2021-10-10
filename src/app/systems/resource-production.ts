@@ -43,9 +43,9 @@ export class ResourceProductionSystem extends System {
         resource.state.capacity = this.admin.effect(limitEffect).get();
       }
 
-      const productionEffect = meta.effects.production;
-      if (productionEffect) {
-        resource.state.change = this.admin.effect(productionEffect).get() ?? 0;
+      const deltaEffect = meta.effects.delta;
+      if (deltaEffect) {
+        resource.state.change = this.admin.effect(deltaEffect).get() ?? 0;
       }
     }
   }
