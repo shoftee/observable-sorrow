@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs } from "vue";
+import { computed, toRefs, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { ResourceItem } from "@/app/presenters/resources";
@@ -13,6 +13,7 @@ const { presenters } = injectChannel();
 const fmt = presenters.formatter;
 
 const { amount, capacity, change, modifier } = toRefs(item);
+const isDeficit = computed(() => unref(change).value < 0);
 </script>
 
 <template>
@@ -20,13 +21,13 @@ const { amount, capacity, change, modifier } = toRefs(item);
     <div class="name col-3">
       <span>{{ t(item.label) }}</span>
       <span
-        v-if="modifier"
+        v-if="modifier?.value"
         class="resource-modifier number"
         :class="{
-          'bg-success': modifier > 0,
-          'bg-danger': modifier < 0,
+          'bg-success': modifier.value > 0,
+          'bg-danger': modifier.value < 0,
         }"
-      >{{ fmt.percent(modifier, "always") }}</span>
+      >{{ fmt.v(modifier) }}</span>
     </div>
     <div class="col-3 number amount">{{ fmt.number(amount, "negative") }}</div>
     <template v-if="capacity">
@@ -37,8 +38,8 @@ const { amount, capacity, change, modifier } = toRefs(item);
     <template v-else>
       <div class="col-3 no-capacity"></div>
     </template>
-    <template v-if="change">
-      <div class="col-3 number change">{{ fmt.number(change, "always") }}/t</div>
+    <template v-if="change.value">
+      <div class="col-3 number change" :class="{ 'text-danger': isDeficit }">{{ fmt.v(change) }}</div>
     </template>
     <template v-else>
       <div class="col-3 no-change"></div>

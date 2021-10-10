@@ -1,4 +1,4 @@
-import { BuildingId, EffectId } from "@/_interfaces";
+import { BuildingId, EffectId, ResourceId } from "@/_interfaces";
 import { asEnumerable } from "@/_utils/enumerable";
 
 import { EntityAdmin } from "..";
@@ -13,6 +13,9 @@ export type ExprContext = {
 const level = (id: BuildingId) => (ctx: ExprContext) =>
   ctx.admin.building(id).state.level;
 
+const res = (id: ResourceId) => (ctx: ExprContext) =>
+  ctx.admin.resource(id).state.amount;
+
 const effect = (id: EffectId) => (ctx: ExprContext) => ctx.val(id);
 
 const unwrap = (expr: Expr, ctx: ExprContext): number =>
@@ -22,6 +25,9 @@ const sum =
   (...exprs: Expr[]) =>
   (ctx: ExprContext) =>
     asEnumerable(exprs).reduce(0, (acc, expr) => acc + unwrap(expr, ctx));
+
+const subtract = (lhs: Expr, rhs: Expr) => (ctx: ExprContext) =>
+  unwrap(lhs, ctx) - unwrap(rhs, ctx);
 
 const prod =
   (...exprs: Expr[]) =>
@@ -47,7 +53,10 @@ export const Exprs: Record<EffectId, Expr> = {
   "catpower.production": 0,
 
   // Catnip delta
-  "catnip.delta": effect("catnip.production"),
+  "catnip.delta": subtract(
+    effect("catnip.production"),
+    effect("population.demand"),
+  ),
   "catnip.production": effect("catnip-field.catnip"),
 
   // catnip fields
@@ -97,5 +106,7 @@ export const Exprs: Record<EffectId, Expr> = {
 
   // population
   "population.growth": 0.01,
-  "population.starvation": 0.85,
+  "population.starvation": 0.2,
+  "population.demand": prod(effect("population.demand.base"), res("kittens")),
+  "population.demand.base": 0.85,
 };

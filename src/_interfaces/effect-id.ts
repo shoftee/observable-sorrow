@@ -23,7 +23,11 @@ export type HutEffectId =
   | "hut.kittens"
   | "hut.kittens.base";
 
-export type PopulationEffectId = "population.growth" | "population.starvation";
+export type PopulationEffectId =
+  | "population.growth"
+  | "population.starvation"
+  | "population.demand"
+  | "population.demand.base";
 
 export type EffectId =
   | ProductionEffectId

@@ -8,7 +8,7 @@ import {
   Meta,
 } from "@/_state";
 
-import { EffectView, IStateManager } from ".";
+import { NumberView, IStateManager } from ".";
 
 export class BonfirePresenter {
   readonly all: BonfireItem[];
@@ -128,6 +128,6 @@ export interface IngredientItem {
 export interface EffectItem {
   id: EffectId;
   label: string;
-  perLevelAmount: EffectView;
-  totalAmount: EffectView;
+  perLevelAmount: NumberView;
+  totalAmount: NumberView;
 }

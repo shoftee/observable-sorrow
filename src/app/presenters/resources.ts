@@ -1,9 +1,9 @@
 import { computed, reactive } from "vue";
 
-import { ResourceId } from "@/_interfaces";
-import { Meta, ResourceMetadataType } from "@/_state";
+import { ResourceId, UnitKind } from "@/_interfaces";
+import { Meta, ResourceMetadataType, ResourceState } from "@/_state";
 
-import { IStateManager } from ".";
+import { IStateManager, NumberView } from ".";
 
 export class ResourcesPresenter {
   readonly all: ResourceItem[];
@@ -25,16 +25,37 @@ export class ResourcesPresenter {
       label: meta.label,
       unlocked: computed(() => res.unlocked),
       amount: computed(() => res.amount),
-      change: computed(() => res.change),
+      change: computed(() => {
+        return meta.id !== "kittens"
+          ? this.resourceChange(res)
+          : this.kittensChange(manager);
+      }),
       capacity: computed(() => res.capacity),
       modifier:
         meta.id !== "catnip"
           ? undefined
-          : computed(() => this.computeCatnipModifier(manager)),
+          : computed(() => this.catnipModifier(manager)),
     });
   }
 
-  private computeCatnipModifier(manager: IStateManager) {
+  private resourceChange(res: ResourceState): NumberView {
+    return {
+      value: res.change,
+      unit: UnitKind.PerTick,
+      showSign: "always",
+    };
+  }
+
+  private kittensChange(manager: IStateManager): NumberView {
+    return {
+      value: manager.population().stockpile,
+      unit: UnitKind.Percent,
+      showSign: "negative",
+      rounded: true,
+    };
+  }
+
+  private catnipModifier(manager: IStateManager): NumberView | undefined {
     const production = manager.effect("catnip-field.catnip");
     const catnipProduction = production.value ?? 0;
 
@@ -44,7 +65,12 @@ export class ResourcesPresenter {
     if (catnipProduction === 0 || weatherModifier === 0) {
       return undefined;
     } else {
-      return weatherModifier;
+      return {
+        value: weatherModifier,
+        unit: UnitKind.Percent,
+        rounded: true,
+        showSign: "always",
+      };
     }
   }
 }
@@ -54,7 +80,7 @@ export interface ResourceItem {
   label: string;
   unlocked: boolean;
   amount: number;
-  change: number;
+  change: NumberView;
   capacity?: number;
-  modifier?: number;
+  modifier?: NumberView;
 }

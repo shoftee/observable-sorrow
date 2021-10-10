@@ -15,9 +15,11 @@ import {
   BuildingState,
   EffectState,
   EnvironmentState,
+  PopulationState,
   RecipeState,
   ResourceState,
 } from "@/_state";
+import { ShowSign } from "@/_utils/notation";
 
 export interface IStateManager {
   building(id: BuildingId): BuildingState;
@@ -25,13 +27,16 @@ export interface IStateManager {
   environment(): EnvironmentState;
   recipe(id: RecipeId): RecipeState;
   resource(id: ResourceId): ResourceState;
+  population(): PopulationState;
 
-  effectView(id: EffectId): ComputedRef<EffectView>;
+  effectView(id: EffectId): ComputedRef<NumberView>;
 }
 
-export interface EffectView {
+export interface NumberView {
   value: number;
   unit: UnitKind;
+  rounded?: boolean;
+  showSign?: ShowSign;
 }
 
 export class StateManager implements IPresenterChangeSink, IStateManager {
@@ -60,6 +65,10 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.values.get("environment") as unknown as EnvironmentState;
   }
 
+  population(): PopulationState {
+    return this.values.get("population") as unknown as PopulationState;
+  }
+
   recipe(id: RecipeId): RecipeState {
     return this.values.get(id) as unknown as RecipeState;
   }
@@ -68,10 +77,12 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.values.get(id) as unknown as ResourceState;
   }
 
-  effectView(id: EffectId): ComputedRef<EffectView> {
+  effectView(id: EffectId): ComputedRef<NumberView> {
     return computed(() => ({
       value: this.effect(id).value ?? 0,
       unit: EffectUnits[id] ?? UnitKind.None,
+      rounded: false,
+      showSign: "always",
     }));
   }
 }

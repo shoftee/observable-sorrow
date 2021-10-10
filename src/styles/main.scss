@@ -167,8 +167,10 @@ main .nav {
         @extend .list-group-item, .small;
 
         .resource-modifier {
-          margin-inline-start: bsize(1);
           @extend .badge, .number;
+          margin-inline-start: bsize(1);
+          position: relative;
+          top: -1px;
         }
       }
     }
