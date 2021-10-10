@@ -5,19 +5,23 @@ import {
   EnvironmentPresenter,
   NumberFormatter,
   ResourcesPresenter,
+  SectionsPresenter,
   StateManager,
 } from ".";
 
 export class PresenterFacade {
   readonly bonfire: BonfirePresenter;
   readonly environment: EnvironmentPresenter;
-  readonly resources: ResourcesPresenter;
   readonly formatter: NumberFormatter;
+  readonly sections: SectionsPresenter;
+  readonly resources: ResourcesPresenter;
 
   constructor(private readonly manager: StateManager) {
     this.bonfire = new BonfirePresenter(this.manager);
     this.environment = new EnvironmentPresenter(this.manager);
+    this.sections = new SectionsPresenter(this.manager);
     this.resources = new ResourcesPresenter(this.manager);
+
     this.formatter = new NumberFormatter(
       {
         precision: 3,

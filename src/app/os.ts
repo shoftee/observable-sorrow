@@ -13,6 +13,7 @@ import {
   NumberFormatter,
   PresenterFacade,
   ResourcesPresenter,
+  SectionsPresenter,
   StateManager,
 } from "./presenters";
 
@@ -26,9 +27,10 @@ export type Channel = {
   };
   presenters: {
     bonfire: BonfirePresenter;
-    resources: ResourcesPresenter;
-    environment: EnvironmentPresenter;
     formatter: NumberFormatter;
+    environment: EnvironmentPresenter;
+    resources: ResourcesPresenter;
+    section: SectionsPresenter;
   };
 };
 
@@ -52,6 +54,7 @@ export async function Setup(): Promise<Channel> {
       environment: presenters.environment,
       formatter: presenters.formatter,
       resources: presenters.resources,
+      section: presenters.sections,
     },
     interactors: {
       bonfire: {

@@ -36,7 +36,7 @@ async function buildItem(id: BonfireItemId): Promise<void> {
         @click="buildItem(item.id)"
       >
         {{ t(item.label) }}
-        <span v-if="level > 0" class="structure-level">{{ level }}</span>
+        <span v-if="level > 0" class="number-annotation border">{{ level }}</span>
       </button>
     </div>
     <template #content>

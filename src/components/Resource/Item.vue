@@ -22,7 +22,7 @@ const isDeficit = computed(() => unref(change).value < 0);
       <span>{{ t(item.label) }}</span>
       <span
         v-if="modifier?.value"
-        class="resource-modifier number"
+        class="resource-modifier number-annotation"
         :class="{
           'bg-success': modifier.value > 0,
           'bg-danger': modifier.value < 0,

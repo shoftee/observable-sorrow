@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 
 import Resources from "./Resource/List.vue";
 import Environment from "./Environment.vue";
@@ -7,31 +8,39 @@ import History from "./History.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
 
 import { injectChannel } from "@/composables/game-channel";
-
-const channel = injectChannel();
+const { interactors, presenters } = injectChannel();
 
 onMounted(async () => {
   // Start the game
-  await channel.interactors.controller.start();
+  await interactors.controller.start();
 })
+
+const { t } = useI18n();
+
+const sections = computed(() => presenters.section.items.filter(s => s.unlocked));
+const enableSections = computed(() => sections.value.length > 1)
 </script>
 
 <template>
   <div class="nav-container scrollable">
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <button class="nav-link active">Bonfire</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link">
-          Village
-          <div class="badge bg-primary">
-            <span class="number">123.456K</span>
-          </div>
+    <ul class="nav nav-pills">
+      <li class="nav-item" v-for="section in sections" :key="section.id">
+        <button
+          class="btn nav-link"
+          :class="{
+            active: section.active,
+            disabled: !enableSections
+          }"
+        >
+          {{ t(section.label) }}
+          <span
+            v-if="section.alert"
+            class="badge rounded-pill bg-danger border border-light"
+          >!</span>
         </button>
       </li>
     </ul>
-    <div class="main-container scrollable">
+    <div class="main-container tab-content scrollable">
       <div class="scrollable col p-2 pe-1">
         <Resources />
       </div>

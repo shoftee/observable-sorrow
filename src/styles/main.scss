@@ -79,9 +79,41 @@ footer {
   overflow-y: auto;
 }
 
-// Badge
-.badge {
+// Custom badge
+.number-annotation {
+  @extend .number;
   @include p(1);
+
+  display: inline-block;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 50rem;
+
+  &:empty {
+    display: none;
+  }
+
+  &.bg-danger,
+  &.bg-success,
+  &.bg-primary,
+  &.bg-dark {
+    @extend .text-light;
+  }
+
+  &.bg-secondary,
+  &.bg-light {
+    @extend .text-dark;
+  }
+
+  button > &,
+  .btn > & {
+    position: relative;
+    top: -1px;
+  }
 }
 
 // Tabs
@@ -90,7 +122,6 @@ main .nav {
   justify-content: center;
 
   @include pt(1);
-  margin-top: calc(2 * bsize(-3) + bsize(-2) + 2px);
 
   .nav-item {
     .nav-link {
@@ -167,10 +198,7 @@ main .nav {
         @extend .list-group-item, .small;
 
         .resource-modifier {
-          @extend .badge, .number;
           margin-inline-start: bsize(1);
-          position: relative;
-          top: -1px;
         }
       }
     }
@@ -179,7 +207,7 @@ main .nav {
 
 // controls
 .btn .structure-level {
-  @extend .badge, .bg-light, .text-dark, .border;
+  @extend .number-annotation, .border;
 }
 
 .btn.capped {

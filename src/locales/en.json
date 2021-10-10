@@ -1,4 +1,13 @@
 {
+  "sections": {
+    "bonfire": {
+      "label": "Bonfire"
+    },
+    "society": {
+      "village": "Village"
+    }
+  },
+
   "resources": {
     "section": {
       "label": "Resources",

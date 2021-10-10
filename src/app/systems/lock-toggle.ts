@@ -11,6 +11,12 @@ export class LockToggleSystem extends System {
     for (const building of this.admin.buildings()) {
       this.updateBuildingUnlocked(building);
     }
+
+    const kittens = this.admin.resource("kittens");
+    if (kittens.state.capacity && kittens.state.capacity > 0) {
+      const population = this.admin.population();
+      population.state.unlocked = true;
+    }
   }
 
   private updateResourceUnlocked(resource: ResourceEntity): void {
