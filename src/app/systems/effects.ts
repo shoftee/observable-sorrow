@@ -1,5 +1,3 @@
-import { EffectId } from "@/_interfaces";
-
 import { System } from ".";
 import { EffectEntity, EntityAdmin, Expr } from "../entity";
 
@@ -26,18 +24,7 @@ class Resolver {
   private readonly resolved: Set<string> = new Set<string>();
   private readonly resolving: Set<string> = new Set<string>();
 
-  private readonly store: ExprValueStore;
-
-  constructor(private readonly admin: EntityAdmin) {
-    this.store = {
-      get: (id: string) => {
-        return this.admin.effect(id as EffectId)?.get();
-      },
-      set: (id: string, val: number) => {
-        this.admin.effect(id as EffectId)?.set(val);
-      },
-    };
-  }
+  constructor(private readonly admin: EntityAdmin) {}
 
   resolveExprs(): void {
     this.resolved.clear();
@@ -66,7 +53,7 @@ class Resolver {
     const calculatedValue = this.unwrap(effect.expr);
     this.resolving.delete(id);
 
-    this.store.set(id, calculatedValue);
+    this.admin.effect(id).set(calculatedValue);
     this.resolved.add(id);
   }
 
@@ -77,8 +64,9 @@ class Resolver {
       return resolver({
         admin: this.admin,
         val: (id) => {
-          this.resolveExpr(this.admin.effect(id));
-          const value = this.store.get(id);
+          const entity = this.admin.effect(id);
+          this.resolveExpr(entity);
+          const value = entity.get();
           if (value === undefined) {
             console.log(`value for effect ${id} is not present in store`);
             throw new Error(
