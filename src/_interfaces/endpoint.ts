@@ -25,10 +25,3 @@ export interface IGameController {
   start(): void;
   stop(): void;
 }
-
-export class GameInteractor {
-  constructor(
-    readonly bonfire: IBonfireInteractor,
-    readonly gameController: IGameController,
-  ) {}
-}

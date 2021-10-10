@@ -1,15 +1,7 @@
 import { Entity } from "@/_ecs";
-import {
-  EffectId,
-  GameInteractor,
-  IGameController,
-  InitializeOptions,
-  OnTickedHandler,
-} from "@/_interfaces";
+import { EffectId, InitializeOptions, OnTickedHandler } from "@/_interfaces";
 import { EffectIds, Meta } from "@/_state";
 import { SystemTimestamp } from "@/_utils/timestamp";
-
-import { GameUpdater } from ".";
 
 import {
   BuildingEntity,
@@ -21,7 +13,6 @@ import {
   EntityAdmin,
   EntityWatcher,
 } from "../entity";
-import { BonfireInteractor } from "../interactors";
 import {
   BuildingSystem,
   CraftingSystem,
@@ -34,14 +25,19 @@ import {
   TimeSystem,
 } from "../systems";
 
+import {
+  InteractorFacade,
+  BonfireInteractor,
+  GameController,
+} from "../interactors";
+
 export class Game {
   private readonly admin: EntityAdmin;
   private readonly watcher: EntityWatcher;
-  private readonly updater: GameUpdater;
   private readonly systems: GameSystems;
   private onTickedHandler?: OnTickedHandler;
 
-  readonly interactor: GameInteractor;
+  readonly interactor: InteractorFacade;
 
   constructor() {
     this.watcher = new EntityWatcher();
@@ -64,14 +60,14 @@ export class Game {
 
     this.systems.init();
 
-    this.updater = new GameUpdater(
+    const controller = new GameController(
       (dt) => this.update(dt),
       new SystemTimestamp(),
     );
 
-    this.interactor = new GameInteractor(
+    this.interactor = new InteractorFacade(
+      controller,
       new BonfireInteractor(this.admin),
-      new GameController(this.updater),
     );
   }
 
@@ -116,17 +112,5 @@ function* createEntities(): IterableIterator<Entity> {
   }
   for (const resource of Meta.resources()) {
     yield new ResourceEntity(resource.id);
-  }
-}
-
-class GameController implements IGameController {
-  constructor(private readonly updater: GameUpdater) {}
-
-  start(): void {
-    this.updater.start();
-  }
-
-  stop(): void {
-    this.updater.stop();
   }
 }

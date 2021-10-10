@@ -1,10 +1,11 @@
+import { IGameController } from "@/_interfaces";
 import { ITimestamp } from "@/_utils/timestamp";
 
-import { TimeConstants } from "../constants";
+import { TimeConstants } from "@/app/constants";
 
 type UpdateFunction = (deltaTime: number) => void;
 
-export class GameUpdater {
+export class GameController implements IGameController {
   private lastTimestamp = 0;
   private handle?: number;
 
