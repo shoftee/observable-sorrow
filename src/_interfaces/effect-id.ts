@@ -41,6 +41,7 @@ export type EffectId =
 
 export enum UnitKind {
   None,
+  Tick,
   PerTick,
   Percent,
 }

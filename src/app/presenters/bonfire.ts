@@ -1,6 +1,6 @@
 import { computed, reactive } from "vue";
 
-import { BonfireItemId, ResourceId, EffectId } from "@/_interfaces";
+import { BonfireItemId, ResourceId, EffectId, UnitKind } from "@/_interfaces";
 import {
   BonfireMetadataType,
   BuildingEffectType,
@@ -92,10 +92,22 @@ export class BonfirePresenter {
         requirement: computed(() => state.requirement),
         fulfillment: computed(() => state.fulfillment),
         fulfilled: computed(() => state.fulfilled),
-        fulfillmentTime: computed(() => state.fulfillmentTime),
+        fulfillmentTime: computed(() => this.fulfillmentTime(state)),
         capped: computed(() => state.capped),
       }),
     );
+  }
+
+  private fulfillmentTime(ingredient: IngredientState): NumberView | undefined {
+    if (ingredient.fulfillmentTime === undefined) {
+      return undefined;
+    }
+    return {
+      value: ingredient.fulfillmentTime,
+      unit: UnitKind.Tick,
+      rounded: true,
+      showSign: "negative",
+    };
   }
 }
 
@@ -121,7 +133,7 @@ export interface IngredientItem {
   requirement: number;
   fulfillment: number;
   fulfilled: boolean;
-  fulfillmentTime?: number | undefined;
+  fulfillmentTime?: NumberView | undefined;
   capped: boolean;
 }
 

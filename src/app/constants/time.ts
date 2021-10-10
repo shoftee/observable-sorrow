@@ -6,4 +6,5 @@ export const TimeConstants = {
   MillisecondsPerUpdate,
   MillisecondsPerTick,
   TicksPerMillisecond,
+  TicksPerSecond: TicksPerMillisecond * 1000,
 };

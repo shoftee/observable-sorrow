@@ -2,9 +2,7 @@
 import { computed, inject } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { UnitKind } from "@/_interfaces";
-
-import { EffectItem, EffectView } from "@/app/presenters";
+import { EffectItem } from "@/app/presenters";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 import { injectChannel } from "@/composables/game-channel";
 
@@ -15,16 +13,6 @@ const events = inject(KeyboardEventsKey);
 
 const { presenters } = injectChannel();
 const fmt = presenters.formatter;
-
-const format = (v: EffectView) => {
-  if (v.unit === UnitKind.Percent) {
-    return fmt.percent(v.value, "always");
-  } else if (v.unit === UnitKind.PerTick) {
-    return fmt.number(v.value, "always") + "/t";
-  } else {
-    return fmt.number(v.value, "always");
-  }
-};
 
 const title = computed(() =>
   events?.shift
@@ -42,7 +30,7 @@ const title = computed(() =>
           <template v-if="item.perLevelAmount" #amount>
             <span class="number">
               {{
-                format(events?.shift ? item.totalAmount : item.perLevelAmount)
+                fmt.v(events?.shift ? item.totalAmount : item.perLevelAmount)
               }}
             </span>
           </template>

@@ -18,6 +18,12 @@ export class PresenterFacade {
     this.bonfire = new BonfirePresenter(this.manager);
     this.environment = new EnvironmentPresenter(this.manager);
     this.resources = new ResourcesPresenter(this.manager);
-    this.formatter = new NumberFormatter(3, new SandcastleBuilderNotation());
+    this.formatter = new NumberFormatter(
+      {
+        precision: 3,
+        units: "seconds",
+      },
+      new SandcastleBuilderNotation(),
+    );
   }
 }

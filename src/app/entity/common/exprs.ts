@@ -57,10 +57,13 @@ export const Exprs: Record<EffectId, Expr> = {
     effect("catnip.production"),
     effect("population.demand"),
   ),
-  "catnip.production": effect("catnip-field.catnip"),
+  "catnip.production": ratio(
+    effect("catnip-field.catnip"),
+    effect("catnip-field.weather"),
+  ),
 
   // catnip fields
-  "catnip-field.catnip.base": ratio(0.125, effect("catnip-field.weather")),
+  "catnip-field.catnip.base": 0.125,
   "catnip-field.catnip": prod(
     effect("catnip-field.catnip.base"),
     level("catnip-field"),

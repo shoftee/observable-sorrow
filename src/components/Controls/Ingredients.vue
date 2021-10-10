@@ -1,36 +1,15 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
+import Ingredient from "./Ingredient.vue";
 
 import { IngredientItem } from "@/app/presenters";
-import { injectChannel } from "@/composables/game-channel";
 
 const { items } = defineProps<{ items: IngredientItem[] }>();
-
-const { t } = useI18n();
-
-const { presenters } = injectChannel();
-const fmt = presenters.formatter;
 </script>
 
 <template>
   <div>
     <ul class="ingredients-list">
-      <li v-for="item in items" :key="item.id" :class="{ unfulfilled: !item.fulfilled }">
-        <div class="label">{{ t(item.label) }}</div>
-        <div class="fulfillment number">
-          <template v-if="!item.fulfilled">
-            {{ fmt.number(item.fulfillment) }} /
-            {{ fmt.number(item.requirement) }}
-            <template
-              v-if="item.fulfillmentTime"
-            >
-              <template v-if="item.fulfillmentTime == Number.POSITIVE_INFINITY">(&infin;)</template>
-              <template v-else>({{ fmt.rounded(item.fulfillmentTime) }}t)</template>
-            </template>
-          </template>
-          <template v-else>{{ fmt.number(item.requirement) }}</template>
-        </div>
-      </li>
+      <Ingredient v-for="item in items" :key="item.id" :item="item" />
     </ul>
   </div>
 </template>
