@@ -1,4 +1,5 @@
 export * from "./common/entity-id";
+export * from "./common/entity";
 export * from "./common/exprs";
 export * from "./common/orders";
 

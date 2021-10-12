@@ -1,4 +1,3 @@
-import { Entity } from "@/_ecs";
 import {
   BuildingId,
   Constructor,
@@ -16,8 +15,9 @@ import {
   EntityWatcher,
   TimeEntity,
   EffectEntity,
+  Entity,
 } from ".";
-import { PopulationEntity } from "./population";
+import { SocietyEntity as SocietyEntity } from "./population";
 
 export class EntityAdmin {
   private readonly pool = new Map<EntityId, Entity>();
@@ -113,7 +113,7 @@ export class EntityAdmin {
     return this.entity("time", TimeEntity);
   }
 
-  population(): PopulationEntity {
-    return this.entity("population", PopulationEntity);
+  society(): SocietyEntity {
+    return this.entity("society", SocietyEntity);
   }
 }

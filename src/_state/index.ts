@@ -8,5 +8,5 @@ export * from "./buildings";
 export * from "./crafting";
 export * from "./effects";
 export * from "./environment";
-export * from "./population";
+export * from "./society";
 export * from "./resources";

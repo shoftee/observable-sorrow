@@ -14,6 +14,7 @@ import {
   PresenterFacade,
   ResourcesPresenter,
   SectionsPresenter,
+  SocietyPresenter,
   StateManager,
 } from "./presenters";
 
@@ -31,6 +32,7 @@ export type Channel = {
     environment: EnvironmentPresenter;
     resources: ResourcesPresenter;
     section: SectionsPresenter;
+    society: SocietyPresenter;
   };
 };
 
@@ -55,6 +57,7 @@ export async function Setup(): Promise<Channel> {
       formatter: presenters.formatter,
       resources: presenters.resources,
       section: presenters.sections,
+      society: presenters.society,
     },
     interactors: {
       bonfire: {

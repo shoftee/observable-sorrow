@@ -15,11 +15,12 @@ import {
   BuildingState,
   EffectState,
   EnvironmentState,
-  PopulationState,
+  SocietyState,
   RecipeState,
   ResourceState,
 } from "@/_state";
 import { ShowSign } from "@/_utils/notation";
+import { EntityId } from "../entity";
 
 export interface IStateManager {
   building(id: BuildingId): BuildingState;
@@ -27,7 +28,7 @@ export interface IStateManager {
   environment(): EnvironmentState;
   recipe(id: RecipeId): RecipeState;
   resource(id: ResourceId): ResourceState;
-  population(): PopulationState;
+  society(): SocietyState;
 
   effectView(id: EffectId): ComputedRef<NumberView>;
 }
@@ -40,13 +41,13 @@ export interface NumberView {
 }
 
 export class StateManager implements IPresenterChangeSink, IStateManager {
-  private readonly values: Map<string, PropertyBag>;
+  private readonly values: Map<EntityId, PropertyBag>;
 
   constructor() {
-    this.values = new Map<string, PropertyBag>();
+    this.values = new Map<EntityId, PropertyBag>();
   }
 
-  update(changes: Map<string, PropertyBag>): void {
+  update(changes: Map<EntityId, PropertyBag>): void {
     for (const [key, value] of changes) {
       const updated = updateObject(value, this.values.get(key));
       this.values.set(key, updated);
@@ -65,8 +66,8 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.values.get("environment") as unknown as EnvironmentState;
   }
 
-  population(): PopulationState {
-    return this.values.get("population") as unknown as PopulationState;
+  society(): SocietyState {
+    return this.values.get("society") as unknown as SocietyState;
   }
 
   recipe(id: RecipeId): RecipeState {

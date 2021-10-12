@@ -6,7 +6,7 @@ export class PopulationSystem extends System {
 
     // apply effects to pops first
     const kittens = this.admin.resource("kittens");
-    const population = this.admin.population().state;
+    const population = this.admin.society().state;
     if (population.stockpile > 1) {
       // A new pop has grown
       this.admin.resource("kittens").delta.addDebit(1);

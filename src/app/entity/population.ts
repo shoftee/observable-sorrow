@@ -1,14 +1,15 @@
 import { reactive } from "vue";
 
-import { Entity } from "@/_ecs";
-import { PopulationState } from "@/_state/population";
+import { SocietyState } from "@/_state/society";
 
-export class PopulationEntity extends Entity {
-  readonly state: PopulationState;
+import { Entity } from ".";
+
+export class SocietyEntity extends Entity {
+  readonly state: SocietyState;
 
   constructor() {
-    super("population");
+    super("society");
 
-    this.state = reactive(new PopulationState());
+    this.state = reactive(new SocietyState());
   }
 }

@@ -3,14 +3,16 @@ import { isReactive, toRaw, watch, WatchStopHandle } from "vue";
 import { PropertyBag, OnTickedHandler } from "@/_interfaces";
 import { asEnumerable } from "@/_utils/enumerable";
 
+import { EntityId } from ".";
+
 interface StatefulEntity {
-  id: string;
+  id: EntityId;
   state?: PropertyBag;
 }
 
 export class EntityWatcher {
-  private readonly handles = new Map<string, WatchStopHandle>();
-  private readonly dirty = new Map<string, PropertyBag>();
+  private readonly handles = new Map<EntityId, WatchStopHandle>();
+  private readonly dirty = new Map<EntityId, PropertyBag>();
 
   watch(entity: StatefulEntity): void {
     if (!entity.state) {
@@ -37,7 +39,7 @@ export class EntityWatcher {
     this.handles.set(entity.id, handle);
   }
 
-  unwatch(id: string): void {
+  unwatch(id: EntityId): void {
     const handle = this.handles.get(id);
     if (handle) {
       handle();
@@ -47,7 +49,7 @@ export class EntityWatcher {
 
   flush(handler: OnTickedHandler): void {
     if (this.dirty.size > 0) {
-      const raw = new Map<string, PropertyBag>(
+      const raw = new Map<EntityId, PropertyBag>(
         asEnumerable(this.dirty).map(([k, v]) => [k, toRaw(v)]),
       );
       handler(raw);

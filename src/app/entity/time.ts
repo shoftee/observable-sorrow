@@ -1,4 +1,4 @@
-import { Entity } from "@/_ecs";
+import { Entity } from ".";
 
 import { CalendarConstants } from "../constants/calendar";
 

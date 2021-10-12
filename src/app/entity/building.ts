@@ -1,13 +1,13 @@
 import { reactive } from "vue";
 
-import { Entity } from "@/_ecs";
 import { BuildingId } from "@/_interfaces";
 import {
   BuildingMetadata,
   BuildingMetadataType,
   BuildingState,
 } from "@/_state";
-import { OrderStatus } from ".";
+
+import { Entity, OrderStatus } from ".";
 
 export class BuildingEntity extends Entity {
   readonly meta: BuildingMetadataType;

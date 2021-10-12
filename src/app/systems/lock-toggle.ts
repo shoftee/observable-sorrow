@@ -14,7 +14,7 @@ export class LockToggleSystem extends System {
 
     const kittens = this.admin.resource("kittens");
     if (kittens.state.capacity && kittens.state.capacity > 0) {
-      const population = this.admin.population();
+      const population = this.admin.society();
       population.state.unlocked = true;
     }
   }

@@ -1,4 +1,3 @@
-import { Entity } from "@/_ecs";
 import { EffectId, InitializeOptions, OnTickedHandler } from "@/_interfaces";
 import { Meta } from "@/_state";
 import { fromObject } from "@/_utils/enumerable";
@@ -13,9 +12,10 @@ import {
   EffectEntity,
   EntityAdmin,
   EntityWatcher,
-  PopulationEntity,
+  SocietyEntity,
   Expr,
   Exprs,
+  Entity,
 } from "../entity";
 import {
   BuildingSystem,
@@ -121,5 +121,5 @@ function* createEntities(): IterableIterator<Entity> {
     yield new ResourceEntity(resource.id);
   }
 
-  yield new PopulationEntity();
+  yield new SocietyEntity();
 }

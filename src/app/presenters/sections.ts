@@ -18,16 +18,17 @@ export class SectionsPresenter {
         label: "sections.society.village",
         active: false,
         alert: computed(() => manager.resource("kittens").amount > 0),
-        unlocked: computed(() => manager.population().unlocked),
+        unlocked: computed(() => manager.society().unlocked),
       }),
     ];
   }
 }
 
+export type SectionId = "bonfire" | "society";
+
 export interface SectionItem {
-  id: "bonfire" | "society";
+  readonly id: SectionId;
   label: string;
   alert: boolean;
-  active: boolean;
   unlocked: boolean;
 }
