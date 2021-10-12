@@ -25,11 +25,13 @@ export class Game {
   private readonly admin: EntityAdmin;
   private readonly watcher: EntityWatcher;
   private readonly systems: GameSystems;
-  private onTickedHandler?: OnTickedHandler;
+  private readonly onTickedHandler: OnTickedHandler;
 
   readonly interactor: InteractorFacade;
 
-  constructor() {
+  constructor(options: InitializeOptions) {
+    this.onTickedHandler = options.onTicked;
+
     this.watcher = new EntityWatcher();
     this.admin = new EntityAdmin(this.watcher);
 
@@ -46,6 +48,7 @@ export class Game {
     );
 
     this.systems.init();
+    this.update(0);
 
     const controller = new GameController(
       (dt) => this.update(dt),
@@ -58,11 +61,6 @@ export class Game {
     );
   }
 
-  public initialize(options: InitializeOptions): void {
-    this.onTickedHandler = options.onTicked;
-    this.update(0);
-  }
-
   private update(dt: number): void {
     // Run updates on all systems.
     this.systems.update(dt);
@@ -73,10 +71,6 @@ export class Game {
 
   private flushChanges() {
     this.watcher.flush((changes) => {
-      if (!this.onTickedHandler)
-        throw new Error(
-          "undefined ticked handler, make sure you call gameController.onTicked(options) before gameController.start()",
-        );
       this.onTickedHandler(changes);
     });
   }
