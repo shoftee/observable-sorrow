@@ -5,12 +5,7 @@ import { EffectId } from "@/_interfaces";
 import { Entity, EntityPool, EntityWatcher, Expr, Exprs, Watch } from ".";
 import { fromObject } from "@/_utils/enumerable";
 
-export interface EffectEntry {
-  get(): number | undefined;
-  set(value: number | undefined): void;
-}
-
-export class EffectEntity extends Entity {
+export class EffectEntity extends Entity<EffectId> {
   readonly state: { value?: number };
 
   constructor(readonly id: EffectId, readonly expr: Expr) {

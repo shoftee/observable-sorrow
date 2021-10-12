@@ -4,7 +4,7 @@ import { SocietyState } from "@/_state/society";
 
 import { Entity, Watch } from ".";
 
-export class SocietyEntity extends Entity {
+export class SocietyEntity extends Entity<"society"> {
   readonly state: SocietyState;
 
   constructor() {

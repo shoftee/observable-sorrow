@@ -2,7 +2,7 @@ import { Entity } from ".";
 
 import { CalendarConstants } from "../constants/calendar";
 
-export class TimeEntity extends Entity {
+export class TimeEntity extends Entity<"time"> {
   readonly ticks: Timer;
   readonly days: Timer;
 

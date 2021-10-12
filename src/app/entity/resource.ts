@@ -4,21 +4,18 @@ import { ResourceId } from "@/_interfaces";
 import {
   Meta,
   ResourceDelta,
-  ResourceMetadata,
   ResourceMetadataType,
   ResourceState,
 } from "@/_state";
 
 import { Entity, EntityPool, EntityWatcher, Watch } from ".";
 
-export class ResourceEntity extends Entity {
-  readonly meta: ResourceMetadataType;
+export class ResourceEntity extends Entity<ResourceId> {
   readonly state: ResourceState;
   readonly delta: ResourceDelta = new ResourceDelta();
 
-  constructor(readonly id: ResourceId) {
-    super(id);
-    this.meta = ResourceMetadata[id];
+  constructor(readonly meta: ResourceMetadataType) {
+    super(meta.id);
     this.state = reactive(new ResourceState());
   }
 
@@ -30,8 +27,8 @@ export class ResourceEntity extends Entity {
 export class ResourcesPool extends EntityPool<ResourceId, ResourceEntity> {
   constructor(watcher: EntityWatcher) {
     super("resources", watcher);
-    for (const { id } of Meta.resources()) {
-      this.add(new ResourceEntity(id));
+    for (const meta of Meta.resources()) {
+      this.add(new ResourceEntity(meta));
     }
   }
 }

@@ -22,10 +22,8 @@ export class RecipeState {
   capped = false;
   fulfilled = false;
 
-  constructor(id: RecipeId) {
-    this.ingredients = IngredientState.fromObject(
-      RecipeMetadata[id].ingredients,
-    );
-    this.products = ResourceMap.fromObject(RecipeMetadata[id].products);
+  constructor(meta: RecipeMetadataType) {
+    this.ingredients = IngredientState.fromObject(meta.ingredients);
+    this.products = ResourceMap.fromObject(meta.products);
   }
 }
