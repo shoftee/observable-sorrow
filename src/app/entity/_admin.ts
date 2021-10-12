@@ -1,13 +1,6 @@
-import {
-  BuildingId,
-  Constructor,
-  EffectId,
-  RecipeId,
-  ResourceId,
-} from "@/_interfaces";
+import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces";
 
 import {
-  EntityId,
   RecipeEntity,
   ResourceEntity,
   BuildingEntity,
@@ -15,105 +8,74 @@ import {
   EntityWatcher,
   TimeEntity,
   EffectEntity,
-  Entity,
+  BuildingsPool,
+  EffectsPool,
+  RecipesPool,
+  ResourcesPool,
 } from ".";
-import { SocietyEntity as SocietyEntity } from "./population";
+import { SocietyEntity as SocietyEntity } from "./society";
 
 export class EntityAdmin {
-  private readonly pool = new Map<EntityId, Entity>();
+  private readonly _buildings: BuildingsPool;
+  private readonly _effects: EffectsPool;
+  private readonly _recipes: RecipesPool;
+  private readonly _resources: ResourcesPool;
 
-  constructor(private readonly watcher: EntityWatcher) {}
+  private readonly _environment: EnvironmentEntity;
+  private readonly _society: SocietyEntity;
+  private readonly _time: TimeEntity;
 
-  add<TEntity extends Entity>(entity: TEntity): void {
-    if (this.pool.has(entity.id as EntityId)) {
-      throw new Error(
-        `An entity with the name '${entity.id}' is already registered.`,
-      );
-    }
-
-    this.pool.set(entity.id as EntityId, entity);
-    this.watcher.watch(entity);
-  }
-
-  remove(id: EntityId): void {
-    if (!this.pool.has(id)) {
-      throw new Error(`There is no registered entity with the ID '${id}'.`);
-    }
-
-    this.pool.delete(id);
-    this.watcher.unwatch(id);
-  }
-
-  protected entity<E extends Entity>(
-    id: EntityId,
-    constructor: Constructor<E>,
-  ): E {
-    const entity = this.pool.get(id);
-    if (entity === undefined) {
-      throw new Error(`There is no registered entity with the id '${id}'.`);
-    }
-    if (!(entity instanceof constructor)) {
-      throw new Error(
-        `Expected the entity with ID '${id}' to be of type '${constructor}' but it was '${Object.getPrototypeOf(
-          entity,
-        )}' instead.`,
-      );
-    } else {
-      return entity;
-    }
-  }
-
-  protected *entities<E extends Entity>(
-    constructor: Constructor<E>,
-  ): Iterable<E> {
-    for (const entity of this.pool.values()) {
-      if (entity instanceof constructor) {
-        yield entity;
-      }
-    }
+  constructor(private readonly watcher: EntityWatcher) {
+    this._buildings = this.watcher.watch(new BuildingsPool(this.watcher));
+    this._effects = this.watcher.watch(new EffectsPool(this.watcher));
+    this._recipes = this.watcher.watch(new RecipesPool(this.watcher));
+    this._resources = this.watcher.watch(new ResourcesPool(this.watcher));
+    this._environment = this.watcher.watch(new EnvironmentEntity());
+    this._society = this.watcher.watch(new SocietyEntity());
+    this._time = this.watcher.watch(new TimeEntity());
   }
 
   recipe(id: RecipeId): RecipeEntity {
-    return this.entity<RecipeEntity>(id, RecipeEntity);
+    return this._recipes.get(id);
   }
 
   recipes(): Iterable<RecipeEntity> {
-    return this.entities(RecipeEntity);
+    return this._recipes.all();
   }
 
   resource(id: ResourceId): ResourceEntity {
-    return this.entity<ResourceEntity>(id, ResourceEntity);
+    return this._resources.get(id);
   }
 
   resources(): Iterable<ResourceEntity> {
-    return this.entities(ResourceEntity);
+    return this._resources.all();
   }
 
   building(id: BuildingId): BuildingEntity {
-    return this.entity(id, BuildingEntity);
+    return this._buildings.get(id);
   }
 
   buildings(): Iterable<BuildingEntity> {
-    return this.entities(BuildingEntity);
+    return this._buildings.all();
   }
 
   effect(id: EffectId): EffectEntity {
-    return this.entity(id, EffectEntity);
+    return this._effects.get(id);
   }
 
   effects(): Iterable<EffectEntity> {
-    return this.entities(EffectEntity);
+    return this._effects.all();
   }
 
   environment(): EnvironmentEntity {
-    return this.entity("environment", EnvironmentEntity);
+    return this._environment;
   }
 
   time(): TimeEntity {
-    return this.entity("time", TimeEntity);
+    return this._time;
   }
 
   society(): SocietyEntity {
-    return this.entity("society", SocietyEntity);
+    return this._society;
   }
 }

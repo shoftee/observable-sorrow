@@ -1,6 +1,11 @@
 import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces";
 
-export type PooledEntityId = "pops" | "resources" | "buildings" | "recipes";
+export type PooledEntityId =
+  | "buildings"
+  | "effects"
+  | "pops"
+  | "recipes"
+  | "resources";
 
 export type EntityId =
   | PooledEntityId

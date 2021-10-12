@@ -2,7 +2,7 @@ import { reactive } from "vue";
 
 import { SocietyState } from "@/_state/society";
 
-import { Entity } from ".";
+import { Entity, Watch } from ".";
 
 export class SocietyEntity extends Entity {
   readonly state: SocietyState;
@@ -11,5 +11,9 @@ export class SocietyEntity extends Entity {
     super("society");
 
     this.state = reactive(new SocietyState());
+  }
+
+  acceptWatcher(watcher: Watch): void {
+    watcher(this.id, this.state);
   }
 }

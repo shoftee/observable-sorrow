@@ -2,7 +2,7 @@ import { reactive } from "vue";
 
 import { EnvironmentState } from "@/_state";
 
-import { Entity } from ".";
+import { Entity, Watch } from ".";
 
 export class EnvironmentEntity extends Entity {
   readonly state: EnvironmentState;
@@ -11,5 +11,9 @@ export class EnvironmentEntity extends Entity {
     super("environment");
 
     this.state = reactive(new EnvironmentState());
+  }
+
+  acceptWatcher(watcher: Watch): void {
+    watcher(this.id, this.state);
   }
 }

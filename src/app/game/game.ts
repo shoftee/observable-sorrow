@@ -1,22 +1,7 @@
-import { EffectId, InitializeOptions, OnTickedHandler } from "@/_interfaces";
-import { Meta } from "@/_state";
-import { fromObject } from "@/_utils/enumerable";
+import { InitializeOptions, OnTickedHandler } from "@/_interfaces";
 import { SystemTimestamp } from "@/_utils/timestamp";
 
-import {
-  BuildingEntity,
-  EnvironmentEntity,
-  TimeEntity,
-  RecipeEntity,
-  ResourceEntity,
-  EffectEntity,
-  EntityAdmin,
-  EntityWatcher,
-  SocietyEntity,
-  Expr,
-  Exprs,
-  Entity,
-} from "../entity";
+import { EntityAdmin, EntityWatcher } from "../entity";
 import {
   BuildingSystem,
   CraftingSystem,
@@ -47,10 +32,6 @@ export class Game {
   constructor() {
     this.watcher = new EntityWatcher();
     this.admin = new EntityAdmin(this.watcher);
-
-    for (const entity of createEntities()) {
-      this.admin.add(entity);
-    }
 
     this.systems = new GameSystems(
       new BuildingSystem(this.admin),
@@ -99,27 +80,4 @@ export class Game {
       this.onTickedHandler(changes);
     });
   }
-}
-
-function* createEntities(): IterableIterator<Entity> {
-  yield new EnvironmentEntity();
-  yield new TimeEntity();
-
-  for (const building of Meta.buildings()) {
-    yield new BuildingEntity(building.id);
-  }
-
-  for (const [id, expr] of fromObject<EffectId, Expr>(Exprs)) {
-    yield new EffectEntity(id, expr);
-  }
-
-  for (const recipe of Meta.recipes()) {
-    yield new RecipeEntity(recipe.id);
-  }
-
-  for (const resource of Meta.resources()) {
-    yield new ResourceEntity(resource.id);
-  }
-
-  yield new SocietyEntity();
 }
