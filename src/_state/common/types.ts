@@ -20,10 +20,6 @@ export class IngredientState {
     this.requirement = requirement;
   }
 
-  static fromMap(map: ResourceMap): IngredientState[] {
-    return IngredientState.fromIterable(map.entries());
-  }
-
   static fromObject(obj: ResourcesType): IngredientState[] {
     return IngredientState.fromIterable(toIterable(obj));
   }

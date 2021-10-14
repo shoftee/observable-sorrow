@@ -1,4 +1,4 @@
-import { EffectId, BuildingId, ResourceId } from "@/_interfaces";
+import { EffectId, BuildingId } from "@/_interfaces";
 import { IngredientState, ResourcesType } from "./common/types";
 
 export type BuildingEffectType = Readonly<{
@@ -66,10 +66,6 @@ export class BuildingState {
 
   constructor(id: BuildingId) {
     const meta = BuildingMetadata[id];
-    this.ingredients = Object.entries(meta.prices.base).map(
-      ([id, requirement]) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        new IngredientState(id as ResourceId, requirement!),
-    );
+    this.ingredients = IngredientState.fromObject(meta.prices.base);
   }
 }
