@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Resources from "./Resource/List.vue";
 import Environment from "./Environment.vue";
 import History from "./History.vue";
+
+import Sections from "./Controls/Sections.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
+import SocietyControls from "./Controls/Society.vue";
 
 import { injectChannel } from "@/composables/game-channel";
+import { SectionId, SectionItem } from "@/app/presenters";
 const { interactors, presenters } = injectChannel();
 
 onMounted(async () => {
@@ -18,35 +22,41 @@ onMounted(async () => {
 const { t } = useI18n();
 
 const sections = computed(() => presenters.section.items.filter(s => s.unlocked));
-const enableSections = computed(() => sections.value.length > 1)
+
+const activeSection = ref<SectionId>("bonfire");
+
+function sectionChanged(item: SectionItem) {
+  activeSection.value = item.id;
+}
+
+const sectionContent = computed(() => {
+  const sectionId = activeSection.value;
+  switch (sectionId) {
+    case "bonfire": return BonfireControls;
+    case "society": return SocietyControls;
+    default: throw new Error(`unexpected section name ${sectionId}`);
+  }
+});
 </script>
 
 <template>
   <div class="nav-container scrollable">
-    <ul class="nav nav-pills">
-      <li class="nav-item" v-for="section in sections" :key="section.id">
-        <button
-          class="btn nav-link"
-          :class="{
-            active: section.active,
-            disabled: !enableSections
-          }"
-        >
-          {{ t(section.label) }}
-          <span
-            v-if="section.alert"
-            class="badge rounded-pill bg-danger border border-light"
-          >!</span>
-        </button>
-      </li>
-    </ul>
+    <Sections :sections="sections" :active="activeSection" @changed="sectionChanged">
+      <template #default="{ section }">
+        {{ t(section.label) }}
+        <span
+          v-if="section.alert"
+          class="badge rounded-pill bg-danger border border-light"
+        >{{ section.alert }}</span>
+      </template>
+    </Sections>
     <div class="main-container tab-content scrollable">
       <div class="scrollable col p-2 pe-1">
         <Resources />
       </div>
       <div class="scrollable col-5 py-2 px-1">
         <div>
-          <BonfireControls />
+          <component :is="sectionContent" />
         </div>
       </div>
       <div class="env-container scrollable col p-2 ps-1 gap-2">

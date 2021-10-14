@@ -6,44 +6,46 @@ export class PopulationSystem extends System {
 
     // apply effects to pops first
     const kittens = this.admin.resource("kittens");
-    const population = this.admin.society().state;
-    if (population.stockpile > 1) {
+    const society = this.admin.society().state;
+    if (society.stockpile > 1) {
       // A new pop has grown
-      this.admin.resource("kittens").delta.addDebit(1);
-      population.stockpile -= 1;
-    } else if (population.stockpile < -1) {
+      society.totalPops += 1;
+      society.stockpile -= 1;
+    } else if (society.stockpile < -1) {
       // A full pop has starved
-      this.admin.resource("kittens").delta.addCredit(1);
-      population.stockpile += 1;
+      society.totalPops -= 1;
+      society.stockpile += 1;
     }
+
+    society.unemployedPops = kittens.state.amount = society.totalPops;
 
     // calculate effects for next tick
     const catnip = this.admin.resource("catnip");
     const kittenCapacity = kittens.state.capacity ?? 0;
     if (kittens.state.amount < kittenCapacity && catnip.state.change > 0) {
       // only grow pops when catnip is increasing.
-      population.delta = this.admin.effect("population.growth").get() ?? 0;
+      society.delta = this.admin.effect("population.growth").get() ?? 0;
 
-      if (population.stockpile < 0) {
+      if (society.stockpile < 0) {
         // if we had fractional starvation, void it.
-        population.stockpile = 0;
+        society.stockpile = 0;
       }
 
-      population.stockpile += dt * population.delta;
+      society.stockpile += dt * society.delta;
     } else if (kittens.state.amount > 0 && catnip.state.amount == 0) {
       // when catnip is 0, pops begin starving.
-      population.delta = this.admin.effect("population.starvation").get() ?? 0;
+      society.delta = this.admin.effect("population.starvation").get() ?? 0;
 
-      if (population.stockpile > 0) {
+      if (society.stockpile > 0) {
         // if we had fractional growth, void it
-        population.stockpile = 0;
+        society.stockpile = 0;
       }
 
-      population.stockpile -= dt * population.delta;
+      society.stockpile -= dt * society.delta;
     } else {
       // otherwise, population is not going to be changing right now, reset state
-      population.delta = 0;
-      population.stockpile = 0;
+      society.delta = 0;
+      society.stockpile = 0;
     }
   }
 }
