@@ -55,7 +55,7 @@ export const Exprs: Record<EffectId, Expr> = {
   // Catnip delta
   "catnip.delta": subtract(
     effect("catnip.production"),
-    effect("population.demand"),
+    effect("population.catnip.demand"),
   ),
   "catnip.production": ratio(
     effect("catnip-field.catnip"),
@@ -108,8 +108,9 @@ export const Exprs: Record<EffectId, Expr> = {
   "hut.catpower": prod(effect("hut.catpower.base"), level("hut")),
 
   // population
-  "population.growth": 0.01,
-  "population.starvation": 0.2,
-  "population.demand": prod(effect("population.demand.base"), res("kittens")),
-  "population.demand.base": 0.85,
+  "population.catnip.demand.base": 0.85,
+  "population.catnip.demand": prod(
+    effect("population.catnip.demand.base"),
+    res("kittens"),
+  ),
 };

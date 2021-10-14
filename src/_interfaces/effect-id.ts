@@ -24,10 +24,8 @@ export type HutEffectId =
   | "hut.kittens.base";
 
 export type PopulationEffectId =
-  | "population.growth"
-  | "population.starvation"
-  | "population.demand"
-  | "population.demand.base";
+  | "population.catnip.demand"
+  | "population.catnip.demand.base";
 
 export type EffectId =
   | ProductionEffectId
@@ -51,6 +49,4 @@ export const EffectUnits: Partial<Record<EffectId, UnitKind>> = {
   "catnip-field.catnip": UnitKind.PerTick,
   "catnip-field.catnip.base": UnitKind.PerTick,
   "catnip-field.weather": UnitKind.Percent,
-  "population.growth": UnitKind.PerTick,
-  "population.starvation": UnitKind.PerTick,
 };
