@@ -13,6 +13,7 @@ import {
   PopulationSystem,
   ResourceProductionSystem,
   TimeSystem,
+  ResourceLimitsSystem,
 } from "../systems";
 
 import {
@@ -43,6 +44,7 @@ export class Game {
       new FulfillmentSystem(this.admin),
       new LockToggleSystem(this.admin),
       new PopulationSystem(this.admin),
+      new ResourceLimitsSystem(this.admin),
       new ResourceProductionSystem(this.admin),
       new TimeSystem(this.admin),
     );

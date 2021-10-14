@@ -1,4 +1,4 @@
-import { ResourceDelta, ResourceMetadata, ResourceState } from "@/_state";
+import { ResourceDelta, ResourceState } from "@/_state";
 
 import { EntityAdmin } from "../entity";
 
@@ -10,11 +10,11 @@ export class ResourceProductionSystem extends System {
   }
 
   init(): void {
-    this.updateEffectValues();
+    this.updateDeltas();
   }
 
   update(): void {
-    this.updateEffectValues();
+    this.updateDeltas();
 
     const dt = this.admin.time().ticks.delta;
     for (const resource of this.admin.resources()) {
@@ -34,14 +34,9 @@ export class ResourceProductionSystem extends System {
     }
   }
 
-  private updateEffectValues() {
+  private updateDeltas() {
     for (const resource of this.admin.resources()) {
-      const meta = ResourceMetadata[resource.id];
-
-      const limitEffect = meta.effects.limit;
-      if (limitEffect) {
-        resource.state.capacity = this.admin.effect(limitEffect).get();
-      }
+      const meta = resource.meta;
 
       const deltaEffect = meta.effects.delta;
       if (deltaEffect) {

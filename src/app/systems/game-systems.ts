@@ -9,6 +9,7 @@ import {
   PopulationSystem,
   ResourceProductionSystem,
   TimeSystem,
+  ResourceLimitsSystem,
 } from ".";
 
 export class GameSystems {
@@ -20,6 +21,7 @@ export class GameSystems {
     readonly fulfillment: FulfillmentSystem,
     readonly lockToggle: LockToggleSystem,
     readonly population: PopulationSystem,
+    readonly resourceLimits: ResourceLimitsSystem,
     readonly resourceProduction: ResourceProductionSystem,
     readonly time: TimeSystem,
   ) {}
@@ -48,6 +50,9 @@ export class GameSystems {
 
     // Update pops.
     this.population.update();
+
+    // Handle resource limits.
+    this.resourceLimits.update();
 
     // Handle resource deltas.
     this.resourceProduction.update();
