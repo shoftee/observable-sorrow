@@ -1,5 +1,5 @@
 import { reactive } from "vue";
-import { EntityId, EntityWatcher, PooledEntityId } from "..";
+import { EntityId, EntityWatcher, PoolEntityId } from "..";
 
 export type Watch = (id: EntityId, state: unknown) => void;
 
@@ -17,7 +17,7 @@ export abstract class EntityPool<
   private readonly pool: Map<TId, TEntity>;
 
   constructor(
-    readonly id: PooledEntityId,
+    readonly id: PoolEntityId,
     private readonly watcher: EntityWatcher,
   ) {
     super(id);
