@@ -3,39 +3,35 @@ import { isReactive, toRaw, watch, WatchStopHandle } from "vue";
 import { PropertyBag, OnTickedHandler } from "@/_interfaces";
 import { asEnumerable } from "@/_utils/enumerable";
 
-import { Entity, EntityId } from ".";
+import { EntityId } from ".";
 
-export class EntityWatcher {
+export interface Watcher {
+  watch(id: EntityId, state: unknown): void;
+  unwatch(id: EntityId): void;
+}
+
+export class EntityWatcher implements Watcher {
   private readonly handles = new Map<EntityId, WatchStopHandle>();
   private readonly dirty = new Map<EntityId, PropertyBag>();
 
-  watch<TEntity extends Entity>(entity: TEntity): TEntity {
-    if (!entity.acceptWatcher) {
-      // ignore entities that have no accept method
-      return entity;
+  watch(id: EntityId, state: unknown): void {
+    if (!isReactive(state)) {
+      throw new Error(`attempted to watch non-reactive state '${id}'`);
     }
 
-    entity.acceptWatcher((id: EntityId, state: unknown) => {
-      if (!isReactive(state)) {
-        throw new Error(`attempted to watch non-reactive state '${id}'`);
-      }
+    const handle = watch(
+      () => state as PropertyBag,
+      (newValue: PropertyBag) => {
+        this.dirty.set(id, newValue);
+      },
+      {
+        deep: true,
+        flush: "sync",
+        immediate: true,
+      },
+    );
 
-      const handle = watch(
-        () => state as PropertyBag,
-        (newValue: PropertyBag) => {
-          this.dirty.set(id, newValue);
-        },
-        {
-          deep: true,
-          flush: "sync",
-          immediate: true,
-        },
-      );
-
-      this.handles.set(id, handle);
-    });
-
-    return entity;
+    this.handles.set(id, handle);
   }
 
   unwatch(id: EntityId): void {

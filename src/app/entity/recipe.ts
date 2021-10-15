@@ -3,7 +3,7 @@ import { reactive } from "vue";
 import { RecipeId } from "@/_interfaces";
 import { Meta, RecipeMetadataType, RecipeState } from "@/_state";
 
-import { Entity, EntityPool, EntityWatcher, OrderStatus, Watch } from ".";
+import { Entity, EntityPool, OrderStatus, Watcher } from ".";
 
 export class RecipeEntity extends Entity<RecipeId> {
   readonly state: RecipeState;
@@ -17,13 +17,13 @@ export class RecipeEntity extends Entity<RecipeId> {
     this.status = OrderStatus.EMPTY;
   }
 
-  acceptWatcher(watcher: Watch): void {
-    watcher(this.id, this.state);
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
   }
 }
 
 export class RecipesPool extends EntityPool<RecipeId, RecipeEntity> {
-  constructor(watcher: EntityWatcher) {
+  constructor(watcher: Watcher) {
     super("recipes", watcher);
     for (const meta of Meta.recipes()) {
       this.add(new RecipeEntity(meta));

@@ -3,7 +3,7 @@ import { reactive } from "vue";
 import { BuildingId } from "@/_interfaces";
 import { BuildingMetadataType, BuildingState, Meta } from "@/_state";
 
-import { Entity, EntityPool, EntityWatcher, OrderStatus, Watch } from ".";
+import { Entity, EntityPool, OrderStatus, Watcher } from ".";
 
 export class BuildingEntity extends Entity<BuildingId> {
   readonly state: BuildingState;
@@ -16,13 +16,13 @@ export class BuildingEntity extends Entity<BuildingId> {
     this.status = OrderStatus.EMPTY;
   }
 
-  acceptWatcher(watcher: Watch): void {
-    watcher(this.id, this.state);
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
   }
 }
 
 export class BuildingsPool extends EntityPool<BuildingId, BuildingEntity> {
-  constructor(watcher: EntityWatcher) {
+  constructor(watcher: Watcher) {
     super("buildings", watcher);
     for (const meta of Meta.buildings()) {
       this.add(new BuildingEntity(meta));

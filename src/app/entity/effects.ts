@@ -2,7 +2,7 @@ import { reactive } from "vue";
 
 import { EffectId } from "@/_interfaces";
 
-import { Entity, EntityPool, EntityWatcher, Expr, Exprs, Watch } from ".";
+import { Entity, EntityPool, Expr, Exprs, Watcher } from ".";
 import { fromObject } from "@/_utils/enumerable";
 
 export class EffectEntity extends Entity<EffectId> {
@@ -13,8 +13,8 @@ export class EffectEntity extends Entity<EffectId> {
     this.state = reactive({ value: undefined });
   }
 
-  acceptWatcher(watcher: Watch): void {
-    watcher(this.id, this.state);
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
   }
 
   get(): number | undefined {
@@ -27,7 +27,7 @@ export class EffectEntity extends Entity<EffectId> {
 }
 
 export class EffectsPool extends EntityPool<EffectId, EffectEntity> {
-  constructor(watcher: EntityWatcher) {
+  constructor(watcher: Watcher) {
     super("effects", watcher);
     for (const [id, expr] of fromObject<EffectId, Expr>(Exprs)) {
       this.add(new EffectEntity(id, expr));

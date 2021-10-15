@@ -1,53 +1,58 @@
 import { reactive } from "vue";
-import { EntityId, EntityWatcher, PoolEntityId } from "..";
 
-export type Watch = (id: EntityId, state: unknown) => void;
+import { EntityId, PoolEntityId, Watcher } from "..";
 
 export abstract class Entity<TId = EntityId> {
   constructor(readonly id: TId) {}
 
-  acceptWatcher?(watcher: Watch): void;
+  watch?(watcher: Watcher): void;
 }
 
 export abstract class EntityPool<
   TId extends EntityId,
   TEntity extends Entity<TId>,
 > extends Entity {
-  private readonly ids: Set<TId>;
+  private readonly ids: TId[];
   private readonly pool: Map<TId, TEntity>;
 
-  constructor(
-    readonly id: PoolEntityId,
-    private readonly watcher: EntityWatcher,
-  ) {
+  constructor(readonly id: PoolEntityId, private readonly watcher: Watcher) {
     super(id);
 
-    this.ids = reactive(new Set<TId>());
+    this.ids = reactive([]);
+    watcher.watch(this.id, this.ids);
+
     this.pool = new Map<TId, TEntity>();
   }
 
-  acceptWatcher(watch: Watch): void {
-    watch(this.id, this.ids);
-  }
-
   add(entity: TEntity): void {
-    if (this.ids.has(entity.id)) {
+    if (this.ids.includes(entity.id)) {
       throw new Error(
         `An entity with the name '${entity.id}' is already registered.`,
       );
     }
 
-    this.ids.add(entity.id);
+    this.ids.push(entity.id);
     this.pool.set(entity.id, entity);
-    this.watcher.watch(entity);
+    entity.watch?.(this.watcher);
   }
 
   remove(id: TId): void {
-    if (!this.ids.has(id)) {
+    if (!this.ids.includes(id)) {
       throw new Error(`There is no registered entity with the ID '${id}'.`);
     }
 
-    this.ids.delete(id);
+    const index = this.ids.indexOf(id);
+    this.ids.splice(index, 1);
+    this.pool.delete(id);
+    this.watcher.unwatch(id);
+  }
+
+  removeLast(): void {
+    if (this.ids.length === 0) {
+      throw new Error("There are no entities in the pool.");
+    }
+
+    const [id] = this.ids.splice(this.ids.length - 1, 1);
     this.pool.delete(id);
     this.watcher.unwatch(id);
   }
@@ -64,5 +69,9 @@ export abstract class EntityPool<
     for (const entity of this.pool.values()) {
       yield entity;
     }
+  }
+
+  get size(): number {
+    return this.pool.size;
   }
 }

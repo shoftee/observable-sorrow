@@ -5,13 +5,13 @@ import {
   ResourceEntity,
   BuildingEntity,
   EnvironmentEntity,
-  EntityWatcher,
   TimeEntity,
   EffectEntity,
   BuildingsPool,
   EffectsPool,
   RecipesPool,
   ResourcesPool,
+  Watcher,
 } from ".";
 import { SocietyEntity as SocietyEntity } from "./society";
 
@@ -25,14 +25,19 @@ export class EntityAdmin {
   private readonly _society: SocietyEntity;
   private readonly _time: TimeEntity;
 
-  constructor(private readonly watcher: EntityWatcher) {
-    this._buildings = this.watcher.watch(new BuildingsPool(this.watcher));
-    this._effects = this.watcher.watch(new EffectsPool(this.watcher));
-    this._recipes = this.watcher.watch(new RecipesPool(this.watcher));
-    this._resources = this.watcher.watch(new ResourcesPool(this.watcher));
-    this._environment = this.watcher.watch(new EnvironmentEntity());
-    this._society = this.watcher.watch(new SocietyEntity());
-    this._time = this.watcher.watch(new TimeEntity());
+  constructor(private readonly watcher: Watcher) {
+    this._buildings = new BuildingsPool(this.watcher);
+    this._effects = new EffectsPool(this.watcher);
+    this._recipes = new RecipesPool(this.watcher);
+    this._resources = new ResourcesPool(this.watcher);
+
+    this._environment = new EnvironmentEntity();
+    this._environment.watch(this.watcher);
+
+    this._society = new SocietyEntity();
+    this._society.watch(this.watcher);
+
+    this._time = new TimeEntity();
   }
 
   recipe(id: RecipeId): RecipeEntity {

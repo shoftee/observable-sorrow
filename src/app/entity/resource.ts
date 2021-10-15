@@ -8,7 +8,7 @@ import {
   ResourceState,
 } from "@/_state";
 
-import { Entity, EntityPool, EntityWatcher, Watch } from ".";
+import { Entity, EntityPool, Watcher } from ".";
 
 export class ResourceEntity extends Entity<ResourceId> {
   readonly state: ResourceState;
@@ -19,13 +19,13 @@ export class ResourceEntity extends Entity<ResourceId> {
     this.state = reactive(new ResourceState());
   }
 
-  acceptWatcher(watcher: Watch): void {
-    watcher(this.id, this.state);
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
   }
 }
 
 export class ResourcesPool extends EntityPool<ResourceId, ResourceEntity> {
-  constructor(watcher: EntityWatcher) {
+  constructor(watcher: Watcher) {
     super("resources", watcher);
     for (const meta of Meta.resources()) {
       this.add(new ResourceEntity(meta));
