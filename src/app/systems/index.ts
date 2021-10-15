@@ -8,8 +8,8 @@ export * from "./effects";
 export * from "./fulfillment";
 export * from "./lock-toggle";
 export * from "./population";
+export * from "./resource-amounts";
 export * from "./resource-limits";
-export * from "./resource-production";
 export * from "./time";
 
 export * from "./game-systems";

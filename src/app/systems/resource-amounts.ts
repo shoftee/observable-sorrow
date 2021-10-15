@@ -4,17 +4,17 @@ import { EntityAdmin } from "../entity";
 
 import { System } from ".";
 
-export class ResourceProductionSystem extends System {
+export class ResourceAmountsSystem extends System {
   constructor(admin: EntityAdmin) {
     super(admin);
   }
 
   init(): void {
-    this.updateDeltas();
+    this.updateChange();
   }
 
   update(): void {
-    this.updateDeltas();
+    this.updateChange();
 
     const dt = this.admin.time().ticks.delta;
     for (const resource of this.admin.resources()) {
@@ -34,7 +34,7 @@ export class ResourceProductionSystem extends System {
     }
   }
 
-  private updateDeltas() {
+  private updateChange() {
     for (const resource of this.admin.resources()) {
       const meta = resource.meta;
 
