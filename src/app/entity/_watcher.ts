@@ -66,10 +66,11 @@ export class EntityWatcher implements Watcher {
   }
 
   flush(handler: OnTickedHandler): void {
-    const watchedPools = this.collectChanges();
-    const changePools = Array.from(watchedPools, (p) => p.toChangePool());
+    const changePools = Array.from(this.collectChanges(), (p) =>
+      p.toChangePool(),
+    );
     handler(changePools);
-    for (const pool of watchedPools) {
+    for (const pool of this.collectChanges()) {
       pool.clear();
     }
   }
