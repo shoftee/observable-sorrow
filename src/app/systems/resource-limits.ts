@@ -1,5 +1,6 @@
-import { System } from ".";
 import { EntityAdmin } from "../entity";
+
+import { System } from ".";
 
 export class ResourceLimitsSystem extends System {
   constructor(admin: EntityAdmin) {
@@ -16,8 +17,7 @@ export class ResourceLimitsSystem extends System {
 
   private updateLimits() {
     for (const resource of this.admin.resources()) {
-      const meta = resource.meta;
-      const limitEffect = meta.effects.limit;
+      const limitEffect = resource.meta.effects.limit;
       if (limitEffect) {
         resource.state.capacity = this.admin.effect(limitEffect).get();
       }

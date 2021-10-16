@@ -23,6 +23,7 @@ export class ResourceAmountsSystem extends System {
         const change = dt * resource.state.change;
 
         if (change > 0) {
+          // change is positive, add value as debit
           resource.delta.addDebit(change);
         } else if (change < 0) {
           // change is negative, add absolute value as credit
@@ -36,9 +37,7 @@ export class ResourceAmountsSystem extends System {
 
   private updateChange() {
     for (const resource of this.admin.resources()) {
-      const meta = resource.meta;
-
-      const deltaEffect = meta.effects.delta;
+      const deltaEffect = resource.meta.effects.delta;
       if (deltaEffect) {
         resource.state.change = this.admin.effect(deltaEffect).get() ?? 0;
       }

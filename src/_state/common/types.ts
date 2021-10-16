@@ -1,5 +1,11 @@
 import { EffectId, ResourceId } from "@/_interfaces";
 
+type ResourceQty = [ResourceId, number];
+
+function toIterable(resources: ResourcesType): Iterable<ResourceQty> {
+  return Object.entries(resources) as Iterable<ResourceQty>;
+}
+
 export class ResourceMap extends Map<ResourceId, number> {
   static fromObject(obj: ResourcesType): ResourceMap {
     return new ResourceMap(toIterable(obj));
@@ -21,14 +27,8 @@ export class IngredientState {
   }
 
   static fromObject(obj: ResourcesType): IngredientState[] {
-    return IngredientState.fromIterable(toIterable(obj));
-  }
-
-  private static fromIterable(
-    iterable: Iterable<[ResourceId, number]>,
-  ): IngredientState[] {
     return Array.from(
-      iterable,
+      toIterable(obj),
       ([id, amount]) => new IngredientState(id, amount),
     );
   }
@@ -45,9 +45,3 @@ export type EffectQuantityType = {
 };
 
 export type ResourcesType = Readonly<Partial<Record<ResourceId, number>>>;
-
-export function toIterable(
-  resources: ResourcesType,
-): Iterable<[ResourceId, number]> {
-  return Object.entries(resources) as Iterable<[ResourceId, number]>;
-}

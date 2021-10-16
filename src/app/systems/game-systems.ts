@@ -28,9 +28,7 @@ export class GameSystems {
 
   init(): void {
     for (const system of this.systems()) {
-      if (system.init) {
-        system.init();
-      }
+      system.init?.();
     }
   }
 
