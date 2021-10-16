@@ -1,10 +1,8 @@
 import { expose } from "comlink";
 
-import {
-  BonfireItemId,
-  InitializeOptions,
-  IRootInteractor,
-} from "@/_interfaces";
+import { BonfireItemId } from "@/_interfaces";
+
+import { IRootInteractor, InitializeOptions } from "./endpoint";
 
 import { Game } from "./game";
 let game: Game;

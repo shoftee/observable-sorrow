@@ -1,7 +1,11 @@
-import { InitializeOptions, OnTickedHandler } from "@/_interfaces";
 import { SystemTimestamp } from "@/_utils/timestamp";
 
 import { EntityAdmin, EntityWatcher } from "../entity";
+import {
+  InteractorFacade,
+  BonfireInteractor,
+  GameController,
+} from "../interactors";
 import {
   BuildingSystem,
   CraftingSystem,
@@ -16,11 +20,7 @@ import {
   TimeSystem,
 } from "../systems";
 
-import {
-  InteractorFacade,
-  BonfireInteractor,
-  GameController,
-} from "../interactors";
+import { InitializeOptions, OnTickedHandler } from "./endpoint";
 
 export class Game {
   private readonly admin: EntityAdmin;

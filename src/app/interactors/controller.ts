@@ -1,7 +1,8 @@
-import { IGameController } from "@/_interfaces";
 import { ITimestamp } from "@/_utils/timestamp";
 
 import { TimeConstants } from "@/app/constants";
+
+import { IGameController } from "../game/endpoint";
 
 type UpdateFunction = (deltaTime: number) => void;
 

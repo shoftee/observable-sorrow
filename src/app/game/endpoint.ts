@@ -1,14 +1,21 @@
-import { EntityId } from "@/app/entity";
-import { BonfireItemId } from "./id";
+import { BonfireItemId } from "@/_interfaces";
 
-export type PropertyBag = Record<string, unknown> | undefined;
-export type OnTickedHandler = (changes: Map<EntityId, PropertyBag>) => void;
+import { EntityId } from "../entity";
+
+export type PropertyBag = Record<string, unknown>;
+export type ChangesBag = {
+  added: Map<EntityId, PropertyBag>;
+  updated: Map<EntityId, PropertyBag>;
+  removed: Set<EntityId>;
+};
+
+export type OnTickedHandler = (changes: ChangesBag) => void;
 export type InitializeOptions = {
   onTicked: OnTickedHandler;
 };
 
 export interface IPresenterChangeSink {
-  update(changes: Map<EntityId, PropertyBag>): void;
+  update(changes: ChangesBag): void;
 }
 
 export interface IRootInteractor {

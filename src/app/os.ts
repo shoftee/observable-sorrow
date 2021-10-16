@@ -5,7 +5,7 @@ import {
   IGameController,
   IRootInteractor,
   OnTickedHandler,
-} from "@/_interfaces";
+} from "./game/endpoint";
 
 import {
   BonfirePresenter,

@@ -5,8 +5,6 @@ import {
   BuildingId,
   EffectId,
   EffectUnits,
-  IPresenterChangeSink,
-  PropertyBag,
   RecipeId,
   ResourceId,
   UnitKind,
@@ -20,7 +18,13 @@ import {
   ResourceState,
 } from "@/_state";
 import { ShowSign } from "@/_utils/notation";
+
 import { EntityId } from "../entity";
+import {
+  ChangesBag,
+  IPresenterChangeSink,
+  PropertyBag,
+} from "../game/endpoint";
 
 export interface IStateManager {
   building(id: BuildingId): BuildingState;
@@ -47,10 +51,15 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     this.values = new Map<EntityId, PropertyBag>();
   }
 
-  update(changes: Map<EntityId, PropertyBag>): void {
-    for (const [key, value] of changes) {
-      const updated = updateObject(value, this.values.get(key));
-      this.values.set(key, updated);
+  update(changes: ChangesBag): void {
+    for (const [id, state] of changes.added) {
+      this.values.set(id as EntityId, reactive(state));
+    }
+    for (const [id, state] of changes.updated) {
+      updateObject(state, this.values.get(id as EntityId));
+    }
+    for (const id of changes.removed) {
+      this.values.delete(id as EntityId);
     }
   }
 

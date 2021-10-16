@@ -1,4 +1,4 @@
-import { IBonfireInteractor, IGameController } from "@/_interfaces";
+import { IGameController, IBonfireInteractor } from "../game/endpoint";
 
 export class InteractorFacade {
   constructor(
