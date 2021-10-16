@@ -17,9 +17,10 @@ import {
   RecipeState,
   ResourceState,
 } from "@/_state";
+import { asEnumerable, Enumerable } from "@/_utils/enumerable";
 import { ShowSign } from "@/_utils/notation";
 
-import { EntityId } from "../entity";
+import { EntityId, PoolEntityId } from "../entity";
 import {
   ChangePool,
   IPresenterChangeSink,
@@ -27,13 +28,20 @@ import {
 } from "../game/endpoint";
 
 export interface IStateManager {
+  buildings(): Enumerable<[BuildingId, BuildingState]>;
   building(id: BuildingId): BuildingState;
-  effect(id: EffectId): EffectState;
-  environment(): EnvironmentState;
-  recipe(id: RecipeId): RecipeState;
-  resource(id: ResourceId): ResourceState;
-  society(): SocietyState;
 
+  effects(): Enumerable<[EffectId, EffectState]>;
+  effect(id: EffectId): EffectState;
+
+  recipes(): Enumerable<[RecipeId, RecipeState]>;
+  recipe(id: RecipeId): RecipeState;
+
+  resources(): Enumerable<[ResourceId, ResourceState]>;
+  resource(id: ResourceId): ResourceState;
+
+  environment(): EnvironmentState;
+  society(): SocietyState;
   effectView(id: EffectId): ComputedRef<NumberView>;
 }
 
@@ -44,51 +52,110 @@ export interface NumberView {
   showSign?: ShowSign;
 }
 
+class ChangePools extends Map<
+  PoolEntityId | undefined,
+  Map<EntityId, PropertyBag>
+> {
+  get buildings(): Map<BuildingId, BuildingState> {
+    return this.getOrAdd("buildings") as unknown as Map<
+      BuildingId,
+      BuildingState
+    >;
+  }
+
+  get effects(): Map<EffectId, EffectState> {
+    return this.getOrAdd("effects") as unknown as Map<EffectId, EffectState>;
+  }
+
+  get recipes(): Map<RecipeId, RecipeState> {
+    return this.getOrAdd("recipes") as unknown as Map<RecipeId, RecipeState>;
+  }
+
+  get resources(): Map<ResourceId, ResourceState> {
+    return this.getOrAdd("resources") as unknown as Map<
+      ResourceId,
+      ResourceState
+    >;
+  }
+
+  getOrAdd(id: PoolEntityId | undefined): Map<EntityId, PropertyBag> {
+    let existing = this.get(id);
+    if (!existing) {
+      existing = new Map<EntityId, PropertyBag>();
+      this.set(id, existing);
+    }
+    return existing;
+  }
+}
+
 export class StateManager implements IPresenterChangeSink, IStateManager {
-  private readonly values: Map<EntityId, PropertyBag>;
+  private readonly pools: ChangePools;
 
   constructor() {
-    this.values = new Map<EntityId, PropertyBag>();
+    this.pools = new ChangePools();
   }
 
   update(changes: Iterable<ChangePool>): void {
     for (const pool of changes) {
-      console.log(pool.poolId ?? "misc", ":", pool);
-
-      for (const [id, state] of pool.added ?? []) {
-        this.values.set(id, reactive(state));
+      const values = this.pools.getOrAdd(pool.poolId);
+      if (pool.added) {
+        for (const [id, state] of pool.added) {
+          values.set(id, reactive(state));
+        }
       }
-      for (const [id, state] of pool.updated ?? []) {
-        updateObject(state, this.values.get(id));
+      if (pool.updated) {
+        for (const [id, state] of pool.updated) {
+          updateObject(state, values.get(id));
+        }
       }
-      for (const id of pool.removed ?? []) {
-        this.values.delete(id);
+      if (pool.removed) {
+        for (const id of pool.removed) {
+          values.delete(id);
+        }
       }
     }
   }
 
+  buildings(): Enumerable<[BuildingId, BuildingState]> {
+    return asEnumerable(this.pools.buildings);
+  }
+
   building(id: BuildingId): BuildingState {
-    return this.values.get(id) as unknown as BuildingState;
+    return this.pools.buildings.get(id) as BuildingState;
+  }
+
+  effects(): Enumerable<[EffectId, EffectState]> {
+    return asEnumerable(this.pools.effects);
   }
 
   effect(id: EffectId): EffectState {
-    return this.values.get(id) as unknown as EffectState;
+    return this.pools.effects.get(id) as EffectState;
   }
 
-  environment(): EnvironmentState {
-    return this.values.get("environment") as unknown as EnvironmentState;
-  }
-
-  society(): SocietyState {
-    return this.values.get("society") as unknown as SocietyState;
+  recipes(): Enumerable<[RecipeId, RecipeState]> {
+    return asEnumerable(this.pools.recipes);
   }
 
   recipe(id: RecipeId): RecipeState {
-    return this.values.get(id) as unknown as RecipeState;
+    return this.pools.recipes.get(id) as RecipeState;
+  }
+
+  resources(): Enumerable<[ResourceId, ResourceState]> {
+    return asEnumerable(this.pools.resources);
   }
 
   resource(id: ResourceId): ResourceState {
-    return this.values.get(id) as unknown as ResourceState;
+    return this.pools.resources.get(id) as ResourceState;
+  }
+
+  environment(): EnvironmentState {
+    const pool = this.pools.getOrAdd(undefined);
+    return pool.get("environment") as unknown as EnvironmentState;
+  }
+
+  society(): SocietyState {
+    const pool = this.pools.getOrAdd(undefined);
+    return pool.get("society") as unknown as SocietyState;
   }
 
   effectView(id: EffectId): ComputedRef<NumberView> {
