@@ -21,7 +21,7 @@ import { ShowSign } from "@/_utils/notation";
 
 import { EntityId } from "../entity";
 import {
-  ChangesBag,
+  ChangePool,
   IPresenterChangeSink,
   PropertyBag,
 } from "../game/endpoint";
@@ -51,15 +51,19 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     this.values = new Map<EntityId, PropertyBag>();
   }
 
-  update(changes: ChangesBag): void {
-    for (const [id, state] of changes.added) {
-      this.values.set(id as EntityId, reactive(state));
-    }
-    for (const [id, state] of changes.updated) {
-      updateObject(state, this.values.get(id as EntityId));
-    }
-    for (const id of changes.removed) {
-      this.values.delete(id as EntityId);
+  update(changes: Iterable<ChangePool>): void {
+    for (const pool of changes) {
+      console.log(pool.poolId ?? "misc", ":", pool);
+
+      for (const [id, state] of pool.added ?? []) {
+        this.values.set(id, reactive(state));
+      }
+      for (const [id, state] of pool.updated ?? []) {
+        updateObject(state, this.values.get(id));
+      }
+      for (const id of pool.removed ?? []) {
+        this.values.delete(id);
+      }
     }
   }
 

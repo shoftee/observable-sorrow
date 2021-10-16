@@ -1,21 +1,23 @@
 import { BonfireItemId } from "@/_interfaces";
 
-import { EntityId } from "../entity";
+import { EntityId, PoolEntityId } from "../entity";
 
 export type PropertyBag = Record<string, unknown>;
-export type ChangesBag = {
-  added: Map<EntityId, PropertyBag>;
-  updated: Map<EntityId, PropertyBag>;
-  removed: Set<EntityId>;
+
+export type ChangePool = {
+  poolId?: PoolEntityId;
+  added?: Map<EntityId, PropertyBag>;
+  updated?: Map<EntityId, PropertyBag>;
+  removed?: Set<EntityId>;
 };
 
-export type OnTickedHandler = (changes: ChangesBag) => void;
+export type OnTickedHandler = (changes: Iterable<ChangePool>) => void;
 export type InitializeOptions = {
   onTicked: OnTickedHandler;
 };
 
 export interface IPresenterChangeSink {
-  update(changes: ChangesBag): void;
+  update(changes: Iterable<ChangePool>): void;
 }
 
 export interface IRootInteractor {

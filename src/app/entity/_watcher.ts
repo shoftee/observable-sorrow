@@ -1,8 +1,8 @@
 import { isReactive, toRaw, watch, WatchStopHandle } from "vue";
 
-import { PropertyBag, OnTickedHandler, ChangesBag } from "../game/endpoint";
+import { PropertyBag, OnTickedHandler, ChangePool } from "../game/endpoint";
 
-import { EntityId } from ".";
+import { EntityId, PoolEntityId } from ".";
 
 export interface Watcher {
   watch(id: EntityId, state: unknown): void;
@@ -11,34 +11,114 @@ export interface Watcher {
 
 export class EntityWatcher implements Watcher {
   private readonly handles = new Map<EntityId, WatchStopHandle>();
+  private readonly misc = new WatchedPool();
+  private readonly pools = new Map<PoolEntityId, WatchedPool>();
 
-  private readonly added = new Map<EntityId, PropertyBag>();
-  private readonly updated = new Map<EntityId, PropertyBag>();
-  private readonly removed = new Set<EntityId>();
-
-  watch(id: EntityId, state: unknown): void {
-    if (!isReactive(state)) {
-      throw new Error(`attempted to watch non-reactive state '${id}'`);
+  pooled(poolId: PoolEntityId): Watcher {
+    let pool = this.pools.get(poolId);
+    if (pool === undefined) {
+      pool = new WatchedPool(poolId);
+      this.pools.set(poolId, pool);
     }
 
-    this.added.set(id, state as PropertyBag);
+    return this.createPooledWatcher(pool);
+  }
 
-    const handle = watch(
-      () => state as PropertyBag,
-      (newValue) => this.updated.set(id, newValue),
-      { deep: true, flush: "sync", immediate: true },
-    );
+  private createPooledWatcher(pool: WatchedPool): Watcher {
+    return {
+      watch: (id, state) => this.watchIn(pool, id, state as PropertyBag),
+      unwatch: (id) => this.unwatchIn(pool, id),
+    };
+  }
 
-    this.handles.set(id, handle);
+  watch(id: EntityId, state: unknown): void {
+    this.watchIn(this.misc, id, state as PropertyBag);
   }
 
   unwatch(id: EntityId): void {
+    this.unwatchIn(this.misc, id);
+  }
+
+  private unwatchIn(pool: WatchedPool, id: EntityId) {
     const handle = this.handles.get(id);
     if (handle) {
       handle();
       this.handles.delete(id);
     }
 
+    pool.remove(id);
+  }
+
+  private watchIn(pool: WatchedPool, id: EntityId, state: PropertyBag) {
+    if (!isReactive(state)) {
+      throw new Error(`attempted to watch non-reactive state '${id}'`);
+    }
+
+    pool.add(id, toRaw(state));
+
+    const handle = watch(
+      () => state,
+      (newValue) => pool.update(id, toRaw(newValue)),
+      { deep: true, flush: "sync" },
+    );
+
+    this.handles.set(id, handle);
+  }
+
+  flush(handler: OnTickedHandler): void {
+    const watchedPools = this.collectChanges();
+    const changePools = Array.from(watchedPools, (p) => p.toChangePool());
+    handler(changePools);
+    for (const pool of watchedPools) {
+      pool.clear();
+    }
+  }
+
+  private *collectChanges(): Iterable<WatchedPool> {
+    if (this.misc.hasChanges()) {
+      yield this.misc;
+    }
+
+    for (const [, pool] of this.pools) {
+      if (pool.hasChanges()) {
+        yield pool;
+      }
+    }
+  }
+}
+
+class WatchedPool {
+  readonly added = new Map<EntityId, PropertyBag>();
+  readonly updated = new Map<EntityId, PropertyBag>();
+  readonly removed = new Set<EntityId>();
+
+  constructor(readonly poolId?: PoolEntityId) {}
+
+  hasChanges(): boolean {
+    return (
+      this.added.size > 0 || this.updated.size > 0 || this.removed.size > 0
+    );
+  }
+
+  clear() {
+    this.added.clear();
+    this.removed.clear();
+    this.updated.clear();
+  }
+
+  add(id: EntityId, state: PropertyBag) {
+    this.added.set(id, toRaw(state));
+  }
+
+  update(id: EntityId, state: PropertyBag) {
+    if (this.added.has(id)) {
+      this.added.set(id, toRaw(state));
+    } else {
+      this.updated.set(id, toRaw(state));
+    }
+  }
+
+  remove(id: EntityId) {
     if (this.added.has(id)) {
       // no need to send a change, just remove entry
       this.added.delete(id);
@@ -51,34 +131,11 @@ export class EntityWatcher implements Watcher {
     }
   }
 
-  flush(handler: OnTickedHandler): void {
-    handler(this.collectChanges());
-  }
-
-  private collectChanges(): ChangesBag {
-    const changes = {
-      added: new Map<EntityId, PropertyBag>(),
-      updated: new Map<EntityId, PropertyBag>(),
-      removed: new Set<EntityId>(),
-    };
-
-    for (const [id, entry] of this.added) {
-      changes.added.set(id, toRaw(entry));
-    }
-    this.added.clear();
-
-    for (const id of this.removed) {
-      changes.removed.add(id);
-    }
-    this.removed.clear();
-
-    for (const [id, entry] of this.updated) {
-      if (!changes.added.has(id) && !changes.removed.has(id)) {
-        changes.updated.set(id, toRaw(entry));
-      }
-    }
-    this.updated.clear();
-
-    return changes;
+  toChangePool(): ChangePool {
+    const result: ChangePool = { poolId: this.poolId };
+    if (this.added.size > 0) result.added = this.added;
+    if (this.updated.size > 0) result.updated = this.updated;
+    if (this.removed.size > 0) result.removed = this.removed;
+    return result;
   }
 }
