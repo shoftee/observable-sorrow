@@ -1,11 +1,18 @@
-import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces";
+import {
+  BuildingId,
+  EffectId,
+  PopId,
+  RecipeId,
+  ResourceId,
+} from "@/_interfaces";
 
 export type PoolEntityId =
   | "buildings"
   | "effects"
   | "pops"
   | "recipes"
-  | "resources";
+  | "resources"
+  | "pops";
 
 export type EntityId =
   | PoolEntityId
@@ -13,6 +20,7 @@ export type EntityId =
   | BuildingId
   | RecipeId
   | EffectId
+  | PopId
   | "environment"
   | "time"
   | "society";

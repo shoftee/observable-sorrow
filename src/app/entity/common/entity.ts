@@ -1,3 +1,4 @@
+import { asEnumerable, Enumerable } from "@/_utils/enumerable";
 import { EntityId, PoolEntityId, Watcher } from "..";
 
 export abstract class Entity<TId = EntityId> {
@@ -10,7 +11,7 @@ export abstract class EntityPool<
   TId extends EntityId,
   TEntity extends Entity<TId>,
 > extends Entity {
-  private readonly pool: Map<TId, TEntity>;
+  protected readonly pool: Map<TId, TEntity>;
 
   constructor(readonly id: PoolEntityId, private readonly watcher: Watcher) {
     super(id);
@@ -18,12 +19,12 @@ export abstract class EntityPool<
     this.pool = new Map<TId, TEntity>();
   }
 
-  add(entity: TEntity): void {
+  protected add(entity: TEntity): void {
     this.pool.set(entity.id, entity);
     entity.watch?.(this.watcher);
   }
 
-  remove(id: TId): void {
+  protected remove(id: TId): void {
     this.pool.delete(id);
     this.watcher.unwatch(id);
   }
@@ -36,10 +37,8 @@ export abstract class EntityPool<
     return entity;
   }
 
-  *all(): Iterable<TEntity> {
-    for (const entity of this.pool.values()) {
-      yield entity;
-    }
+  enumerate(): Enumerable<TEntity> {
+    return asEnumerable(this.pool.values());
   }
 
   get size(): number {

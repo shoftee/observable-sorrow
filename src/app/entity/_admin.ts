@@ -9,6 +9,7 @@ import {
   EffectEntity,
   BuildingsPool,
   EffectsPool,
+  PopsPool,
   RecipesPool,
   ResourcesPool,
   EntityWatcher,
@@ -20,6 +21,7 @@ export class EntityAdmin {
   private readonly _effects: EffectsPool;
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
+  private readonly _pops: PopsPool;
 
   private readonly _environment: EnvironmentEntity;
   private readonly _society: SocietyEntity;
@@ -30,6 +32,7 @@ export class EntityAdmin {
     this._effects = new EffectsPool(this.watcher.pooled("effects"));
     this._recipes = new RecipesPool(this.watcher.pooled("recipes"));
     this._resources = new ResourcesPool(this.watcher.pooled("resources"));
+    this._pops = new PopsPool(this.watcher.pooled("pops"));
 
     this._environment = new EnvironmentEntity();
     this._environment.watch(this.watcher);
@@ -45,7 +48,7 @@ export class EntityAdmin {
   }
 
   recipes(): Iterable<RecipeEntity> {
-    return this._recipes.all();
+    return this._recipes.enumerate();
   }
 
   resource(id: ResourceId): ResourceEntity {
@@ -53,7 +56,7 @@ export class EntityAdmin {
   }
 
   resources(): Iterable<ResourceEntity> {
-    return this._resources.all();
+    return this._resources.enumerate();
   }
 
   building(id: BuildingId): BuildingEntity {
@@ -61,7 +64,7 @@ export class EntityAdmin {
   }
 
   buildings(): Iterable<BuildingEntity> {
-    return this._buildings.all();
+    return this._buildings.enumerate();
   }
 
   effect(id: EffectId): EffectEntity {
@@ -69,7 +72,7 @@ export class EntityAdmin {
   }
 
   effects(): Iterable<EffectEntity> {
-    return this._effects.all();
+    return this._effects.enumerate();
   }
 
   environment(): EnvironmentEntity {
@@ -82,5 +85,9 @@ export class EntityAdmin {
 
   society(): SocietyEntity {
     return this._society;
+  }
+
+  pops(): PopsPool {
+    return this._pops;
   }
 }

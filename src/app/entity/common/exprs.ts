@@ -1,4 +1,4 @@
-import { BuildingId, EffectId, ResourceId } from "@/_interfaces";
+import { BuildingId, EffectId } from "@/_interfaces";
 import { asEnumerable } from "@/_utils/enumerable";
 
 import { EntityAdmin } from "..";
@@ -12,9 +12,6 @@ export type ExprContext = {
 
 const level = (id: BuildingId) => (ctx: ExprContext) =>
   ctx.admin.building(id).state.level;
-
-const res = (id: ResourceId) => (ctx: ExprContext) =>
-  ctx.admin.resource(id).state.amount;
 
 const effect = (id: EffectId) => (ctx: ExprContext) => ctx.val(id);
 
@@ -111,6 +108,6 @@ export const Exprs: Record<EffectId, Expr> = {
   "population.catnip.demand.base": 0.85,
   "population.catnip.demand": prod(
     effect("population.catnip.demand.base"),
-    res("kittens"),
+    ({ admin }) => admin.pops().size,
   ),
 };

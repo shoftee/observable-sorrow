@@ -1,3 +1,8 @@
+import { count } from "@/_utils/collections";
+import { trunc } from "@/_utils/mathx";
+
+import { SocietyEntity } from "../entity";
+
 import { System } from ".";
 
 export class PopulationSystem extends System {
@@ -5,24 +10,48 @@ export class PopulationSystem extends System {
   private readonly starvationPerTick = -0.2;
 
   update(): void {
-    const dt = this.admin.time().ticks.delta;
+    this.updatePops();
+    this.updateStockpile();
+  }
 
-    // apply effects to pops first
-    const society = this.admin.society().state;
-    if (society.stockpile > 1) {
+  private updatePops() {
+    const society = this.admin.society();
+    const state = society.state;
+    const effectiveStockpile = trunc(state.stockpile);
+    if (effectiveStockpile >= 1) {
       // A new pop has grown
-      society.totalPops += 1;
-      society.stockpile -= 1;
-    } else if (society.stockpile < -1) {
+      this.growPops(society, effectiveStockpile);
+      state.stockpile -= effectiveStockpile;
+    } else if (effectiveStockpile <= -1) {
       // A full pop has starved
-      society.totalPops -= 1;
-      society.stockpile += 1;
+      this.killPops(society, Math.abs(effectiveStockpile));
+      state.stockpile += effectiveStockpile;
     }
 
     const kittens = this.admin.resource("kittens");
-    society.unemployedPops = kittens.state.amount = society.totalPops;
+    kittens.state.amount = society.state.totalPops;
+  }
 
-    // calculate effects for next tick
+  private growPops(society: SocietyEntity, n: number): void {
+    const pops = this.admin.pops();
+    const grown = pops.grow(n);
+    society.state.totalPops += grown.length;
+    society.state.unemployedPops += grown.length;
+  }
+
+  private killPops(society: SocietyEntity, n: number): void {
+    const pops = this.admin.pops();
+    const killed = pops.kill(n);
+    society.state.totalPops -= killed.length;
+
+    const unemployedDeaths = count(killed, (p) => p.state.job === "none");
+    society.state.unemployedPops -= unemployedDeaths;
+  }
+
+  private updateStockpile() {
+    const dt = this.admin.time().ticks.delta;
+    const society = this.admin.society().state;
+    const kittens = this.admin.resource("kittens");
     const catnip = this.admin.resource("catnip");
     const kittenCapacity = kittens.state.capacity ?? 0;
     if (catnip.state.amount > 0 && kittens.state.amount < kittenCapacity) {
