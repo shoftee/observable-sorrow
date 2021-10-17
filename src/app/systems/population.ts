@@ -25,7 +25,7 @@ export class PopulationSystem extends System {
     } else if (effectiveStockpile <= -1) {
       // A full pop has starved
       this.killPops(society, Math.abs(effectiveStockpile));
-      state.stockpile += effectiveStockpile;
+      state.stockpile -= effectiveStockpile;
     }
 
     const kittens = this.admin.resource("kittens");
