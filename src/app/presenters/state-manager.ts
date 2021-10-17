@@ -5,6 +5,7 @@ import {
   BuildingId,
   EffectId,
   EffectUnits,
+  PopId,
   RecipeId,
   ResourceId,
   UnitKind,
@@ -16,6 +17,7 @@ import {
   SocietyState,
   RecipeState,
   ResourceState,
+  PopState,
 } from "@/_state";
 import { asEnumerable, Enumerable } from "@/_utils/enumerable";
 import { ShowSign } from "@/_utils/notation";
@@ -33,6 +35,8 @@ export interface IStateManager {
 
   effects(): Enumerable<[EffectId, EffectState]>;
   effect(id: EffectId): EffectState;
+
+  pops(): Enumerable<[PopId, PopState]>;
 
   recipes(): Enumerable<[RecipeId, RecipeState]>;
   recipe(id: RecipeId): RecipeState;
@@ -67,6 +71,10 @@ class ChangePools extends Map<
     return this.getOrAdd("effects") as unknown as Map<EffectId, EffectState>;
   }
 
+  get pops(): Map<PopId, PopState> {
+    return this.getOrAdd("pops") as unknown as Map<PopId, PopState>;
+  }
+
   get recipes(): Map<RecipeId, RecipeState> {
     return this.getOrAdd("recipes") as unknown as Map<RecipeId, RecipeState>;
   }
@@ -81,7 +89,7 @@ class ChangePools extends Map<
   getOrAdd(id: PoolEntityId | undefined): Map<EntityId, PropertyBag> {
     let existing = this.get(id);
     if (!existing) {
-      existing = new Map<EntityId, PropertyBag>();
+      existing = reactive(new Map<EntityId, PropertyBag>());
       this.set(id, existing);
     }
     return existing;
@@ -117,7 +125,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   buildings(): Enumerable<[BuildingId, BuildingState]> {
-    return asEnumerable(this.pools.buildings);
+    return asEnumerable(this.pools.buildings.entries());
   }
 
   building(id: BuildingId): BuildingState {
@@ -125,15 +133,19 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   effects(): Enumerable<[EffectId, EffectState]> {
-    return asEnumerable(this.pools.effects);
+    return asEnumerable(this.pools.effects.entries());
   }
 
   effect(id: EffectId): EffectState {
     return this.pools.effects.get(id) as EffectState;
   }
 
+  pops(): Enumerable<[PopId, PopState]> {
+    return asEnumerable(this.pools.pops.entries());
+  }
+
   recipes(): Enumerable<[RecipeId, RecipeState]> {
-    return asEnumerable(this.pools.recipes);
+    return asEnumerable(this.pools.recipes.entries());
   }
 
   recipe(id: RecipeId): RecipeState {
@@ -141,7 +153,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   resources(): Enumerable<[ResourceId, ResourceState]> {
-    return asEnumerable(this.pools.resources);
+    return asEnumerable(this.pools.resources.entries());
   }
 
   resource(id: ResourceId): ResourceState {

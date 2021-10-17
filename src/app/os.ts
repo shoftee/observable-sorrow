@@ -4,6 +4,7 @@ import {
   IBonfireInteractor,
   IGameController,
   IRootInteractor,
+  ISocietyInteractor,
   OnTickedHandler,
 } from "./game/endpoint";
 
@@ -25,6 +26,7 @@ export type Channel = {
   interactors: {
     controller: RemoteObject<IGameController>;
     bonfire: RemoteObject<IBonfireInteractor>;
+    society: RemoteObject<ISocietyInteractor>;
   };
   presenters: {
     bonfire: BonfirePresenter;
@@ -62,6 +64,10 @@ export async function Setup(): Promise<Channel> {
     interactors: {
       bonfire: {
         buildItem: root.buildItem,
+      },
+      society: {
+        assignJob: root.assignJob,
+        unassignJob: root.unassignJob,
       },
       controller: {
         start: root.start,

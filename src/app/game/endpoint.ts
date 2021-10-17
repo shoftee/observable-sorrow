@@ -1,4 +1,4 @@
-import { BonfireItemId } from "@/_interfaces";
+import { BonfireItemId, JobId } from "@/_interfaces";
 
 import { EntityId, PoolEntityId } from "../entity";
 
@@ -25,10 +25,17 @@ export interface IRootInteractor {
   start(): void;
   stop(): void;
   buildItem(id: BonfireItemId): void;
+  assignJob(id: JobId): void;
+  unassignJob(id: JobId): void;
 }
 
 export interface IBonfireInteractor {
   buildItem(id: BonfireItemId): void;
+}
+
+export interface ISocietyInteractor {
+  assignJob(id: JobId): void;
+  unassignJob(id: JobId): void;
 }
 
 export interface IGameController {

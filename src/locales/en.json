@@ -10,6 +10,19 @@
     }
   },
 
+  "jobs": {
+    "title": "Jobs",
+    "status": {
+      "empty": "But nobody came.",
+      "good": "Work is going well.",
+      "idle": "{idle} are idle."
+    },
+    "woodcutter": {
+      "label": "Woodcutter",
+      "description": "Use your mystical kitten powers and get back to chopping!"
+    }
+  },
+
   "resources": {
     "section": {
       "label": "Resources",

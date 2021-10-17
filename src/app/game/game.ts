@@ -4,6 +4,7 @@ import { EntityAdmin, EntityWatcher } from "../entity";
 import {
   InteractorFacade,
   BonfireInteractor,
+  SocietyInteractor,
   GameController,
 } from "../interactors";
 import {
@@ -60,6 +61,7 @@ export class Game {
     this.interactor = new InteractorFacade(
       controller,
       new BonfireInteractor(this.admin),
+      new SocietyInteractor(this.admin),
     );
   }
 

@@ -1,7 +1,4 @@
-import { count } from "@/_utils/collections";
 import { trunc } from "@/_utils/mathx";
-
-import { SocietyEntity } from "../entity";
 
 import { System } from ".";
 
@@ -11,6 +8,7 @@ export class PopulationSystem extends System {
 
   update(): void {
     this.updatePops();
+    this.updateSociety();
     this.updateStockpile();
   }
 
@@ -20,32 +18,27 @@ export class PopulationSystem extends System {
     const effectiveStockpile = trunc(state.stockpile);
     if (effectiveStockpile >= 1) {
       // A new pop has grown
-      this.growPops(society, effectiveStockpile);
+      this.admin.pops().grow(effectiveStockpile);
       state.stockpile -= effectiveStockpile;
     } else if (effectiveStockpile <= -1) {
       // A full pop has starved
-      this.killPops(society, Math.abs(effectiveStockpile));
+      this.admin.pops().kill(Math.abs(effectiveStockpile));
       state.stockpile -= effectiveStockpile;
     }
+  }
+
+  private updateSociety() {
+    const society = this.admin.society();
 
     const kittens = this.admin.resource("kittens");
-    kittens.state.amount = society.state.totalPops;
-  }
 
-  private growPops(society: SocietyEntity, n: number): void {
     const pops = this.admin.pops();
-    const grown = pops.grow(n);
-    society.state.totalPops += grown.length;
-    society.state.unemployedPops += grown.length;
-  }
+    society.state.totalPops = pops.size;
+    society.state.unemployedPops = pops
+      .enumerate()
+      .count((item) => item.state.job === undefined);
 
-  private killPops(society: SocietyEntity, n: number): void {
-    const pops = this.admin.pops();
-    const killed = pops.kill(n);
-    society.state.totalPops -= killed.length;
-
-    const unemployedDeaths = count(killed, (p) => p.state.job === "none");
-    society.state.unemployedPops -= unemployedDeaths;
+    kittens.state.amount = pops.size;
   }
 
   private updateStockpile() {

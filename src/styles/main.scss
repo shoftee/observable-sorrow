@@ -6,10 +6,6 @@
 @import "tippy.scss";
 
 // Global changes
-.btn {
-  @extend .btn-light;
-}
-
 body {
   @extend .user-select-none;
 }
@@ -82,9 +78,9 @@ footer {
 // Custom badge
 .number-annotation {
   @extend .number;
-  @include p(1);
 
   display: inline-block;
+  padding: 0.2rem 0.25rem;
   font-size: 0.75em;
   font-weight: 700;
   line-height: 1;
@@ -112,7 +108,7 @@ footer {
   button > &,
   .btn > & {
     position: relative;
-    top: -1px;
+    top: -2px;
   }
 }
 

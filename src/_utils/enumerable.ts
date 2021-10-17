@@ -36,6 +36,39 @@ export class Enumerable<T> implements Iterable<T> {
     return count(this, selector ?? TrueFn);
   }
 
+  first(): T {
+    for (const item of this.take(1)) {
+      return item;
+    }
+    throw new Error(`Expected at least one item but iterable was empty.`);
+  }
+
+  take(count: number): Enumerable<T> {
+    const that = this as Iterable<T>;
+    return new Enumerable(
+      (function* () {
+        let taken = 0;
+        for (const item of that) {
+          if (taken++ >= count) break;
+          yield item;
+        }
+      })(),
+    );
+  }
+
+  filter(selector: (item: T) => boolean): Enumerable<T> {
+    const that = this as Iterable<T>;
+    return new Enumerable(
+      (function* () {
+        for (const item of that) {
+          if (selector(item)) {
+            yield item;
+          }
+        }
+      })(),
+    );
+  }
+
   reduce<TResult>(
     seed: TResult,
     accumulator: (acc: TResult, value: T) => TResult,

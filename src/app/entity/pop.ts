@@ -1,7 +1,8 @@
 import { reactive } from "vue";
 
-import { PopId } from "@/_interfaces";
+import { JobId, PopId } from "@/_interfaces";
 import { PopState } from "@/_state";
+import { Enumerable } from "@/_utils/enumerable";
 
 import { Entity, EntityPool, Watcher } from ".";
 
@@ -52,5 +53,13 @@ export class PopsPool extends EntityPool<PopId, PopEntity> {
       yield super.get(id);
       super.remove(id);
     }
+  }
+
+  unemployed(): Enumerable<PopEntity> {
+    return this.enumerate().filter((item) => item.state.job === undefined);
+  }
+
+  withJob(id: JobId): Enumerable<PopEntity> {
+    return this.enumerate().filter((item) => item.state.job === id);
   }
 }

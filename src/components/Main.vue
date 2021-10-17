@@ -46,7 +46,7 @@ const sectionContent = computed(() => {
         {{ t(section.label) }}
         <span
           v-if="section.alert"
-          class="badge rounded-pill bg-danger border border-light"
+          class="number-annotation bg-danger"
         >{{ section.alert }}</span>
       </template>
     </Sections>

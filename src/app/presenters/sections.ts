@@ -5,6 +5,7 @@ import { StateManager } from ".";
 
 export class SectionsPresenter {
   readonly items: SectionItem[];
+
   constructor(manager: StateManager) {
     this.items = [this.bonfireSection(), this.societySection(manager)];
   }

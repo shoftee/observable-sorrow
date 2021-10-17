@@ -4,6 +4,8 @@ import {
   BonfireMetadataType,
   BuildingMetadata,
   BuildingMetadataType,
+  JobMetadata,
+  JobMetadataType,
   RecipeMetadata,
   RecipeMetadataType,
   ResourceMetadata,
@@ -26,6 +28,10 @@ export const Meta = {
 
   building(id: BuildingId): BuildingMetadataType {
     return BuildingMetadata[id];
+  },
+
+  jobs(): Enumerable<JobMetadataType> {
+    return asEnumerable(Object.values(JobMetadata));
   },
 
   recipes(): Enumerable<RecipeMetadataType> {

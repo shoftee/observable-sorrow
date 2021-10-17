@@ -1,30 +1,36 @@
 import { expose } from "comlink";
 
-import { BonfireItemId } from "@/_interfaces";
+import { BonfireItemId, JobId } from "@/_interfaces";
 
 import { IRootInteractor, InitializeOptions } from "./endpoint";
 
 import { Game } from "./game";
 let game: Game;
 
-expose(<IRootInteractor>{
+const interactor: IRootInteractor = {
   initialize(options: InitializeOptions) {
     game = new Game(options);
   },
   start() {
-    if (!game) throw NotInitializedError();
-    game.interactor.controller.start();
+    if (isInitialized(game)) game.interactor.controller.start();
   },
   stop() {
-    if (!game) throw NotInitializedError();
-    game.interactor.controller.stop();
+    if (isInitialized(game)) game.interactor.controller.stop();
   },
   buildItem(id: BonfireItemId) {
-    if (!game) throw NotInitializedError();
-    game.interactor.bonfire.buildItem(id);
+    if (isInitialized(game)) game.interactor.bonfire.buildItem(id);
   },
-});
+  assignJob(id: JobId) {
+    if (isInitialized(game)) game.interactor.society.assignJob(id);
+  },
+  unassignJob(id: JobId) {
+    if (isInitialized(game)) game.interactor.society.unassignJob(id);
+  },
+};
 
-function NotInitializedError() {
-  return new Error("you need to call initialize(options) first");
+expose(interactor);
+
+function isInitialized(game: Game | undefined): game is Game {
+  if (!game) throw new Error("you need to call initialize(options) first");
+  return true;
 }
