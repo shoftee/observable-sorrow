@@ -37,3 +37,17 @@ export function any<T>(
   }
   return false;
 }
+
+// Counts the items that return true for the specified condition.
+export function count<T>(
+  iterable: Iterable<T>,
+  filter: (item: T) => boolean,
+): number {
+  let count = 0;
+  for (const item of iterable) {
+    if (filter(item) === true) {
+      count++;
+    }
+  }
+  return count;
+}

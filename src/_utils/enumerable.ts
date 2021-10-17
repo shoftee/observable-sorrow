@@ -1,4 +1,6 @@
-import { all, any } from "./collections";
+import { all, any, count } from "./collections";
+
+const TrueFn = (_: unknown) => true;
 
 export class Enumerable<T> implements Iterable<T> {
   constructor(private readonly iterator: Iterator<T>) {}
@@ -22,12 +24,16 @@ export class Enumerable<T> implements Iterable<T> {
     );
   }
 
-  all(selector: (item: T) => boolean): boolean {
-    return all(this, selector);
+  all(selector?: (item: T) => boolean): boolean {
+    return all(this, selector ?? TrueFn);
   }
 
-  any(selector: (item: T) => boolean): boolean {
-    return any(this, selector);
+  any(selector?: (item: T) => boolean): boolean {
+    return any(this, selector ?? TrueFn);
+  }
+
+  count(selector?: (item: T) => boolean): number {
+    return count(this, selector ?? TrueFn);
   }
 
   reduce<TResult>(
