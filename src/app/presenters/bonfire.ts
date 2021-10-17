@@ -1,6 +1,6 @@
 import { computed, reactive } from "vue";
 
-import { BonfireItemId, ResourceId, EffectId, UnitKind } from "@/_interfaces";
+import { BonfireItemId, ResourceId, UnitKind } from "@/_interfaces";
 import {
   BonfireMetadataType,
   BuildingEffectType,
@@ -76,9 +76,9 @@ export class BonfirePresenter {
   ): EffectItem[] {
     return Array.from(effects, (meta) =>
       reactive({
-        id: meta.total,
+        id: meta.id,
         label: meta.label,
-        perLevelAmount: manager.effectView(meta.per),
+        singleAmount: manager.effectView(meta.per),
         totalAmount: manager.effectView(meta.total),
       }),
     );
@@ -138,8 +138,8 @@ export interface IngredientItem {
 }
 
 export interface EffectItem {
-  id: EffectId;
+  id: string;
   label: string;
-  perLevelAmount: NumberView;
+  singleAmount: NumberView;
   totalAmount: NumberView;
 }

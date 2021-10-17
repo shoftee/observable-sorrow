@@ -15,11 +15,20 @@
     "status": {
       "empty": "But nobody came.",
       "good": "Work is going well.",
-      "idle": "{idle} are idle."
+      "idle": "One is idle. | {idle} are idle."
+    },
+    "effects": {
+      "title": {
+        "per-worker": "Effects (per worker)",
+        "total": "Effects (total)"
+      }
     },
     "woodcutter": {
       "label": "Woodcutter",
-      "description": "Use your mystical kitten powers and get back to chopping!"
+      "description": "Use your mystical kitten powers and get back to chopping!",
+      "effects": {
+        "wood": "Wood production {amount}"
+      }
     }
   },
 

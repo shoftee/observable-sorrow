@@ -4,15 +4,16 @@ import { useI18n } from 'vue-i18n';
 
 import JobButton from './JobButton.vue';
 
-import { injectChannel } from '@/composables/game-channel';
 import { count } from '@/_utils/collections';
+import { injectChannel } from '@/composables/game-channel';
 
 const { society } = injectChannel().presenters;
 const { t } = useI18n();
+
 const jobs = computed(() => society.jobs);
 const totalPops = computed(() => society.pops.values.length);
 const unemployedPops = computed(() => count(society.pops.values, item => item.job === undefined))
-const hasFullEmployment = computed(() => unemployedPops.value === 0)
+const noUnemployment = computed(() => unemployedPops.value === 0)
 </script>
 
 <template>
@@ -24,15 +25,13 @@ const hasFullEmployment = computed(() => unemployedPops.value === 0)
       <div class="card-header">{{ t("jobs.title") }}</div>
       <div class="card-body">
         <div>
-          <p v-if="hasFullEmployment">{{ t("jobs.status.good") }}</p>
+          <p v-if="noUnemployment">{{ t("jobs.status.good") }}</p>
           <p v-else>
-            <i18n-t scope="global" keypath="jobs.status.idle" tag="span">
-              <template #idle>{{ unemployedPops }}</template>
-            </i18n-t>
+            <span>{{ t("jobs.status.idle", { idle: unemployedPops }, unemployedPops) }}</span>
           </p>
         </div>
-        <div class="col-xl-6 col-md-8 col-12" v-for="job in jobs.values()" :key="job.id">
-          <JobButton :item="job" :disabled="hasFullEmployment" />
+        <div class="col-xl-6 col-12" v-for="job in jobs.values()" :key="job.id">
+          <JobButton :item="job" :noUnemployment="noUnemployment" />
         </div>
       </div>
     </template>

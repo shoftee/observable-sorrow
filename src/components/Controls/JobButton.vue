@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Effects from "./Effects.vue";
@@ -7,10 +7,12 @@ import Effects from "./Effects.vue";
 import { JobId } from "@/_interfaces";
 import { JobItem } from "@/app/presenters";
 import { injectChannel } from "@/composables/game-channel";
+import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
-const { item } = defineProps<{ item: JobItem, disabled: boolean }>();
-
+const { item } = defineProps<{ item: JobItem, noUnemployment: boolean }>();
 const { t } = useI18n();
+const events = inject(KeyboardEventsKey);
+
 const effects = computed(() => item.effects ?? []);
 
 const interactors = injectChannel().interactors;
@@ -30,7 +32,7 @@ async function unassignJob(id: JobId): Promise<void> {
       <button
         type="button"
         class="btn btn-primary w-100 shadow-none"
-        :disabled="item.capped || disabled"
+        :disabled="item.capped || noUnemployment"
         @click="assignJob(item.id)"
       >
         {{ t(item.label) }}
@@ -39,7 +41,7 @@ async function unassignJob(id: JobId): Promise<void> {
       <button
         type="button"
         class="btn btn-primary"
-        :disabled="item.capped || disabled"
+        :disabled="item.capped || noUnemployment"
         @click="assignJob(item.id)"
       >
         <span class="bi-plus"></span>
@@ -59,7 +61,11 @@ async function unassignJob(id: JobId): Promise<void> {
           <p class="description">{{ t(item.description) }}</p>
           <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
         </div>
-        <Effects v-if="effects.length > 0" :items="effects" />
+        <Effects v-if="effects.length > 0" :items="effects">
+          <template
+            #title
+          >{{ t(events?.shift ? "jobs.effects.title.total" : "jobs.effects.title.per-worker") }}</template>
+        </Effects>
       </div>
     </template>
   </tippy>

@@ -39,6 +39,7 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     label: "resources.wood.label",
     effects: {
       limit: "wood.limit",
+      delta: "wood.delta",
     },
     flags: {},
   },

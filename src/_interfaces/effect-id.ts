@@ -1,8 +1,5 @@
-export type ProductionEffectId =
-  | "catnip.production"
-  | "wood.production"
-  | "catpower.production";
-export type DeltaEffectId = "catnip.delta";
+export type ProductionEffectId = "catnip.production" | "wood.production";
+export type DeltaEffectId = "catnip.delta" | "wood.delta";
 
 export type LimitEffectId =
   | "catnip.limit"
@@ -23,6 +20,8 @@ export type HutEffectId =
   | "hut.kittens"
   | "hut.kittens.base";
 
+export type JobEffectId = "jobs.woodcutter.wood.base" | "jobs.woodcutter.wood";
+
 export type PopulationEffectId =
   | "population.catnip.demand"
   | "population.catnip.demand.base";
@@ -34,6 +33,7 @@ export type EffectId =
   | CatnipFieldEffectId
   | HutEffectId
   | PopulationEffectId
+  | JobEffectId
   | "weather.modifier.season"
   | "weather.modifier.severity";
 
@@ -49,4 +49,6 @@ export const EffectUnits: Partial<Record<EffectId, UnitKind>> = {
   "catnip-field.catnip": UnitKind.PerTick,
   "catnip-field.catnip.base": UnitKind.PerTick,
   "catnip-field.weather": UnitKind.Percent,
+  "jobs.woodcutter.wood": UnitKind.PerTick,
+  "jobs.woodcutter.wood.base": UnitKind.PerTick,
 };

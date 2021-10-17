@@ -45,11 +45,11 @@ export const Exprs: Record<EffectId, Expr> = {
   "kittens.limit": effect("hut.kittens"),
   "catpower.limit": effect("hut.catpower"),
 
-  // extras....
-  "wood.production": 0,
-  "catpower.production": 0,
+  // Wood
+  "wood.delta": effect("wood.production"),
+  "wood.production": sum(effect("jobs.woodcutter.wood")),
 
-  // Catnip delta
+  // Catnip
   "catnip.delta": subtract(
     effect("catnip.production"),
     effect("population.catnip.demand"),
@@ -59,7 +59,7 @@ export const Exprs: Record<EffectId, Expr> = {
     effect("catnip-field.weather"),
   ),
 
-  // catnip fields
+  // Catnip fields
   "catnip-field.catnip.base": 0.125,
   "catnip-field.catnip": prod(
     effect("catnip-field.catnip.base"),
@@ -70,7 +70,7 @@ export const Exprs: Record<EffectId, Expr> = {
     effect("weather.modifier.severity"),
   ),
 
-  // weather
+  // Weather
   "weather.modifier.season": ({ admin }) => {
     switch (admin.environment().state.season) {
       case "spring":
@@ -109,5 +109,12 @@ export const Exprs: Record<EffectId, Expr> = {
   "population.catnip.demand": prod(
     effect("population.catnip.demand.base"),
     ({ admin }) => admin.pops().size,
+  ),
+
+  // jobs
+  "jobs.woodcutter.wood.base": 0.018,
+  "jobs.woodcutter.wood": prod(
+    effect("jobs.woodcutter.wood.base"),
+    ({ admin }) => admin.pops().withJob("woodcutter").count(),
   ),
 };

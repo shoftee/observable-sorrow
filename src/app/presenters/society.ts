@@ -1,7 +1,7 @@
 import { computed, reactive } from "vue";
 
 import { JobId, PopId } from "@/_interfaces";
-import { JobMetadataType, Meta, PopState } from "@/_state";
+import { JobEffectType, JobMetadataType, Meta, PopState } from "@/_state";
 
 import { EffectItem, IStateManager } from ".";
 
@@ -55,8 +55,22 @@ export class SocietyPresenter {
       capped: false,
       unlocked: true,
       pops: computed(() => manager.pops().count(([, s]) => s.job === meta.id)),
-      effects: [],
+      effects: computed(() => this.effects(meta.effects, manager)),
     });
+  }
+
+  private effects(
+    effects: JobEffectType[],
+    manager: IStateManager,
+  ): EffectItem[] {
+    return Array.from(effects, (meta) =>
+      reactive({
+        id: meta.id,
+        label: meta.label,
+        singleAmount: manager.effectView(meta.base),
+        totalAmount: manager.effectView(meta.total),
+      }),
+    );
   }
 
   private newPopItem(id: PopId, state: PopState): PopItem {

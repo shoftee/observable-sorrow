@@ -2,6 +2,7 @@ import { EffectId, BuildingId } from "@/_interfaces";
 import { IngredientState, ResourcesType } from "./common/types";
 
 export type BuildingEffectType = Readonly<{
+  id: string;
   per: EffectId;
   total: EffectId;
   label: string;
@@ -29,6 +30,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     unlockRatio: 0.3,
     effects: [
       {
+        id: "catnip",
         per: "catnip-field.catnip.base",
         total: "catnip-field.catnip",
         label: "building-effects.catnip-field.catnip.label",
@@ -44,11 +46,13 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     unlockRatio: 0.3,
     effects: [
       {
+        id: "catpower",
         per: "hut.catpower.base",
         total: "hut.catpower",
         label: "building-effects.hut.catpower.label",
       },
       {
+        id: "kittens",
         per: "hut.kittens.base",
         total: "hut.kittens",
         label: "building-effects.hut.kittens.label",
