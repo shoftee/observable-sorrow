@@ -22,5 +22,6 @@ export type EntityId =
   | EffectId
   | PopId
   | "environment"
-  | "time"
-  | "society";
+  | "player"
+  | "society"
+  | "time";

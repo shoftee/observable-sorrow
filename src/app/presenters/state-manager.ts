@@ -18,6 +18,8 @@ import {
   RecipeState,
   ResourceState,
   PopState,
+  PlayerState,
+  TimeState,
 } from "@/_state";
 import { asEnumerable, Enumerable } from "@/_utils/enumerable";
 import { ShowSign } from "@/_utils/notation";
@@ -45,7 +47,10 @@ export interface IStateManager {
   resource(id: ResourceId): ResourceState;
 
   environment(): EnvironmentState;
+  player(): PlayerState;
   society(): SocietyState;
+  time(): TimeState;
+
   effectView(id: EffectId): ComputedRef<NumberView>;
 }
 
@@ -165,9 +170,19 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return pool.get("environment") as unknown as EnvironmentState;
   }
 
+  player(): PlayerState {
+    const pool = this.pools.getOrAdd(undefined);
+    return pool.get("player") as unknown as PlayerState;
+  }
+
   society(): SocietyState {
     const pool = this.pools.getOrAdd(undefined);
     return pool.get("society") as unknown as SocietyState;
+  }
+
+  time(): TimeState {
+    const pool = this.pools.getOrAdd(undefined);
+    return pool.get("time") as unknown as TimeState;
   }
 
   effectView(id: EffectId): ComputedRef<NumberView> {

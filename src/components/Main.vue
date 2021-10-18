@@ -5,6 +5,7 @@ import { useI18n } from "vue-i18n";
 import Resources from "./Resource/List.vue";
 import Environment from "./Environment.vue";
 import History from "./History.vue";
+import DevTools from "./DevTools.vue";
 
 import Sections from "./Controls/Sections.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
@@ -37,6 +38,8 @@ const sectionContent = computed(() => {
     default: throw new Error(`unexpected section name ${sectionId}`);
   }
 });
+
+const dt = window.__OS_DEVTOOLS__;
 </script>
 
 <template>
@@ -68,5 +71,8 @@ const sectionContent = computed(() => {
         </div>
       </div>
     </div>
+    <suspense>
+      <DevTools v-if="dt && dt.on" />
+    </suspense>
   </div>
 </template>

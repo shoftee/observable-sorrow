@@ -1,8 +1,7 @@
 import { UnitKind } from "@/_interfaces";
 import { INumberNotation, ShowSign } from "@/_utils/notation";
 
-import { NumberView } from ".";
-import { TimeConstants } from "../constants";
+import { IStateManager, NumberView } from ".";
 
 export interface FormattingOptions {
   precision: number;
@@ -11,8 +10,9 @@ export interface FormattingOptions {
 
 export class NumberFormatter {
   constructor(
-    public options: FormattingOptions,
+    private readonly manager: IStateManager,
     private readonly notation: INumberNotation,
+    public options: FormattingOptions,
   ) {}
 
   number(v: number, showSign: ShowSign = "negative"): string {
@@ -42,7 +42,7 @@ export class NumberFormatter {
         } else {
           return (
             this.notation.number(
-              value / TimeConstants.TicksPerSecond,
+              value / (1000 / this.manager.time().millisPerTick),
               precision,
               showSign,
             ) + "s"
@@ -55,7 +55,7 @@ export class NumberFormatter {
         } else {
           return (
             this.notation.number(
-              value * TimeConstants.TicksPerSecond,
+              value * (1000 / this.manager.time().millisPerTick),
               precision,
               showSign,
             ) + "/s"

@@ -1,16 +1,26 @@
-import { Entity } from ".";
+import { reactive } from "vue";
 
-import { CalendarConstants } from "../constants/calendar";
+import { TimeConstants, TimeState } from "@/_state";
+
+import { Entity, Watcher } from ".";
 
 export class TimeEntity extends Entity<"time"> {
+  readonly state: TimeState;
+
   readonly ticks: Timer;
   readonly days: Timer;
 
   constructor() {
     super("time");
 
+    this.state = reactive(new TimeState());
+
     this.ticks = new Timer(1);
-    this.days = new Timer(CalendarConstants.TicksPerDay);
+    this.days = new Timer(TimeConstants.TicksPerDay);
+  }
+
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
   }
 
   *timers(): Iterable<Timer> {

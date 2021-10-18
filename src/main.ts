@@ -14,4 +14,8 @@ applyTippy(app);
 import applyI18n from "./plugins/vue-i18n";
 applyI18n(app);
 
+// add OS devtools
+import applyDevTools from "./plugins/devtools";
+applyDevTools();
+
 app.mount("#app");

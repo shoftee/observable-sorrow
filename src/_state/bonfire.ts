@@ -1,7 +1,7 @@
 import { BonfireBuildingId, BonfireItemId } from "../_interfaces/id";
 
 type BonfireIntentType =
-  | { kind: "gather-catnip"; amount: number }
+  | { kind: "gather-catnip" }
   | { kind: "refine-catnip"; recipeId: "refine-catnip" }
   | { kind: "buy-building"; buildingId: BonfireBuildingId };
 
@@ -16,7 +16,7 @@ export type BonfireMetadataType = Readonly<{
 export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   "gather-catnip": {
     id: "gather-catnip",
-    intent: { kind: "gather-catnip", amount: 1 },
+    intent: { kind: "gather-catnip" },
     label: "bonfire.gather-catnip.label",
     description: "bonfire.gather-catnip.description",
   },

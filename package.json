@@ -23,6 +23,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.5",
     "@intlify/vue-i18n-loader": "^3.2.0",
+    "@types/bootstrap": "^5.1.6",
     "@types/chai": "^4.2.15",
     "@types/lodash": "^4.14.175",
     "@types/mocha": "^8.2.1",

@@ -12,25 +12,32 @@ const interactor: IRootInteractor = {
     game = new Game(options);
   },
   start() {
-    if (isInitialized(game)) game.interactor.controller.start();
+    game.interactor.controller.start();
   },
   stop() {
-    if (isInitialized(game)) game.interactor.controller.stop();
+    game.interactor.controller.stop();
   },
   buildItem(id: BonfireItemId) {
-    if (isInitialized(game)) game.interactor.bonfire.buildItem(id);
+    game.interactor.bonfire.buildItem(id);
   },
   assignJob(id: JobId) {
-    if (isInitialized(game)) game.interactor.society.assignJob(id);
+    game.interactor.society.assignJob(id);
   },
   unassignJob(id: JobId) {
-    if (isInitialized(game)) game.interactor.society.unassignJob(id);
+    game.interactor.society.unassignJob(id);
+  },
+  turnDevToolsOn() {
+    game.interactor.devTools.turnDevToolsOn();
+  },
+  turnDevToolsOff() {
+    game.interactor.devTools.turnDevToolsOff();
+  },
+  setGatherCatnip(amount: number) {
+    game.interactor.devTools.setGatherCatnip(amount);
+  },
+  setTimeAcceleration(factor: number) {
+    game.interactor.devTools.setTimeAcceleration(factor);
   },
 };
 
 expose(interactor);
-
-function isInitialized(game: Game | undefined): game is Game {
-  if (!game) throw new Error("you need to call initialize(options) first");
-  return true;
-}

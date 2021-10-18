@@ -209,3 +209,8 @@ main .nav {
 .btn.capped {
   @extend .text-danger, .text-opacity-75;
 }
+
+// devtools
+#show-devtools {
+  z-index: calc($zindex-offcanvas + 1);
+}

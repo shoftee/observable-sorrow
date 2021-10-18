@@ -1,14 +1,18 @@
 import { SeasonId, WeatherId } from "@/_interfaces";
 import { DefaultChooser } from "@/_utils/probability";
 
-import { CalendarConstants } from "../constants";
-import { EnvironmentEntity } from "../entity";
+import { EnvironmentEntity, TimeEntity } from "../entity";
 
 import { System } from ".";
+import { TimeConstants } from "@/_state";
 
 export class EnvironmentSystem extends System {
   get environment(): EnvironmentEntity {
     return this.admin.environment();
+  }
+
+  get time(): TimeEntity {
+    return this.admin.time();
   }
 
   init(): void {
@@ -18,12 +22,13 @@ export class EnvironmentSystem extends System {
   update(): void {
     const environment = this.environment;
 
-    const days = this.admin.time().days;
+    const days = this.time.days;
     if (days.wholeTicks > 0) {
       environment.state.day += days.wholeTicks;
 
-      while (environment.state.day >= CalendarConstants.DaysPerSeason) {
-        environment.state.day -= CalendarConstants.DaysPerSeason;
+      const daysPerSeason = TimeConstants.DaysPerSeason;
+      while (environment.state.day >= daysPerSeason) {
+        environment.state.day -= daysPerSeason;
         this.progressToNextSeason();
       }
     }

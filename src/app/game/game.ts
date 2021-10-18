@@ -5,6 +5,7 @@ import {
   InteractorFacade,
   BonfireInteractor,
   SocietyInteractor,
+  DevToolsInteractor,
   GameController,
 } from "../interactors";
 import {
@@ -54,6 +55,7 @@ export class Game {
     this.update(0);
 
     const controller = new GameController(
+      this.admin,
       (dt) => this.update(dt),
       new SystemTimestamp(),
     );
@@ -62,6 +64,7 @@ export class Game {
       controller,
       new BonfireInteractor(this.admin),
       new SocietyInteractor(this.admin),
+      new DevToolsInteractor(this.admin),
     );
   }
 

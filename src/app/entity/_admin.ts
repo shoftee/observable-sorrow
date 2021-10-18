@@ -1,20 +1,21 @@
 import { BuildingId, EffectId, RecipeId, ResourceId } from "@/_interfaces";
 
 import {
-  RecipeEntity,
-  ResourceEntity,
   BuildingEntity,
-  EnvironmentEntity,
-  TimeEntity,
-  EffectEntity,
   BuildingsPool,
+  EffectEntity,
   EffectsPool,
-  PopsPool,
-  RecipesPool,
-  ResourcesPool,
   EntityWatcher,
+  EnvironmentEntity,
+  PopsPool,
+  RecipeEntity,
+  RecipesPool,
+  ResourceEntity,
+  ResourcesPool,
+  PlayerEntity,
+  SocietyEntity,
+  TimeEntity,
 } from ".";
-import { SocietyEntity as SocietyEntity } from "./society";
 
 export class EntityAdmin {
   private readonly _buildings: BuildingsPool;
@@ -24,6 +25,7 @@ export class EntityAdmin {
   private readonly _pops: PopsPool;
 
   private readonly _environment: EnvironmentEntity;
+  private readonly _player: PlayerEntity;
   private readonly _society: SocietyEntity;
   private readonly _time: TimeEntity;
 
@@ -37,26 +39,14 @@ export class EntityAdmin {
     this._environment = new EnvironmentEntity();
     this._environment.watch(this.watcher);
 
+    this._player = new PlayerEntity();
+    this._player.watch(this.watcher);
+
     this._society = new SocietyEntity();
     this._society.watch(this.watcher);
 
     this._time = new TimeEntity();
-  }
-
-  recipe(id: RecipeId): RecipeEntity {
-    return this._recipes.get(id);
-  }
-
-  recipes(): Iterable<RecipeEntity> {
-    return this._recipes.enumerate();
-  }
-
-  resource(id: ResourceId): ResourceEntity {
-    return this._resources.get(id);
-  }
-
-  resources(): Iterable<ResourceEntity> {
-    return this._resources.enumerate();
+    this._time.watch(this.watcher);
   }
 
   building(id: BuildingId): BuildingEntity {
@@ -75,19 +65,39 @@ export class EntityAdmin {
     return this._effects.enumerate();
   }
 
+  pops(): PopsPool {
+    return this._pops;
+  }
+
+  recipe(id: RecipeId): RecipeEntity {
+    return this._recipes.get(id);
+  }
+
+  recipes(): Iterable<RecipeEntity> {
+    return this._recipes.enumerate();
+  }
+
+  resource(id: ResourceId): ResourceEntity {
+    return this._resources.get(id);
+  }
+
+  resources(): Iterable<ResourceEntity> {
+    return this._resources.enumerate();
+  }
+
   environment(): EnvironmentEntity {
     return this._environment;
   }
 
-  time(): TimeEntity {
-    return this._time;
+  player(): PlayerEntity {
+    return this._player;
   }
 
   society(): SocietyEntity {
     return this._society;
   }
 
-  pops(): PopsPool {
-    return this._pops;
+  time(): TimeEntity {
+    return this._time;
   }
 }

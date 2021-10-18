@@ -20,13 +20,12 @@ export interface IPresenterChangeSink {
   update(changes: Iterable<ChangePool>): void;
 }
 
-export interface IRootInteractor {
+export interface IRootInteractor
+  extends IBonfireInteractor,
+    IDevToolsInteractor,
+    IGameController,
+    ISocietyInteractor {
   initialize(options: InitializeOptions): void;
-  start(): void;
-  stop(): void;
-  buildItem(id: BonfireItemId): void;
-  assignJob(id: JobId): void;
-  unassignJob(id: JobId): void;
 }
 
 export interface IBonfireInteractor {
@@ -36,6 +35,13 @@ export interface IBonfireInteractor {
 export interface ISocietyInteractor {
   assignJob(id: JobId): void;
   unassignJob(id: JobId): void;
+}
+
+export interface IDevToolsInteractor {
+  turnDevToolsOn(): void;
+  turnDevToolsOff(): void;
+  setGatherCatnip(amount: number): void;
+  setTimeAcceleration(factor: number): void;
 }
 
 export interface IGameController {

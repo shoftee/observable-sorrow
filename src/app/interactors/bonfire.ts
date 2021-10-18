@@ -11,7 +11,9 @@ export class BonfireInteractor implements IBonfireInteractor {
     const metadata = BonfireMetadata[id];
     switch (metadata.intent.kind) {
       case "gather-catnip":
-        this.admin.resource("catnip").delta.addDebit(metadata.intent.amount);
+        this.admin
+          .resource("catnip")
+          .delta.addDebit(this.admin.player().state.gatherCatnip);
         break;
 
       case "refine-catnip": {
