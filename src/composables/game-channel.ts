@@ -1,6 +1,6 @@
 import { inject, InjectionKey, Ref } from "vue";
 
-import { Channel } from "@/app/os";
+import { Channel } from "@/app/channel";
 
 export const ChannelKey: InjectionKey<Ref<Channel>> = Symbol("GameChannel");
 

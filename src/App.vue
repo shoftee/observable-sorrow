@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { provide, ref } from "vue";
-import { Channel } from "./app/os";
+import { Channel } from "./app/channel";
 
 import GameLoader from "./components/GameLoader.vue";
 import Main from "./components/Main.vue"
