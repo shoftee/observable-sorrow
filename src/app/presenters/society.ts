@@ -1,7 +1,7 @@
 import { computed, reactive } from "vue";
 
-import { JobId, PopId } from "@/_interfaces";
-import { JobEffectType, JobMetadataType, Meta, PopState } from "@/_state";
+import { JobId, PopId } from "@/app/interfaces";
+import { JobEffectType, JobMetadataType, Meta, PopState } from "@/app/state";
 
 import { EffectItem, IStateManager } from ".";
 

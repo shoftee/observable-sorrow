@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { SandcastleBuilderNotation } from "@/_utils/notation/sandcastle-builder";
+import { SandcastleBuilderNotation } from "@/app/utils/notation/sandcastle-builder";
 
 const n = new SandcastleBuilderNotation();
 

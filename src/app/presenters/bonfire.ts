@@ -1,12 +1,12 @@
 import { computed, reactive } from "vue";
 
-import { BonfireItemId, ResourceId, UnitKind } from "@/_interfaces";
+import { BonfireItemId, ResourceId, UnitKind } from "@/app/interfaces";
 import {
   BonfireMetadataType,
   BuildingEffectType,
   IngredientState,
   Meta,
-} from "@/_state";
+} from "@/app/state";
 
 import { NumberView, IStateManager } from ".";
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { toRefs } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { toRefs } from "vue";
+import { useI18n } from "vue-i18n";
 
-import { injectChannel } from '@/composables/game-channel';
-import { IngredientItem } from '@/app/presenters';
+import { IngredientItem } from "@/app/presenters";
+import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: IngredientItem }>();
 

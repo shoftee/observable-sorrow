@@ -1,7 +1,7 @@
 import { computed, reactive } from "vue";
 
-import { Meta } from "@/_state";
-import { SeasonId, WeatherId } from "@/_interfaces";
+import { Meta } from "@/app/state";
+import { SeasonId, WeatherId } from "@/app/interfaces";
 
 import { IStateManager } from ".";
 

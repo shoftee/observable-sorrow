@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-import JobButton from './JobButton.vue';
+import JobButton from "./JobButton.vue";
 
-import { count } from '@/_utils/collections';
-import { injectChannel } from '@/composables/game-channel';
+import { count } from "@/app/utils/collections";
+import { injectChannel } from "@/composables/game-channel";
 
 const { society } = injectChannel().presenters;
 const { t } = useI18n();

@@ -14,7 +14,7 @@ import {
   RecipeId,
   ResourceId,
   UnitKind,
-} from "@/_interfaces";
+} from "@/app/interfaces";
 import {
   BuildingState,
   EffectState,
@@ -25,9 +25,9 @@ import {
   PopState,
   PlayerState,
   TimeState,
-} from "@/_state";
-import { asEnumerable, Enumerable } from "@/_utils/enumerable";
-import { ShowSign } from "@/_utils/notation";
+} from "@/app/state";
+import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
+import { ShowSign } from "@/app/utils/notation";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;

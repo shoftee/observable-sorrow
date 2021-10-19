@@ -1,5 +1,5 @@
-import { UnitKind } from "@/_interfaces";
-import { INumberNotation, ShowSign } from "@/_utils/notation";
+import { UnitKind } from "@/app/interfaces";
+import { INumberNotation, ShowSign } from "@/app/utils/notation";
 
 import { IStateManager, NumberView } from ".";
 

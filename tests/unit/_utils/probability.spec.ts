@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { choose } from "@/_utils/probability";
+import { choose } from "@/app/utils/probability";
 
 describe("probability", () => {
   describe("choose", () => {

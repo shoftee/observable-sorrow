@@ -7,7 +7,7 @@ import {
   IRootInteractor,
   ISocietyInteractor,
   OnTickedHandler,
-} from "@/_interfaces";
+} from "@/app/interfaces";
 
 import {
   BonfirePresenter,
@@ -21,7 +21,7 @@ import {
   StateManager,
 } from "./presenters";
 
-const worker = new Worker(new URL("./worker.ts", import.meta.url));
+const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
 const root = wrap<IRootInteractor>(worker);
 
 export type Channel = {

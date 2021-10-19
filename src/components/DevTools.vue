@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 import { Offcanvas } from "bootstrap"
 
-import { injectChannel } from '@/composables/game-channel';
-import { useKeyboardEvent } from '@/composables/use-event-listener';
+import { injectChannel } from "@/composables/game-channel";
+import { useKeyboardEvent } from "@/composables/use-event-listener";
 
 const { devTools } = injectChannel().interactors;
 const { player } = injectChannel().presenters;

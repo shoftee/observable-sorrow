@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 import Ingredients from "./Ingredients.vue";
 import Effects from "./Effects.vue";
 
-import { BonfireItemId } from "@/_interfaces";
+import { BonfireItemId } from "@/app/interfaces";
 import { BonfireItem } from "@/app/presenters";
 import { injectChannel } from "@/composables/game-channel";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";

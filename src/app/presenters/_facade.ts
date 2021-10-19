@@ -1,4 +1,4 @@
-import { SandcastleBuilderNotation } from "@/_utils/notation";
+import { SandcastleBuilderNotation } from "@/app/utils/notation";
 
 import {
   BonfirePresenter,

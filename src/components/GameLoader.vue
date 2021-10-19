@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted } from "vue";
 
-import { Channel, Setup } from '@/app/channel';
+import { Channel, Setup } from "@/app/channel";
 
 const emit = defineEmits<{
   (e: "loaded", channel: Channel): void,

@@ -1,7 +1,7 @@
 import { computed, reactive } from "vue";
 
-import { ResourceId, UnitKind } from "@/_interfaces";
-import { Meta, ResourceMetadataType, ResourceState } from "@/_state";
+import { ResourceId, UnitKind } from "@/app/interfaces";
+import { Meta, ResourceMetadataType, ResourceState } from "@/app/state";
 
 import { IStateManager, NumberView } from ".";
 

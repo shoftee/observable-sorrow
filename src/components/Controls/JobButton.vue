@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 
 import Effects from "./Effects.vue";
 
-import { JobId } from "@/_interfaces";
+import { JobId } from "@/app/interfaces";
 import { JobItem } from "@/app/presenters";
 import { injectChannel } from "@/composables/game-channel";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";

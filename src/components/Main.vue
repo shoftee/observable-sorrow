@@ -6,13 +6,13 @@ import Resources from "./Resource/List.vue";
 import Environment from "./Environment.vue";
 import History from "./History.vue";
 import DevTools from "./DevTools.vue";
-
 import Sections from "./Controls/Sections.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
 import SocietyControls from "./Controls/Society.vue";
 
-import { injectChannel } from "@/composables/game-channel";
 import { SectionId, SectionItem } from "@/app/presenters";
+
+import { injectChannel } from "@/composables/game-channel";
 const { interactors, presenters } = injectChannel();
 
 onMounted(async () => {
