@@ -1,5 +1,6 @@
-import { SocietyState } from "@/_state";
 import { computed, reactive } from "vue";
+
+import { SocietyState } from "@/_state";
 
 import { StateManager } from ".";
 
