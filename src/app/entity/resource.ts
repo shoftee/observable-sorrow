@@ -1,14 +1,9 @@
 import { reactive } from "vue";
 
 import { ResourceId } from "@/_interfaces";
-import {
-  Meta,
-  ResourceDelta,
-  ResourceMetadataType,
-  ResourceState,
-} from "@/_state";
+import { Meta, ResourceMetadataType, ResourceState } from "@/_state";
 
-import { Entity, EntityPool, Watcher } from ".";
+import { Entity, EntityPool, ResourceDelta, Watcher } from ".";
 
 export class ResourceEntity extends Entity<ResourceId> {
   readonly state: ResourceState;

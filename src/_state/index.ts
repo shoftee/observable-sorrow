@@ -1,4 +1,3 @@
-export * from "./common/delta";
 export * from "./common/types";
 
 export * from "./_facade";

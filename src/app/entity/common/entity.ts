@@ -1,5 +1,7 @@
+import { EntityId, PoolEntityId } from "@/_interfaces";
 import { asEnumerable, Enumerable } from "@/_utils/enumerable";
-import { EntityId, PoolEntityId, Watcher } from "..";
+
+import { Watcher } from "..";
 
 export abstract class Entity<TId = EntityId> {
   constructor(readonly id: TId) {}

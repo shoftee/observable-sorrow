@@ -1,5 +1,6 @@
 import { ResourceId } from "@/_interfaces";
-import { ResourceDelta, Delta } from "@/_state";
+
+import { ResourceDelta, Delta } from "..";
 
 export class DeltaSet {
   private readonly map = new Map<ResourceId, ResourceDelta>();

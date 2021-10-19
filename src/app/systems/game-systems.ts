@@ -1,3 +1,5 @@
+import { EntityAdmin } from "../entity";
+
 import {
   System,
   BuildingSystem,
@@ -13,18 +15,29 @@ import {
 } from ".";
 
 export class GameSystems {
-  constructor(
-    readonly buildings: BuildingSystem,
-    readonly crafting: CraftingSystem,
-    readonly effects: EffectsSystem,
-    readonly environment: EnvironmentSystem,
-    readonly fulfillment: FulfillmentSystem,
-    readonly lockToggle: LockToggleSystem,
-    readonly population: PopulationSystem,
-    readonly resourceAmounts: ResourceAmountsSystem,
-    readonly resourceLimits: ResourceLimitsSystem,
-    readonly time: TimeSystem,
-  ) {}
+  private readonly buildings: BuildingSystem;
+  private readonly crafting: CraftingSystem;
+  private readonly effects: EffectsSystem;
+  private readonly environment: EnvironmentSystem;
+  private readonly fulfillment: FulfillmentSystem;
+  private readonly lockToggle: LockToggleSystem;
+  private readonly population: PopulationSystem;
+  private readonly resourceAmounts: ResourceAmountsSystem;
+  private readonly resourceLimits: ResourceLimitsSystem;
+  private readonly time: TimeSystem;
+
+  constructor(admin: EntityAdmin) {
+    this.buildings = new BuildingSystem(admin);
+    this.crafting = new CraftingSystem(admin);
+    this.effects = new EffectsSystem(admin);
+    this.environment = new EnvironmentSystem(admin);
+    this.fulfillment = new FulfillmentSystem(admin);
+    this.lockToggle = new LockToggleSystem(admin);
+    this.population = new PopulationSystem(admin);
+    this.resourceAmounts = new ResourceAmountsSystem(admin);
+    this.resourceLimits = new ResourceLimitsSystem(admin);
+    this.time = new TimeSystem(admin);
+  }
 
   init(): void {
     for (const system of this.systems()) {

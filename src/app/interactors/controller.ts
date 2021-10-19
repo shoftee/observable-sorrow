@@ -1,6 +1,6 @@
+import { IGameController } from "@/_interfaces";
 import { ITimestamp } from "@/_utils/timestamp";
 
-import { IGameController } from "../game/endpoint";
 import { EntityAdmin } from "../entity";
 
 type UpdateFunction = (deltaTime: number) => void;

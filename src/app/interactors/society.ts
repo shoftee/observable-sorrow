@@ -1,7 +1,6 @@
-import { JobId } from "@/_interfaces";
+import { ISocietyInteractor, JobId } from "@/_interfaces";
 
 import { EntityAdmin } from "../entity";
-import { ISocietyInteractor } from "../game/endpoint";
 
 export class SocietyInteractor implements ISocietyInteractor {
   constructor(private readonly admin: EntityAdmin) {}

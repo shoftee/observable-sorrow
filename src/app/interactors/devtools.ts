@@ -1,8 +1,7 @@
+import { IDevToolsInteractor } from "@/_interfaces";
 import { PlayerState } from "@/_state";
 
 import { EntityAdmin, PlayerEntity } from "../entity";
-
-import { IDevToolsInteractor } from "../game/endpoint";
 
 export class DevToolsInteractor implements IDevToolsInteractor {
   private readonly offOptions = new PlayerState();

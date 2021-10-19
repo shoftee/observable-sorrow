@@ -7,7 +7,7 @@ import {
   IRootInteractor,
   ISocietyInteractor,
   OnTickedHandler,
-} from "./game/endpoint";
+} from "@/_interfaces";
 
 import {
   BonfirePresenter,
@@ -21,7 +21,7 @@ import {
   StateManager,
 } from "./presenters";
 
-const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
+const worker = new Worker(new URL("./worker.ts", import.meta.url));
 const root = wrap<IRootInteractor>(worker);
 
 export type Channel = {
@@ -42,9 +42,8 @@ export type Channel = {
   };
 };
 
-const stateManager = new StateManager();
-
 export async function Setup(): Promise<Channel> {
+  const stateManager = new StateManager();
   const handler: OnTickedHandler = function (changes) {
     stateManager.update(changes);
   };

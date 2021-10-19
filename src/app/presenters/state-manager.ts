@@ -3,9 +3,14 @@ import { computed, ComputedRef, reactive } from "vue";
 
 import {
   BuildingId,
+  ChangePool,
   EffectId,
   EffectUnits,
+  EntityId,
+  IPresenterChangeSink,
+  PoolEntityId,
   PopId,
+  PropertyBag,
   RecipeId,
   ResourceId,
   UnitKind,
@@ -23,13 +28,6 @@ import {
 } from "@/_state";
 import { asEnumerable, Enumerable } from "@/_utils/enumerable";
 import { ShowSign } from "@/_utils/notation";
-
-import { EntityId, PoolEntityId } from "../entity";
-import {
-  ChangePool,
-  IPresenterChangeSink,
-  PropertyBag,
-} from "../game/endpoint";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;

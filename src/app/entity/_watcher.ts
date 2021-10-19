@@ -1,8 +1,12 @@
 import { isReactive, toRaw, watch, WatchStopHandle } from "vue";
 
-import { PropertyBag, OnTickedHandler, ChangePool } from "../game/endpoint";
-
-import { EntityId, PoolEntityId } from ".";
+import {
+  ChangePool,
+  EntityId,
+  OnTickedHandler,
+  PoolEntityId,
+  PropertyBag,
+} from "@/_interfaces";
 
 export interface Watcher {
   watch(id: EntityId, state: unknown): void;

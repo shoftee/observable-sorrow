@@ -1,6 +1,4 @@
-import { BonfireItemId, JobId } from "@/_interfaces";
-
-import { EntityId, PoolEntityId } from "../entity";
+import { BonfireItemId, EntityId, JobId, PoolEntityId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 

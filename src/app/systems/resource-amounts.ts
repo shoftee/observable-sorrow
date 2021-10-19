@@ -1,6 +1,6 @@
-import { ResourceDelta, ResourceState } from "@/_state";
+import { ResourceState } from "@/_state";
 
-import { EntityAdmin } from "../entity";
+import { EntityAdmin, ResourceDelta } from "../entity";
 
 import { System } from ".";
 
