@@ -13,7 +13,9 @@ export class TimeEntity extends Entity<"time"> {
   constructor() {
     super("time");
 
-    this.state = reactive(new TimeState());
+    this.state = reactive({
+      millisPerTick: TimeConstants.MillisPerTick,
+    });
 
     this.ticks = new Timer(1);
     this.days = new Timer(TimeConstants.TicksPerDay);

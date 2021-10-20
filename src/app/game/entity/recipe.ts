@@ -1,7 +1,13 @@
 import { reactive } from "vue";
 
 import { RecipeId } from "@/app/interfaces";
-import { Meta, RecipeMetadataType, RecipeState } from "@/app/state";
+import {
+  ingredientsFromObject,
+  Meta,
+  RecipeMetadataType,
+  RecipeState,
+  ResourceMap,
+} from "@/app/state";
 
 import { Entity, EntityPool, OrderStatus, Watcher } from ".";
 
@@ -12,7 +18,12 @@ export class RecipeEntity extends Entity<RecipeId> {
 
   constructor(readonly meta: RecipeMetadataType) {
     super(meta.id);
-    this.state = reactive(new RecipeState(meta));
+    this.state = reactive({
+      ingredients: ingredientsFromObject(meta.ingredients),
+      products: ResourceMap.fromObject(meta.products),
+      capped: false,
+      fulfilled: false,
+    });
 
     this.status = OrderStatus.EMPTY;
   }

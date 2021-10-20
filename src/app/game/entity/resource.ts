@@ -11,7 +11,12 @@ export class ResourceEntity extends Entity<ResourceId> {
 
   constructor(readonly meta: ResourceMetadataType) {
     super(meta.id);
-    this.state = reactive(new ResourceState());
+    this.state = reactive({
+      unlocked: false,
+      amount: 0,
+      change: 0,
+      capacity: undefined,
+    });
   }
 
   watch(watcher: Watcher): void {

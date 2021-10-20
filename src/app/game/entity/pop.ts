@@ -12,7 +12,10 @@ export class PopEntity extends Entity<PopId> {
   constructor(id: number) {
     super(`pop-${id}` as PopId);
 
-    this.state = reactive(new PopState());
+    this.state = reactive({
+      job: undefined,
+      name: `Kitten #${id}`,
+    });
   }
 
   watch(watcher: Watcher): void {

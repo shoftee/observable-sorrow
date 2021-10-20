@@ -19,11 +19,11 @@ import {
   BuildingState,
   EffectState,
   EnvironmentState,
-  SocietyState,
+  PlayerState,
+  PopState,
   RecipeState,
   ResourceState,
-  PopState,
-  PlayerState,
+  SocietyState,
   TimeState,
 } from "@/app/state";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";

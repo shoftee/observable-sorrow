@@ -43,9 +43,9 @@ export const WeatherMetadata: Record<WeatherId, WeatherMetadataType> = {
   },
 };
 
-export class EnvironmentState {
-  year = 0;
-  season: SeasonId = "spring";
-  day = 0;
-  weather: WeatherId = "neutral";
+export interface EnvironmentState {
+  year: number;
+  season: SeasonId;
+  day: number;
+  weather: WeatherId;
 }

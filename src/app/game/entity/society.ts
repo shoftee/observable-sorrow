@@ -10,7 +10,12 @@ export class SocietyEntity extends Entity<"society"> {
   constructor() {
     super("society");
 
-    this.state = reactive(new SocietyState());
+    this.state = reactive({
+      stockpile: 0,
+      unlocked: false,
+      totalPops: 0,
+      unemployedPops: 0,
+    });
   }
 
   watch(watcher: Watcher): void {

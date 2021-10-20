@@ -1,7 +1,12 @@
 import { reactive } from "vue";
 
 import { BuildingId } from "@/app/interfaces";
-import { BuildingMetadataType, BuildingState, Meta } from "@/app/state";
+import {
+  BuildingMetadataType,
+  BuildingState,
+  ingredientsFromObject,
+  Meta,
+} from "@/app/state";
 
 import { Entity, EntityPool, OrderStatus, Watcher } from ".";
 
@@ -12,7 +17,15 @@ export class BuildingEntity extends Entity<BuildingId> {
 
   constructor(readonly meta: BuildingMetadataType) {
     super(meta.id);
-    this.state = reactive(new BuildingState(this.id));
+
+    this.state = reactive({
+      ingredients: ingredientsFromObject(meta.prices.base),
+      unlocked: false,
+      level: 0,
+      capped: false,
+      fulfilled: false,
+    });
+
     this.status = OrderStatus.EMPTY;
   }
 

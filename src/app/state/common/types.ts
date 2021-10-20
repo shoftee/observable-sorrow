@@ -12,26 +12,24 @@ export class ResourceMap extends Map<ResourceId, number> {
   }
 }
 
-export class IngredientState {
+export interface IngredientState {
   readonly resourceId: ResourceId;
   requirement: number;
-
   fulfillmentTime: number | undefined;
-  fulfillment = 0;
-  capped = false;
-  fulfilled = true;
+  fulfillment: number;
+  capped: boolean;
+  fulfilled: boolean;
+}
 
-  constructor(resourceId: ResourceId, requirement: number) {
-    this.resourceId = resourceId;
-    this.requirement = requirement;
-  }
-
-  static fromObject(obj: ResourcesType): IngredientState[] {
-    return Array.from(
-      toIterable(obj),
-      ([id, amount]) => new IngredientState(id, amount),
-    );
-  }
+export function ingredientsFromObject(obj: ResourcesType): IngredientState[] {
+  return Array.from(toIterable(obj), ([id, amount]) => ({
+    resourceId: id,
+    requirement: amount,
+    fulfillmentTime: undefined,
+    fulfillment: 0,
+    capped: false,
+    fulfilled: true,
+  }));
 }
 
 export type ResourceQuantityType = {

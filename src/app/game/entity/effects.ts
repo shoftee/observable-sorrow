@@ -1,12 +1,13 @@
 import { reactive } from "vue";
 
 import { EffectId } from "@/app/interfaces";
+import { EffectState } from "@/app/state";
 import { fromObject } from "@/app/utils/enumerable";
 
 import { Entity, EntityPool, Expr, Exprs, Watcher } from ".";
 
 export class EffectEntity extends Entity<EffectId> {
-  readonly state: { value?: number };
+  readonly state: EffectState;
 
   constructor(readonly id: EffectId, readonly expr: Expr) {
     super(id);

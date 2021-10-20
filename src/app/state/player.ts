@@ -1,4 +1,4 @@
-export class PlayerState {
-  timeAcceleration = 1;
-  gatherCatnip = 1;
+export interface PlayerState {
+  timeAcceleration: number;
+  gatherCatnip: number;
 }

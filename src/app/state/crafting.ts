@@ -15,15 +15,9 @@ export const RecipeMetadata: Record<RecipeId, RecipeMetadataType> = {
   },
 };
 
-export class RecipeState {
+export interface RecipeState {
   readonly ingredients: IngredientState[];
   readonly products: ResourceMap;
-
-  capped = false;
-  fulfilled = false;
-
-  constructor(meta: RecipeMetadataType) {
-    this.ingredients = IngredientState.fromObject(meta.ingredients);
-    this.products = ResourceMap.fromObject(meta.products);
-  }
+  capped: boolean;
+  fulfilled: boolean;
 }

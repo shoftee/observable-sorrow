@@ -4,12 +4,15 @@ import { PlayerState } from "@/app/state";
 import { EntityAdmin, PlayerEntity } from "../entity";
 
 export class DevToolsInteractor implements IDevToolsInteractor {
-  private readonly offOptions = new PlayerState();
-  private readonly onOptions = new PlayerState();
+  private readonly offOptions: PlayerState;
+  private readonly onOptions: PlayerState;
 
   private on = false;
 
-  constructor(private readonly admin: EntityAdmin) {}
+  constructor(private readonly admin: EntityAdmin) {
+    this.offOptions = { gatherCatnip: 1, timeAcceleration: 1 };
+    this.onOptions = { gatherCatnip: 1, timeAcceleration: 1 };
+  }
 
   private get player(): PlayerEntity {
     return this.admin.player();

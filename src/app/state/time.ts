@@ -4,6 +4,6 @@ export const TimeConstants = {
   DaysPerSeason: 100,
 };
 
-export class TimeState {
-  millisPerTick = TimeConstants.MillisPerTick;
+export interface TimeState {
+  millisPerTick: number;
 }

@@ -31,13 +31,14 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
   },
 };
 
-export class SocietyState {
-  stockpile = 0;
-  unlocked = false;
-  totalPops = 0;
-  unemployedPops = 0;
+export interface SocietyState {
+  stockpile: number;
+  unlocked: boolean;
+  totalPops: number;
+  unemployedPops: number;
 }
 
-export class PopState {
+export interface PopState {
   job: JobId | undefined;
+  name: string;
 }

@@ -62,9 +62,9 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
   },
 };
 
-export class ResourceState {
-  unlocked = false;
-  amount = 0;
-  change = 0;
-  capacity?: number;
+export interface ResourceState {
+  unlocked: boolean;
+  amount: number;
+  change: number;
+  capacity: number | undefined;
 }

@@ -61,15 +61,10 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
 };
 
-export class BuildingState {
+export interface BuildingState {
   readonly ingredients: IngredientState[];
-  unlocked = false;
-  level = 0;
-  capped = false;
-  fulfilled = false;
-
-  constructor(id: BuildingId) {
-    const meta = BuildingMetadata[id];
-    this.ingredients = IngredientState.fromObject(meta.prices.base);
-  }
+  unlocked: boolean;
+  level: number;
+  capped: boolean;
+  fulfilled: boolean;
 }

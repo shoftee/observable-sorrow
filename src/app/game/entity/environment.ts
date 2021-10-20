@@ -10,7 +10,12 @@ export class EnvironmentEntity extends Entity<"environment"> {
   constructor() {
     super("environment");
 
-    this.state = reactive(new EnvironmentState());
+    this.state = reactive({
+      year: 0,
+      season: "spring",
+      day: 0,
+      weather: "neutral",
+    });
   }
 
   watch(watcher: Watcher): void {

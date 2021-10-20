@@ -1,1 +1,3 @@
-export type EffectState = { value: number | undefined };
+export interface EffectState {
+  value: number | undefined;
+}
