@@ -1,6 +1,6 @@
 import { SeasonId, WeatherId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
-import { DefaultChooser } from "@/app/utils/probability";
+import { choose } from "@/app/utils/probability";
 
 import { EnvironmentEntity, TimeEntity } from "../entity";
 
@@ -70,7 +70,7 @@ export class EnvironmentSystem extends System {
       return "neutral";
     }
 
-    return DefaultChooser.choose(
+    return choose(
       [
         {
           frequency: 175,
@@ -85,6 +85,7 @@ export class EnvironmentSystem extends System {
         },
       ],
       1000,
+      () => this.admin.prng().environment(),
     );
   }
 }

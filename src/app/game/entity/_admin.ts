@@ -7,12 +7,13 @@ import {
   EffectsPool,
   EntityWatcher,
   EnvironmentEntity,
-  PopsPool,
   RecipeEntity,
   RecipesPool,
   ResourceEntity,
   ResourcesPool,
   PlayerEntity,
+  PopsPool,
+  PrngEntity,
   SocietyEntity,
   TimeEntity,
 } from ".";
@@ -26,6 +27,7 @@ export class EntityAdmin {
 
   private readonly _environment: EnvironmentEntity;
   private readonly _player: PlayerEntity;
+  private readonly _prng: PrngEntity;
   private readonly _society: SocietyEntity;
   private readonly _time: TimeEntity;
 
@@ -41,6 +43,8 @@ export class EntityAdmin {
 
     this._player = new PlayerEntity();
     this._player.watch(this.watcher);
+
+    this._prng = new PrngEntity();
 
     this._society = new SocietyEntity();
     this._society.watch(this.watcher);
@@ -91,6 +95,10 @@ export class EntityAdmin {
 
   player(): PlayerEntity {
     return this._player;
+  }
+
+  prng(): PrngEntity {
+    return this._prng;
   }
 
   society(): SocietyEntity {

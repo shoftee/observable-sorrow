@@ -11,6 +11,7 @@ export * from "./effects";
 export * from "./environment";
 export * from "./player";
 export * from "./pop";
+export * from "./prng";
 export * from "./recipe";
 export * from "./resource";
 export * from "./society";

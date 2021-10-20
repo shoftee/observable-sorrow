@@ -8,7 +8,7 @@ type RandomFunc = () => number;
 export function choose<TResult>(
   options: ChoiceType<TResult>[],
   total: number,
-  randomFunc: RandomFunc = () => Math.random(),
+  randomFunc: RandomFunc,
 ): TResult {
   let providedTotal = 0;
   let unspecifiedCount = 0;
@@ -51,13 +51,3 @@ export function choose<TResult>(
   // return last item as default
   return options[options.length - 1].result;
 }
-
-export interface Chooser {
-  choose<TResult>(options: ChoiceType<TResult>[], total: number): TResult;
-}
-
-export const DefaultChooser = {
-  choose<TResult>(options: ChoiceType<TResult>[], total: number): TResult {
-    return choose(options, total, () => Math.random());
-  },
-};

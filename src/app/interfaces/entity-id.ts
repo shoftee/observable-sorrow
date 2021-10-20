@@ -23,5 +23,6 @@ export type EntityId =
   | PopId
   | "environment"
   | "player"
+  | "prng"
   | "society"
   | "time";
