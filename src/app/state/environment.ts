@@ -47,5 +47,5 @@ export class EnvironmentState {
   year = 0;
   season: SeasonId = "spring";
   day = 0;
-  weatherId: WeatherId = "neutral";
+  weather: WeatherId = "neutral";
 }

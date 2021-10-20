@@ -86,7 +86,7 @@ export const Exprs: Record<EffectId, Expr> = {
   },
 
   "weather.modifier.severity": ({ admin }) => {
-    switch (admin.environment().state.weatherId) {
+    switch (admin.environment().state.weather) {
       case "warm":
         return +0.15;
       case "cold":

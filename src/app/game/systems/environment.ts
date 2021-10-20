@@ -47,7 +47,7 @@ export class EnvironmentSystem extends System {
   }
 
   private updateWeather() {
-    this.environment.state.weatherId = this.chooseWeather();
+    this.environment.state.weather = this.chooseWeather();
   }
 
   private calculateNextSeason(currentSeason: SeasonId): SeasonId {

@@ -20,10 +20,10 @@ export class EnvironmentPresenter {
       season: computed(() => state.season),
       seasonLabel: computed(() => Meta.season(state.season).label),
       year: computed(() => state.year),
-      weather: computed(() => state.weatherId),
-      weatherLabel: computed(() => Meta.weather(state.weatherId).label),
+      weather: computed(() => state.weather),
+      weatherLabel: computed(() => Meta.weather(state.weather).label),
       calendarLabel: computed(() =>
-        Meta.weather(state.weatherId).label
+        Meta.weather(state.weather).label
           ? "environment.calendar.full.weather"
           : "environment.calendar.full.no-weather",
       ),
