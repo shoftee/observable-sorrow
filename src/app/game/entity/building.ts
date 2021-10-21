@@ -51,6 +51,17 @@ export class BuildingsPool extends EntityPool<BuildingId, BuildingEntity> {
         const buildingState = buildings[building.id];
         if (buildingState?.level !== undefined) {
           building.state.level = buildingState.level;
+
+          // HACK: these should update automatically.
+          const multiplier = Math.pow(
+            building.meta.prices.ratio,
+            building.state.level,
+          );
+
+          for (const ingredient of building.state.ingredients) {
+            const base = building.meta.prices.base[ingredient.resourceId] ?? 0;
+            ingredient.requirement = base * multiplier;
+          }
         }
       }
     }
