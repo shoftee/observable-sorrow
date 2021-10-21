@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 
-import { SocietyState } from "@/app/state/society";
+import { JobId } from "@/app/interfaces";
+import { SocietyState } from "@/app/state";
 import { SaveState } from "@/app/store";
 
 import { Entity, Watcher } from ".";
@@ -13,9 +14,9 @@ export class SocietyEntity extends Entity<"society"> {
 
     this.state = reactive({
       stockpile: 0,
-      unlocked: false,
       totalPops: 0,
       idlePops: 0,
+      unlockedJobs: new Set<JobId>(),
     });
   }
 

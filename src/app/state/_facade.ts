@@ -1,4 +1,10 @@
-import { BuildingId, ResourceId, SeasonId, WeatherId } from "@/app/interfaces";
+import {
+  BuildingId,
+  ResourceId,
+  SeasonId,
+  SectionId,
+  WeatherId,
+} from "@/app/interfaces";
 import {
   BonfireMetadata,
   BonfireMetadataType,
@@ -12,6 +18,8 @@ import {
   ResourceMetadataType,
   SeasonMetadataType,
   SeasonsMetadata,
+  SectionMetadataType,
+  SectionsMetadata,
   WeatherMetadata,
   WeatherMetadataType,
 } from "@/app/state";
@@ -48,6 +56,14 @@ export const Meta = {
 
   season(id: SeasonId): SeasonMetadataType {
     return SeasonsMetadata[id];
+  },
+
+  sections(): Enumerable<SectionMetadataType> {
+    return asEnumerable(Object.values(SectionsMetadata));
+  },
+
+  section(id: SectionId): SectionMetadataType {
+    return SectionsMetadata[id];
   },
 
   weather(id: WeatherId): WeatherMetadataType {

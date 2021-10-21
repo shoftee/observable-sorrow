@@ -29,20 +29,16 @@ export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   },
   "catnip-field": {
     id: "catnip-field",
-    intent: buyBuildingIntent("catnip-field"),
+    intent: { kind: "buy-building", buildingId: "catnip-field" },
     label: "bonfire.catnip-field.label",
     description: "bonfire.catnip-field.description",
     flavor: "bonfire.catnip-field.flavor",
   },
   hut: {
     id: "hut",
-    intent: buyBuildingIntent("hut"),
+    intent: { kind: "buy-building", buildingId: "hut" },
     label: "bonfire.hut.label",
     description: "bonfire.hut.description",
     flavor: "bonfire.hut.flavor",
   },
 };
-
-function buyBuildingIntent(buildingId: BonfireBuildingId): BonfireIntentType {
-  return { kind: "buy-building", buildingId };
-}

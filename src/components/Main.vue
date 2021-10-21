@@ -10,7 +10,8 @@ import Sections from "./Controls/Sections.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
 import SocietyControls from "./Controls/Society.vue";
 
-import { SectionId, SectionItem } from "@/app/presenters";
+import { SectionId } from "@/app/interfaces";
+import { SectionItem } from "@/app/presenters";
 
 import { injectChannel } from "@/composables/game-channel";
 const { interactors, presenters } = injectChannel();
@@ -24,7 +25,7 @@ const { t } = useI18n();
 
 const sections = computed(() => presenters.section.items.filter(s => s.unlocked));
 
-const activeSection = ref<SectionId>("bonfire");
+const activeSection = ref<SectionId>("bonfire-section");
 
 function sectionChanged(item: SectionItem) {
   activeSection.value = item.id;
@@ -37,8 +38,8 @@ async function save(): Promise<void> {
 const sectionContent = computed(() => {
   const sectionId = activeSection.value;
   switch (sectionId) {
-    case "bonfire": return BonfireControls;
-    case "society": return SocietyControls;
+    case "bonfire-section": return BonfireControls;
+    case "society-section": return SocietyControls;
     default: throw new Error(`unexpected section name ${sectionId}`);
   }
 });

@@ -12,6 +12,7 @@ import {
   ResourceAmountsSystem,
   ResourceLimitsSystem,
   TimeSystem,
+  SectionsSystem,
 } from ".";
 
 export class GameSystems {
@@ -24,6 +25,7 @@ export class GameSystems {
   private readonly population: PopulationSystem;
   private readonly resourceAmounts: ResourceAmountsSystem;
   private readonly resourceLimits: ResourceLimitsSystem;
+  private readonly sections: SectionsSystem;
   private readonly time: TimeSystem;
 
   constructor(admin: EntityAdmin) {
@@ -36,6 +38,7 @@ export class GameSystems {
     this.population = new PopulationSystem(admin);
     this.resourceAmounts = new ResourceAmountsSystem(admin);
     this.resourceLimits = new ResourceLimitsSystem(admin);
+    this.sections = new SectionsSystem(admin);
     this.time = new TimeSystem(admin);
   }
 
@@ -61,6 +64,9 @@ export class GameSystems {
 
     // Update pops.
     this.population.update();
+
+    // Update sections.
+    this.sections.update();
 
     // Update resource limits and apply amount deltas.
     this.resourceLimits.update();

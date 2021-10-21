@@ -1,4 +1,5 @@
 import { EntityId, PoolEntityId } from "@/app/interfaces";
+import { SaveState } from "@/app/store";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 
 import { Watcher } from "..";
@@ -7,6 +8,8 @@ export abstract class Entity<TId = EntityId> {
   constructor(readonly id: TId) {}
 
   watch?(watcher: Watcher): void;
+  loadState?(state: SaveState): void;
+  saveState?(state: SaveState): void;
 }
 
 export abstract class EntityPool<

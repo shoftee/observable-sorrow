@@ -78,8 +78,8 @@ export class BonfirePresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: manager.effectView(meta.per),
-        totalAmount: manager.effectView(meta.total),
+        singleAmount: manager.numberView(meta.per),
+        totalAmount: manager.numberView(meta.total),
       }),
     );
   }

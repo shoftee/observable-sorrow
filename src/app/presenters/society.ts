@@ -67,8 +67,8 @@ export class SocietyPresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: manager.effectView(meta.base),
-        totalAmount: manager.effectView(meta.total),
+        singleAmount: manager.numberView(meta.base),
+        totalAmount: manager.numberView(meta.total),
       }),
     );
   }

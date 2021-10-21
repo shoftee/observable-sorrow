@@ -69,6 +69,13 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "hut.catpower.base": 75,
   "hut.catpower": prod(effect("hut.catpower.base"), level("hut")),
 
+  // Population
+  "population.catnip.demand.base": 0.85,
+  "population.catnip.demand": prod(
+    effect("population.catnip.demand.base"),
+    ({ admin }) => admin.pops().size,
+  ),
+
   // Weather
   "weather.modifier.season": ({ admin }) => {
     switch (admin.environment().state.season) {
@@ -93,13 +100,6 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
         return 0;
     }
   },
-
-  // Population
-  "population.catnip.demand.base": 0.85,
-  "population.catnip.demand": prod(
-    effect("population.catnip.demand.base"),
-    ({ admin }) => admin.pops().size,
-  ),
 
   // Jobs
   "jobs.woodcutter.wood.base": 0.018,

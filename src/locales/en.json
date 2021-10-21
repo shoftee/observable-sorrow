@@ -4,6 +4,7 @@
       "label": "Bonfire"
     },
     "society": {
+      "label": "Society",
       "outpost": "Outpost",
       "small-village": "Small Village",
       "village": "Village"

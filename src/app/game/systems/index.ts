@@ -10,6 +10,7 @@ export * from "./lock-toggle";
 export * from "./population";
 export * from "./resource-amounts";
 export * from "./resource-limits";
+export * from "./sections";
 export * from "./time";
 
 export * from "./game-systems";

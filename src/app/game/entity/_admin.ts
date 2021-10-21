@@ -3,23 +3,27 @@ import {
   NumberEffectId,
   RecipeId,
   ResourceId,
+  SectionId,
 } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
 
 import {
+  Entity,
+  EntityWatcher,
   BuildingEntity,
   BuildingsPool,
   NumberEffectEntity,
   NumberEffectsPool,
-  EntityWatcher,
   EnvironmentEntity,
+  PlayerEntity,
+  PopsPool,
+  PrngEntity,
   RecipeEntity,
   RecipesPool,
   ResourceEntity,
   ResourcesPool,
-  PlayerEntity,
-  PopsPool,
-  PrngEntity,
+  SectionEntity,
+  SectionsPool,
   SocietyEntity,
   TimeEntity,
 } from ".";
@@ -30,6 +34,7 @@ export class EntityAdmin {
   private readonly _pops: PopsPool;
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
+  private readonly _sections: SectionsPool;
 
   private readonly _environment: EnvironmentEntity;
   private readonly _player: PlayerEntity;
@@ -43,6 +48,7 @@ export class EntityAdmin {
     this._pops = new PopsPool(this.watcher.pooled("pops"));
     this._recipes = new RecipesPool(this.watcher.pooled("recipes"));
     this._resources = new ResourcesPool(this.watcher.pooled("resources"));
+    this._sections = new SectionsPool(this.watcher.pooled("sections"));
 
     this._environment = new EnvironmentEntity();
     this._environment.watch(this.watcher);
@@ -60,25 +66,25 @@ export class EntityAdmin {
   }
 
   loadState(state: SaveState): void {
-    this._buildings.loadState(state);
-    this._resources.loadState(state);
-    this._pops.loadState(state);
-    this._environment.loadState(state);
-    this._player.loadState(state);
-    this._prng.loadState(state);
-    this._society.loadState(state);
-    this._time.loadState(state);
+    for (const key in this) {
+      if (Object.prototype.hasOwnProperty.call(this, key)) {
+        const element = this[key];
+        if (element instanceof Entity) {
+          element.loadState?.(state);
+        }
+      }
+    }
   }
 
   saveState(state: SaveState): void {
-    this._buildings.saveState(state);
-    this._resources.saveState(state);
-    this._pops.saveState(state);
-    this._environment.saveState(state);
-    this._player.saveState(state);
-    this._prng.saveState(state);
-    this._society.saveState(state);
-    this._time.saveState(state);
+    for (const key in this) {
+      if (Object.prototype.hasOwnProperty.call(this, key)) {
+        const element = this[key];
+        if (element instanceof Entity) {
+          element.saveState?.(state);
+        }
+      }
+    }
   }
 
   building(id: BuildingId): BuildingEntity {
@@ -115,6 +121,14 @@ export class EntityAdmin {
 
   resources(): Iterable<ResourceEntity> {
     return this._resources.enumerate();
+  }
+
+  section(id: SectionId): SectionEntity {
+    return this._sections.get(id);
+  }
+
+  sections(): Iterable<SectionEntity> {
+    return this._sections.enumerate();
   }
 
   environment(): EnvironmentEntity {

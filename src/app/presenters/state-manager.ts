@@ -13,6 +13,7 @@ import {
   PropertyBag,
   RecipeId,
   ResourceId,
+  SectionId,
   UnitKind,
 } from "@/app/interfaces";
 import {
@@ -23,6 +24,7 @@ import {
   PopState,
   RecipeState,
   ResourceState,
+  SectionState,
   SocietyState,
   TimeState,
 } from "@/app/state";
@@ -44,12 +46,15 @@ export interface IStateManager {
   resources(): Enumerable<[ResourceId, ResourceState]>;
   resource(id: ResourceId): ResourceState;
 
+  sections(): Enumerable<[SectionId, SectionState]>;
+  section(id: SectionId): SectionState;
+
   environment(): EnvironmentState;
   player(): PlayerState;
   society(): SocietyState;
   time(): TimeState;
 
-  effectView(id: NumberEffectId): ComputedRef<NumberView>;
+  numberView(id: NumberEffectId): ComputedRef<NumberView>;
 }
 
 export interface NumberView {
@@ -90,6 +95,10 @@ class ChangePools extends Map<
       ResourceId,
       ResourceState
     >;
+  }
+
+  get sections(): Map<SectionId, SectionState> {
+    return this.getOrAdd("sections") as unknown as Map<SectionId, SectionState>;
   }
 
   getOrAdd(id: PoolEntityId | undefined): Map<EntityId, PropertyBag> {
@@ -166,6 +175,15 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.resources.get(id) as ResourceState;
   }
 
+  sections(): Enumerable<[SectionId, SectionState]> {
+    return asEnumerable(this.pools.sections.entries());
+  }
+
+  section(id: SectionId): SectionState {
+    const pool = this.pools.getOrAdd("sections");
+    return pool.get(id) as unknown as SectionState;
+  }
+
   environment(): EnvironmentState {
     const pool = this.pools.getOrAdd(undefined);
     return pool.get("environment") as unknown as EnvironmentState;
@@ -186,7 +204,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return pool.get("time") as unknown as TimeState;
   }
 
-  effectView(id: NumberEffectId): ComputedRef<NumberView> {
+  numberView(id: NumberEffectId): ComputedRef<NumberView> {
     return computed(() => ({
       value: this.effect(id).value ?? 0,
       unit: EffectUnits[id] ?? UnitKind.None,

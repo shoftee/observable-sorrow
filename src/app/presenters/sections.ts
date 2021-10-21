@@ -1,6 +1,7 @@
 import { computed, reactive } from "vue";
 
-import { SocietyState } from "@/app/state";
+import { SectionId } from "@/app/interfaces";
+import { SectionState } from "@/app/state";
 
 import { StateManager } from ".";
 
@@ -8,53 +9,25 @@ export class SectionsPresenter {
   readonly items: SectionItem[];
 
   constructor(manager: StateManager) {
-    this.items = [this.bonfireSection(), this.societySection(manager)];
+    this.items = manager
+      .sections()
+      .map(([id, state]) => this.newSectionItem(id, state))
+      .toArray();
   }
 
-  private bonfireSection(): SectionItem {
+  private newSectionItem(id: SectionId, state: SectionState): SectionItem {
     return reactive({
-      id: "bonfire",
-      label: "sections.bonfire.label",
-      active: true,
-      unlocked: true,
+      id: id,
+      label: computed(() => state.label),
+      unlocked: computed(() => state.unlocked),
+      alert: computed(() => state.alert),
     });
-  }
-
-  private societySection(manager: StateManager): SectionItem {
-    const society = manager.society();
-    return reactive({
-      id: "society",
-      label: computed(() => this.societyLabel(society)),
-      active: false,
-      alert: computed(() => this.societyAlertText(society)),
-      unlocked: computed(() => society.unlocked),
-    });
-  }
-
-  private societyLabel(society: SocietyState): string {
-    if (society.totalPops === 0) {
-      return "sections.society.outpost";
-    } else if (society.totalPops < 5) {
-      return "sections.society.small-village";
-    } else {
-      return "sections.society.village";
-    }
-  }
-
-  private societyAlertText(society: SocietyState): string | undefined {
-    return society.idlePops === 0
-      ? undefined
-      : society.idlePops < 100
-      ? society.idlePops.toFixed(0)
-      : "99+";
   }
 }
 
-export type SectionId = "bonfire" | "society";
-
 export interface SectionItem {
   readonly id: SectionId;
+  unlocked: boolean;
   label: string;
   alert?: string | undefined;
-  unlocked: boolean;
 }

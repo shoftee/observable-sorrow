@@ -16,5 +16,6 @@ export * from "./pop";
 export * from "./prng";
 export * from "./recipe";
 export * from "./resource";
+export * from "./section";
 export * from "./society";
 export * from "./time";

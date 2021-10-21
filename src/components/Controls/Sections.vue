@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import { SectionId, SectionItem } from "@/app/presenters";
+import { SectionId } from "@/app/interfaces";
+import { SectionItem } from "@/app/presenters";
 
 const props = defineProps<{
   sections: SectionItem[],

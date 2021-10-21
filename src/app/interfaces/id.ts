@@ -15,3 +15,5 @@ export type JobId = "woodcutter";
 export type RecipeId = "refine-catnip";
 export type SeasonId = "spring" | "summer" | "autumn" | "winter";
 export type WeatherId = "neutral" | "warm" | "cold";
+
+export type SectionId = `${"bonfire" | "society"}-section`;
