@@ -58,11 +58,7 @@ export class PopsPool extends EntityPool<PopId, PopEntity> {
     }
   }
 
-  unemployed(): Enumerable<PopEntity> {
-    return this.enumerate().filter((item) => item.state.job === undefined);
-  }
-
-  withJob(id: JobId): Enumerable<PopEntity> {
+  withJob(id: JobId | undefined): Enumerable<PopEntity> {
     return this.enumerate().filter((item) => item.state.job === id);
   }
 }

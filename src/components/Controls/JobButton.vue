@@ -9,7 +9,7 @@ import { JobItem } from "@/app/presenters";
 import { injectChannel } from "@/composables/game-channel";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
-const { item } = defineProps<{ item: JobItem, noUnemployment: boolean }>();
+const { item } = defineProps<{ item: JobItem, noIdle: boolean }>();
 const { t } = useI18n();
 const events = inject(KeyboardEventsKey);
 
@@ -31,8 +31,8 @@ async function unassignJob(id: JobId): Promise<void> {
     <div class="col-12 btn-group">
       <button
         type="button"
-        class="btn btn-primary w-100 shadow-none"
-        :disabled="item.capped || noUnemployment"
+        class="btn btn-secondary w-100 shadow-none"
+        :disabled="item.capped || noIdle"
         @click="assignJob(item.id)"
       >
         {{ t(item.label) }}
@@ -40,15 +40,15 @@ async function unassignJob(id: JobId): Promise<void> {
       </button>
       <button
         type="button"
-        class="btn btn-primary"
-        :disabled="item.capped || noUnemployment"
+        class="btn btn-secondary"
+        :disabled="item.capped || noIdle"
         @click="assignJob(item.id)"
       >
         <span class="bi-plus"></span>
       </button>
       <button
         type="button"
-        class="btn btn-primary"
+        class="btn btn-secondary"
         :disabled="item.pops === 0"
         @click="unassignJob(item.id)"
       >

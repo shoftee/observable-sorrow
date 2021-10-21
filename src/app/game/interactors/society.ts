@@ -6,7 +6,7 @@ export class SocietyInteractor implements ISocietyInteractor {
   constructor(private readonly admin: EntityAdmin) {}
 
   assignJob(id: JobId): void {
-    const pop = this.admin.pops().unemployed().first();
+    const pop = this.admin.pops().withJob(undefined).first();
     pop.state.job = id;
   }
 

@@ -42,10 +42,10 @@ export class SectionsPresenter {
   }
 
   private societyAlertText(society: SocietyState): string | undefined {
-    return society.unemployedPops === 0
+    return society.idlePops === 0
       ? undefined
-      : society.unemployedPops < 100
-      ? society.unemployedPops.toFixed(0)
+      : society.idlePops < 100
+      ? society.idlePops.toFixed(0)
       : "99+";
   }
 }

@@ -10,7 +10,10 @@ export class PlayerEntity extends Entity<"player"> {
   constructor() {
     super("player");
 
-    this.state = reactive({ gatherCatnip: 1, timeAcceleration: 1 });
+    this.state = reactive({
+      gatherCatnip: 1,
+      timeAcceleration: 1,
+    });
   }
 
   watch(watcher: Watcher): void {

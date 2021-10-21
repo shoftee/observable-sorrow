@@ -12,8 +12,7 @@ const { t } = useI18n();
 
 const jobs = computed(() => society.jobs);
 const totalPops = computed(() => society.pops.values.length);
-const unemployedPops = computed(() => count(society.pops.values, item => item.job === undefined))
-const noUnemployment = computed(() => unemployedPops.value === 0)
+const idle = computed(() => count(society.pops.values, item => item.job === undefined))
 </script>
 
 <template>
@@ -25,13 +24,13 @@ const noUnemployment = computed(() => unemployedPops.value === 0)
       <div class="card-header">{{ t("jobs.title") }}</div>
       <div class="card-body">
         <div>
-          <p v-if="noUnemployment">{{ t("jobs.status.good") }}</p>
+          <p v-if="idle === 0">{{ t("jobs.status.good") }}</p>
           <p v-else>
-            <span>{{ t("jobs.status.idle", { idle: unemployedPops }, unemployedPops) }}</span>
+            <span>{{ t("jobs.status.idle", { idle }, idle) }}</span>
           </p>
         </div>
         <div class="col-xl-6 col-12" v-for="job in jobs.values()" :key="job.id">
-          <JobButton :item="job" :noUnemployment="noUnemployment" />
+          <JobButton :item="job" :noIdle="idle === 0" />
         </div>
       </div>
     </template>

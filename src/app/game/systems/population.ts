@@ -34,9 +34,7 @@ export class PopulationSystem extends System {
 
     const pops = this.admin.pops();
     society.state.totalPops = pops.size;
-    society.state.unemployedPops = pops
-      .enumerate()
-      .count((item) => item.state.job === undefined);
+    society.state.idlePops = pops.withJob(undefined).count();
 
     kittens.state.amount = pops.size;
   }

@@ -14,7 +14,7 @@ export class SocietyEntity extends Entity<"society"> {
       stockpile: 0,
       unlocked: false,
       totalPops: 0,
-      unemployedPops: 0,
+      idlePops: 0,
     });
   }
 

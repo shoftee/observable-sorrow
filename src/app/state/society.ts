@@ -35,7 +35,7 @@ export interface SocietyState {
   stockpile: number;
   unlocked: boolean;
   totalPops: number;
-  unemployedPops: number;
+  idlePops: number;
 }
 
 export interface PopState {
