@@ -21,12 +21,21 @@ footer {
   @include px(2);
   @include py(1);
   @extend .bg-light;
+  gap: bsize(1);
 }
 
 header {
   @include flex-row();
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+
+  .header-start,
+  .header-middle,
+  .header-end {
+    display: flex;
+    gap: bsize(1);
+    align-items: center;
+  }
 }
 
 main {

@@ -10,9 +10,6 @@ export type ChangePool = {
 };
 
 export type OnTickedHandler = (changes: Iterable<ChangePool>) => void;
-export type InitializeOptions = {
-  onTicked: OnTickedHandler;
-};
 
 export interface IPresenterChangeSink {
   update(changes: Iterable<ChangePool>): void;
@@ -22,8 +19,12 @@ export interface IRootInteractor
   extends IBonfireInteractor,
     IDevToolsInteractor,
     IGameController,
-    ISocietyInteractor {
-  initialize(options: InitializeOptions): void;
+    ISocietyInteractor,
+    IStoreInteractor {
+  initialize(
+    onTicked: OnTickedHandler,
+    saveSlot: number | undefined,
+  ): Promise<void>;
 }
 
 export interface IBonfireInteractor {
@@ -33,6 +34,10 @@ export interface IBonfireInteractor {
 export interface ISocietyInteractor {
   assignJob(id: JobId): void;
   unassignJob(id: JobId): void;
+}
+
+export interface IStoreInteractor {
+  save(): Promise<void>;
 }
 
 export interface IDevToolsInteractor {

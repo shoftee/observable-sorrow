@@ -39,7 +39,7 @@ export function random(seed: number): Prng {
   };
 
   return {
-    state: () => state,
+    state: () => state | 0,
     next,
     fork,
   };

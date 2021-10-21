@@ -21,17 +21,21 @@ function onLoaded(c: Channel) {
 
 <template>
   <div class="app-container">
-    <header class="gap-1">
-      <div>Observable Sorrow</div>
-      <div class="badge bg-success">
-        <i class="bi bi-droplet"></i> &beta;
+    <header>
+      <div class="header-start d-flex gap-1 align-items-center">
+        <div>Observable Sorrow</div>
+        <div class="badge bg-success">
+          <i class="bi bi-droplet"></i> &beta;
+        </div>
       </div>
+      <div class="header-middle"></div>
+      <div class="header-end"></div>
     </header>
     <main class="scrollable">
       <GameLoader v-if="!loaded" @loaded="onLoaded" />
       <Main v-else class="w-100 h-100" />
     </main>
-    <footer class="gap-1">
+    <footer>
       <div>
         Observable Sorrow is a clone of
         <a href="https://kittensgame.com/web/">Kittens Game</a>.

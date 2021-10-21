@@ -1,22 +1,23 @@
-import {
-  IBonfireInteractor,
-  IDevToolsInteractor,
-  IGameController,
-  ISocietyInteractor,
-} from "@/app/interfaces";
-
 import { EntityAdmin } from "../entity";
 
-import { BonfireInteractor, SocietyInteractor, DevToolsInteractor } from ".";
+import {
+  BonfireInteractor,
+  DevToolsInteractor,
+  GameController,
+  SocietyInteractor,
+  StoreInteractor,
+} from ".";
 
 export class InteractorFacade {
-  readonly bonfire: IBonfireInteractor;
-  readonly society: ISocietyInteractor;
-  readonly devTools: IDevToolsInteractor;
+  readonly bonfire: BonfireInteractor;
+  readonly society: SocietyInteractor;
+  readonly store: StoreInteractor;
+  readonly devTools: DevToolsInteractor;
 
-  constructor(readonly controller: IGameController, admin: EntityAdmin) {
+  constructor(readonly controller: GameController, admin: EntityAdmin) {
     this.bonfire = new BonfireInteractor(admin);
     this.society = new SocietyInteractor(admin);
+    this.store = new StoreInteractor(admin);
     this.devTools = new DevToolsInteractor(admin);
   }
 }

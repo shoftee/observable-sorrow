@@ -30,6 +30,10 @@ function sectionChanged(item: SectionItem) {
   activeSection.value = item.id;
 }
 
+async function save(): Promise<void> {
+  await interactors.store.save();
+}
+
 const sectionContent = computed(() => {
   const sectionId = activeSection.value;
   switch (sectionId) {
@@ -74,5 +78,8 @@ const dt = window.__OS_DEVTOOLS__;
     <suspense>
       <DevTools v-if="dt && dt.on" />
     </suspense>
+    <teleport to=".header-end">
+      <button class="btn btn-link p-0 m-0" @click="save">Save</button>
+    </teleport>
   </div>
 </template>

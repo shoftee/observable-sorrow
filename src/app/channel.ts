@@ -6,6 +6,7 @@ import {
   IGameController,
   IRootInteractor,
   ISocietyInteractor,
+  IStoreInteractor,
   OnTickedHandler,
 } from "@/app/interfaces";
 
@@ -20,6 +21,7 @@ import {
   SocietyPresenter,
   StateManager,
 } from "./presenters";
+import { loadOrInitGeneral } from "./store/db";
 
 const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
 const root = wrap<IRootInteractor>(worker);
@@ -30,6 +32,7 @@ export type Channel = {
     controller: RemoteObject<IGameController>;
     devTools: RemoteObject<IDevToolsInteractor>;
     society: RemoteObject<ISocietyInteractor>;
+    store: RemoteObject<IStoreInteractor>;
   };
   presenters: {
     bonfire: BonfirePresenter;
@@ -47,7 +50,9 @@ export async function Setup(): Promise<Channel> {
   const handler: OnTickedHandler = function (changes) {
     stateManager.update(changes);
   };
-  await root.initialize(proxy({ onTicked: handler }));
+
+  const general = await loadOrInitGeneral();
+  await root.initialize(proxy(handler), general.currentSlot);
 
   const presenters = new PresenterFacade(stateManager);
 
@@ -65,10 +70,6 @@ export async function Setup(): Promise<Channel> {
       bonfire: {
         buildItem: root.buildItem,
       },
-      society: {
-        assignJob: root.assignJob,
-        unassignJob: root.unassignJob,
-      },
       controller: {
         start: root.start,
         stop: root.stop,
@@ -78,6 +79,13 @@ export async function Setup(): Promise<Channel> {
         turnDevToolsOff: root.turnDevToolsOff,
         setGatherCatnip: root.setGatherCatnip,
         setTimeAcceleration: root.setTimeAcceleration,
+      },
+      society: {
+        assignJob: root.assignJob,
+        unassignJob: root.unassignJob,
+      },
+      store: {
+        save: root.save,
       },
     },
   };

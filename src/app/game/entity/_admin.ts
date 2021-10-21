@@ -1,4 +1,5 @@
 import { BuildingId, EffectId, RecipeId, ResourceId } from "@/app/interfaces";
+import { SaveState } from "@/app/store";
 
 import {
   BuildingEntity,
@@ -51,6 +52,28 @@ export class EntityAdmin {
 
     this._time = new TimeEntity();
     this._time.watch(this.watcher);
+  }
+
+  loadState(state: SaveState): void {
+    this._buildings.loadState(state);
+    this._resources.loadState(state);
+    this._pops.loadState(state);
+    this._environment.loadState(state);
+    this._player.loadState(state);
+    this._prng.loadState(state);
+    this._society.loadState(state);
+    this._time.loadState(state);
+  }
+
+  saveState(state: SaveState): void {
+    this._buildings.saveState(state);
+    this._resources.saveState(state);
+    this._pops.saveState(state);
+    this._environment.saveState(state);
+    this._player.saveState(state);
+    this._prng.saveState(state);
+    this._society.saveState(state);
+    this._time.saveState(state);
   }
 
   building(id: BuildingId): BuildingEntity {

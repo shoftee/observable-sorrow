@@ -28,48 +28,50 @@ useKeyboardEvent("keyup", (e) => {
 });
 </script>
 <template>
-  <aside>
-    <button
-      id="show-devtools"
-      type="button"
-      data-bs-toggle="offcanvas"
-      data-bs-target="#dt-offcanvas"
-      class="btn btn-outline-secondary position-fixed m-5 bottom-0 end-0"
-    >
-      <span class="bi bi-gear"></span>
-    </button>
-    <div id="dt-offcanvas" class="offcanvas offcanvas-end" tabindex="-1">
-      <div class="offcanvas-header">Dev Tools</div>
-      <div class="offcanvas-body">
-        <div class="row">
-          <label for="gather-catnip" class="form-label">Gather Catnip = {{ gatherCatnip }}</label>
-          <input
-            id="gather-catnip"
-            type="range"
-            class="form-range"
-            min="1"
-            max="100"
-            v-model.number="gatherCatnip"
-            @change="devTools.setGatherCatnip(gatherCatnip)"
-          />
-        </div>
-        <div class="row">
-          <label
-            for="time-acceleration"
-            class="form-label"
-          >Time Acceleration = {{ timeAcceleration }}</label>
-          <input
-            id="time-acceleration"
-            type="range"
-            class="form-range"
-            min="0.5"
-            max="10"
-            step="0.1"
-            v-model.number="timeAcceleration"
-            @change="devTools.setTimeAcceleration(timeAcceleration)"
-          />
+  <teleport to=".app-container">
+    <aside>
+      <button
+        id="show-devtools"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#dt-offcanvas"
+        class="btn btn-outline-secondary position-fixed m-5 bottom-0 end-0"
+      >
+        <span class="bi bi-gear"></span>
+      </button>
+      <div id="dt-offcanvas" class="offcanvas offcanvas-end" tabindex="-1">
+        <div class="offcanvas-header">Dev Tools</div>
+        <div class="offcanvas-body">
+          <div class="row">
+            <label for="gather-catnip" class="form-label">Gather Catnip = {{ gatherCatnip }}</label>
+            <input
+              id="gather-catnip"
+              type="range"
+              class="form-range"
+              min="1"
+              max="100"
+              v-model.number="gatherCatnip"
+              @change="devTools.setGatherCatnip(gatherCatnip)"
+            />
+          </div>
+          <div class="row">
+            <label
+              for="time-acceleration"
+              class="form-label"
+            >Time Acceleration = {{ timeAcceleration }}</label>
+            <input
+              id="time-acceleration"
+              type="range"
+              class="form-range"
+              min="0.5"
+              max="10"
+              step="0.1"
+              v-model.number="timeAcceleration"
+              @change="devTools.setTimeAcceleration(timeAcceleration)"
+            />
+          </div>
         </div>
       </div>
-    </div>
-  </aside>
+    </aside>
+  </teleport>
 </template>
