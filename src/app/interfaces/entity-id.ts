@@ -1,6 +1,6 @@
 import {
   BuildingId,
-  EffectId,
+  NumberEffectId,
   PopId,
   RecipeId,
   ResourceId,
@@ -8,18 +8,17 @@ import {
 
 export type PoolEntityId =
   | "buildings"
-  | "effects"
+  | "numbers"
   | "pops"
   | "recipes"
-  | "resources"
-  | "pops";
+  | "resources";
 
 export type EntityId =
   | PoolEntityId
   | ResourceId
   | BuildingId
   | RecipeId
-  | EffectId
+  | NumberEffectId
   | PopId
   | "environment"
   | "player"

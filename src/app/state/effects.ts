@@ -1,3 +1,3 @@
-export interface EffectState {
+export interface NumberEffectState {
   value: number | undefined;
 }

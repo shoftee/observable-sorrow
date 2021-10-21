@@ -4,7 +4,7 @@ import { computed, ComputedRef, reactive } from "vue";
 import {
   BuildingId,
   ChangePool,
-  EffectId,
+  NumberEffectId,
   EffectUnits,
   EntityId,
   IPresenterChangeSink,
@@ -17,7 +17,7 @@ import {
 } from "@/app/interfaces";
 import {
   BuildingState,
-  EffectState,
+  NumberEffectState,
   EnvironmentState,
   PlayerState,
   PopState,
@@ -33,8 +33,8 @@ export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
   building(id: BuildingId): BuildingState;
 
-  effects(): Enumerable<[EffectId, EffectState]>;
-  effect(id: EffectId): EffectState;
+  effects(): Enumerable<[NumberEffectId, NumberEffectState]>;
+  effect(id: NumberEffectId): NumberEffectState;
 
   pops(): Enumerable<[PopId, PopState]>;
 
@@ -49,7 +49,7 @@ export interface IStateManager {
   society(): SocietyState;
   time(): TimeState;
 
-  effectView(id: EffectId): ComputedRef<NumberView>;
+  effectView(id: NumberEffectId): ComputedRef<NumberView>;
 }
 
 export interface NumberView {
@@ -70,8 +70,11 @@ class ChangePools extends Map<
     >;
   }
 
-  get effects(): Map<EffectId, EffectState> {
-    return this.getOrAdd("effects") as unknown as Map<EffectId, EffectState>;
+  get numbers(): Map<NumberEffectId, NumberEffectState> {
+    return this.getOrAdd("numbers") as unknown as Map<
+      NumberEffectId,
+      NumberEffectState
+    >;
   }
 
   get pops(): Map<PopId, PopState> {
@@ -135,12 +138,12 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.buildings.get(id) as BuildingState;
   }
 
-  effects(): Enumerable<[EffectId, EffectState]> {
-    return asEnumerable(this.pools.effects.entries());
+  effects(): Enumerable<[NumberEffectId, NumberEffectState]> {
+    return asEnumerable(this.pools.numbers.entries());
   }
 
-  effect(id: EffectId): EffectState {
-    return this.pools.effects.get(id) as EffectState;
+  effect(id: NumberEffectId): NumberEffectState {
+    return this.pools.numbers.get(id) as NumberEffectState;
   }
 
   pops(): Enumerable<[PopId, PopState]> {
@@ -183,7 +186,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return pool.get("time") as unknown as TimeState;
   }
 
-  effectView(id: EffectId): ComputedRef<NumberView> {
+  effectView(id: NumberEffectId): ComputedRef<NumberView> {
     return computed(() => ({
       value: this.effect(id).value ?? 0,
       unit: EffectUnits[id] ?? UnitKind.None,

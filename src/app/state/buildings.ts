@@ -1,10 +1,10 @@
-import { EffectId, BuildingId } from "@/app/interfaces";
+import { NumberEffectId, BuildingId } from "@/app/interfaces";
 import { IngredientState, ResourcesType } from "./common/types";
 
 export type BuildingEffectType = Readonly<{
   id: string;
-  per: EffectId;
-  total: EffectId;
+  per: NumberEffectId;
+  total: NumberEffectId;
   label: string;
 }>;
 

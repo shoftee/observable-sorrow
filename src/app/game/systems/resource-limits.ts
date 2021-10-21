@@ -19,7 +19,7 @@ export class ResourceLimitsSystem extends System {
     for (const resource of this.admin.resources()) {
       const limitEffect = resource.meta.effects.limit;
       if (limitEffect) {
-        resource.state.capacity = this.admin.effect(limitEffect).get();
+        resource.state.capacity = this.admin.number(limitEffect).get();
       }
     }
   }

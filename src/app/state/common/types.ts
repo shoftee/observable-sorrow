@@ -1,4 +1,4 @@
-import { EffectId, ResourceId } from "@/app/interfaces";
+import { ResourceId } from "@/app/interfaces";
 
 type ResourceQty = [ResourceId, number];
 
@@ -35,11 +35,6 @@ export function ingredientsFromObject(obj: ResourcesType): IngredientState[] {
 export type ResourceQuantityType = {
   readonly id: ResourceId;
   readonly quantity: number;
-};
-
-export type EffectQuantityType = {
-  readonly id: EffectId;
-  readonly amount: number;
 };
 
 export type ResourcesType = Readonly<Partial<Record<ResourceId, number>>>;

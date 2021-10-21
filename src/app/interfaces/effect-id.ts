@@ -26,7 +26,7 @@ export type PopulationEffectId =
   | "population.catnip.demand"
   | "population.catnip.demand.base";
 
-export type EffectId =
+export type NumberEffectId =
   | ProductionEffectId
   | DeltaEffectId
   | LimitEffectId
@@ -44,7 +44,7 @@ export enum UnitKind {
   Percent,
 }
 
-export const EffectUnits: Partial<Record<EffectId, UnitKind>> = {
+export const EffectUnits: Partial<Record<NumberEffectId, UnitKind>> = {
   "catnip.delta": UnitKind.PerTick,
   "catnip-field.catnip": UnitKind.PerTick,
   "catnip-field.catnip.base": UnitKind.PerTick,

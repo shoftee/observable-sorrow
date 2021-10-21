@@ -1,11 +1,16 @@
-import { BuildingId, EffectId, RecipeId, ResourceId } from "@/app/interfaces";
+import {
+  BuildingId,
+  NumberEffectId,
+  RecipeId,
+  ResourceId,
+} from "@/app/interfaces";
 import { SaveState } from "@/app/store";
 
 import {
   BuildingEntity,
   BuildingsPool,
-  EffectEntity,
-  EffectsPool,
+  NumberEffectEntity,
+  NumberEffectsPool,
   EntityWatcher,
   EnvironmentEntity,
   RecipeEntity,
@@ -21,10 +26,10 @@ import {
 
 export class EntityAdmin {
   private readonly _buildings: BuildingsPool;
-  private readonly _effects: EffectsPool;
+  private readonly _numbers: NumberEffectsPool;
+  private readonly _pops: PopsPool;
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
-  private readonly _pops: PopsPool;
 
   private readonly _environment: EnvironmentEntity;
   private readonly _player: PlayerEntity;
@@ -34,10 +39,10 @@ export class EntityAdmin {
 
   constructor(private readonly watcher: EntityWatcher) {
     this._buildings = new BuildingsPool(this.watcher.pooled("buildings"));
-    this._effects = new EffectsPool(this.watcher.pooled("effects"));
+    this._numbers = new NumberEffectsPool(this.watcher.pooled("numbers"));
+    this._pops = new PopsPool(this.watcher.pooled("pops"));
     this._recipes = new RecipesPool(this.watcher.pooled("recipes"));
     this._resources = new ResourcesPool(this.watcher.pooled("resources"));
-    this._pops = new PopsPool(this.watcher.pooled("pops"));
 
     this._environment = new EnvironmentEntity();
     this._environment.watch(this.watcher);
@@ -84,12 +89,12 @@ export class EntityAdmin {
     return this._buildings.enumerate();
   }
 
-  effect(id: EffectId): EffectEntity {
-    return this._effects.get(id);
+  number(id: NumberEffectId): NumberEffectEntity {
+    return this._numbers.get(id);
   }
 
-  effects(): Iterable<EffectEntity> {
-    return this._effects.enumerate();
+  numbers(): Iterable<NumberEffectEntity> {
+    return this._numbers.enumerate();
   }
 
   pops(): PopsPool {

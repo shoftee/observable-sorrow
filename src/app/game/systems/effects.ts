@@ -1,5 +1,8 @@
+import { NumberEffectId } from "@/app/interfaces";
+
+import { NumberEffectEntity, EntityAdmin, NumberExpr } from "../entity";
+
 import { System } from ".";
-import { EffectEntity, EntityAdmin, Expr } from "../entity";
 
 export class EffectsSystem extends System {
   constructor(admin: EntityAdmin) {
@@ -29,22 +32,20 @@ class Resolver {
   resolveExprs(): void {
     this.resolved.clear();
     this.resolving.clear();
-    for (const effect of this.admin.effects()) {
+    for (const effect of this.admin.numbers()) {
       this.resolveExpr(effect);
     }
   }
 
-  private resolveExpr(effect: EffectEntity) {
+  private resolveExpr(effect: NumberEffectEntity) {
     const id = effect.id;
     if (this.resolved.has(id)) {
       return;
     }
 
     if (this.resolving.has(id)) {
-      console.log("detected cycle during calculation", this.resolving);
-      throw new Error(
-        `Could not calculate value for effect '${id}', please check log.`,
-      );
+      console.log(this.resolving);
+      throw new CouldNotResolveEffectError(id, "cycle detected");
     }
 
     // Add current calculation to resolving stack.
@@ -53,25 +54,22 @@ class Resolver {
     const calculatedValue = this.unwrap(effect.expr);
     this.resolving.delete(id);
 
-    this.admin.effect(id).set(calculatedValue);
+    this.admin.number(id).set(calculatedValue);
     this.resolved.add(id);
   }
 
-  private unwrap(resolver: Expr): number {
-    if (typeof resolver === "number") {
-      return resolver;
+  private unwrap(expr: NumberExpr): number {
+    if (typeof expr === "number") {
+      return expr;
     } else {
-      return resolver({
+      return expr({
         admin: this.admin,
         val: (id) => {
-          const entity = this.admin.effect(id);
+          const entity = this.admin.number(id);
           this.resolveExpr(entity);
           const value = entity.get();
           if (value === undefined) {
-            console.log(`value for effect ${id} is not present in store`);
-            throw new Error(
-              `Could not resolve value for effect '${id}', please check log.`,
-            );
+            throw new CouldNotResolveEffectError(id, "value not in store");
           }
           return value;
         },
@@ -80,7 +78,13 @@ class Resolver {
   }
 }
 
-export interface ExprValueStore {
+export interface NumberValueStore {
   get(id: string): number | undefined;
   set(id: string, val: number): void;
+}
+
+class CouldNotResolveEffectError extends Error {
+  constructor(readonly id: NumberEffectId, readonly reason: string) {
+    super(`could not resolve value for effect '${id}': ${reason}`);
+  }
 }
