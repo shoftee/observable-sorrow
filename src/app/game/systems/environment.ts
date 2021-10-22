@@ -15,10 +15,6 @@ export class EnvironmentSystem extends System {
     return this.admin.time();
   }
 
-  init(): void {
-    this.updateWeather();
-  }
-
   update(): void {
     const environment = this.environment;
 

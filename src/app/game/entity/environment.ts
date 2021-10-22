@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive, toRaw } from "vue";
 
 import { EnvironmentState } from "@/app/state";
 import { SaveState } from "@/app/store";
@@ -19,6 +19,10 @@ export class EnvironmentEntity extends Entity<"environment"> {
     });
   }
 
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
+  }
+
   loadState(state: SaveState): void {
     if (state.environment) {
       Object.assign(this.state, state.environment);
@@ -26,15 +30,6 @@ export class EnvironmentEntity extends Entity<"environment"> {
   }
 
   saveState(state: SaveState): void {
-    state.environment = {
-      day: this.state.day,
-      season: this.state.season,
-      year: this.state.year,
-      weather: this.state.weather,
-    };
-  }
-
-  watch(watcher: Watcher): void {
-    watcher.watch(this.id, this.state);
+    state.environment = { ...toRaw(this.state) };
   }
 }
