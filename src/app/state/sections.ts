@@ -1,24 +1,25 @@
-import { SectionId } from "@/app/interfaces";
+import { SectionId, SectionUnlockEffectId } from "@/app/interfaces";
 
 export type SectionMetadataType = {
   id: SectionId;
   label: string;
-  unlocked?: boolean;
+  unlockEffect?: SectionUnlockEffectId;
 };
 
 export const SectionsMetadata: Record<SectionId, SectionMetadataType> = {
   "bonfire-section": {
     id: "bonfire-section",
     label: "sections.bonfire.label",
-    unlocked: true,
   },
   "society-section": {
     id: "society-section",
     label: "sections.society.label",
+    unlockEffect: "unlock.section.society",
   },
   "science-section": {
     id: "science-section",
     label: "sections.science.label",
+    unlockEffect: "unlock.section.science",
   },
 };
 

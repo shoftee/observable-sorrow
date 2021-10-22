@@ -1,4 +1,5 @@
 import {
+  BooleanEffectId,
   BuildingId,
   NumberEffectId,
   RecipeId,
@@ -8,13 +9,15 @@ import {
 import { SaveState } from "@/app/store";
 
 import {
-  Entity,
-  EntityWatcher,
+  BooleanEffectEntity,
+  BooleanEffectsPool,
   BuildingEntity,
   BuildingsPool,
+  Entity,
+  EntityWatcher,
+  EnvironmentEntity,
   NumberEffectEntity,
   NumberEffectsPool,
-  EnvironmentEntity,
   PlayerEntity,
   PopsPool,
   PrngEntity,
@@ -31,6 +34,7 @@ import {
 export class EntityAdmin {
   private readonly _buildings: BuildingsPool;
   private readonly _numbers: NumberEffectsPool;
+  private readonly _booleans: BooleanEffectsPool;
   private readonly _pops: PopsPool;
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
@@ -43,6 +47,7 @@ export class EntityAdmin {
   private readonly _time: TimeEntity;
 
   constructor(private readonly watcher: EntityWatcher) {
+    this._booleans = new BooleanEffectsPool(this.watcher.pooled("booleans"));
     this._buildings = new BuildingsPool(this.watcher.pooled("buildings"));
     this._numbers = new NumberEffectsPool(this.watcher.pooled("numbers"));
     this._pops = new PopsPool(this.watcher.pooled("pops"));
@@ -85,6 +90,14 @@ export class EntityAdmin {
         }
       }
     }
+  }
+
+  booleans(): Iterable<BooleanEffectEntity> {
+    return this._booleans.enumerate();
+  }
+
+  boolean(id: BooleanEffectId): BooleanEffectEntity {
+    return this._booleans.get(id);
   }
 
   building(id: BuildingId): BuildingEntity {

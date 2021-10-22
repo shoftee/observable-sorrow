@@ -2,8 +2,21 @@ import { System } from ".";
 
 export class SectionsSystem extends System {
   update(): void {
+    this.unlock();
+
     this.updateSociety();
-    this.updateScience();
+  }
+
+  private unlock() {
+    for (const section of this.admin.sections()) {
+      const unlockEffect = section.meta.unlockEffect;
+      if (section.state.unlocked || unlockEffect === undefined) {
+        continue;
+      }
+
+      const effect = this.admin.boolean(unlockEffect);
+      section.state.unlocked = effect.state.value ?? false;
+    }
   }
 
   private updateSociety() {
@@ -12,24 +25,6 @@ export class SectionsSystem extends System {
 
     section.label = this.societyLabel(society.totalPops);
     section.alert = this.societyAlert(society.idlePops);
-
-    if (!section.unlocked) {
-      const kittens = this.admin.resource("kittens").state;
-      if (kittens.capacity && kittens.capacity > 0) {
-        section.unlocked = true;
-        society.unlockedJobs.add("woodcutter");
-      }
-    }
-  }
-
-  private updateScience() {
-    const section = this.admin.section("science-section").state;
-    if (!section.unlocked) {
-      const library = this.admin.building("library").state;
-      if (library.level > 0) {
-        section.unlocked = true;
-      }
-    }
   }
 
   private societyLabel(totalPops: number): string {

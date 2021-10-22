@@ -1,4 +1,5 @@
 import {
+  BooleanEffectId,
   BuildingId,
   NumberEffectId,
   PopId,
@@ -10,18 +11,20 @@ import {
 export type PoolEntityId =
   | "buildings"
   | "numbers"
+  | "booleans"
   | "pops"
   | "recipes"
   | "resources"
   | "sections";
 
 export type EntityId =
-  | PoolEntityId
-  | ResourceId
+  | BooleanEffectId
   | BuildingId
-  | RecipeId
   | NumberEffectId
+  | PoolEntityId
   | PopId
+  | RecipeId
+  | ResourceId
   | SectionId
   | "environment"
   | "player"

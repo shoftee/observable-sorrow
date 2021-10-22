@@ -3,29 +3,27 @@ import { asEnumerable } from "@/app/utils/enumerable";
 
 import { effect, unwrap, Expr, ExprContext } from "./common";
 
-export type NumberExpr = Expr<number>;
-type NumberExprContext = ExprContext<number>;
+export type NumberExpr = Expr<number, NumberEffectId>;
+type Ctx = ExprContext<number, NumberEffectId>;
 
-const level = (id: BuildingId) => (ctx: NumberExprContext) =>
+const level = (id: BuildingId) => (ctx: Ctx) =>
   ctx.admin.building(id).state.level;
 
 const sum =
   (...exprs: NumberExpr[]) =>
-  (ctx: NumberExprContext) =>
+  (ctx: Ctx) =>
     asEnumerable(exprs).reduce(0, (acc, expr) => acc + unwrap(expr, ctx));
 
-const subtract =
-  (lhs: NumberExpr, rhs: NumberExpr) => (ctx: NumberExprContext) =>
-    unwrap(lhs, ctx) - unwrap(rhs, ctx);
+const subtract = (lhs: NumberExpr, rhs: NumberExpr) => (ctx: Ctx) =>
+  unwrap(lhs, ctx) - unwrap(rhs, ctx);
 
 const prod =
   (...exprs: NumberExpr[]) =>
-  (ctx: NumberExprContext) =>
+  (ctx: Ctx) =>
     asEnumerable(exprs).reduce(1, (acc, expr) => acc * unwrap(expr, ctx));
 
-const ratio =
-  (base: NumberExpr, ratio: NumberExpr) => (ctx: NumberExprContext) =>
-    unwrap(base, ctx) * (1 + unwrap(ratio, ctx));
+const ratio = (base: NumberExpr, ratio: NumberExpr) => (ctx: Ctx) =>
+  unwrap(base, ctx) * (1 + unwrap(ratio, ctx));
 
 export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   // Limits and other stuff

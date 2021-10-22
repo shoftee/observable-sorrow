@@ -1,17 +1,16 @@
-import { NumberEffectId } from "@/app/interfaces";
 import { EntityAdmin } from "..";
 
-export type Expr<T> = T | ((context: ExprContext<T>) => T);
+export type Expr<T, Id> = T | ((context: ExprContext<T, Id>) => T);
 
-export type ExprContext<T> = {
+export type ExprContext<T, Id> = {
   admin: EntityAdmin;
-  val: (id: NumberEffectId) => T;
+  val: (id: Id) => T;
 };
 
-export function effect<T>(id: NumberEffectId): Expr<T> {
-  return (ctx: ExprContext<T>) => ctx.val(id);
+export function effect<T, Id>(id: Id): Expr<T, Id> {
+  return (ctx: ExprContext<T, Id>) => ctx.val(id);
 }
 
-export function unwrap<T>(expr: Expr<T>, ctx: ExprContext<T>): T {
+export function unwrap<T, Id>(expr: Expr<T, Id>, ctx: ExprContext<T, Id>): T {
   return expr instanceof Function ? expr(ctx) : expr;
 }

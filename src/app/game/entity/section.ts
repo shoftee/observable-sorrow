@@ -12,7 +12,7 @@ export class SectionEntity extends Entity<SectionId> {
     super(meta.id);
 
     this.state = reactive({
-      unlocked: meta.unlocked ?? false,
+      unlocked: meta.unlockEffect === undefined,
       label: meta.label,
       alert: undefined,
     });
