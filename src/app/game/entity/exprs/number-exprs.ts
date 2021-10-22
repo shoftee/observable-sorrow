@@ -28,7 +28,7 @@ const ratio =
     unwrap(base, ctx) * (1 + unwrap(ratio, ctx));
 
 export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
-  // Limits
+  // Limits and other stuff
   "catnip.limit.base": 5000,
   "catnip.limit": effect("catnip.limit.base"),
 
@@ -37,6 +37,9 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
 
   "kittens.limit": effect("hut.kittens-limit"),
   "catpower.limit": effect("hut.catpower-limit"),
+  "science.limit": effect("library.science-limit"),
+  "science.ratio": effect("library.science-ratio"),
+  "culture.limit": effect("library.culture-limit"),
 
   // Wood
   "wood.delta": effect("wood.production"),
@@ -68,6 +71,23 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "hut.kittens-limit": prod(effect("hut.kittens-limit.base"), level("hut")),
   "hut.catpower-limit.base": 75,
   "hut.catpower-limit": prod(effect("hut.catpower-limit.base"), level("hut")),
+
+  // Libraries
+  "library.science-limit.base": 250,
+  "library.science-limit": prod(
+    effect("library.science-limit.base"),
+    level("library"),
+  ),
+  "library.science-ratio.base": 0.1,
+  "library.science-ratio": prod(
+    effect("library.science-ratio.base"),
+    level("library"),
+  ),
+  "library.culture-limit.base": 10,
+  "library.culture-limit": prod(
+    effect("library.culture-limit.base"),
+    level("library"),
+  ),
 
   // Population
   "population.catnip-demand.base": 0.85,

@@ -16,6 +16,10 @@ export const SectionsMetadata: Record<SectionId, SectionMetadataType> = {
     id: "society-section",
     label: "sections.society.label",
   },
+  "science-section": {
+    id: "science-section",
+    label: "sections.science.label",
+  },
 };
 
 export interface SectionState {

@@ -1,5 +1,9 @@
 export type ProductionEffectId = "catnip.production" | "wood.production";
 export type DeltaEffectId = "catnip.delta" | "wood.delta";
+export type RatioEffectId =
+  | "science.ratio"
+  | "weather.season-ratio"
+  | "weather.severity-ratio";
 
 export type LimitEffectId =
   | "catnip.limit"
@@ -7,7 +11,9 @@ export type LimitEffectId =
   | "wood.limit"
   | "wood.limit.base"
   | "kittens.limit"
-  | "catpower.limit";
+  | "catpower.limit"
+  | "science.limit"
+  | "culture.limit";
 
 export type CatnipFieldEffectId =
   | "catnip-field.weather"
@@ -20,6 +26,14 @@ export type HutEffectId =
   | "hut.kittens-limit"
   | "hut.kittens-limit.base";
 
+export type LibraryEffectId =
+  | "library.science-limit"
+  | "library.science-limit.base"
+  | "library.science-ratio"
+  | "library.science-ratio.base"
+  | "library.culture-limit"
+  | "library.culture-limit.base";
+
 export type JobEffectId = "jobs.woodcutter.wood.base" | "jobs.woodcutter.wood";
 
 export type PopulationEffectId =
@@ -29,13 +43,13 @@ export type PopulationEffectId =
 export type NumberEffectId =
   | ProductionEffectId
   | DeltaEffectId
+  | RatioEffectId
   | LimitEffectId
   | CatnipFieldEffectId
   | HutEffectId
+  | LibraryEffectId
   | PopulationEffectId
-  | JobEffectId
-  | "weather.season-ratio"
-  | "weather.severity-ratio";
+  | JobEffectId;
 
 export enum UnitKind {
   None,
@@ -51,4 +65,8 @@ export const EffectUnits: Partial<Record<NumberEffectId, UnitKind>> = {
   "catnip-field.weather": UnitKind.Percent,
   "jobs.woodcutter.wood": UnitKind.PerTick,
   "jobs.woodcutter.wood.base": UnitKind.PerTick,
+  "weather.season-ratio": UnitKind.Percent,
+  "weather.severity-ratio": UnitKind.Percent,
+  "library.science-ratio": UnitKind.Percent,
+  "library.science-ratio.base": UnitKind.Percent,
 };

@@ -59,6 +59,34 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
       },
     ],
   },
+  library: {
+    id: "library",
+    prices: {
+      base: { wood: 25 },
+      ratio: 1.15,
+    },
+    unlockRatio: 0.3,
+    effects: [
+      {
+        id: "science.limit",
+        per: "library.science-limit.base",
+        total: "library.science-limit",
+        label: "buildings.library.effects.science-limit",
+      },
+      {
+        id: "science.ratio",
+        per: "library.science-ratio.base",
+        total: "library.science-ratio",
+        label: "buildings.library.effects.science-ratio",
+      },
+      {
+        id: "culture.limit",
+        per: "library.culture-limit.base",
+        total: "library.culture-limit",
+        label: "buildings.library.effects.culture-limit",
+      },
+    ],
+  },
 };
 
 export interface BuildingState {

@@ -60,6 +60,14 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
+  science: {
+    id: "science",
+    label: "resources.science.label",
+    effects: {
+      limit: "science.limit",
+    },
+    flags: {},
+  },
 };
 
 export interface ResourceState {

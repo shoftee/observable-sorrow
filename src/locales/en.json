@@ -8,6 +8,9 @@
       "outpost": "Outpost",
       "small-village": "Small Village",
       "village": "Village"
+    },
+    "science": {
+      "label": "Science"
     }
   },
 
@@ -40,6 +43,9 @@
     },
     "kittens": {
       "label": "kittens"
+    },
+    "science": {
+      "label": "science"
     }
   },
 
@@ -113,6 +119,16 @@
       "effects": {
         "catpower-limit": "Maximum catpower {amount}",
         "kittens-limit": "Maximum kittens {amount}"
+      }
+    },
+    "library": {
+      "label": "Library",
+      "description": "A library to store sacred catkind knowledge. Increases science output.",
+      "flavor": "All in Catonese",
+      "effects": {
+        "science-limit": "Maximum science {amount}",
+        "science-ratio": "Science output bonus {amount}",
+        "culture-limit": "Maximum culture {amount}"
       }
     }
   }

@@ -3,6 +3,7 @@ import { System } from ".";
 export class SectionsSystem extends System {
   update(): void {
     this.updateSociety();
+    this.updateScience();
   }
 
   private updateSociety() {
@@ -17,6 +18,16 @@ export class SectionsSystem extends System {
       if (kittens.capacity && kittens.capacity > 0) {
         section.unlocked = true;
         society.unlockedJobs.add("woodcutter");
+      }
+    }
+  }
+
+  private updateScience() {
+    const section = this.admin.section("science-section").state;
+    if (!section.unlocked) {
+      const library = this.admin.building("library").state;
+      if (library.level > 0) {
+        section.unlocked = true;
       }
     }
   }

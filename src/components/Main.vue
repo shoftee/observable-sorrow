@@ -9,6 +9,7 @@ import DevTools from "./DevTools.vue";
 import Sections from "./Controls/Sections.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
 import SocietyControls from "./Controls/Society.vue";
+import ScienceControls from "./Controls/Science.vue";
 
 import { SectionId } from "@/app/interfaces";
 import { SectionItem } from "@/app/presenters";
@@ -40,6 +41,7 @@ const sectionContent = computed(() => {
   switch (sectionId) {
     case "bonfire-section": return BonfireControls;
     case "society-section": return SocietyControls;
+    case "science-section": return ScienceControls;
     default: throw new Error(`unexpected section name ${sectionId}`);
   }
 });
@@ -76,11 +78,11 @@ const dt = window.__OS_DEVTOOLS__;
         </div>
       </div>
     </div>
-    <suspense>
-      <DevTools v-if="dt && dt.on" />
-    </suspense>
     <teleport to=".header-end">
       <button class="btn btn-link p-0 m-0" @click="save">Save</button>
     </teleport>
+    <suspense>
+      <DevTools v-if="dt && dt.on" />
+    </suspense>
   </div>
 </template>
