@@ -1,5 +1,5 @@
 import { mergeWith } from "lodash";
-import { computed, ComputedRef, reactive } from "vue";
+import { reactive } from "vue";
 
 import {
   BuildingId,
@@ -35,8 +35,7 @@ export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
   building(id: BuildingId): BuildingState;
 
-  effects(): Enumerable<[NumberEffectId, NumberEffectState]>;
-  effect(id: NumberEffectId): NumberEffectState;
+  numberView(id: NumberEffectId): NumberView;
 
   pops(): Enumerable<[PopId, PopState]>;
 
@@ -53,8 +52,6 @@ export interface IStateManager {
   player(): PlayerState;
   society(): SocietyState;
   time(): TimeState;
-
-  numberView(id: NumberEffectId): ComputedRef<NumberView>;
 }
 
 export interface NumberView {
@@ -147,12 +144,14 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.buildings.get(id) as BuildingState;
   }
 
-  effects(): Enumerable<[NumberEffectId, NumberEffectState]> {
-    return asEnumerable(this.pools.numbers.entries());
-  }
-
-  effect(id: NumberEffectId): NumberEffectState {
-    return this.pools.numbers.get(id) as NumberEffectState;
+  numberView(id: NumberEffectId): NumberView {
+    const number = this.pools.numbers.get(id) as NumberEffectState;
+    return {
+      value: number.value ?? 0,
+      unit: EffectUnits[id] ?? UnitKind.None,
+      rounded: false,
+      showSign: "always",
+    };
   }
 
   pops(): Enumerable<[PopId, PopState]> {
@@ -202,15 +201,6 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   time(): TimeState {
     const pool = this.pools.getOrAdd(undefined);
     return pool.get("time") as unknown as TimeState;
-  }
-
-  numberView(id: NumberEffectId): ComputedRef<NumberView> {
-    return computed(() => ({
-      value: this.effect(id).value ?? 0,
-      unit: EffectUnits[id] ?? UnitKind.None,
-      rounded: false,
-      showSign: "always",
-    }));
   }
 }
 

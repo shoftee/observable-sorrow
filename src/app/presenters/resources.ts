@@ -56,21 +56,14 @@ export class ResourcesPresenter {
   }
 
   private catnipModifier(manager: IStateManager): NumberView | undefined {
-    const production = manager.effect("catnip-field.catnip");
-    const catnipProduction = production.value ?? 0;
+    const catnipField = manager.building("catnip-field");
 
-    const weather = manager.effect("catnip-field.weather");
-    const weatherModifier = weather.value ?? 0;
+    const weatherModifier = manager.numberView("catnip-field.weather");
 
-    if (catnipProduction === 0 || weatherModifier === 0) {
-      return undefined;
+    if (catnipField.level > 0 && weatherModifier.value !== 0) {
+      return weatherModifier;
     } else {
-      return {
-        value: weatherModifier,
-        unit: UnitKind.Percent,
-        rounded: true,
-        showSign: "always",
-      };
+      return undefined;
     }
   }
 }
