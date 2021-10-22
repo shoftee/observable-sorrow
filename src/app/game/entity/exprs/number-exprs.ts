@@ -35,8 +35,8 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "wood.limit.base": 200,
   "wood.limit": effect("wood.limit.base"),
 
-  "kittens.limit": effect("hut.kittens"),
-  "catpower.limit": effect("hut.catpower"),
+  "kittens.limit": effect("hut.kittens-limit"),
+  "catpower.limit": effect("hut.catpower-limit"),
 
   // Wood
   "wood.delta": effect("wood.production"),
@@ -45,7 +45,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   // Catnip
   "catnip.delta": subtract(
     effect("catnip.production"),
-    effect("population.catnip.demand"),
+    effect("population.catnip-demand"),
   ),
   "catnip.production": ratio(
     effect("catnip-field.catnip"),
@@ -59,25 +59,25 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     level("catnip-field"),
   ),
   "catnip-field.weather": sum(
-    effect("weather.modifier.season"),
-    effect("weather.modifier.severity"),
+    effect("weather.season-ratio"),
+    effect("weather.severity-ratio"),
   ),
 
   // Huts
-  "hut.kittens.base": 2,
-  "hut.kittens": prod(effect("hut.kittens.base"), level("hut")),
-  "hut.catpower.base": 75,
-  "hut.catpower": prod(effect("hut.catpower.base"), level("hut")),
+  "hut.kittens-limit.base": 2,
+  "hut.kittens-limit": prod(effect("hut.kittens-limit.base"), level("hut")),
+  "hut.catpower-limit.base": 75,
+  "hut.catpower-limit": prod(effect("hut.catpower-limit.base"), level("hut")),
 
   // Population
-  "population.catnip.demand.base": 0.85,
-  "population.catnip.demand": prod(
-    effect("population.catnip.demand.base"),
+  "population.catnip-demand.base": 0.85,
+  "population.catnip-demand": prod(
+    effect("population.catnip-demand.base"),
     ({ admin }) => admin.pops().size,
   ),
 
   // Weather
-  "weather.modifier.season": ({ admin }) => {
+  "weather.season-ratio": ({ admin }) => {
     switch (admin.environment().state.season) {
       case "spring":
         return +0.5;
@@ -90,7 +90,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
         return 0;
     }
   },
-  "weather.modifier.severity": ({ admin }) => {
+  "weather.severity-ratio": ({ admin }) => {
     switch (admin.environment().state.weather) {
       case "warm":
         return +0.15;

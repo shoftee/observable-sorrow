@@ -18,12 +18,6 @@
       "good": "Work is going well.",
       "idle": "One is idle. | {idle} are idle."
     },
-    "effects": {
-      "title": {
-        "per-worker": "Effects (per worker)",
-        "total": "Effects (total)"
-      }
-    },
     "woodcutter": {
       "label": "Woodcutter",
       "description": "Use your mystical kitten powers and get back to chopping!",
@@ -89,35 +83,36 @@
       "label": "Refine catnip",
       "description": "Use your mystical kitten powers to convert catnip into wood.",
       "flavor": "So… tired…"
+    }
+  },
+
+  "effects": {
+    "buildings": {
+      "per-level": "Effects (per level)",
+      "total": "Effects (total)"
     },
+    "jobs": {
+      "per-worker": "Effects (per worker)",
+      "total": "Effects (total)"
+    }
+  },
+
+  "buildings": {
     "catnip-field": {
       "label": "Catnip field",
       "description": "Plant some catnip to grow in the village. Fields have increased production during Spring and decreased production during Winter.",
-      "flavor": "‘Nip as far as the eye can see."
+      "flavor": "‘Nip as far as the eye can see.",
+      "effects": {
+        "catnip": "Catnip production {amount}"
+      }
     },
     "hut": {
       "label": "Hut",
       "description": "A simple home with space for 2 kittens. Kittens consume catnip to stay alive.",
-      "flavor": "The Nation of Two"
-    }
-  },
-
-  "building-effects": {
-    "title": {
-      "per-level": "Effects (per level)",
-      "total": "Effects (total)"
-    },
-    "catnip-field": {
-      "catnip": {
-        "label": "Catnip production {amount}"
-      }
-    },
-    "hut": {
-      "catpower": {
-        "label": "Maximum catpower {amount}"
-      },
-      "kittens": {
-        "label": "Maximum kittens {amount}"
+      "flavor": "The Nation of Two",
+      "effects": {
+        "catpower-limit": "Maximum catpower {amount}",
+        "kittens-limit": "Maximum kittens {amount}"
       }
     }
   }

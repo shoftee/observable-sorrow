@@ -15,16 +15,16 @@ export type CatnipFieldEffectId =
   | "catnip-field.catnip.base";
 
 export type HutEffectId =
-  | "hut.catpower"
-  | "hut.catpower.base"
-  | "hut.kittens"
-  | "hut.kittens.base";
+  | "hut.catpower-limit"
+  | "hut.catpower-limit.base"
+  | "hut.kittens-limit"
+  | "hut.kittens-limit.base";
 
 export type JobEffectId = "jobs.woodcutter.wood.base" | "jobs.woodcutter.wood";
 
 export type PopulationEffectId =
-  | "population.catnip.demand"
-  | "population.catnip.demand.base";
+  | "population.catnip-demand"
+  | "population.catnip-demand.base";
 
 export type NumberEffectId =
   | ProductionEffectId
@@ -34,8 +34,8 @@ export type NumberEffectId =
   | HutEffectId
   | PopulationEffectId
   | JobEffectId
-  | "weather.modifier.season"
-  | "weather.modifier.severity";
+  | "weather.season-ratio"
+  | "weather.severity-ratio";
 
 export enum UnitKind {
   None,

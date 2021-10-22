@@ -62,9 +62,7 @@ async function unassignJob(id: JobId): Promise<void> {
           <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
         </div>
         <Effects v-if="effects.length > 0" :items="effects">
-          <template
-            #title
-          >{{ t(events?.shift ? "jobs.effects.title.total" : "jobs.effects.title.per-worker") }}</template>
+          <template #title>{{ t(events?.shift ? "effects.jobs.total" : "effects.jobs.per-worker") }}</template>
         </Effects>
       </div>
     </template>

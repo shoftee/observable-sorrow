@@ -50,7 +50,7 @@ async function buildItem(id: BonfireItemId): Promise<void> {
         <Effects v-if="effects.length > 0" :items="effects">
           <template
             #title
-          >{{ t(events?.shift ? "building-effects.title.total" : "building-effects.title.per-level") }}</template>
+          >{{ t(events?.shift ? "effects.buildings.total" : "effects.buildings.per-level") }}</template>
         </Effects>
       </div>
     </template>

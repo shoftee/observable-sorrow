@@ -30,15 +30,15 @@ export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
   "catnip-field": {
     id: "catnip-field",
     intent: { kind: "buy-building", buildingId: "catnip-field" },
-    label: "bonfire.catnip-field.label",
-    description: "bonfire.catnip-field.description",
-    flavor: "bonfire.catnip-field.flavor",
+    label: "buildings.catnip-field.label",
+    description: "buildings.catnip-field.description",
+    flavor: "buildings.catnip-field.flavor",
   },
   hut: {
     id: "hut",
     intent: { kind: "buy-building", buildingId: "hut" },
-    label: "bonfire.hut.label",
-    description: "bonfire.hut.description",
-    flavor: "bonfire.hut.flavor",
+    label: "buildings.hut.label",
+    description: "buildings.hut.description",
+    flavor: "buildings.hut.flavor",
   },
 };
