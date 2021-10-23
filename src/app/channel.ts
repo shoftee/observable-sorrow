@@ -5,6 +5,7 @@ import {
   IDevToolsInteractor,
   IGameController,
   IRootInteractor,
+  IScienceInteractor,
   ISocietyInteractor,
   IStoreInteractor,
   OnTickedHandler,
@@ -17,6 +18,7 @@ import {
   PlayerPresenter,
   PresenterFacade,
   ResourcesPresenter,
+  SciencePresenter,
   SectionsPresenter,
   SocietyPresenter,
   StateManager,
@@ -32,6 +34,7 @@ export type Channel = {
     controller: RemoteObject<IGameController>;
     devTools: RemoteObject<IDevToolsInteractor>;
     society: RemoteObject<ISocietyInteractor>;
+    science: RemoteObject<IScienceInteractor>;
     store: RemoteObject<IStoreInteractor>;
   };
   presenters: {
@@ -40,6 +43,7 @@ export type Channel = {
     environment: EnvironmentPresenter;
     player: PlayerPresenter;
     resources: ResourcesPresenter;
+    science: SciencePresenter;
     section: SectionsPresenter;
     society: SocietyPresenter;
   };
@@ -63,6 +67,7 @@ export async function Setup(): Promise<Channel> {
       formatter: presenters.formatter,
       player: presenters.player,
       resources: presenters.resources,
+      science: presenters.science,
       section: presenters.sections,
       society: presenters.society,
     },
@@ -83,6 +88,9 @@ export async function Setup(): Promise<Channel> {
       society: {
         assignJob: root.assignJob,
         unassignJob: root.unassignJob,
+      },
+      science: {
+        researchTechnology: root.researchTechnology,
       },
       store: {
         save: root.save,

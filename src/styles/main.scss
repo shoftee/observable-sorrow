@@ -74,6 +74,12 @@ main {
   }
 }
 
+.calendar {
+  @include p(2);
+  @include flex-column();
+  align-self: stretch;
+}
+
 // vertical stack
 .button-stack {
   @include flex-column();

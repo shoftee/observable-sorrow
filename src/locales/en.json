@@ -78,6 +78,10 @@
   },
 
   "calendar": {
+    "basic": {
+      "no-weather": "{season}",
+      "weather": "{season} ({weather})"
+    },
     "full": {
       "no-weather": "Year {year} – {season}, day {day}",
       "weather": "Year {year} – {season} ({weather}), day {day}"
@@ -134,6 +138,18 @@
         "science-ratio": "Science output bonus {amount}",
         "culture-limit": "Maximum culture {amount}"
       }
+    }
+  },
+
+  "technology": {
+    "section": {
+      "title": "Technologies"
+    },
+    "calendar": {
+      "label": "Calendar",
+      "description": "Develops the ability to predict when the seasons will change. Essential for advanced agriculture.",
+      "flavor": "What day is it again?",
+      "effect": "Provides a way of more precise time tracking."
     }
   }
 }

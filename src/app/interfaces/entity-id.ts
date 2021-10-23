@@ -7,6 +7,7 @@ import {
   RecipeId,
   ResourceId,
   SectionId,
+  TechnologyId,
 } from "@/app/interfaces";
 
 export type PoolEntityId =
@@ -17,7 +18,8 @@ export type PoolEntityId =
   | "pops"
   | "recipes"
   | "resources"
-  | "sections";
+  | "sections"
+  | "technologies";
 
 export type EntityId =
   | BooleanEffectId
@@ -29,6 +31,7 @@ export type EntityId =
   | RecipeId
   | ResourceId
   | SectionId
+  | TechnologyId
   | "environment"
   | "player"
   | "prng"

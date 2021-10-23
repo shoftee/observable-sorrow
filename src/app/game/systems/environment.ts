@@ -19,11 +19,20 @@ export class EnvironmentSystem extends System {
 
   init(): void {
     const environment = this.environment.state;
+    const calendar = this.admin.technology("calendar").state;
     watchSyncEffect(() => {
-      if (environment.weather !== "neutral") {
-        environment.calendar = "calendar.full.weather";
+      if (calendar.researched) {
+        if (environment.weather !== "neutral") {
+          environment.calendar = "calendar.full.weather";
+        } else {
+          environment.calendar = "calendar.full.no-weather";
+        }
       } else {
-        environment.calendar = "calendar.full.no-weather";
+        if (environment.weather !== "neutral") {
+          environment.calendar = "calendar.basic.weather";
+        } else {
+          environment.calendar = "calendar.basic.no-weather";
+        }
       }
     });
   }

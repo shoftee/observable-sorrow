@@ -1,4 +1,4 @@
-import { BonfireItemId, JobId, PoolEntityId } from ".";
+import { BonfireItemId, JobId, PoolEntityId, TechnologyId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 
@@ -19,6 +19,7 @@ export interface IRootInteractor
   extends IBonfireInteractor,
     IDevToolsInteractor,
     IGameController,
+    IScienceInteractor,
     ISocietyInteractor,
     IStoreInteractor {
   initialize(
@@ -29,6 +30,10 @@ export interface IRootInteractor
 
 export interface IBonfireInteractor {
   buildItem(id: BonfireItemId): void;
+}
+
+export interface IScienceInteractor {
+  researchTechnology(id: TechnologyId): void;
 }
 
 export interface ISocietyInteractor {

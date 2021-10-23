@@ -17,3 +17,5 @@ export type SeasonId = "spring" | "summer" | "autumn" | "winter";
 export type WeatherId = "neutral" | "warm" | "cold";
 
 export type SectionId = "bonfire" | "society" | "science";
+
+export type TechnologyId = "calendar";

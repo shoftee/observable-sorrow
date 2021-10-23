@@ -4,6 +4,7 @@ import {
   ResourceId,
   SeasonId,
   SectionId,
+  TechnologyId,
   WeatherId,
 } from "@/app/interfaces";
 import {
@@ -21,6 +22,8 @@ import {
   SeasonsMetadata,
   SectionMetadataType,
   SectionsMetadata,
+  TechMetadata,
+  TechMetadataType,
   WeatherMetadata,
   WeatherMetadataType,
 } from "@/app/state";
@@ -69,6 +72,14 @@ export const Meta = {
 
   section(id: SectionId): SectionMetadataType {
     return SectionsMetadata[id];
+  },
+
+  technologies(): Enumerable<TechMetadataType> {
+    return asEnumerable(Object.values(TechMetadata));
+  },
+
+  technology(id: TechnologyId): TechMetadataType {
+    return TechMetadata[id];
   },
 
   weather(id: WeatherId): WeatherMetadataType {

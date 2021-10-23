@@ -6,6 +6,7 @@ import {
   NumberFormatter,
   PlayerPresenter,
   ResourcesPresenter,
+  SciencePresenter,
   SectionsPresenter,
   SocietyPresenter,
   StateManager,
@@ -17,6 +18,7 @@ export class PresenterFacade {
   readonly formatter: NumberFormatter;
   readonly player: PlayerPresenter;
   readonly resources: ResourcesPresenter;
+  readonly science: SciencePresenter;
   readonly sections: SectionsPresenter;
   readonly society: SocietyPresenter;
 
@@ -25,6 +27,7 @@ export class PresenterFacade {
     this.environment = new EnvironmentPresenter(this.manager);
     this.player = new PlayerPresenter(this.manager);
     this.resources = new ResourcesPresenter(this.manager);
+    this.science = new SciencePresenter(this.manager);
     this.sections = new SectionsPresenter(this.manager);
     this.society = new SocietyPresenter(this.manager);
 
