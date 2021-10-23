@@ -27,6 +27,13 @@
       "effects": {
         "wood": "Wood production {amount}"
       }
+    },
+    "scholar": {
+      "label": "Scholar",
+      "description": "Ponder the myriad wonders of the world around you.",
+      "effects": {
+        "science": "Science production {amount}"
+      }
     }
   },
 

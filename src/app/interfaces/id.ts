@@ -10,7 +10,7 @@ export type ResourceId = "catnip" | "wood" | "kittens" | "catpower" | "science";
 export type BuildingId = BonfireBuildingId;
 
 export type PopId = `pop-${number}`;
-export type JobId = "woodcutter";
+export type JobId = "woodcutter" | "scholar";
 
 export type RecipeId = "refine-catnip";
 export type SeasonId = "spring" | "summer" | "autumn" | "winter";

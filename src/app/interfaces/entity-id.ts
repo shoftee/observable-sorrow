@@ -1,6 +1,7 @@
 import {
   BooleanEffectId,
   BuildingId,
+  JobId,
   NumberEffectId,
   PopId,
   RecipeId,
@@ -9,9 +10,10 @@ import {
 } from "@/app/interfaces";
 
 export type PoolEntityId =
-  | "buildings"
-  | "numbers"
   | "booleans"
+  | "buildings"
+  | "jobs"
+  | "numbers"
   | "pops"
   | "recipes"
   | "resources"
@@ -20,6 +22,7 @@ export type PoolEntityId =
 export type EntityId =
   | BooleanEffectId
   | BuildingId
+  | JobId
   | NumberEffectId
   | PoolEntityId
   | PopId

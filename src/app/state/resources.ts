@@ -64,6 +64,7 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     id: "science",
     label: "resources.science.label",
     effects: {
+      delta: "science.delta",
       limit: "science.limit",
     },
     flags: {},

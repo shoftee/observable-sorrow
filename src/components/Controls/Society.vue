@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import JobButton from "./JobButton.vue";
@@ -10,7 +10,7 @@ import { injectChannel } from "@/composables/game-channel";
 const { society } = injectChannel().presenters;
 const { t } = useI18n();
 
-const jobs = computed(() => society.jobs);
+const jobs = computed(() => unref(society.jobs).filter(item => item.unlocked));
 const totalPops = computed(() => society.pops.values.length);
 const idle = computed(() => count(society.pops.values, item => item.job === undefined))
 </script>
@@ -30,7 +30,7 @@ const idle = computed(() => count(society.pops.values, item => item.job === unde
           </p>
         </div>
         <div class="jobs">
-          <div class="row" v-for="job in jobs.values()" :key="job.id">
+          <div class="row" v-for="job in jobs" :key="job.id">
             <div class="col-xl-6 col-12">
               <JobButton :item="job" :noIdle="idle === 0" />
             </div>

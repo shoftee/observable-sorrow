@@ -1,4 +1,4 @@
-import { BuildingId, NumberEffectId } from "@/app/interfaces";
+import { BuildingId, JobId, NumberEffectId } from "@/app/interfaces";
 import { asEnumerable } from "@/app/utils/enumerable";
 
 import { effect, unwrap, Expr, ExprContext } from "./common";
@@ -8,6 +8,9 @@ type Ctx = ExprContext<number, NumberEffectId>;
 
 const level = (id: BuildingId) => (ctx: Ctx) =>
   ctx.admin.building(id).state.level;
+
+const workers = (id: JobId) => (ctx: Ctx) =>
+  ctx.admin.pops().withJob(id).count();
 
 const sum =
   (...exprs: NumberExpr[]) =>
@@ -51,6 +54,13 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "catnip.production": ratio(
     effect("catnip-field.catnip"),
     effect("catnip-field.weather"),
+  ),
+
+  // Science
+  "science.delta": effect("science.production"),
+  "science.production": ratio(
+    effect("jobs.scholar.science"),
+    effect("science.ratio"),
   ),
 
   // Catnip fields
@@ -123,6 +133,11 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "jobs.woodcutter.wood.base": 0.018,
   "jobs.woodcutter.wood": prod(
     effect("jobs.woodcutter.wood.base"),
-    ({ admin }) => admin.pops().withJob("woodcutter").count(),
+    workers("woodcutter"),
+  ),
+  "jobs.scholar.science.base": 0.035,
+  "jobs.scholar.science": prod(
+    effect("jobs.scholar.science.base"),
+    workers("scholar"),
   ),
 };

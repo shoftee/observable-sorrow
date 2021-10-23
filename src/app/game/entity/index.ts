@@ -12,6 +12,7 @@ export * from "./_watcher";
 export * from "./boolean-effects";
 export * from "./building";
 export * from "./environment";
+export * from "./job";
 export * from "./number-effects";
 export * from "./player";
 export * from "./pop";

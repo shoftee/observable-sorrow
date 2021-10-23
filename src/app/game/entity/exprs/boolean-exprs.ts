@@ -8,4 +8,6 @@ export const BooleanExprs: Record<BooleanEffectId, BooleanExpr> = {
   "unlock.section.society": ({ admin }) => admin.society().state.totalPops > 0,
   "unlock.section.science": ({ admin }) =>
     admin.building("library").state.level > 0,
+  "unlock.job.scholar": ({ admin }) =>
+    admin.building("library").state.level > 0,
 };

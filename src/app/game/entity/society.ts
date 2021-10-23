@@ -1,6 +1,5 @@
 import { reactive } from "vue";
 
-import { JobId } from "@/app/interfaces";
 import { SocietyState } from "@/app/state";
 import { SaveState } from "@/app/store";
 
@@ -16,7 +15,6 @@ export class SocietyEntity extends Entity<"society"> {
       stockpile: 0,
       totalPops: 0,
       idlePops: 0,
-      unlockedJobs: new Set<JobId>(),
     });
   }
 

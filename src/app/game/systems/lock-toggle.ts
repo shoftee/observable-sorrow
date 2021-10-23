@@ -1,16 +1,51 @@
+import { BooleanEffectId } from "@/app/interfaces";
 import { Flag, UnlockMode } from "@/app/state";
 
 import { ResourceEntity, BuildingEntity } from "../entity";
+
 import { System } from ".";
+
+type Unlockable = {
+  meta: {
+    unlockEffect?: BooleanEffectId;
+  };
+  state: {
+    unlocked: boolean;
+  };
+};
 
 export class LockToggleSystem extends System {
   update(): void {
+    for (const section of this.unlockables()) {
+      this.applyUnlockEffect(section);
+    }
+
     for (const resource of this.admin.resources()) {
       this.updateResourceUnlocked(resource);
     }
+
     for (const building of this.admin.buildings()) {
       this.updateBuildingUnlocked(building);
     }
+  }
+
+  private *unlockables(): Iterable<Unlockable> {
+    for (const section of this.admin.sections()) {
+      yield section;
+    }
+    for (const job of this.admin.jobs()) {
+      yield job;
+    }
+  }
+
+  private applyUnlockEffect(entity: Unlockable): void {
+    const unlockEffect = entity.meta.unlockEffect;
+    if (entity.state.unlocked || unlockEffect === undefined) {
+      return;
+    }
+
+    const effect = this.admin.boolean(unlockEffect);
+    entity.state.unlocked = effect.state.value ?? false;
   }
 
   private updateResourceUnlocked(resource: ResourceEntity): void {

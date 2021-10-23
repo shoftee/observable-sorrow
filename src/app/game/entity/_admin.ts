@@ -1,6 +1,7 @@
 import {
   BooleanEffectId,
   BuildingId,
+  JobId,
   NumberEffectId,
   RecipeId,
   ResourceId,
@@ -16,6 +17,8 @@ import {
   Entity,
   EntityWatcher,
   EnvironmentEntity,
+  JobEntity,
+  JobsPool,
   NumberEffectEntity,
   NumberEffectsPool,
   PlayerEntity,
@@ -33,6 +36,7 @@ import {
 
 export class EntityAdmin {
   private readonly _buildings: BuildingsPool;
+  private readonly _jobs: JobsPool;
   private readonly _numbers: NumberEffectsPool;
   private readonly _booleans: BooleanEffectsPool;
   private readonly _pops: PopsPool;
@@ -49,6 +53,7 @@ export class EntityAdmin {
   constructor(private readonly watcher: EntityWatcher) {
     this._booleans = new BooleanEffectsPool(this.watcher.pooled("booleans"));
     this._buildings = new BuildingsPool(this.watcher.pooled("buildings"));
+    this._jobs = new JobsPool(this.watcher.pooled("jobs"));
     this._numbers = new NumberEffectsPool(this.watcher.pooled("numbers"));
     this._pops = new PopsPool(this.watcher.pooled("pops"));
     this._recipes = new RecipesPool(this.watcher.pooled("recipes"));
@@ -134,6 +139,14 @@ export class EntityAdmin {
 
   resources(): Iterable<ResourceEntity> {
     return this._resources.enumerate();
+  }
+
+  job(id: JobId): JobEntity {
+    return this._jobs.get(id);
+  }
+
+  jobs(): Iterable<JobEntity> {
+    return this._jobs.enumerate();
   }
 
   section(id: SectionId): SectionEntity {

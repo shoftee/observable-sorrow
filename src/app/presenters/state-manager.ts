@@ -6,6 +6,7 @@ import {
   ChangePool,
   EffectUnits,
   IPresenterChangeSink,
+  JobId,
   NumberEffectId,
   PoolEntityId,
   PopId,
@@ -18,6 +19,7 @@ import {
 import {
   BuildingState,
   EnvironmentState,
+  JobState,
   NumberEffectState,
   PlayerState,
   PopState,
@@ -35,6 +37,9 @@ export interface IStateManager {
   building(id: BuildingId): BuildingState;
 
   numberView(id: NumberEffectId): NumberView;
+
+  jobs(): Enumerable<[JobId, JobState]>;
+  job(id: JobId): JobState;
 
   pops(): Enumerable<[PopId, PopState]>;
 
@@ -69,6 +74,10 @@ class ChangePools extends Map<
       BuildingId,
       BuildingState
     >;
+  }
+
+  get jobs(): Map<JobId, JobState> {
+    return this.getOrAdd("jobs") as unknown as Map<JobId, JobState>;
   }
 
   get numbers(): Map<NumberEffectId, NumberEffectState> {
@@ -151,6 +160,14 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
       rounded: false,
       showSign: "always",
     };
+  }
+
+  jobs(): Enumerable<[JobId, JobState]> {
+    return asEnumerable(this.pools.jobs.entries());
+  }
+
+  job(id: JobId): JobState {
+    return this.pools.jobs.get(id) as JobState;
   }
 
   pops(): Enumerable<[PopId, PopState]> {

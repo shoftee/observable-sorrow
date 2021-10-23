@@ -1,7 +1,7 @@
-import { computed, reactive } from "vue";
+import { computed, ComputedRef, reactive } from "vue";
 
 import { JobId, PopId } from "@/app/interfaces";
-import { JobEffectType, JobMetadataType, Meta, PopState } from "@/app/state";
+import { JobEffectType, JobState, Meta, PopState } from "@/app/state";
 
 import { EffectItem, IStateManager } from ".";
 
@@ -27,7 +27,7 @@ export interface Values<T> {
 
 export class SocietyPresenter {
   readonly pops: Values<PopItem>;
-  readonly jobs: Map<JobId, JobItem>;
+  readonly jobs: ComputedRef<JobItem[]>;
 
   constructor(manager: IStateManager) {
     this.pops = reactive({
@@ -39,21 +39,27 @@ export class SocietyPresenter {
       ),
     });
 
-    this.jobs = reactive(
-      new Map<JobId, JobItem>(
-        Meta.jobs().map((meta) => [meta.id, this.newJobItem(meta, manager)]),
-      ),
+    this.jobs = computed(() =>
+      manager
+        .jobs()
+        .map(([id, state]) => this.newJobItem(id, state, manager))
+        .toArray(),
     );
   }
 
-  private newJobItem(meta: JobMetadataType, manager: IStateManager): JobItem {
+  private newJobItem(
+    id: JobId,
+    state: JobState,
+    manager: IStateManager,
+  ): JobItem {
+    const meta = Meta.job(id);
     return reactive({
       id: meta.id,
       label: meta.label,
       description: meta.description,
       flavor: meta.flavor,
       capped: false,
-      unlocked: true,
+      unlocked: computed(() => state.unlocked),
       pops: computed(() => manager.pops().count(([, s]) => s.job === meta.id)),
       effects: computed(() => this.effects(meta.effects, manager)),
     });

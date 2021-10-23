@@ -2,21 +2,7 @@ import { System } from ".";
 
 export class SectionsSystem extends System {
   update(): void {
-    this.unlock();
-
     this.updateSociety();
-  }
-
-  private unlock() {
-    for (const section of this.admin.sections()) {
-      const unlockEffect = section.meta.unlockEffect;
-      if (section.state.unlocked || unlockEffect === undefined) {
-        continue;
-      }
-
-      const effect = this.admin.boolean(unlockEffect);
-      section.state.unlocked = effect.state.value ?? false;
-    }
   }
 
   private updateSociety() {
