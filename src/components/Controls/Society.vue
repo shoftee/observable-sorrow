@@ -29,8 +29,12 @@ const idle = computed(() => count(society.pops.values, item => item.job === unde
             <span>{{ t("jobs.status.idle", { idle }, idle) }}</span>
           </p>
         </div>
-        <div class="col-xl-6 col-12" v-for="job in jobs.values()" :key="job.id">
-          <JobButton :item="job" :noIdle="idle === 0" />
+        <div class="jobs">
+          <div class="row" v-for="job in jobs.values()" :key="job.id">
+            <div class="col-xl-6 col-12">
+              <JobButton :item="job" :noIdle="idle === 0" />
+            </div>
+          </div>
         </div>
       </div>
     </template>

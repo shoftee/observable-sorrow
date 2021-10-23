@@ -219,6 +219,12 @@ main .nav {
   @extend .text-danger, .text-opacity-75;
 }
 
+// society
+.jobs {
+  @include flex-column();
+  gap: bsize(2);
+}
+
 // devtools
 #show-devtools {
   z-index: calc($zindex-offcanvas + 1);

@@ -4,7 +4,10 @@ export interface SocietyState {
   stockpile: number;
   totalPops: number;
   idlePops: number;
-  unlockedJobs: Set<JobId>;
+}
+
+export interface JobState {
+  unlocked: boolean;
 }
 
 export interface PopState {

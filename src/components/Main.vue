@@ -26,7 +26,7 @@ const { t } = useI18n();
 
 const sections = computed(() => presenters.section.items.filter(s => s.unlocked));
 
-const activeSection = ref<SectionId>("bonfire-section");
+const activeSection = ref<SectionId>("bonfire");
 
 function sectionChanged(item: SectionItem) {
   activeSection.value = item.id;
@@ -39,9 +39,9 @@ async function save(): Promise<void> {
 const sectionContent = computed(() => {
   const sectionId = activeSection.value;
   switch (sectionId) {
-    case "bonfire-section": return BonfireControls;
-    case "society-section": return SocietyControls;
-    case "science-section": return ScienceControls;
+    case "bonfire": return BonfireControls;
+    case "society": return SocietyControls;
+    case "science": return ScienceControls;
     default: throw new Error(`unexpected section name ${sectionId}`);
   }
 });

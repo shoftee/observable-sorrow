@@ -4,10 +4,9 @@ import { reactive } from "vue";
 import {
   BuildingId,
   ChangePool,
-  NumberEffectId,
   EffectUnits,
-  EntityId,
   IPresenterChangeSink,
+  NumberEffectId,
   PoolEntityId,
   PopId,
   PropertyBag,
@@ -18,8 +17,8 @@ import {
 } from "@/app/interfaces";
 import {
   BuildingState,
-  NumberEffectState,
   EnvironmentState,
+  NumberEffectState,
   PlayerState,
   PopState,
   RecipeState,
@@ -63,7 +62,7 @@ export interface NumberView {
 
 class ChangePools extends Map<
   PoolEntityId | undefined,
-  Map<EntityId, PropertyBag>
+  Map<string, PropertyBag>
 > {
   get buildings(): Map<BuildingId, BuildingState> {
     return this.getOrAdd("buildings") as unknown as Map<
@@ -98,10 +97,10 @@ class ChangePools extends Map<
     return this.getOrAdd("sections") as unknown as Map<SectionId, SectionState>;
   }
 
-  getOrAdd(id: PoolEntityId | undefined): Map<EntityId, PropertyBag> {
+  getOrAdd(id: PoolEntityId | undefined): Map<string, PropertyBag> {
     let existing = this.get(id);
     if (!existing) {
-      existing = reactive(new Map<EntityId, PropertyBag>());
+      existing = reactive(new Map<string, PropertyBag>());
       this.set(id, existing);
     }
     return existing;

@@ -20,7 +20,7 @@ export class SectionsSystem extends System {
   }
 
   private updateSociety() {
-    const section = this.admin.section("society-section").state;
+    const section = this.admin.section("society").state;
     const society = this.admin.society().state;
 
     section.label = this.societyLabel(society.totalPops);

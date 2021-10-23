@@ -16,4 +16,4 @@ export type RecipeId = "refine-catnip";
 export type SeasonId = "spring" | "summer" | "autumn" | "winter";
 export type WeatherId = "neutral" | "warm" | "cold";
 
-export type SectionId = `${"bonfire" | "society" | "science"}-section`;
+export type SectionId = "bonfire" | "society" | "science";

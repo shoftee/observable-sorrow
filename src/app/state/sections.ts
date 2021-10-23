@@ -7,17 +7,17 @@ export type SectionMetadataType = {
 };
 
 export const SectionsMetadata: Record<SectionId, SectionMetadataType> = {
-  "bonfire-section": {
-    id: "bonfire-section",
+  bonfire: {
+    id: "bonfire",
     label: "sections.bonfire.label",
   },
-  "society-section": {
-    id: "society-section",
+  society: {
+    id: "society",
     label: "sections.society.label",
     unlockEffect: "unlock.section.society",
   },
-  "science-section": {
-    id: "science-section",
+  science: {
+    id: "science",
     label: "sections.science.label",
     unlockEffect: "unlock.section.science",
   },

@@ -1,12 +1,12 @@
-import { BonfireItemId, EntityId, JobId, PoolEntityId } from ".";
+import { BonfireItemId, JobId, PoolEntityId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 
 export type ChangePool = {
   poolId?: PoolEntityId;
-  added?: Map<EntityId, PropertyBag>;
-  updated?: Map<EntityId, PropertyBag>;
-  removed?: Set<EntityId>;
+  added?: Map<string, PropertyBag>;
+  updated?: Map<string, PropertyBag>;
+  removed?: Set<string>;
 };
 
 export type OnTickedHandler = (changes: Iterable<ChangePool>) => void;
