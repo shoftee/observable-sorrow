@@ -4,4 +4,6 @@ export type SectionUnlockEffectId =
 
 export type JobUnlockEffectId = "unlock.job.scholar";
 
+export type BuildingUnlockEffectId = never;
+
 export type BooleanEffectId = SectionUnlockEffectId | JobUnlockEffectId;

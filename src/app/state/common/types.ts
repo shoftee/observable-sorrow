@@ -21,6 +21,12 @@ export interface IngredientState {
   fulfilled: boolean;
 }
 
+export interface FulfillmentState {
+  readonly ingredients: IngredientState[];
+  fulfilled: boolean;
+  capped: boolean;
+}
+
 export function ingredientsFromObject(obj: ResourcesType): IngredientState[] {
   return Array.from(toIterable(obj), ([id, amount]) => ({
     resourceId: id,

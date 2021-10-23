@@ -1,23 +1,44 @@
-import { NumberEffectId, BuildingId } from "@/app/interfaces";
-import { IngredientState, ResourcesType } from "./common/types";
+import {
+  NumberEffectId,
+  BuildingId,
+  BuildingUnlockEffectId,
+} from "@/app/interfaces";
+
+import { FulfillmentState, ResourcesType } from "./common/types";
 
 export type BuildingEffectType = Readonly<{
+  /** A unique key for the effect. */
   id: string;
+  /** The name of the 'per-level' effect for the building. */
   per: NumberEffectId;
+  /** The name of the 'total' effect for the building. */
   total: NumberEffectId;
+  /** The label for the effect. */
   label: string;
 }>;
 
 type BuildingPricesType = Readonly<{
+  /** Every level of the building will increase the ingredient requirements by this many times. */
   ratio: number;
+  /** The ingredients required to build the first level of the building. */
   base: ResourcesType;
 }>;
 
 export type BuildingMetadataType = Readonly<{
   id: BuildingId;
-  unlockRatio: number;
+  /** Unlock requirements for the building. */
+  unlock?: BuildingUnlockType;
+  /** Price definition for the building. */
   prices: BuildingPricesType;
+  /** List of the effects of the building. */
   effects: BuildingEffectType[];
+}>;
+
+export type BuildingUnlockType = Readonly<{
+  /** Until this effect is satisfied, the building will remain locked. */
+  unlockEffect?: BuildingUnlockEffectId;
+  /** When an ingredient resource reaches this fraction of its requirement, the building is unlocked. */
+  priceRatio?: number;
 }>;
 
 export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
@@ -27,7 +48,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
       ratio: 1.12,
       base: { catnip: 10 },
     },
-    unlockRatio: 0.3,
+    unlock: { priceRatio: 0.3 },
     effects: [
       {
         id: "catnip",
@@ -43,7 +64,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
       ratio: 2.5,
       base: { wood: 5 },
     },
-    unlockRatio: 0.3,
+    unlock: { priceRatio: 0.3 },
     effects: [
       {
         id: "catpower-limit",
@@ -65,22 +86,22 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
       base: { wood: 25 },
       ratio: 1.15,
     },
-    unlockRatio: 0.3,
+    unlock: { priceRatio: 0.3 },
     effects: [
       {
-        id: "science.limit",
+        id: "science-limit",
         per: "library.science-limit.base",
         total: "library.science-limit",
         label: "buildings.library.effects.science-limit",
       },
       {
-        id: "science.ratio",
+        id: "science-ratio",
         per: "library.science-ratio.base",
         total: "library.science-ratio",
         label: "buildings.library.effects.science-ratio",
       },
       {
-        id: "culture.limit",
+        id: "culture-limit",
         per: "library.culture-limit.base",
         total: "library.culture-limit",
         label: "buildings.library.effects.culture-limit",
@@ -89,10 +110,9 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
 };
 
-export interface BuildingState {
-  readonly ingredients: IngredientState[];
+export interface BuildingState extends FulfillmentState {
+  /** Whether the building is unlocked or not. */
   unlocked: boolean;
+  /** The level of the building. */
   level: number;
-  capped: boolean;
-  fulfilled: boolean;
 }

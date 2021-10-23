@@ -16,8 +16,8 @@ type Unlockable = {
 
 export class LockToggleSystem extends System {
   update(): void {
-    for (const section of this.unlockables()) {
-      this.applyUnlockEffect(section);
+    for (const unlockable of this.unlockables()) {
+      this.applyUnlockEffect(unlockable);
     }
 
     for (const resource of this.admin.resources()) {
@@ -71,10 +71,33 @@ export class LockToggleSystem extends System {
 
   private updateBuildingUnlocked(building: BuildingEntity): void {
     if (!building.state.unlocked) {
+      const unlock = building.meta.unlock;
+      if (unlock === undefined) {
+        // unlock requirements not specified, unlock automatically
+        building.state.unlocked = true;
+        return;
+      }
+
+      const effect = unlock.unlockEffect;
+      if (effect !== undefined) {
+        // building is gated behind an effect
+        const entity = this.admin.boolean(effect);
+        if (!entity.state.value) {
+          // effect not satisfied, keep locked
+          return;
+        }
+      }
+
+      const ratio = unlock.priceRatio;
+      if (ratio === undefined) {
+        // price ratio not specified, unlock automatically.
+        building.state.unlocked = true;
+        return;
+      }
+
       for (const ingredient of building.state.ingredients) {
-        const unlockThreshold =
-          ingredient.requirement * building.meta.unlockRatio;
-        if (ingredient.fulfillment >= unlockThreshold) {
+        const threshold = ingredient.requirement * ratio;
+        if (ingredient.fulfillment >= threshold) {
           building.state.unlocked = true;
           return;
         }
