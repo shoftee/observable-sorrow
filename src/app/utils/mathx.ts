@@ -26,21 +26,17 @@ export type Prng = {
 export function random(seed: number): Prng {
   let state = seed;
 
-  // mulberry32 https://stackoverflow.com/a/47593316/586472
-  const next = function () {
+  // https://stackoverflow.com/a/47593316/586472
+  function mulberry32() {
     let t = (state += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-
-  const fork = function () {
-    return random(next());
-  };
+  }
 
   return {
-    state: () => state | 0,
-    next,
-    fork,
+    state: () => state,
+    next: () => mulberry32(),
+    fork: () => random(mulberry32()),
   };
 }

@@ -9,7 +9,7 @@ export class PrngEntity extends Entity<"prng"> {
   constructor() {
     super("prng");
 
-    const prng = random(Date.now() | 0);
+    const prng = random(Date.now());
     this._environment = prng.fork();
   }
 

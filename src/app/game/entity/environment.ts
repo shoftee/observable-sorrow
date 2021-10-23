@@ -1,4 +1,4 @@
-import { reactive, toRaw } from "vue";
+import { reactive } from "vue";
 
 import { EnvironmentState } from "@/app/state";
 import { SaveState } from "@/app/store";
@@ -31,6 +31,11 @@ export class EnvironmentEntity extends Entity<"environment"> {
   }
 
   saveState(state: SaveState): void {
-    state.environment = { ...toRaw(this.state) };
+    state.environment = {
+      day: this.state.day,
+      season: this.state.season,
+      weather: this.state.weather,
+      year: this.state.year,
+    };
   }
 }

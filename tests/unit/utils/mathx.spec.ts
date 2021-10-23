@@ -82,23 +82,29 @@ describe("random", () => {
     });
   });
   describe("state", () => {
-    it("should equal the seed", () => {
+    it("should represent seed value", () => {
+      const rng = random(123456);
+      rng.next();
+
+      const copy = random(rng.state());
+      expect(copy.next()).to.equal(rng.next());
+    });
+    it("should change on next", () => {
+      const rng = random(123456);
+      const state1 = rng.state();
+
+      rng.next();
+      const state2 = rng.state();
+      expect(state1).to.not.equal(state2);
+
+      rng.next();
+      const state3 = rng.state();
+      expect(state2).to.not.equal(state3);
+    });
+    it("should be pure", () => {
       const rng = random(123456);
       expect(rng.state()).to.equal(123456);
-    });
-    it("should not modify the seed", () => {
-      const rng = random(123456);
       expect(rng.state()).to.equal(123456);
-      expect(rng.state()).to.equal(123456);
-    });
-    it("should change deterministically", () => {
-      const rng1 = random(123456);
-      rng1.next();
-
-      const rng2 = random(123456);
-      rng2.next();
-
-      expect(rng1.state()).to.equal(rng2.state());
     });
   });
 });
