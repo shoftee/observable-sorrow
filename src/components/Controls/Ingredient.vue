@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { IngredientItem } from "@/app/presenters";
+import { IngredientItem } from "@/app/presenters/common/ingredients";
 import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: IngredientItem }>();
@@ -11,25 +10,23 @@ const { t } = useI18n();
 
 const { presenters } = injectChannel();
 const fmt = presenters.formatter;
-
-const { label, fulfilled, fulfillment, requirement, fulfillmentTime } = toRefs(item);
 </script>
 
 <template>
-  <li :class="{ unfulfilled: !fulfilled }">
-    <div class="label">{{ t(label) }}</div>
+  <li :class="{ unfulfilled: !item.fulfilled }">
+    <div class="label">{{ t(item.label) }}</div>
     <div class="fulfillment number">
-      <template v-if="!fulfilled">
-        {{ fmt.number(fulfillment) }} /
-        {{ fmt.number(requirement) }}
+      <template v-if="!item.fulfilled">
+        {{ fmt.number(item.fulfillment) }} /
+        {{ fmt.number(item.requirement) }}
         <template
-          v-if="fulfillmentTime !== undefined"
+          v-if="item.fulfillmentTime !== undefined"
         >
-          <template v-if="fulfillmentTime.value === Number.POSITIVE_INFINITY">(&infin;)</template>
-          <template v-else>({{ fmt.v(fulfillmentTime) }})</template>
+          <template v-if="item.fulfillmentTime.value === Number.POSITIVE_INFINITY">(&infin;)</template>
+          <template v-else>({{ fmt.v(item.fulfillmentTime) }})</template>
         </template>
       </template>
-      <template v-else>{{ fmt.number(requirement) }}</template>
+      <template v-else>{{ fmt.number(item.requirement) }}</template>
     </div>
   </li>
 </template>

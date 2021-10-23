@@ -34,24 +34,29 @@ const interactor: IRootInteractor = {
     const slot = await load(saveSlot);
     runner = new Runner(onTicked, slot);
   },
+  // game controls
   start() {
     runner.interactor.controller.start();
   },
   stop() {
     runner.interactor.controller.stop();
   },
+  // store
   async save() {
     await runner.interactor.store.save();
   },
+  // bonfire
   buildItem(id: BonfireItemId) {
     runner.interactor.bonfire.buildItem(id);
   },
+  // society
   assignJob(id: JobId) {
     runner.interactor.society.assignJob(id);
   },
   unassignJob(id: JobId) {
     runner.interactor.society.unassignJob(id);
   },
+  // devtools
   turnDevToolsOn() {
     runner.interactor.devTools.turnDevToolsOn();
   },

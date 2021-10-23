@@ -16,6 +16,7 @@ export class EnvironmentEntity extends Entity<"environment"> {
       season: "spring",
       day: 0,
       weather: "neutral",
+      calendar: "calendar.basic.no-weather",
     });
   }
 

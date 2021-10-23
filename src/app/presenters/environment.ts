@@ -18,15 +18,11 @@ export class EnvironmentPresenter {
     return reactive({
       day: computed(() => state.day),
       season: computed(() => state.season),
-      seasonLabel: computed(() => Meta.season(state.season).label),
       year: computed(() => state.year),
       weather: computed(() => state.weather),
+      calendarLabel: computed(() => state.calendar),
+      seasonLabel: computed(() => Meta.season(state.season).label),
       weatherLabel: computed(() => Meta.weather(state.weather).label),
-      calendarLabel: computed(() =>
-        Meta.weather(state.weather).label
-          ? "environment.calendar.full.weather"
-          : "environment.calendar.full.no-weather",
-      ),
     });
   }
 }
@@ -36,9 +32,7 @@ export interface Calendar {
   season: SeasonId;
   year: number;
   weather: WeatherId;
+  calendarLabel: string;
   seasonLabel: string;
   weatherLabel: string | undefined;
-  calendarLabel:
-    | "environment.calendar.full.weather"
-    | "environment.calendar.full.no-weather";
 }

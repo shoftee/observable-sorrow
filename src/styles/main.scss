@@ -74,6 +74,12 @@ main {
   }
 }
 
+// vertical stack
+.button-stack {
+  @include flex-column();
+  gap: bsize(2);
+}
+
 footer {
   @include flex-row();
   justify-content: flex-end;
@@ -210,19 +216,13 @@ main .nav {
   }
 }
 
-// controls
+// buttons
 .btn .structure-level {
   @extend .number-annotation, .border;
 }
 
 .btn.capped {
   @extend .text-danger, .text-opacity-75;
-}
-
-// society
-.jobs {
-  @include flex-column();
-  gap: bsize(2);
 }
 
 // devtools

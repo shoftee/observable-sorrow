@@ -48,4 +48,5 @@ export interface EnvironmentState {
   season: SeasonId;
   day: number;
   weather: WeatherId;
+  calendar: string;
 }

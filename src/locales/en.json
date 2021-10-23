@@ -74,16 +74,13 @@
     "weather": {
       "warm": "Warm",
       "cold": "Cold"
-    },
-    "calendar": {
-      "basic": {
-        "no-weather": "{season}",
-        "weather": "{season} ({weather})"
-      },
-      "full": {
-        "no-weather": "Year {year} – {season}, day {day}",
-        "weather": "Year {year} – {season} ({weather}), day {day}"
-      }
+    }
+  },
+
+  "calendar": {
+    "full": {
+      "no-weather": "Year {year} – {season}, day {day}",
+      "weather": "Year {year} – {season} ({weather}), day {day}"
     }
   },
 

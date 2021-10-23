@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Ingredient from "./Ingredient.vue";
 
-import { IngredientItem } from "@/app/presenters";
+import { IngredientItem } from "@/app/presenters/common/ingredients";
 
 const { items } = defineProps<{ items: IngredientItem[] }>();
 </script>

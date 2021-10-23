@@ -113,6 +113,14 @@ export class EntityAdmin {
     return this._buildings.enumerate();
   }
 
+  job(id: JobId): JobEntity {
+    return this._jobs.get(id);
+  }
+
+  jobs(): Iterable<JobEntity> {
+    return this._jobs.enumerate();
+  }
+
   number(id: NumberEffectId): NumberEffectEntity {
     return this._numbers.get(id);
   }
@@ -139,14 +147,6 @@ export class EntityAdmin {
 
   resources(): Iterable<ResourceEntity> {
     return this._resources.enumerate();
-  }
-
-  job(id: JobId): JobEntity {
-    return this._jobs.get(id);
-  }
-
-  jobs(): Iterable<JobEntity> {
-    return this._jobs.enumerate();
   }
 
   section(id: SectionId): SectionEntity {

@@ -1,10 +1,10 @@
 import { SectionId, SectionUnlockEffectId } from "@/app/interfaces";
 
-export type SectionMetadataType = {
+export type SectionMetadataType = Readonly<{
   id: SectionId;
   label: string;
   unlockEffect?: SectionUnlockEffectId;
-};
+}>;
 
 export const SectionsMetadata: Record<SectionId, SectionMetadataType> = {
   bonfire: {

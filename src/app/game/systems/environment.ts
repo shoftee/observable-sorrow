@@ -1,3 +1,5 @@
+import { watchSyncEffect } from "vue";
+
 import { SeasonId, WeatherId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 import { choose } from "@/app/utils/probability";
@@ -13,6 +15,17 @@ export class EnvironmentSystem extends System {
 
   get time(): TimeEntity {
     return this.admin.time();
+  }
+
+  init(): void {
+    const environment = this.environment.state;
+    watchSyncEffect(() => {
+      if (environment.weather !== "neutral") {
+        environment.calendar = "calendar.full.weather";
+      } else {
+        environment.calendar = "calendar.full.no-weather";
+      }
+    });
   }
 
   update(): void {

@@ -1,14 +1,10 @@
 import { computed, reactive } from "vue";
 
-import { BonfireItemId, ResourceId, UnitKind } from "@/app/interfaces";
-import {
-  BonfireMetadataType,
-  BuildingEffectType,
-  IngredientState,
-  Meta,
-} from "@/app/state";
+import { BonfireItemId, BuildingId } from "@/app/interfaces";
+import { BonfireMetadataType, Meta } from "@/app/state";
 
 import { NumberView, IStateManager } from ".";
+import { fromIngredients, IngredientItem } from "./common/ingredients";
 
 export class BonfirePresenter {
   readonly all: BonfireItem[];
@@ -43,10 +39,9 @@ export class BonfirePresenter {
         flavor: meta.flavor,
 
         unlocked: true,
+        ingredients: computed(() => fromIngredients(state.ingredients)),
         capped: computed(() => state.capped),
         fulfilled: computed(() => state.fulfilled),
-
-        ingredients: computed(() => this.ingredients(state.ingredients)),
       });
     } else {
       const buildingId = meta.intent.buildingId;
@@ -59,21 +54,20 @@ export class BonfirePresenter {
 
         unlocked: computed(() => state.unlocked),
         level: computed(() => state.level),
+        ingredients: computed(() => fromIngredients(state.ingredients)),
         capped: computed(() => state.capped),
         fulfilled: computed(() => state.fulfilled),
 
-        ingredients: computed(() => this.ingredients(state.ingredients)),
-        effects: computed(() =>
-          this.effects(Meta.building(buildingId).effects, manager),
-        ),
+        effects: computed(() => this.effects(buildingId, manager)),
       });
     }
   }
 
   private effects(
-    effects: BuildingEffectType[],
+    buildingId: BuildingId,
     manager: IStateManager,
   ): EffectItem[] {
+    const effects = Meta.building(buildingId).effects;
     return Array.from(effects, (meta) =>
       reactive({
         id: meta.id,
@@ -82,32 +76,6 @@ export class BonfirePresenter {
         totalAmount: manager.numberView(meta.total),
       }),
     );
-  }
-
-  private ingredients(ingredients: IngredientState[]): IngredientItem[] {
-    return Array.from(ingredients, (state) =>
-      reactive({
-        id: state.resourceId,
-        label: Meta.resource(state.resourceId).label,
-        requirement: computed(() => state.requirement),
-        fulfillment: computed(() => state.fulfillment),
-        fulfilled: computed(() => state.fulfilled),
-        fulfillmentTime: computed(() => this.fulfillmentTime(state)),
-        capped: computed(() => state.capped),
-      }),
-    );
-  }
-
-  private fulfillmentTime(ingredient: IngredientState): NumberView | undefined {
-    if (ingredient.fulfillmentTime === undefined) {
-      return undefined;
-    }
-    return {
-      value: ingredient.fulfillmentTime,
-      unit: UnitKind.Tick,
-      rounded: true,
-      showSign: "negative",
-    };
   }
 }
 
@@ -125,16 +93,6 @@ export interface BonfireItem {
 
   ingredients?: IngredientItem[];
   effects?: EffectItem[];
-}
-
-export interface IngredientItem {
-  id: ResourceId;
-  label: string;
-  requirement: number;
-  fulfillment: number;
-  fulfilled: boolean;
-  fulfillmentTime?: NumberView | undefined;
-  capped: boolean;
 }
 
 export interface EffectItem {
