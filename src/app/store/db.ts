@@ -1,6 +1,5 @@
 import { deleteDB, openDB, StoreValue } from "idb";
-
-import { OsSchema } from "./schema";
+import { DatabaseName, LatestSchema, LatestVersion, migrate } from "./schemas";
 
 export class NotInitializedError extends Error {
   constructor() {
@@ -27,20 +26,15 @@ export class SaveSlotVersionMismatchError extends Error {
 }
 
 function openStore() {
-  return openDB<OsSchema>("game-data", 1, {
-    upgrade(db, oldVersion) {
-      if (oldVersion < 1) {
-        db.createObjectStore("general");
-        db.put("general", { currentSlot: undefined }, "general");
-
-        db.createObjectStore("saves", { autoIncrement: true });
-      }
+  return openDB<LatestSchema>(DatabaseName, LatestVersion, {
+    async upgrade(db, oldVersion) {
+      await migrate(db, oldVersion);
     },
   });
 }
 
-export type General = StoreValue<OsSchema, "general">;
-export type SaveSlot = StoreValue<OsSchema, "saves">;
+export type General = StoreValue<LatestSchema, "general">;
+export type SaveSlot = StoreValue<LatestSchema, "saves">;
 
 /** Creates a new save slot.
  * @returns the identifier of the new slot.
