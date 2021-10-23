@@ -17,7 +17,7 @@ export class BuildingSystem extends System {
     for (const building of this.admin.buildings()) {
       switch (building.status) {
         case OrderStatus.ORDERED: {
-          this.orders.build(building.id);
+          this.orders.fulfill(building.id);
           building.status = OrderStatus.READY;
           break;
         }

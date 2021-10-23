@@ -16,7 +16,7 @@ export class CraftingSystem extends System {
     for (const recipe of this.admin.recipes()) {
       switch (recipe.status) {
         case OrderStatus.ORDERED: {
-          this.orders.build(recipe.id);
+          this.orders.fulfill(recipe.id);
           recipe.status = OrderStatus.READY;
           break;
         }

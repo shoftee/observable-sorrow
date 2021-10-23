@@ -20,7 +20,7 @@ export class OrderHandler<T> {
 
   constructor(readonly admin: EntityAdmin) {}
 
-  build(order: T): void {
+  fulfill(order: T): void {
     this.queue.enqueue(order);
   }
 
