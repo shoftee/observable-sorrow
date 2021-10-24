@@ -34,6 +34,13 @@
       "effects": {
         "science": "Science production {amount}"
       }
+    },
+    "farmer": {
+      "label": "Farmer",
+      "description": "Cultivate catnip in the surrounding lands.",
+      "effects": {
+        "catnip": "Catnip production {amount}"
+      }
     }
   },
 
@@ -150,6 +157,12 @@
       "description": "Develops the ability to predict when the seasons will change. Essential for advanced agriculture.",
       "flavor": "What day is it again?",
       "effect": "Provides a way of more precise time tracking."
+    },
+    "agriculture": {
+      "label": "Agriculture",
+      "description": "The basis of all civilised life. Allows the working of land for food.",
+      "flavor": "Best thing since sliced bread!",
+      "effect": "Unlocks Farmers and Barns."
     }
   }
 }

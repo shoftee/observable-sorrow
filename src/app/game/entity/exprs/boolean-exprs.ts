@@ -10,4 +10,6 @@ export const BooleanExprs: Record<BooleanEffectId, BooleanExpr> = {
     admin.building("library").state.level > 0,
   "unlock.job.scholar": ({ admin }) =>
     admin.building("library").state.level > 0,
+  "unlock.job.farmer": ({ admin }) =>
+    admin.technology("agriculture").state.researched,
 };

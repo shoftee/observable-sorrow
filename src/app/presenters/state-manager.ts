@@ -54,7 +54,7 @@ export interface IStateManager {
   sections(): Enumerable<[SectionId, SectionState]>;
   section(id: SectionId): SectionState;
 
-  technologies(): Enumerable<[TechnologyId, TechnologyState]>;
+  technologies(): Enumerable<TechnologyId>;
   technology(id: TechnologyId): TechnologyState;
 
   environment(): EnvironmentState;
@@ -211,8 +211,8 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return pool.get(id) as unknown as SectionState;
   }
 
-  technologies(): Enumerable<[TechnologyId, TechnologyState]> {
-    return asEnumerable(this.pools.technologies.entries());
+  technologies(): Enumerable<TechnologyId> {
+    return asEnumerable(this.pools.technologies.keys());
   }
 
   technology(id: TechnologyId): TechnologyState {

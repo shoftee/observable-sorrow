@@ -1,5 +1,6 @@
-import { BooleanEffectId } from "@/app/interfaces";
-import { Flag, UnlockMode } from "@/app/state";
+import { BooleanEffectId, TechnologyId } from "@/app/interfaces";
+import { Flag, Meta, UnlockMode } from "@/app/state";
+import { asEnumerable } from "@/app/utils/enumerable";
 
 import { ResourceEntity, BuildingEntity } from "../entity";
 
@@ -15,6 +16,18 @@ type Unlockable = {
 };
 
 export class LockToggleSystem extends System {
+  private readonly technologyDeps = new Map<TechnologyId, Set<TechnologyId>>();
+
+  init(): void {
+    for (const tech of Meta.technologies()) {
+      const deps = this.technologyDeps.get(tech.id) ?? new Set<TechnologyId>();
+      for (const dep of tech.dependsOn) {
+        deps.add(dep);
+      }
+      this.technologyDeps.set(tech.id, deps);
+    }
+  }
+
   update(): void {
     for (const unlockable of this.unlockables()) {
       this.applyUnlockEffect(unlockable);
@@ -26,6 +39,15 @@ export class LockToggleSystem extends System {
 
     for (const building of this.admin.buildings()) {
       this.updateBuildingUnlocked(building);
+    }
+
+    for (const [id, deps] of this.technologyDeps) {
+      const tech = this.admin.technology(id);
+      if (!tech.state.unlocked) {
+        tech.state.unlocked = asEnumerable(deps)
+          .map((id) => this.admin.technology(id))
+          .all((dep) => dep.state.researched);
+      }
     }
   }
 

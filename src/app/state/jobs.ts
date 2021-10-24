@@ -44,4 +44,18 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
       },
     ],
   },
+  farmer: {
+    id: "farmer",
+    label: "jobs.farmer.label",
+    description: "jobs.farmer.description",
+    unlockEffect: "unlock.job.farmer",
+    effects: [
+      {
+        id: "catnip",
+        label: "jobs.farmer.effects.catnip",
+        base: "jobs.farmer.catnip.base",
+        total: "jobs.farmer.catnip",
+      },
+    ],
+  },
 };

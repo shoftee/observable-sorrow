@@ -51,9 +51,9 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("catnip.production"),
     effect("population.catnip-demand"),
   ),
-  "catnip.production": ratio(
-    effect("catnip-field.catnip"),
-    effect("catnip-field.weather"),
+  "catnip.production": sum(
+    ratio(effect("catnip-field.catnip"), effect("catnip-field.weather")),
+    effect("jobs.farmer.catnip"),
   ),
 
   // Science
@@ -139,5 +139,10 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "jobs.scholar.science": prod(
     effect("jobs.scholar.science.base"),
     workers("scholar"),
+  ),
+  "jobs.farmer.catnip.base": 1,
+  "jobs.farmer.catnip": prod(
+    effect("jobs.farmer.catnip.base"),
+    workers("farmer"),
   ),
 };

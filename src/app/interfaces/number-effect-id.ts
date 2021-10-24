@@ -41,7 +41,9 @@ export type JobEffectId =
   | "jobs.woodcutter.wood.base"
   | "jobs.woodcutter.wood"
   | "jobs.scholar.science.base"
-  | "jobs.scholar.science";
+  | "jobs.scholar.science"
+  | "jobs.farmer.catnip.base"
+  | "jobs.farmer.catnip";
 
 export type PopulationEffectId =
   | "population.catnip-demand"

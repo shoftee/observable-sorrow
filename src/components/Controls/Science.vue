@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { unref } from "vue";
+import { computed, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import TechnologyButton from "./TechnologyButton.vue";
@@ -9,7 +9,7 @@ const { science } = injectChannel().presenters;
 
 const { t } = useI18n();
 
-const technologies = unref(science.items);
+const technologies = computed(() => unref(science.items).filter(item => item.unlocked));
 </script>
 
 <template>

@@ -1,4 +1,4 @@
-import { IngredientState, ResourcesType } from ".";
+import { FulfillmentState, ResourcesType } from ".";
 import { TechnologyId } from "../interfaces";
 
 export type TechMetadataType = Readonly<{
@@ -8,6 +8,7 @@ export type TechMetadataType = Readonly<{
   flavor?: string;
   ingredients: ResourcesType;
   effects: TechEffectType[];
+  dependsOn: TechnologyId[];
 }>;
 
 export type TechEffectType = Readonly<{
@@ -23,13 +24,20 @@ export const TechMetadata: Record<TechnologyId, TechMetadataType> = {
     flavor: "technology.calendar.flavor",
     ingredients: { science: 30 },
     effects: [{ id: "default", label: "technology.calendar.effect" }],
+    dependsOn: [],
+  },
+  agriculture: {
+    id: "agriculture",
+    label: "technology.agriculture.label",
+    description: "technology.agriculture.description",
+    flavor: "technology.agriculture.flavor",
+    ingredients: { science: 100 },
+    effects: [{ id: "default", label: "technology.agriculture.effect" }],
+    dependsOn: ["calendar"],
   },
 };
 
-export interface TechnologyState {
+export interface TechnologyState extends FulfillmentState {
   unlocked: boolean;
   researched: boolean;
-  ingredients: IngredientState[];
-  fulfilled: boolean;
-  capped: boolean;
 }

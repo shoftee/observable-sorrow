@@ -19,7 +19,7 @@ export class TechnologyEntity extends Entity<TechnologyId> {
     super(meta.id);
 
     this.state = reactive({
-      unlocked: true,
+      unlocked: false,
       researched: false,
       ingredients: ingredientsFromObject(meta.ingredients),
       fulfilled: false,

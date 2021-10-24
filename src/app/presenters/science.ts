@@ -1,7 +1,7 @@
-import { computed, reactive } from "vue";
+import { computed, ComputedRef, reactive } from "vue";
 
 import { TechnologyId } from "@/app/interfaces";
-import { Meta, TechMetadataType } from "@/app/state";
+import { Meta } from "@/app/state";
 
 import { StateManager } from ".";
 import { IngredientItem, fromIngredients } from "./common/ingredients";
@@ -25,16 +25,20 @@ export interface TechEffectItem {
 }
 
 export class SciencePresenter {
-  readonly items: TechItem[];
+  readonly items: ComputedRef<TechItem[]>;
 
   constructor(manager: StateManager) {
-    this.items = Meta.technologies()
-      .map((meta) => this.newTechItem(meta, manager))
-      .toArray();
+    this.items = computed(() =>
+      manager
+        .technologies()
+        .map((id) => this.newTechItem(id, manager))
+        .toArray(),
+    );
   }
 
-  private newTechItem(meta: TechMetadataType, manager: StateManager): TechItem {
-    const state = manager.technology(meta.id);
+  private newTechItem(id: TechnologyId, manager: StateManager): TechItem {
+    const meta = Meta.technology(id);
+    const state = manager.technology(id);
     return reactive({
       id: meta.id,
       label: meta.label,

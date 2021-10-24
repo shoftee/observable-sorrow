@@ -19,8 +19,6 @@ function onTabClick(section: SectionItem) {
   active.value = section.id
   emit("changed", section);
 }
-
-defineExpose({ active });
 </script>
 <template>
   <ul class="nav nav-pills">
