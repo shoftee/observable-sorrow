@@ -30,20 +30,6 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
       },
     ],
   },
-  scholar: {
-    id: "scholar",
-    label: "jobs.scholar.label",
-    description: "jobs.scholar.description",
-    unlockEffect: "unlock.job.scholar",
-    effects: [
-      {
-        id: "science",
-        label: "jobs.scholar.effects.science",
-        base: "jobs.scholar.science.base",
-        total: "jobs.scholar.science",
-      },
-    ],
-  },
   farmer: {
     id: "farmer",
     label: "jobs.farmer.label",
@@ -55,6 +41,20 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
         label: "jobs.farmer.effects.catnip",
         base: "jobs.farmer.catnip.base",
         total: "jobs.farmer.catnip",
+      },
+    ],
+  },
+  scholar: {
+    id: "scholar",
+    label: "jobs.scholar.label",
+    description: "jobs.scholar.description",
+    unlockEffect: "unlock.job.scholar",
+    effects: [
+      {
+        id: "science",
+        label: "jobs.scholar.effects.science",
+        base: "jobs.scholar.science.base",
+        total: "jobs.scholar.science",
       },
     ],
   },
