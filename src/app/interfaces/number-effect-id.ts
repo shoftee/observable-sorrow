@@ -76,6 +76,8 @@ export const EffectUnits: Partial<Record<NumberEffectId, UnitKind>> = {
   "jobs.woodcutter.wood.base": UnitKind.PerTick,
   "jobs.scholar.science": UnitKind.PerTick,
   "jobs.scholar.science.base": UnitKind.PerTick,
+  "jobs.farmer.catnip": UnitKind.PerTick,
+  "jobs.farmer.catnip.base": UnitKind.PerTick,
   "weather.season-ratio": UnitKind.Percent,
   "weather.severity-ratio": UnitKind.Percent,
   "library.science-ratio": UnitKind.Percent,
