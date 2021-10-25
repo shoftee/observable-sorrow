@@ -24,6 +24,21 @@ export class Enumerable<T> implements Iterable<T> {
     );
   }
 
+  flatMap<TResult>(
+    selector: (item: T) => Iterable<TResult>,
+  ): Enumerable<TResult> {
+    const that = this as Iterable<T>;
+    return new Enumerable(
+      (function* () {
+        for (const outer of that) {
+          for (const inner of selector(outer)) {
+            yield inner;
+          }
+        }
+      })(),
+    );
+  }
+
   all(selector?: (item: T) => boolean): boolean {
     return all(this, selector ?? TrueFn);
   }
