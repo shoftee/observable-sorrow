@@ -234,4 +234,7 @@ main .nav {
 // devtools
 #show-devtools {
   z-index: calc($zindex-offcanvas + 1);
+  position: fixed;
+  bottom: bsize(5);
+  right: bsize(5);
 }

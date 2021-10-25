@@ -35,7 +35,7 @@ useKeyboardEvent("keyup", (e) => {
         type="button"
         data-bs-toggle="offcanvas"
         data-bs-target="#dt-offcanvas"
-        class="btn btn-outline-secondary position-fixed m-5 bottom-0 end-0"
+        class="btn btn-danger shadow-none"
       >
         <span class="bi bi-gear"></span>
       </button>

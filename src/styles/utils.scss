@@ -1,6 +1,14 @@
 // Useful mixins
 @mixin wh-100() {
+  @include w-100();
+  @include h-100();
+}
+
+@mixin w-100() {
   width: 100%;
+}
+
+@mixin h-100() {
   height: 100%;
 }
 
