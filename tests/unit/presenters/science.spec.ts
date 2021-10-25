@@ -16,7 +16,7 @@ describe("science presenter", () => {
     expect(techs.value).to.have.lengthOf(0);
 
     manager.update([calendarAddedPool()]);
-    expect(unref(techs)).to.have.lengthOf(1);
+    expect(unref(techs)).to.have.lengthOf(2);
 
     manager.update([]);
   });
@@ -25,9 +25,8 @@ describe("science presenter", () => {
     expect(techs.value).to.have.lengthOf(0);
 
     manager.update([calendarAddedPool()]);
-    expect(unref(techs)).to.have.lengthOf(1);
 
-    const calendar = manager.technology("calendar");
+    const calendar = manager.tech("calendar");
     expect(calendar.fulfilled).to.be.false;
     expect(calendar.ingredients[0].fulfillment).to.equal(0);
 
@@ -36,7 +35,7 @@ describe("science presenter", () => {
     expect(calendar.ingredients[0].fulfilled).to.be.true;
     expect(calendar.ingredients[0].fulfillment).to.equal(42);
 
-    const agriculture = manager.technology("agriculture");
+    const agriculture = manager.tech("agriculture");
     manager.update([calendarResearchedPool()]);
     expect(unref(techs)).to.have.lengthOf(2);
     expect(agriculture.fulfilled).to.be.true;
@@ -46,7 +45,7 @@ describe("science presenter", () => {
 
 function calendarAddedPool(): ChangePool {
   return {
-    poolId: "technologies",
+    poolId: "techs",
     added: new Map<string, PropertyBag>([
       [
         "calendar",
@@ -90,7 +89,7 @@ function calendarAddedPool(): ChangePool {
 
 function calendarFulfilledPool(): ChangePool {
   return {
-    poolId: "technologies",
+    poolId: "techs",
     updated: new Map<string, PropertyBag>([
       [
         "calendar",
@@ -111,7 +110,7 @@ function calendarFulfilledPool(): ChangePool {
 
 function calendarResearchedPool(): ChangePool {
   return {
-    poolId: "technologies",
+    poolId: "techs",
     updated: new Map<string, PropertyBag>([
       ["calendar", { researched: true }],
       [
