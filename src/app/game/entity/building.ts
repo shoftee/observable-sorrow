@@ -9,9 +9,16 @@ import {
 } from "@/app/state";
 import { SaveState } from "@/app/store";
 
-import { Entity, EntityPool, OrderStatus, Watcher } from ".";
+import {
+  Entity,
+  EntityPool,
+  OrderStatus,
+  Persisted,
+  Watched,
+  Watcher,
+} from ".";
 
-export class BuildingEntity extends Entity<BuildingId> {
+export class BuildingEntity extends Entity<BuildingId> implements Watched {
   readonly state: BuildingState;
 
   status: OrderStatus;
@@ -35,7 +42,10 @@ export class BuildingEntity extends Entity<BuildingId> {
   }
 }
 
-export class BuildingsPool extends EntityPool<BuildingId, BuildingEntity> {
+export class BuildingsPool
+  extends EntityPool<BuildingId, BuildingEntity>
+  implements Persisted
+{
   constructor(watcher: Watcher) {
     super("buildings", watcher);
     for (const meta of Meta.buildings()) {

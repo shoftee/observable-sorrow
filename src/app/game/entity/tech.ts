@@ -8,10 +8,17 @@ import {
   TechState,
 } from "@/app/state";
 
-import { Entity, EntityPool, OrderStatus, Watcher } from ".";
+import {
+  Entity,
+  EntityPool,
+  OrderStatus,
+  Persisted,
+  Watched,
+  Watcher,
+} from ".";
 import { SaveState } from "@/app/store";
 
-export class TechEntity extends Entity<TechId> {
+export class TechEntity extends Entity<TechId> implements Watched {
   readonly state: TechState;
   status: OrderStatus;
 
@@ -34,7 +41,10 @@ export class TechEntity extends Entity<TechId> {
   }
 }
 
-export class TechsPool extends EntityPool<TechId, TechEntity> {
+export class TechsPool
+  extends EntityPool<TechId, TechEntity>
+  implements Persisted
+{
   constructor(watcher: Watcher) {
     super("techs", watcher);
     for (const meta of Meta.techs()) {

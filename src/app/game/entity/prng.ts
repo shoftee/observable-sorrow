@@ -1,9 +1,9 @@
 import { SaveState } from "@/app/store";
 import { Prng, random } from "@/app/utils/mathx";
 
-import { Entity } from ".";
+import { Entity, Persisted } from ".";
 
-export class PrngEntity extends Entity<"prng"> {
+export class PrngEntity extends Entity<"prng"> implements Persisted {
   private _environment: Prng;
 
   constructor() {

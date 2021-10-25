@@ -4,9 +4,9 @@ import { ResourceId } from "@/app/interfaces";
 import { Meta, ResourceMetadataType, ResourceState } from "@/app/state";
 import { SaveState } from "@/app/store";
 
-import { Entity, EntityPool, ResourceDelta, Watcher } from ".";
+import { Entity, EntityPool, ResourceDelta, Watched, Watcher } from ".";
 
-export class ResourceEntity extends Entity<ResourceId> {
+export class ResourceEntity extends Entity<ResourceId> implements Watched {
   readonly state: ResourceState;
   readonly delta: ResourceDelta = new ResourceDelta();
 

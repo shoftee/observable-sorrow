@@ -8,7 +8,7 @@ import {
   IPresenterChangeSink,
   JobId,
   NumberEffectId,
-  PoolEntityId,
+  PoolId,
   PopId,
   PropertyBag,
   RecipeId,
@@ -70,10 +70,7 @@ export interface NumberView {
   showSign?: ShowSign;
 }
 
-class ChangePools extends Map<
-  PoolEntityId | undefined,
-  Map<string, PropertyBag>
-> {
+class ChangePools extends Map<PoolId, Map<string, PropertyBag>> {
   get buildings(): Map<BuildingId, BuildingState> {
     return this.getOrAdd("buildings") as unknown as Map<
       BuildingId,
@@ -115,7 +112,7 @@ class ChangePools extends Map<
     return this.getOrAdd("techs") as unknown as Map<TechId, TechState>;
   }
 
-  getOrAdd(id: PoolEntityId | undefined): Map<string, PropertyBag> {
+  getOrAdd(id: PoolId): Map<string, PropertyBag> {
     let existing = this.get(id);
     if (!existing) {
       existing = reactive(new Map<string, PropertyBag>());
@@ -218,22 +215,22 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   environment(): EnvironmentState {
-    const pool = this.pools.getOrAdd(undefined);
+    const pool = this.pools.getOrAdd("singletons");
     return pool.get("environment") as unknown as EnvironmentState;
   }
 
   player(): PlayerState {
-    const pool = this.pools.getOrAdd(undefined);
+    const pool = this.pools.getOrAdd("singletons");
     return pool.get("player") as unknown as PlayerState;
   }
 
   society(): SocietyState {
-    const pool = this.pools.getOrAdd(undefined);
+    const pool = this.pools.getOrAdd("singletons");
     return pool.get("society") as unknown as SocietyState;
   }
 
   time(): TimeState {
-    const pool = this.pools.getOrAdd(undefined);
+    const pool = this.pools.getOrAdd("singletons");
     return pool.get("time") as unknown as TimeState;
   }
 }

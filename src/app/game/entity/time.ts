@@ -2,10 +2,10 @@ import { reactive } from "vue";
 
 import { TimeConstants, TimeState } from "@/app/state";
 
-import { Entity, Watcher } from ".";
+import { Entity, Persisted, Watched, Watcher } from ".";
 import { SaveState } from "@/app/store";
 
-export class TimeEntity extends Entity<"time"> {
+export class TimeEntity extends Entity<"time"> implements Watched, Persisted {
   readonly state: TimeState;
 
   readonly ticks: Timer;
@@ -22,6 +22,10 @@ export class TimeEntity extends Entity<"time"> {
     this.days = new Timer(TimeConstants.TicksPerDay);
   }
 
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
+  }
+
   loadState(save: SaveState): void {
     if (save.time) {
       this.ticks.absolute = save.time.ticks;
@@ -34,10 +38,6 @@ export class TimeEntity extends Entity<"time"> {
       ticks: this.ticks.absolute,
       days: this.days.absolute,
     };
-  }
-
-  watch(watcher: Watcher): void {
-    watcher.watch(this.id, this.state);
   }
 
   *timers(): Iterable<Timer> {

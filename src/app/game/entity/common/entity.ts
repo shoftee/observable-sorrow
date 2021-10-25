@@ -1,26 +1,29 @@
-import { EntityId, PoolEntityId } from "@/app/interfaces";
+import { EntityId, PoolId } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 
 import { Watcher } from "..";
 
-export abstract class Entity<TId = EntityId> {
-  constructor(readonly id: TId) {}
+export interface Watched {
+  watch(watcher: Watcher): void;
+}
 
-  watch?(watcher: Watcher): void;
-  loadState?(state: SaveState): void;
-  saveState?(state: SaveState): void;
+export interface Persisted {
+  loadState(state: SaveState): void;
+  saveState(state: SaveState): void;
+}
+
+export abstract class Entity<TId extends EntityId> {
+  constructor(readonly id: TId) {}
 }
 
 export abstract class EntityPool<
   TId extends EntityId,
-  TEntity extends Entity<TId>,
-> extends Entity {
+  TEntity extends Entity<TId> & Partial<Watched>,
+> {
   protected readonly pool: Map<TId, TEntity>;
 
-  constructor(readonly id: PoolEntityId, private readonly watcher: Watcher) {
-    super(id);
-
+  constructor(readonly id: PoolId, private readonly watcher: Watcher) {
     this.pool = new Map<TId, TEntity>();
   }
 

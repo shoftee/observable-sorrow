@@ -4,10 +4,10 @@ import { JobId, PopId } from "@/app/interfaces";
 import { PopState } from "@/app/state";
 import { Enumerable } from "@/app/utils/enumerable";
 
-import { Entity, EntityPool, Watcher } from ".";
+import { Entity, EntityPool, Persisted, Watched, Watcher } from ".";
 import { SaveState } from "@/app/store";
 
-export class PopEntity extends Entity<PopId> {
+export class PopEntity extends Entity<PopId> implements Watched {
   readonly state: PopState;
 
   constructor(id: number) {
@@ -24,7 +24,10 @@ export class PopEntity extends Entity<PopId> {
   }
 }
 
-export class PopsPool extends EntityPool<PopId, PopEntity> {
+export class PopsPool
+  extends EntityPool<PopId, PopEntity>
+  implements Persisted
+{
   private readonly ids: PopId[];
   private nextPopId = 1;
 

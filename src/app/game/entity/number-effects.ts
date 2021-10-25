@@ -4,9 +4,19 @@ import { NumberEffectId } from "@/app/interfaces";
 import { NumberEffectState } from "@/app/state";
 import { fromObject } from "@/app/utils/enumerable";
 
-import { Entity, EntityPool, NumberExpr, NumberExprs, Watcher } from ".";
+import {
+  Entity,
+  EntityPool,
+  NumberExpr,
+  NumberExprs,
+  Watched,
+  Watcher,
+} from ".";
 
-export class NumberEffectEntity extends Entity<NumberEffectId> {
+export class NumberEffectEntity
+  extends Entity<NumberEffectId>
+  implements Watched
+{
   readonly state: NumberEffectState;
 
   constructor(readonly id: NumberEffectId, readonly expr: NumberExpr) {

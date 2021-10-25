@@ -3,9 +3,9 @@ import { reactive } from "vue";
 import { JobId } from "@/app/interfaces";
 import { JobMetadataType, JobState, Meta } from "@/app/state";
 
-import { Entity, EntityPool, Watcher } from ".";
+import { Entity, EntityPool, Watched, Watcher } from ".";
 
-export class JobEntity extends Entity<JobId> {
+export class JobEntity extends Entity<JobId> implements Watched {
   readonly state: JobState;
 
   constructor(readonly meta: JobMetadataType) {

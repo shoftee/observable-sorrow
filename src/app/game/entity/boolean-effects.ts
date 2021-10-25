@@ -4,9 +4,19 @@ import { BooleanEffectId } from "@/app/interfaces";
 import { BooleanEffectState } from "@/app/state";
 import { fromObject } from "@/app/utils/enumerable";
 
-import { Entity, EntityPool, BooleanExpr, BooleanExprs, Watcher } from ".";
+import {
+  Entity,
+  EntityPool,
+  BooleanExpr,
+  BooleanExprs,
+  Watcher,
+  Watched,
+} from ".";
 
-export class BooleanEffectEntity extends Entity<BooleanEffectId> {
+export class BooleanEffectEntity
+  extends Entity<BooleanEffectId>
+  implements Watched
+{
   readonly state: BooleanEffectState;
 
   constructor(readonly id: BooleanEffectId, readonly expr: BooleanExpr) {

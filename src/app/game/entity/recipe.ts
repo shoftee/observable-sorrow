@@ -9,9 +9,9 @@ import {
   ResourceMap,
 } from "@/app/state";
 
-import { Entity, EntityPool, OrderStatus, Watcher } from ".";
+import { Entity, EntityPool, OrderStatus, Watched, Watcher } from ".";
 
-export class RecipeEntity extends Entity<RecipeId> {
+export class RecipeEntity extends Entity<RecipeId> implements Watched {
   readonly state: RecipeState;
 
   status: OrderStatus;

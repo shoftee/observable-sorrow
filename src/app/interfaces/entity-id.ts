@@ -10,30 +10,26 @@ import {
   TechId,
 } from "@/app/interfaces";
 
-export type PoolEntityId =
-  | "booleans"
-  | "buildings"
-  | "jobs"
-  | "numbers"
-  | "pops"
-  | "recipes"
-  | "resources"
-  | "sections"
-  | "techs";
-
-export type EntityId =
-  | BooleanEffectId
-  | BuildingId
-  | JobId
-  | NumberEffectId
-  | PoolEntityId
-  | PopId
-  | RecipeId
-  | ResourceId
-  | SectionId
-  | TechId
+export type SingletonEntityId =
   | "environment"
   | "player"
   | "prng"
   | "society"
   | "time";
+
+export interface PoolIdMap {
+  singletons: SingletonEntityId;
+
+  booleans: BooleanEffectId;
+  buildings: BuildingId;
+  jobs: JobId;
+  numbers: NumberEffectId;
+  pops: PopId;
+  recipes: RecipeId;
+  resources: ResourceId;
+  sections: SectionId;
+  techs: TechId;
+}
+
+export type PoolId = keyof PoolIdMap;
+export type EntityId = PoolIdMap[PoolId];

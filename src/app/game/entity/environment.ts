@@ -3,9 +3,12 @@ import { reactive } from "vue";
 import { EnvironmentState } from "@/app/state";
 import { SaveState } from "@/app/store";
 
-import { Entity, Watcher } from ".";
+import { Entity, Persisted, Watched, Watcher } from ".";
 
-export class EnvironmentEntity extends Entity<"environment"> {
+export class EnvironmentEntity
+  extends Entity<"environment">
+  implements Watched, Persisted
+{
   readonly state: EnvironmentState;
 
   constructor() {

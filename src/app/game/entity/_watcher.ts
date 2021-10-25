@@ -4,8 +4,9 @@ import {
   ChangePool,
   EntityId,
   OnTickedHandler,
-  PoolEntityId,
+  PoolId,
   PropertyBag,
+  SingletonEntityId,
 } from "@/app/interfaces";
 
 export interface Watcher {
@@ -15,10 +16,10 @@ export interface Watcher {
 
 export class EntityWatcher implements Watcher {
   private readonly handles = new Map<EntityId, WatchStopHandle>();
-  private readonly misc = new WatchedPool();
-  private readonly pools = new Map<PoolEntityId, WatchedPool>();
+  private readonly singletons = new WatchedPool("singletons");
+  private readonly pools = new Map<PoolId, WatchedPool>();
 
-  pooled(poolId: PoolEntityId): Watcher {
+  pooled(poolId: PoolId): Watcher {
     let pool = this.pools.get(poolId);
     if (pool === undefined) {
       pool = new WatchedPool(poolId);
@@ -35,12 +36,12 @@ export class EntityWatcher implements Watcher {
     };
   }
 
-  watch(id: EntityId, state: unknown): void {
-    this.watchIn(this.misc, id, state as PropertyBag);
+  watch(id: SingletonEntityId, state: unknown): void {
+    this.watchIn(this.singletons, id, state as PropertyBag);
   }
 
-  unwatch(id: EntityId): void {
-    this.unwatchIn(this.misc, id);
+  unwatch(id: SingletonEntityId): void {
+    this.unwatchIn(this.singletons, id);
   }
 
   private unwatchIn(pool: WatchedPool, id: EntityId) {
@@ -80,8 +81,8 @@ export class EntityWatcher implements Watcher {
   }
 
   private *collectChanges(): Iterable<WatchedPool> {
-    if (this.misc.hasChanges()) {
-      yield this.misc;
+    if (this.singletons.hasChanges()) {
+      yield this.singletons;
     }
 
     for (const [, pool] of this.pools) {
@@ -97,7 +98,7 @@ class WatchedPool {
   readonly updated = new Map<EntityId, PropertyBag>();
   readonly removed = new Set<EntityId>();
 
-  constructor(readonly poolId?: PoolEntityId) {}
+  constructor(readonly poolId: PoolId) {}
 
   hasChanges(): boolean {
     return (

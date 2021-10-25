@@ -1,9 +1,9 @@
-import { BonfireItemId, JobId, PoolEntityId, TechId } from ".";
+import { BonfireItemId, JobId, PoolId, TechId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 
 export type ChangePool = {
-  poolId?: PoolEntityId;
+  poolId: PoolId;
   added?: Map<string, PropertyBag>;
   updated?: Map<string, PropertyBag>;
   removed?: Set<string>;

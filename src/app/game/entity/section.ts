@@ -3,9 +3,9 @@ import { reactive } from "vue";
 import { SectionId } from "@/app/interfaces";
 import { Meta, SectionMetadataType, SectionState } from "@/app/state";
 
-import { Entity, EntityPool, Watcher } from ".";
+import { Entity, EntityPool, Watched, Watcher } from ".";
 
-export class SectionEntity extends Entity<SectionId> {
+export class SectionEntity extends Entity<SectionId> implements Watched {
   readonly state: SectionState;
 
   constructor(readonly meta: SectionMetadataType) {

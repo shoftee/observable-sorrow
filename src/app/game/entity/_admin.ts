@@ -15,7 +15,6 @@ import {
   BooleanEffectsPool,
   BuildingEntity,
   BuildingsPool,
-  Entity,
   EntityWatcher,
   EnvironmentEntity,
   JobEntity,
@@ -35,6 +34,7 @@ import {
   TechsPool,
   TechEntity,
   TimeEntity,
+  Persisted,
 } from ".";
 
 export class EntityAdmin {
@@ -83,9 +83,9 @@ export class EntityAdmin {
   loadState(state: SaveState): void {
     for (const key in this) {
       if (Object.prototype.hasOwnProperty.call(this, key)) {
-        const element = this[key];
-        if (element instanceof Entity) {
-          element.loadState?.(state);
+        const element = this[key] as Partial<Persisted>;
+        if (element.loadState) {
+          element.loadState(state);
         }
       }
     }
@@ -94,9 +94,9 @@ export class EntityAdmin {
   saveState(state: SaveState): void {
     for (const key in this) {
       if (Object.prototype.hasOwnProperty.call(this, key)) {
-        const element = this[key];
-        if (element instanceof Entity) {
-          element.saveState?.(state);
+        const element = this[key] as Partial<Persisted>;
+        if (element.saveState) {
+          element.saveState(state);
         }
       }
     }
