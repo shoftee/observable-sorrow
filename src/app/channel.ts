@@ -90,7 +90,7 @@ export async function Setup(): Promise<Channel> {
         unassignJob: root.unassignJob,
       },
       science: {
-        researchTechnology: root.researchTechnology,
+        researchTech: root.researchTech,
       },
       store: {
         save: root.save,

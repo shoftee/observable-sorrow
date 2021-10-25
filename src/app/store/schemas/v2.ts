@@ -1,6 +1,6 @@
 import { DBSchema } from "idb";
 
-import { TechnologyId } from "@/app/interfaces";
+import { TechId } from "@/app/interfaces";
 
 import { AtomicState, DeepPartial } from "..";
 import { OsSchemaV1 } from "./v1";
@@ -21,7 +21,7 @@ export interface OsSchemaV2 extends DBSchema {
       state: LastStateSchema &
         DeepPartial<{
           science: {
-            [T in TechnologyId]?: AtomicState<{
+            [T in TechId]?: AtomicState<{
               researched: boolean;
             }>;
           };

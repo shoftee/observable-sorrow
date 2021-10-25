@@ -3,7 +3,7 @@ import { useI18n } from "vue-i18n";
 
 import Ingredients from "@/components/Controls/Ingredients.vue"
 
-import { TechnologyId } from "@/app/interfaces";
+import { TechId } from "@/app/interfaces";
 import { TechItem } from "@/app/presenters";
 
 import { injectChannel } from "@/composables/game-channel";
@@ -13,8 +13,8 @@ const { t } = useI18n();
 
 const { tech } = defineProps<{ tech: TechItem }>();
 
-async function researchTechnology(id: TechnologyId): Promise<void> {
-  await interactors.science.researchTechnology(id);
+async function research(id: TechId): Promise<void> {
+  await interactors.science.researchTech(id);
 }
 </script>
 
@@ -27,7 +27,7 @@ async function researchTechnology(id: TechnologyId): Promise<void> {
         class="btn btn-outline-secondary w-100"
         :class="{ capped: tech.capped }"
         :disabled="!tech.fulfilled || tech.researched"
-        @click="researchTechnology(tech.id)"
+        @click="research(tech.id)"
       >
         <span v-if="tech.researched" class="bi bi-check"></span>
         {{ t(tech.label) }}

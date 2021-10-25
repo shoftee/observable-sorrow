@@ -1,4 +1,4 @@
-import { BooleanEffectId, TechnologyId } from "@/app/interfaces";
+import { BooleanEffectId, TechId } from "@/app/interfaces";
 import { Flag, Meta, UnlockMode } from "@/app/state";
 import { asEnumerable } from "@/app/utils/enumerable";
 
@@ -16,15 +16,15 @@ type Unlockable = {
 };
 
 export class LockToggleSystem extends System {
-  private readonly technologyDeps = new Map<TechnologyId, Set<TechnologyId>>();
+  private readonly techDeps = new Map<TechId, Set<TechId>>();
 
   init(): void {
-    for (const tech of Meta.technologies()) {
-      const deps = this.technologyDeps.get(tech.id) ?? new Set<TechnologyId>();
+    for (const tech of Meta.techs()) {
+      const deps = this.techDeps.get(tech.id) ?? new Set<TechId>();
       for (const dep of tech.dependsOn) {
         deps.add(dep);
       }
-      this.technologyDeps.set(tech.id, deps);
+      this.techDeps.set(tech.id, deps);
     }
   }
 
@@ -41,11 +41,11 @@ export class LockToggleSystem extends System {
       this.updateBuildingUnlocked(building);
     }
 
-    for (const [id, deps] of this.technologyDeps) {
-      const tech = this.admin.technology(id);
+    for (const [id, deps] of this.techDeps) {
+      const tech = this.admin.tech(id);
       if (!tech.state.unlocked) {
         tech.state.unlocked = asEnumerable(deps)
-          .map((id) => this.admin.technology(id))
+          .map((id) => this.admin.tech(id))
           .all((dep) => dep.state.researched);
       }
     }

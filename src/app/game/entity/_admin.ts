@@ -6,7 +6,7 @@ import {
   RecipeId,
   ResourceId,
   SectionId,
-  TechnologyId,
+  TechId,
 } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
 
@@ -32,8 +32,8 @@ import {
   SectionEntity,
   SectionsPool,
   SocietyEntity,
-  TechnologiesPool,
-  TechnologyEntity,
+  TechsPool,
+  TechEntity,
   TimeEntity,
 } from ".";
 
@@ -46,7 +46,7 @@ export class EntityAdmin {
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
   private readonly _sections: SectionsPool;
-  private readonly _technologies: TechnologiesPool;
+  private readonly _techs: TechsPool;
 
   private readonly _environment: EnvironmentEntity;
   private readonly _player: PlayerEntity;
@@ -63,9 +63,7 @@ export class EntityAdmin {
     this._recipes = new RecipesPool(this.watcher.pooled("recipes"));
     this._resources = new ResourcesPool(this.watcher.pooled("resources"));
     this._sections = new SectionsPool(this.watcher.pooled("sections"));
-    this._technologies = new TechnologiesPool(
-      this.watcher.pooled("technologies"),
-    );
+    this._techs = new TechsPool(this.watcher.pooled("techs"));
 
     this._environment = new EnvironmentEntity();
     this._environment.watch(this.watcher);
@@ -164,12 +162,12 @@ export class EntityAdmin {
     return this._sections.enumerate();
   }
 
-  technology(id: TechnologyId): TechnologyEntity {
-    return this._technologies.get(id);
+  tech(id: TechId): TechEntity {
+    return this._techs.get(id);
   }
 
-  technologies(): Iterable<TechnologyEntity> {
-    return this._technologies.enumerate();
+  techs(): Iterable<TechEntity> {
+    return this._techs.enumerate();
   }
 
   environment(): EnvironmentEntity {

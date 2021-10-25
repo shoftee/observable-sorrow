@@ -21,5 +21,5 @@ export * from "./recipe";
 export * from "./resource";
 export * from "./section";
 export * from "./society";
-export * from "./technology";
+export * from "./tech";
 export * from "./time";

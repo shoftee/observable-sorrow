@@ -29,8 +29,8 @@ export class FulfillmentSystem extends System {
     for (const building of this.admin.buildings()) {
       yield building.state;
     }
-    for (const technology of this.admin.technologies()) {
-      yield technology.state;
+    for (const tech of this.admin.techs()) {
+      yield tech.state;
     }
   }
 

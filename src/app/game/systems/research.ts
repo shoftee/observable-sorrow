@@ -1,29 +1,29 @@
-import { TechnologyId } from "@/app/interfaces";
+import { TechId } from "@/app/interfaces";
 
 import { EntityAdmin, OrderStatus } from "../entity";
 
 import { System, OrderHandler, OrderContext, OrderResult } from ".";
 
 export class ResearchSystem extends System {
-  private readonly orders: OrderHandler<TechnologyId>;
+  private readonly orders: OrderHandler<TechId>;
 
   constructor(admin: EntityAdmin) {
     super(admin);
 
-    this.orders = new OrderHandler<TechnologyId>(admin);
+    this.orders = new OrderHandler<TechId>(admin);
   }
 
   update(): void {
-    for (const technology of this.admin.technologies()) {
-      switch (technology.status) {
+    for (const tech of this.admin.techs()) {
+      switch (tech.status) {
         case OrderStatus.ORDERED: {
-          this.orders.fulfill(technology.id);
-          technology.status = OrderStatus.READY;
+          this.orders.fulfill(tech.id);
+          tech.status = OrderStatus.READY;
           break;
         }
         case OrderStatus.READY: {
           if (this.admin.time().ticks.wholeTicks > 0) {
-            technology.status = OrderStatus.EMPTY;
+            tech.status = OrderStatus.EMPTY;
           }
           break;
         }
@@ -36,11 +36,11 @@ export class ResearchSystem extends System {
     });
   }
 
-  private applyResearchTech(context: OrderContext<TechnologyId>): OrderResult {
+  private applyResearchTech(context: OrderContext<TechId>): OrderResult {
     const { order, transaction, admin } = context;
 
-    const technology = admin.technology(order);
-    const ingredients = technology.state.ingredients;
+    const tech = admin.tech(order);
+    const ingredients = tech.state.ingredients;
     for (const { resourceId, requirement } of ingredients) {
       transaction.addCredit(resourceId, requirement);
 
@@ -59,10 +59,10 @@ export class ResearchSystem extends System {
     return { success: true };
   }
 
-  private setResearched(context: OrderContext<TechnologyId>): void {
+  private setResearched(context: OrderContext<TechId>): void {
     const { order, admin } = context;
 
-    const technology = admin.technology(order);
-    technology.state.researched = true;
+    const tech = admin.tech(order);
+    tech.state.researched = true;
   }
 }

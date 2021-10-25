@@ -12,5 +12,5 @@ export * from "./player";
 export * from "./resources";
 export * from "./sections";
 export * from "./society";
-export * from "./technologies";
+export * from "./techs";
 export * from "./time";

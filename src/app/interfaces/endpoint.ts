@@ -1,4 +1,4 @@
-import { BonfireItemId, JobId, PoolEntityId, TechnologyId } from ".";
+import { BonfireItemId, JobId, PoolEntityId, TechId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 
@@ -33,7 +33,7 @@ export interface IBonfireInteractor {
 }
 
 export interface IScienceInteractor {
-  researchTechnology(id: TechnologyId): void;
+  researchTech(id: TechId): void;
 }
 
 export interface ISocietyInteractor {

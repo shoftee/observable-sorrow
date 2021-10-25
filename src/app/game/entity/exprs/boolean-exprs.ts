@@ -11,5 +11,5 @@ export const BooleanExprs: Record<BooleanEffectId, BooleanExpr> = {
   "unlock.job.scholar": ({ admin }) =>
     admin.building("library").state.level > 0,
   "unlock.job.farmer": ({ admin }) =>
-    admin.technology("agriculture").state.researched,
+    admin.tech("agriculture").state.researched,
 };

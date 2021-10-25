@@ -1,13 +1,13 @@
 import { computed, ComputedRef, reactive } from "vue";
 
-import { TechnologyId } from "@/app/interfaces";
+import { TechId } from "@/app/interfaces";
 import { Meta } from "@/app/state";
 
 import { StateManager } from ".";
 import { IngredientItem, fromIngredients } from "./common/ingredients";
 
 export interface TechItem {
-  id: TechnologyId;
+  id: TechId;
   label: string;
   description: string;
   flavor: string | undefined;
@@ -30,15 +30,15 @@ export class SciencePresenter {
   constructor(manager: StateManager) {
     this.items = computed(() =>
       manager
-        .technologies()
+        .techs()
         .map((id) => this.newTechItem(id, manager))
         .toArray(),
     );
   }
 
-  private newTechItem(id: TechnologyId, manager: StateManager): TechItem {
-    const meta = Meta.technology(id);
-    const state = manager.technology(id);
+  private newTechItem(id: TechId, manager: StateManager): TechItem {
+    const meta = Meta.tech(id);
+    const state = manager.tech(id);
     return reactive({
       id: meta.id,
       label: meta.label,

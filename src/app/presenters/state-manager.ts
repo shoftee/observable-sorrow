@@ -14,7 +14,7 @@ import {
   RecipeId,
   ResourceId,
   SectionId,
-  TechnologyId,
+  TechId,
   UnitKind,
 } from "@/app/interfaces";
 import {
@@ -28,7 +28,7 @@ import {
   ResourceState,
   SectionState,
   SocietyState,
-  TechnologyState,
+  TechState,
   TimeState,
 } from "@/app/state";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
@@ -54,8 +54,8 @@ export interface IStateManager {
   sections(): Enumerable<[SectionId, SectionState]>;
   section(id: SectionId): SectionState;
 
-  technologies(): Enumerable<TechnologyId>;
-  technology(id: TechnologyId): TechnologyState;
+  techs(): Enumerable<TechId>;
+  tech(id: TechId): TechState;
 
   environment(): EnvironmentState;
   player(): PlayerState;
@@ -111,11 +111,8 @@ class ChangePools extends Map<
     return this.getOrAdd("sections") as unknown as Map<SectionId, SectionState>;
   }
 
-  get technologies(): Map<TechnologyId, TechnologyState> {
-    return this.getOrAdd("technologies") as unknown as Map<
-      TechnologyId,
-      TechnologyState
-    >;
+  get techs(): Map<TechId, TechState> {
+    return this.getOrAdd("techs") as unknown as Map<TechId, TechState>;
   }
 
   getOrAdd(id: PoolEntityId | undefined): Map<string, PropertyBag> {
@@ -211,13 +208,13 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return pool.get(id) as unknown as SectionState;
   }
 
-  technologies(): Enumerable<TechnologyId> {
-    return asEnumerable(this.pools.technologies.keys());
+  techs(): Enumerable<TechId> {
+    return asEnumerable(this.pools.techs.keys());
   }
 
-  technology(id: TechnologyId): TechnologyState {
-    const pool = this.pools.getOrAdd("technologies");
-    return pool.get(id) as unknown as TechnologyState;
+  tech(id: TechId): TechState {
+    const pool = this.pools.getOrAdd("techs");
+    return pool.get(id) as unknown as TechState;
   }
 
   environment(): EnvironmentState {

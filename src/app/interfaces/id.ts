@@ -18,4 +18,4 @@ export type WeatherId = "neutral" | "warm" | "cold";
 
 export type SectionId = "bonfire" | "society" | "science";
 
-export type TechnologyId = "calendar" | "agriculture";
+export type TechId = "calendar" | "agriculture";

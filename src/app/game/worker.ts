@@ -5,7 +5,7 @@ import {
   IRootInteractor,
   JobId,
   OnTickedHandler,
-  TechnologyId,
+  TechId,
 } from "@/app/interfaces";
 
 import { Runner } from "./runner";
@@ -58,8 +58,8 @@ const interactor: IRootInteractor = {
     runner.interactor.society.unassignJob(id);
   },
   // science
-  researchTechnology(id: TechnologyId) {
-    runner.interactor.science.researchTechnology(id);
+  researchTech(id: TechId) {
+    runner.interactor.science.researchTech(id);
   },
   // devtools
   turnDevToolsOn() {
