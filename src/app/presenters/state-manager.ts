@@ -3,7 +3,7 @@ import { reactive } from "vue";
 
 import {
   BuildingId,
-  ChangePool,
+  MutationPool,
   EffectUnits,
   IPresenterChangeSink,
   JobId,
@@ -16,10 +16,13 @@ import {
   SectionId,
   TechId,
   UnitKind,
+  EventPool,
+  EventId,
 } from "@/app/interfaces";
 import {
   BuildingState,
   EnvironmentState,
+  HistoryEvent,
   JobState,
   NumberEffectState,
   PlayerState,
@@ -33,6 +36,8 @@ import {
 } from "@/app/state";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 import { ShowSign } from "@/app/utils/notation";
+
+import { Channel } from "./common/channel";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
@@ -61,6 +66,8 @@ export interface IStateManager {
   player(): PlayerState;
   society(): SocietyState;
   time(): TimeState;
+
+  history(): Channel<HistoryEvent>;
 }
 
 export interface NumberView {
@@ -70,7 +77,7 @@ export interface NumberView {
   showSign?: ShowSign;
 }
 
-class ChangePools extends Map<PoolId, Map<string, PropertyBag>> {
+class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
   get buildings(): Map<BuildingId, BuildingState> {
     return this.getOrAdd("buildings") as unknown as Map<
       BuildingId,
@@ -122,15 +129,32 @@ class ChangePools extends Map<PoolId, Map<string, PropertyBag>> {
   }
 }
 
-export class StateManager implements IPresenterChangeSink, IStateManager {
-  private readonly pools: ChangePools;
-
-  constructor() {
-    this.pools = new ChangePools();
+class EventPools extends Map<EventId, Channel<unknown>> {
+  get history(): Channel<HistoryEvent> {
+    return this.getOrAdd<HistoryEvent>("history");
   }
 
-  update(changes: Iterable<ChangePool>): void {
-    for (const pool of changes) {
+  getOrAdd<TEvent>(id: EventId): Channel<TEvent> {
+    let existing = this.get(id);
+    if (!existing) {
+      existing = new Channel<TEvent>();
+      this.set(id, existing);
+    }
+    return existing as Channel<TEvent>;
+  }
+}
+
+export class StateManager implements IPresenterChangeSink, IStateManager {
+  private readonly pools: MutationPools;
+  private readonly events: EventPools;
+
+  constructor() {
+    this.pools = new MutationPools();
+    this.events = new EventPools();
+  }
+
+  acceptMutations(mutations: MutationPool[]): void {
+    for (const pool of mutations) {
       const values = this.pools.getOrAdd(pool.poolId);
       if (pool.added) {
         for (const [id, state] of pool.added) {
@@ -147,6 +171,13 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
           values.delete(id);
         }
       }
+    }
+  }
+
+  acceptEvents(events: EventPool[]): void {
+    for (const pool of events) {
+      const channel = this.events.getOrAdd(pool.id);
+      channel.push(pool.events);
     }
   }
 
@@ -232,6 +263,10 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   time(): TimeState {
     const pool = this.pools.getOrAdd("singletons");
     return pool.get("time") as unknown as TimeState;
+  }
+
+  history(): Channel<HistoryEvent> {
+    return this.events.history;
   }
 }
 

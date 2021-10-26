@@ -35,13 +35,14 @@ import {
   TechEntity,
   TimeEntity,
   Persisted,
+  HistoryEntity,
 } from ".";
 
 export class EntityAdmin {
+  private readonly _booleans: BooleanEffectsPool;
   private readonly _buildings: BuildingsPool;
   private readonly _jobs: JobsPool;
   private readonly _numbers: NumberEffectsPool;
-  private readonly _booleans: BooleanEffectsPool;
   private readonly _pops: PopsPool;
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
@@ -49,6 +50,7 @@ export class EntityAdmin {
   private readonly _techs: TechsPool;
 
   private readonly _environment: EnvironmentEntity;
+  private readonly _history: HistoryEntity;
   private readonly _player: PlayerEntity;
   private readonly _prng: PrngEntity;
   private readonly _society: SocietyEntity;
@@ -66,18 +68,20 @@ export class EntityAdmin {
     this._techs = new TechsPool(this.watcher.pooled("techs"));
 
     this._environment = new EnvironmentEntity();
-    this._environment.watch(this.watcher);
+    this._environment.watch(this.watcher.pooled());
 
     this._player = new PlayerEntity();
-    this._player.watch(this.watcher);
+    this._player.watch(this.watcher.pooled());
 
     this._prng = new PrngEntity();
 
     this._society = new SocietyEntity();
-    this._society.watch(this.watcher);
+    this._society.watch(this.watcher.pooled());
 
     this._time = new TimeEntity();
-    this._time.watch(this.watcher);
+    this._time.watch(this.watcher.pooled());
+
+    this._history = new HistoryEntity(this.watcher.buffered("history"));
   }
 
   loadState(state: SaveState): void {
@@ -188,5 +192,9 @@ export class EntityAdmin {
 
   time(): TimeEntity {
     return this._time;
+  }
+
+  history(): HistoryEntity {
+    return this._history;
   }
 }

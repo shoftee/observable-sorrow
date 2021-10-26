@@ -1,12 +1,14 @@
 import { isReactive, toRaw, watch, WatchStopHandle } from "vue";
 
 import {
-  ChangePool,
   EntityId,
-  OnTickedHandler,
+  OnEventHandler,
+  OnMutationHandler as OnMutationHandler,
   PoolId,
   PropertyBag,
-  SingletonEntityId,
+  MutationPool,
+  EventId,
+  EventPool,
 } from "@/app/interfaces";
 
 export interface Watcher {
@@ -14,34 +16,31 @@ export interface Watcher {
   unwatch(id: EntityId): void;
 }
 
-export class EntityWatcher implements Watcher {
+export interface Buffer {
+  push(state: unknown): void;
+}
+
+export class EntityWatcher {
   private readonly handles = new Map<EntityId, WatchStopHandle>();
   private readonly singletons = new WatchedPool("singletons");
   private readonly pools = new Map<PoolId, WatchedPool>();
+  private readonly buffers = new Map<EventId, EventBuffer>();
 
-  pooled(poolId: PoolId): Watcher {
+  pooled(poolId: PoolId = "singletons"): Watcher {
     let pool = this.pools.get(poolId);
     if (pool === undefined) {
       pool = new WatchedPool(poolId);
       this.pools.set(poolId, pool);
     }
 
-    return this.createPooledWatcher(pool);
+    return this.watcher(pool);
   }
 
-  private createPooledWatcher(pool: WatchedPool): Watcher {
+  private watcher(pool: WatchedPool): Watcher {
     return {
       watch: (id, state) => this.watchIn(pool, id, state as PropertyBag),
       unwatch: (id) => this.unwatchIn(pool, id),
     };
-  }
-
-  watch(id: SingletonEntityId, state: unknown): void {
-    this.watchIn(this.singletons, id, state as PropertyBag);
-  }
-
-  unwatch(id: SingletonEntityId): void {
-    this.unwatchIn(this.singletons, id);
   }
 
   private unwatchIn(pool: WatchedPool, id: EntityId) {
@@ -70,26 +69,66 @@ export class EntityWatcher implements Watcher {
     this.handles.set(id, handle);
   }
 
-  flush(handler: OnTickedHandler): void {
-    const changePools = Array.from(this.collectChanges(), (p) =>
-      p.toChangePool(),
-    );
-    handler(changePools);
-    for (const pool of this.collectChanges()) {
+  buffered(id: EventId): Buffer {
+    let buffer = this.buffers.get(id);
+    if (buffer === undefined) {
+      buffer = new EventBuffer(id);
+      this.buffers.set(id, buffer);
+    }
+
+    return this.wrapBuffer(buffer);
+  }
+
+  private wrapBuffer(buffer: EventBuffer): Buffer {
+    return {
+      push: (state) => buffer.items.push(state as PropertyBag),
+    };
+  }
+
+  flushMutations(handler: OnMutationHandler): void {
+    const mutationPools = this.changedPools();
+
+    handler(mutationPools.map((m) => m.toMutationPool()));
+
+    for (const pool of mutationPools) {
       pool.clear();
     }
   }
 
-  private *collectChanges(): Iterable<WatchedPool> {
+  flushEvents(handler: OnEventHandler): void {
+    const buffers = this.pendingBuffers();
+
+    handler(buffers.map((b) => b.toEventPool()));
+
+    for (const buffer of buffers) {
+      buffer.clear();
+    }
+  }
+
+  private changedPools(): WatchedPool[] {
+    const pools = [];
     if (this.singletons.hasChanges()) {
-      yield this.singletons;
+      pools.push(this.singletons);
     }
 
-    for (const [, pool] of this.pools) {
+    for (const pool of this.pools.values()) {
       if (pool.hasChanges()) {
-        yield pool;
+        pools.push(pool);
       }
     }
+
+    return pools;
+  }
+
+  private pendingBuffers(): EventBuffer[] {
+    const pools = [];
+    for (const pool of this.buffers.values()) {
+      if (pool.items.length > 0) {
+        pools.push(pool);
+      }
+    }
+
+    return pools;
   }
 }
 
@@ -137,11 +176,27 @@ class WatchedPool {
     }
   }
 
-  toChangePool(): ChangePool {
-    const result: ChangePool = { poolId: this.poolId };
+  toMutationPool(): MutationPool {
+    const result: MutationPool = { poolId: this.poolId };
     if (this.added.size > 0) result.added = this.added;
     if (this.updated.size > 0) result.updated = this.updated;
     if (this.removed.size > 0) result.removed = this.removed;
     return result;
+  }
+}
+
+class EventBuffer {
+  readonly items: PropertyBag[];
+
+  constructor(readonly id: EventId) {
+    this.items = [];
+  }
+
+  toEventPool(): EventPool {
+    return { id: this.id, events: this.items };
+  }
+
+  clear() {
+    this.items.length = 0;
   }
 }

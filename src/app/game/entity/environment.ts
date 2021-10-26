@@ -19,7 +19,8 @@ export class EnvironmentEntity
       season: "spring",
       day: 0,
       weather: "neutral",
-      calendar: "calendar.basic.no-weather",
+      calendarLabel: "calendar.basic.no-weather",
+      epochLabel: "calendar.epoch.basic",
     });
   }
 

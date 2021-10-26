@@ -8,11 +8,12 @@
 // Global changes
 body {
   @extend .user-select-none;
+  overflow: hidden;
 }
 
 // main
 .app-container {
-  height: 100%;
+  @include h-100();
   @include flex-column();
 }
 
@@ -38,46 +39,69 @@ header {
   }
 }
 
+// containers
 main {
   @include wh-100();
   @include flex-column();
   align-items: center;
+}
 
-  .loader {
-    @include wh-100();
-    display: flex;
-    align-items: center;
+.loader {
+  @include wh-100();
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-container {
+  @include flex-column();
+  align-items: center;
+
+  nav {
     justify-content: center;
-  }
-
-  .nav-container {
-    @include flex-column();
-    align-items: center;
-
-    nav {
-      justify-content: center;
-    }
-  }
-
-  .main-container {
-    width: 100%;
-    @include flex-row();
-    max-width: 1920px;
-  }
-
-  .env-container {
-    @include flex-column();
-  }
-
-  .controls {
-    @include flex-column();
   }
 }
 
-.calendar {
+.main-container {
+  @include wh-100();
+  @include flex-row();
+  @include p(2);
+  max-width: 1920px;
+}
+
+.env-container {
+  @include h-100();
+  @include flex-column();
+}
+
+.bonfire-controls {
+  @include flex-column();
+  @include p(0);
+  overflow-x: hidden;
+}
+
+.calendar-container {
   @include p(2);
   @include flex-column();
   align-self: stretch;
+}
+
+.history-container {
+  @include flex-column();
+  @include h-100();
+}
+
+.log-container {
+  @include h-100();
+  position: relative;
+  overflow: hidden;
+  mask-image: linear-gradient(to top, transparent, rgba(255, 255, 255, 1) 25vh);
+}
+
+.game-controls-container {
+  @include p(2);
+  @include flex-column();
+  gap: bsize(2);
 }
 
 // vertical stack
@@ -92,7 +116,8 @@ footer {
 }
 
 // remove overflow from flexbox
-.scrollable {
+.unscrollable,
+[unscrollable] {
   overflow-y: auto;
 }
 
@@ -135,7 +160,7 @@ footer {
 
 // Tabs
 main .nav {
-  width: 100%;
+  @include w-100();
   justify-content: center;
 
   @include pt(1);

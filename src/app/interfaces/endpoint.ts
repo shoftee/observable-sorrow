@@ -1,18 +1,22 @@
-import { BonfireItemId, JobId, PoolId, TechId } from ".";
+import { BonfireItemId, EventId, JobId, PoolId, TechId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 
-export type ChangePool = {
+export type MutationPool = {
   poolId: PoolId;
   added?: Map<string, PropertyBag>;
   updated?: Map<string, PropertyBag>;
   removed?: Set<string>;
 };
 
-export type OnTickedHandler = (changes: Iterable<ChangePool>) => void;
+export type EventPool = { id: EventId; events: PropertyBag[] };
+
+export type OnMutationHandler = (mutations: MutationPool[]) => void;
+export type OnEventHandler = (events: EventPool[]) => void;
 
 export interface IPresenterChangeSink {
-  update(changes: Iterable<ChangePool>): void;
+  acceptMutations(changes: MutationPool[]): void;
+  acceptEvents(events: EventPool[]): void;
 }
 
 export interface IRootInteractor
@@ -23,7 +27,8 @@ export interface IRootInteractor
     ISocietyInteractor,
     IStoreInteractor {
   initialize(
-    onTicked: OnTickedHandler,
+    onTicked: OnMutationHandler,
+    onLogEvent: OnEventHandler,
     saveSlot: number | undefined,
   ): Promise<void>;
 }

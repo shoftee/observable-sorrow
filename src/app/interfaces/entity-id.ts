@@ -15,7 +15,8 @@ export type SingletonEntityId =
   | "player"
   | "prng"
   | "society"
-  | "time";
+  | "time"
+  | "logs";
 
 export interface PoolIdMap {
   singletons: SingletonEntityId;
@@ -33,3 +34,5 @@ export interface PoolIdMap {
 
 export type PoolId = keyof PoolIdMap;
 export type EntityId = PoolIdMap[PoolId];
+
+export type EventId = "history";

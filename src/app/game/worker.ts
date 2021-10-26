@@ -4,7 +4,8 @@ import {
   BonfireItemId,
   IRootInteractor,
   JobId,
-  OnTickedHandler,
+  OnEventHandler,
+  OnMutationHandler,
   TechId,
 } from "@/app/interfaces";
 
@@ -26,14 +27,15 @@ async function load(id: number | undefined): Promise<SaveSlot> {
 let runner: Runner;
 const interactor: IRootInteractor = {
   async initialize(
-    onTicked: OnTickedHandler,
+    onMutation: OnMutationHandler,
+    onEvent: OnEventHandler,
     saveSlot: number | undefined,
   ): Promise<void> {
     if (runner !== undefined) {
       runner.interactor.controller.stop();
     }
     const slot = await load(saveSlot);
-    runner = new Runner(onTicked, slot);
+    runner = new Runner(onMutation, onEvent, slot);
   },
   // game controls
   start() {

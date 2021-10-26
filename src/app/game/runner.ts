@@ -1,4 +1,4 @@
-import { OnTickedHandler } from "@/app/interfaces";
+import { OnEventHandler, OnMutationHandler } from "@/app/interfaces";
 import { SaveSlot } from "@/app/store/db";
 import { SystemTimestamp } from "@/app/utils/timestamp";
 
@@ -10,12 +10,19 @@ export class Runner {
   private readonly admin: EntityAdmin;
   private readonly watcher: EntityWatcher;
   private readonly systems: GameSystems;
-  private readonly onTickedHandler: OnTickedHandler;
+
+  private readonly onTickedHandler: OnMutationHandler;
+  private readonly onLogEventHandler: OnEventHandler;
 
   readonly interactor: InteractorFacade;
 
-  constructor(onTicked: OnTickedHandler, saveSlot: SaveSlot) {
-    this.onTickedHandler = onTicked;
+  constructor(
+    onMutation: OnMutationHandler,
+    onLogEvent: OnEventHandler,
+    saveSlot: SaveSlot,
+  ) {
+    this.onTickedHandler = onMutation;
+    this.onLogEventHandler = onLogEvent;
 
     this.watcher = new EntityWatcher();
     this.admin = new EntityAdmin(this.watcher);
@@ -43,8 +50,11 @@ export class Runner {
   }
 
   private flushChanges() {
-    this.watcher.flush((changes) => {
+    this.watcher.flushMutations((changes) => {
       this.onTickedHandler(changes);
+    });
+    this.watcher.flushEvents((logEvents) => {
+      this.onLogEventHandler(logEvents);
     });
   }
 }

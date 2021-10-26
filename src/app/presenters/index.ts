@@ -3,6 +3,7 @@ export * from "./_facade";
 export * from "./bonfire";
 export * from "./environment";
 export * from "./formatter";
+export * from "./log";
 export * from "./player";
 export * from "./resources";
 export * from "./science";

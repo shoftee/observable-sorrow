@@ -11,7 +11,7 @@ const fmt = presenters.formatter;
 </script>
 
 <template>
-  <div class="calendar">
+  <div class="calendar-container">
     <i18n-t scope="global" :keypath="state.calendarLabel" tag="span">
       <template #year>
         <span class="number">{{ fmt.number(state.year) }}</span>

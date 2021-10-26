@@ -40,11 +40,13 @@ export class Channel<T> {
     }
   }
 
-  subscribe(handler: (items: Iterable<T>) => void): void {
-    watchSyncEffect(() => {
+  subscribe(handler: (items: Iterable<T>) => void): StopHandle {
+    return watchSyncEffect(() => {
       if (this.trigger.value) {
         handler(this.pull());
       }
     });
   }
 }
+
+type StopHandle = () => void;

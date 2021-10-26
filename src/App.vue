@@ -31,7 +31,7 @@ function onLoaded(c: Channel) {
       <div class="header-middle"></div>
       <div class="header-end"></div>
     </header>
-    <main class="scrollable">
+    <main unscrollable>
       <GameLoader v-if="!loaded" @loaded="onLoaded" />
       <Main v-else class="w-100 h-100" />
     </main>

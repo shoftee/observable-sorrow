@@ -48,5 +48,6 @@ export interface EnvironmentState {
   season: SeasonId;
   day: number;
   weather: WeatherId;
-  calendar: string;
+  calendarLabel: string;
+  epochLabel: string;
 }

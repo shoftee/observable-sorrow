@@ -22,16 +22,18 @@ export class EnvironmentSystem extends System {
     const calendar = this.admin.tech("calendar").state;
     watchSyncEffect(() => {
       if (calendar.researched) {
+        environment.epochLabel = "calendar.epoch.full";
         if (environment.weather !== "neutral") {
-          environment.calendar = "calendar.full.weather";
+          environment.calendarLabel = "calendar.full.weather";
         } else {
-          environment.calendar = "calendar.full.no-weather";
+          environment.calendarLabel = "calendar.full.no-weather";
         }
       } else {
+        environment.epochLabel = "calendar.epoch.basic";
         if (environment.weather !== "neutral") {
-          environment.calendar = "calendar.basic.weather";
+          environment.calendarLabel = "calendar.basic.weather";
         } else {
-          environment.calendar = "calendar.basic.no-weather";
+          environment.calendarLabel = "calendar.basic.no-weather";
         }
       }
     });

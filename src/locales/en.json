@@ -1,4 +1,10 @@
 {
+  "game": {
+    "control": {
+      "pawse": "Pawse",
+      "unpawse": "Unpawse"
+    }
+  },
   "sections": {
     "bonfire": {
       "label": "Bonfire"
@@ -85,6 +91,10 @@
   },
 
   "calendar": {
+    "epoch": {
+      "basic": "{season}",
+      "full": "Year {year} – {season}"
+    },
     "basic": {
       "no-weather": "{season}",
       "weather": "{season} ({weather})"
@@ -145,6 +155,13 @@
         "science-ratio": "Science output bonus {amount}",
         "culture-limit": "Maximum culture {amount}"
       }
+    }
+  },
+
+  "population": {
+    "kitten": {
+      "arrive": "A kitten has joined your village!",
+      "starve": "A kitten starved to death."
     }
   },
 

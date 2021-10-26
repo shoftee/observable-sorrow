@@ -11,11 +11,11 @@ const items = computed(() => {
 </script>
 
 <template>
-  <div class="controls">
-    <section class="row row-cols-1 row-cols-xl-2 g-2">
+  <div class="controls container">
+    <div class="row row-cols-1 row-cols-xl-2 g-2">
       <div class="col" v-for="item in items" :key="item.id">
         <BuildingButton :item="item" />
       </div>
-    </section>
+    </div>
   </div>
 </template>

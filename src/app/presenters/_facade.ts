@@ -3,6 +3,7 @@ import { SandcastleBuilderNotation } from "@/app/utils/notation";
 import {
   BonfirePresenter,
   EnvironmentPresenter,
+  LogPresenter,
   NumberFormatter,
   PlayerPresenter,
   ResourcesPresenter,
@@ -16,6 +17,7 @@ export class PresenterFacade {
   readonly bonfire: BonfirePresenter;
   readonly environment: EnvironmentPresenter;
   readonly formatter: NumberFormatter;
+  readonly log: LogPresenter;
   readonly player: PlayerPresenter;
   readonly resources: ResourcesPresenter;
   readonly science: SciencePresenter;
@@ -25,6 +27,7 @@ export class PresenterFacade {
   constructor(private readonly manager: StateManager) {
     this.bonfire = new BonfirePresenter(this.manager);
     this.environment = new EnvironmentPresenter(this.manager);
+    this.log = new LogPresenter(this.manager);
     this.player = new PlayerPresenter(this.manager);
     this.resources = new ResourcesPresenter(this.manager);
     this.science = new SciencePresenter(this.manager);

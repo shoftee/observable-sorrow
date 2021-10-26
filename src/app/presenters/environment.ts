@@ -20,7 +20,8 @@ export class EnvironmentPresenter {
       season: computed(() => state.season),
       year: computed(() => state.year),
       weather: computed(() => state.weather),
-      calendarLabel: computed(() => state.calendar),
+      calendarLabel: computed(() => state.calendarLabel),
+      epochLabel: computed(() => state.epochLabel),
       seasonLabel: computed(() => Meta.season(state.season).label),
       weatherLabel: computed(() => Meta.weather(state.weather).label),
     });
@@ -33,6 +34,7 @@ export interface Calendar {
   year: number;
   weather: WeatherId;
   calendarLabel: string;
+  epochLabel: string;
   seasonLabel: string;
   weatherLabel: string | undefined;
 }

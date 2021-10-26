@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { unref } from "vue";
 
 import { SciencePresenter, StateManager } from "@/app/presenters";
-import { ChangePool, PropertyBag } from "@/app/interfaces";
+import { MutationPool, PropertyBag } from "@/app/interfaces";
 
 describe("science presenter", () => {
   let manager: StateManager;
@@ -15,35 +15,35 @@ describe("science presenter", () => {
     const techs = presenter.items;
     expect(techs.value).to.have.lengthOf(0);
 
-    manager.update([calendarAddedPool()]);
+    manager.acceptMutations([calendarAddedPool()]);
     expect(unref(techs)).to.have.lengthOf(2);
 
-    manager.update([]);
+    manager.acceptMutations([]);
   });
   it("should have reactive states", () => {
     const techs = presenter.items;
     expect(techs.value).to.have.lengthOf(0);
 
-    manager.update([calendarAddedPool()]);
+    manager.acceptMutations([calendarAddedPool()]);
 
     const calendar = manager.tech("calendar");
     expect(calendar.fulfilled).to.be.false;
     expect(calendar.ingredients[0].fulfillment).to.equal(0);
 
-    manager.update([calendarFulfilledPool()]);
+    manager.acceptMutations([calendarFulfilledPool()]);
     expect(calendar.fulfilled).to.be.true;
     expect(calendar.ingredients[0].fulfilled).to.be.true;
     expect(calendar.ingredients[0].fulfillment).to.equal(42);
 
     const agriculture = manager.tech("agriculture");
-    manager.update([calendarResearchedPool()]);
+    manager.acceptMutations([calendarResearchedPool()]);
     expect(unref(techs)).to.have.lengthOf(2);
     expect(agriculture.fulfilled).to.be.true;
     expect(agriculture.ingredients[0].fulfillment).to.equal(200);
   });
 });
 
-function calendarAddedPool(): ChangePool {
+function calendarAddedPool(): MutationPool {
   return {
     poolId: "techs",
     added: new Map<string, PropertyBag>([
@@ -87,7 +87,7 @@ function calendarAddedPool(): ChangePool {
   };
 }
 
-function calendarFulfilledPool(): ChangePool {
+function calendarFulfilledPool(): MutationPool {
   return {
     poolId: "techs",
     updated: new Map<string, PropertyBag>([
@@ -108,7 +108,7 @@ function calendarFulfilledPool(): ChangePool {
   };
 }
 
-function calendarResearchedPool(): ChangePool {
+function calendarResearchedPool(): MutationPool {
   return {
     poolId: "techs",
     updated: new Map<string, PropertyBag>([

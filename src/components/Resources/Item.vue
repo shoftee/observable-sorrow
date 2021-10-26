@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRefs, unref } from "vue";
+import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { ResourceItem } from "@/app/presenters/resources";
@@ -13,7 +13,6 @@ const { presenters } = injectChannel();
 const fmt = presenters.formatter;
 
 const { amount, capacity, change, modifier } = toRefs(item);
-const isDeficit = computed(() => unref(change).value < 0);
 </script>
 
 <template>
@@ -39,7 +38,10 @@ const isDeficit = computed(() => unref(change).value < 0);
       <div class="col-3 no-capacity"></div>
     </template>
     <template v-if="change.value">
-      <div class="col-3 number change" :class="{ 'text-danger': isDeficit }">{{ fmt.v(change) }}</div>
+      <div
+        class="col-3 number change"
+        :class="{ 'text-danger': change.value < 0 }"
+      >{{ fmt.v(change) }}</div>
     </template>
     <template v-else>
       <div class="col-3 no-change"></div>

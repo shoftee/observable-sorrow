@@ -1,4 +1,4 @@
-import { proxy, RemoteObject, wrap } from "comlink";
+import { proxy, releaseProxy, RemoteObject, wrap } from "comlink";
 
 import {
   IBonfireInteractor,
@@ -8,7 +8,8 @@ import {
   IScienceInteractor,
   ISocietyInteractor,
   IStoreInteractor,
-  OnTickedHandler,
+  OnEventHandler,
+  OnMutationHandler,
 } from "@/app/interfaces";
 
 import {
@@ -24,9 +25,6 @@ import {
   StateManager,
 } from "./presenters";
 import { loadOrInitGeneral } from "./store/db";
-
-const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
-const root = wrap<IRootInteractor>(worker);
 
 export type Channel = {
   interactors: {
@@ -49,14 +47,33 @@ export type Channel = {
   };
 };
 
+let release: () => void;
+
 export async function Setup(): Promise<Channel> {
+  // release old proxies if they're around
+  release?.();
+
+  const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
+  const root = wrap<IRootInteractor>(worker);
+
   const stateManager = new StateManager();
-  const handler: OnTickedHandler = function (changes) {
-    stateManager.update(changes);
+  const onTicked: OnMutationHandler = proxy(function (changes) {
+    stateManager.acceptMutations(changes);
+  });
+  const onLogEvent: OnEventHandler = function (logEvents) {
+    stateManager.acceptEvents(logEvents);
   };
 
   const general = await loadOrInitGeneral();
-  await root.initialize(proxy(handler), general.currentSlot);
+  await root.initialize(
+    proxy(onTicked),
+    proxy(onLogEvent),
+    general.currentSlot,
+  );
+
+  release = () => {
+    root[releaseProxy]();
+  };
 
   const presenters = new PresenterFacade(stateManager);
 

@@ -2,10 +2,13 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Resources from "./Resource/List.vue";
-import Environment from "./Environment.vue";
-import History from "./History.vue";
+import Calendar from "./Environment/Calendar.vue";
+import History from "./Environment/History.vue";
+
 import DevTools from "./DevTools.vue";
+
+import Resources from "./Resources/List.vue";
+
 import Sections from "./Controls/Sections.vue";
 import BonfireControls from "./Controls/Bonfire.vue";
 import SocietyControls from "./Controls/Society.vue";
@@ -50,7 +53,7 @@ const dt = window.__OS_DEVTOOLS__;
 </script>
 
 <template>
-  <div class="nav-container scrollable">
+  <div class="nav-container">
     <Sections :sections="sections" :active="activeSection" @changed="sectionChanged">
       <template #default="{ section }">
         {{ t(section.label) }}
@@ -60,22 +63,18 @@ const dt = window.__OS_DEVTOOLS__;
         >{{ section.alert }}</span>
       </template>
     </Sections>
-    <div class="main-container tab-content scrollable">
-      <div class="scrollable col p-2 pe-1">
+    <div unscrollable class="main-container gap-2">
+      <div unscrollable class="col">
         <Resources />
       </div>
-      <div class="scrollable col-5 py-2 px-1">
+      <div unscrollable class="col-5">
         <div>
           <component :is="sectionContent" />
         </div>
       </div>
-      <div class="env-container scrollable col p-2 ps-1 gap-2">
-        <div>
-          <Environment />
-        </div>
-        <div class="scrollable">
-          <History />
-        </div>
+      <div unscrollable class="env-container col">
+        <Calendar />
+        <History />
       </div>
     </div>
     <teleport to=".header-end">
