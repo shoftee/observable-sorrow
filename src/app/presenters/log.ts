@@ -1,7 +1,7 @@
 import { useI18n } from "vue-i18n";
 
 import { StateManager } from ".";
-import { HistoryEvent, Kind } from "../state";
+import { Disposition, HistoryEvent, Kind } from "../state";
 
 export class LogPresenter {
   private eventId = 0;
@@ -9,11 +9,13 @@ export class LogPresenter {
   constructor(manager: StateManager) {
     manager.history().subscribe((events) => {
       for (const event of events) {
-        document.dispatchEvent(
-          new CustomEvent<LogItem>("onlogmessage", {
-            detail: { id: this.eventId++, resolve: (t) => resolve(t, event) },
-          }),
-        );
+        if (event.disposition !== Disposition.Ignore) {
+          document.dispatchEvent(
+            new CustomEvent<LogItem>("onlogmessage", {
+              detail: { id: this.eventId++, resolve: (t) => resolve(t, event) },
+            }),
+          );
+        }
       }
     });
   }
@@ -23,14 +25,11 @@ type TextComposer = ReturnType<typeof useI18n>["t"];
 
 function resolve(t: TextComposer, event: HistoryEvent): string {
   switch (event.kind) {
-    case Kind.Text:
-      return event.text;
-
     case Kind.Label:
-      return t(event.label, event.data ?? {});
+      return t(event.label, event.named ?? {});
 
-    case Kind.CountLabel:
-      return t(event.label, event.data ?? {}, event.count);
+    case Kind.PluralLabel:
+      return t(event.label, event.named ?? {}, event.plural);
 
     default:
       throw new Error("unexpected event kind");

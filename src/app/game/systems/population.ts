@@ -1,3 +1,4 @@
+import { pluralLabel, Disposition } from "@/app/state";
 import { trunc } from "@/app/utils/mathx";
 
 import { System } from ".";
@@ -22,15 +23,29 @@ export class PopulationSystem extends System {
       this.admin.pops().grow(count);
       state.stockpile -= count;
 
-      this.admin.history().countLabel("population.kitten.arrived", count);
+      this.kittensArrived(count);
     } else if (effectiveStockpile <= -1) {
       // A full pop has starved
       const count = Math.abs(effectiveStockpile);
       this.admin.pops().kill(count);
       state.stockpile += count;
 
-      this.admin.history().countLabel("population.kitten.starved", count);
+      this.kittensStarved(count);
     }
+  }
+
+  private kittensArrived(count: number) {
+    const event = pluralLabel("population.kitten.arrived", count);
+    if (this.admin.pops().size > 10) {
+      // Once past 10 pops, these messages are not so interesting.
+      event.disposition = Disposition.Ignore;
+    }
+    this.admin.history().push(event);
+  }
+
+  private kittensStarved(count: number) {
+    const event = pluralLabel("population.kitten.starved", count);
+    this.admin.history().push(event);
   }
 
   private updateSociety() {

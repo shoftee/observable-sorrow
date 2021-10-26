@@ -8,7 +8,7 @@ export * from "./crafting";
 export * from "./effects";
 export * from "./environment";
 export * from "./jobs";
-export * from "./log";
+export * from "./history";
 export * from "./player";
 export * from "./resources";
 export * from "./sections";
