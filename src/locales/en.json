@@ -160,8 +160,8 @@
 
   "population": {
     "kitten": {
-      "arrive": "A kitten has joined your village!",
-      "starve": "A kitten starved to death."
+      "arrived": "A kitten has joined your village! | {count} kittens have joined your village!",
+      "starved": "A kitten starved to death. | {count} kittens starved to death."
     }
   },
 

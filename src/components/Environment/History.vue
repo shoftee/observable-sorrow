@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Pawse from './Pawse.vue';
 
 import { injectChannel } from '@/composables/game-channel';
 import { LogItem } from '@/app/presenters';
 import { useLogItemEvent } from '@/composables/use-event-listener';
-import { Kind } from '@/app/state';
+
+import { LogEpoch, newLogEpoch, removeClippedEvents } from './_types';
 
 const { environment, formatter: fmt } = injectChannel().presenters;
 const { t } = useI18n();
@@ -14,18 +15,6 @@ const { t } = useI18n();
 let epochId = ref(0);
 const epochs: LogEpoch[] = reactive([]);
 const requireNewEpoch = ref(true);
-
-interface LogEpoch {
-  id: number;
-  year: number;
-  seasonLabel: string;
-  ref: Element | undefined;
-  events: {
-    id: number,
-    text: string,
-    ref: Element | undefined;
-  }[];
-}
 
 watch(() => environment.calendar.season, () => {
   requireNewEpoch.value = true;
@@ -36,60 +25,27 @@ function clearLog() {
   requireNewEpoch.value = true;
 }
 
-function ensureRecent() {
+function latestEpoch(): LogEpoch {
   if (requireNewEpoch.value) {
-    // Use non-reactive copies, otherwise old epochs will change with current calendar.
-    const { year, seasonLabel } = environment.calendar;
-    epochs.unshift({
-      id: epochId.value++,
-      year: year,
-      seasonLabel: seasonLabel,
-      ref: undefined,
-      events: [],
-    });
+    const newEpoch = newLogEpoch(epochId.value++, environment.calendar);
+    epochs.unshift(newEpoch)
     requireNewEpoch.value = false;
   }
+
+  return epochs[0];
 }
 
-const latestEpoch = computed(() => {
-  ensureRecent();
-  return epochs[0];
-});
 useLogItemEvent((e: CustomEvent<LogItem>): void => {
   const container = document.getElementsByClassName("log-container")[0];
   if (!container) {
     throw new Error(".log-container not found");
   }
 
-  for (let i = 0; i < epochs.length; i++) {
-    const epoch = epochs[i];
-    if (epoch.ref === undefined) continue;
-    const epochRef = epoch.ref as HTMLElement;
+  removeClippedEvents(epochs, container);
 
-    if (i > 0 && epochRef.offsetTop > container.clientHeight) {
-      // everything after this point must go.
-      epochs.splice(i);
-      continue;
-    }
-
-    for (let j = 0; j < epoch.events.length; j++) {
-      const event = epoch.events[j];
-      if (event.ref === undefined) continue;
-
-      const eventRef = event.ref as HTMLElement;
-      if (eventRef.offsetTop > container.clientHeight) {
-        // everything after this point must go.
-        epoch.events.splice(j);
-      }
-    }
-  }
-
-  const text = e.detail.event.kind === Kind.Label ? t(e.detail.event.label) : e.detail.event.text;
-
-  latestEpoch.value.events.unshift({
+  latestEpoch().events.unshift({
     id: e.detail.id,
-    text: text,
-    ref: undefined,
+    text: e.detail.resolve(t),
   });
 });
 </script>

@@ -1,4 +1,3 @@
-import { Kind } from "@/app/state";
 import { trunc } from "@/app/utils/mathx";
 
 import { System } from ".";
@@ -19,20 +18,18 @@ export class PopulationSystem extends System {
     const effectiveStockpile = trunc(state.stockpile);
     if (effectiveStockpile >= 1) {
       // A new pop has grown
-      this.admin.pops().grow(effectiveStockpile);
-      state.stockpile -= effectiveStockpile;
+      const count = effectiveStockpile;
+      this.admin.pops().grow(count);
+      state.stockpile -= count;
 
-      this.admin
-        .history()
-        .push({ kind: Kind.Label, label: "population.kitten.arrive" });
+      this.admin.history().countLabel("population.kitten.arrived", count);
     } else if (effectiveStockpile <= -1) {
       // A full pop has starved
-      this.admin.pops().kill(Math.abs(effectiveStockpile));
-      state.stockpile -= effectiveStockpile;
+      const count = Math.abs(effectiveStockpile);
+      this.admin.pops().kill(count);
+      state.stockpile += count;
 
-      this.admin
-        .history()
-        .push({ kind: Kind.Label, label: "population.kitten.starve" });
+      this.admin.history().countLabel("population.kitten.starved", count);
     }
   }
 
