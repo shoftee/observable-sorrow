@@ -22,7 +22,7 @@ const gatherCatnip = ref(options.gatherCatnip);
 const timeAcceleration = ref(options.timeAcceleration);
 
 useKeyboardEvent("keyup", (e) => {
-  if (e.key === "`") {
+  if (e.code === "Backquote") {
     Offcanvas.getOrCreateInstance("#dt-offcanvas")?.toggle();
   }
 });
