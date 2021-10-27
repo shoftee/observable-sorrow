@@ -19,7 +19,7 @@ export type LimitEffectId =
   | "culture.limit";
 
 export type CatnipFieldEffectId =
-  | "catnip-field.weather"
+  | "weather.ratio"
   | "catnip-field.catnip"
   | "catnip-field.catnip.base";
 
@@ -71,7 +71,7 @@ export const EffectUnits: Partial<Record<NumberEffectId, UnitKind>> = {
   "catnip.delta": UnitKind.PerTick,
   "catnip-field.catnip": UnitKind.PerTick,
   "catnip-field.catnip.base": UnitKind.PerTick,
-  "catnip-field.weather": UnitKind.Percent,
+  "weather.ratio": UnitKind.Percent,
   "jobs.woodcutter.wood": UnitKind.PerTick,
   "jobs.woodcutter.wood.base": UnitKind.PerTick,
   "jobs.scholar.science": UnitKind.PerTick,

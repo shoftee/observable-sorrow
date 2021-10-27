@@ -58,7 +58,7 @@ export class ResourcesPresenter {
   private catnipModifier(manager: IStateManager): NumberView | undefined {
     const catnipField = manager.building("catnip-field");
 
-    const weatherModifier = manager.numberView("catnip-field.weather");
+    const weatherModifier = manager.numberView("weather.ratio");
 
     if (catnipField.level > 0 && weatherModifier.value !== 0) {
       return weatherModifier;

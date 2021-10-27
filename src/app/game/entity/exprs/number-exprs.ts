@@ -48,7 +48,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("population.catnip-demand"),
   ),
   "catnip.production": sum(
-    ratio(effect("catnip-field.catnip"), effect("catnip-field.weather")),
+    ratio(effect("catnip-field.catnip"), effect("weather.ratio")),
     effect("jobs.farmer.catnip"),
   ),
 
@@ -68,10 +68,6 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "catnip-field.catnip": prod(
     effect("catnip-field.catnip.base"),
     level("catnip-field"),
-  ),
-  "catnip-field.weather": sum(
-    effect("weather.season-ratio"),
-    effect("weather.severity-ratio"),
   ),
 
   // Huts
@@ -128,6 +124,10 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
         return 0;
     }
   },
+  "weather.ratio": sum(
+    effect("weather.season-ratio"),
+    effect("weather.severity-ratio"),
+  ),
 
   // Jobs
   "jobs.woodcutter.wood.base": 0.018,
