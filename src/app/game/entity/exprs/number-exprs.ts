@@ -42,10 +42,6 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "science.ratio": effect("library.science-ratio"),
   "culture.limit": effect("library.culture-limit"),
 
-  // Wood
-  "wood.delta": effect("wood.production"),
-  "wood.production": sum(effect("jobs.woodcutter.wood")),
-
   // Catnip
   "catnip.delta": subtract(
     effect("catnip.production"),
@@ -55,6 +51,10 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     ratio(effect("catnip-field.catnip"), effect("catnip-field.weather")),
     effect("jobs.farmer.catnip"),
   ),
+
+  // Wood
+  "wood.delta": effect("wood.production"),
+  "wood.production": sum(effect("jobs.woodcutter.wood")),
 
   // Science
   "science.delta": effect("science.production"),

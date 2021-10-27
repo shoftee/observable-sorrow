@@ -1,7 +1,1 @@
-export interface NumberEffectState {
-  value: number | undefined;
-}
-
-export interface BooleanEffectState {
-  value: boolean | undefined;
-}
+export type EffectState<T> = { value: T | undefined };

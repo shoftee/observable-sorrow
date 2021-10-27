@@ -21,10 +21,10 @@ import {
 } from "@/app/interfaces";
 import {
   BuildingState,
+  EffectState,
   EnvironmentState,
   HistoryEvent,
   JobState,
-  NumberEffectState,
   PlayerState,
   PopState,
   RecipeState,
@@ -89,10 +89,10 @@ class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
     return this.getOrAdd("jobs") as unknown as Map<JobId, JobState>;
   }
 
-  get numbers(): Map<NumberEffectId, NumberEffectState> {
+  get numbers(): Map<NumberEffectId, EffectState<number>> {
     return this.getOrAdd("numbers") as unknown as Map<
       NumberEffectId,
-      NumberEffectState
+      EffectState<number>
     >;
   }
 
@@ -190,7 +190,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   numberView(id: NumberEffectId): NumberView {
-    const number = this.pools.numbers.get(id) as NumberEffectState;
+    const number = this.pools.numbers.get(id) as EffectState<number>;
     return {
       value: number.value ?? 0,
       unit: EffectUnits[id] ?? UnitKind.None,

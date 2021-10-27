@@ -9,6 +9,7 @@ import {
   TechId,
 } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
+import { Enumerable } from "@/app/utils/enumerable";
 
 import {
   BooleanEffectEntity,
@@ -106,7 +107,7 @@ export class EntityAdmin {
     }
   }
 
-  booleans(): Iterable<BooleanEffectEntity> {
+  booleans(): Enumerable<BooleanEffectEntity> {
     return this._booleans.enumerate();
   }
 
@@ -134,7 +135,7 @@ export class EntityAdmin {
     return this._numbers.get(id);
   }
 
-  numbers(): Iterable<NumberEffectEntity> {
+  numbers(): Enumerable<NumberEffectEntity> {
     return this._numbers.enumerate();
   }
 

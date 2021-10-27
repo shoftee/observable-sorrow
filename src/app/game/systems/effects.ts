@@ -1,5 +1,8 @@
-import { EntityAdmin, Expr } from "../entity";
+import { watchSyncEffect } from "vue";
 
+import { EffectState } from "@/app/state";
+
+import { BooleanExprs, EntityAdmin, Expr, NumberExprs } from "../entity";
 import { System } from ".";
 
 export class EffectsSystem extends System {
@@ -8,34 +11,35 @@ export class EffectsSystem extends System {
   }
 
   init(): void {
-    this.resolveEffectValues();
+    watchSyncEffect(() => this.resolveEffectValues());
   }
 
   update(): void {
-    this.resolveEffectValues();
+    return;
   }
 
   private resolveEffectValues() {
     const resolver = new Resolver(this.admin);
-    resolver.resolveExprs(this.admin.numbers(), {
-      get: (id) => this.admin.number(id),
-    });
-    resolver.resolveExprs(this.admin.booleans(), {
-      get: (id) => this.admin.boolean(id),
-    });
+    resolver.resolveExprs(
+      this.admin.numbers().map((m) => m.id),
+      {
+        expr: (id) => NumberExprs[id],
+        state: (id) => this.admin.number(id).state,
+      },
+    );
+    resolver.resolveExprs(
+      this.admin.booleans().map((m) => m.id),
+      {
+        expr: (id) => BooleanExprs[id],
+        state: (id) => this.admin.boolean(id).state,
+      },
+    );
   }
 }
 
-type EffectEntity<T, Id extends string> = {
-  id: Id;
-  readonly expr: Expr<T, Id>;
-  readonly state: {
-    value: T | undefined;
-  };
-};
-
-interface EntityStore<T, TId extends string> {
-  get(id: TId): EffectEntity<T, TId>;
+interface EffectStore<T, TId extends string> {
+  expr(id: TId): Expr<T, TId>;
+  state(id: TId): EffectState<T>;
 }
 
 class Resolver {
@@ -45,8 +49,8 @@ class Resolver {
   constructor(private readonly admin: EntityAdmin) {}
 
   resolveExprs<T, Id extends string>(
-    effects: Iterable<EffectEntity<T, Id>>,
-    store: EntityStore<T, Id>,
+    effects: Iterable<Id>,
+    store: EffectStore<T, Id>,
   ): void {
     this.resolved.clear();
     this.resolving.clear();
@@ -55,11 +59,7 @@ class Resolver {
     }
   }
 
-  private resolveExpr<T, Id extends string>(
-    entity: EffectEntity<T, Id>,
-    store: EntityStore<T, Id>,
-  ) {
-    const id = entity.id;
+  private resolveExpr<T, Id extends string>(id: Id, store: EffectStore<T, Id>) {
     if (this.resolved.has(id)) {
       return;
     }
@@ -72,24 +72,22 @@ class Resolver {
     // Add current calculation to resolving stack.
     // This allows us to detect cycles.
     this.resolving.add(id);
-    const calculatedValue = this.unwrap(entity.expr, store);
+    const calculatedValue = this.unwrap(id, store);
     this.resolving.delete(id);
 
-    store.get(id).state.value = calculatedValue;
+    store.state(id).value = calculatedValue;
     this.resolved.add(id);
   }
 
-  private unwrap<T, Id extends string>(
-    expr: Expr<T, Id>,
-    store: EntityStore<T, Id>,
-  ): T {
+  private unwrap<T, Id extends string>(id: Id, store: EffectStore<T, Id>): T {
+    const expr = store.expr(id);
     if (expr instanceof Function) {
       return expr({
         admin: this.admin,
         val: (id) => {
-          const entity = store.get(id);
-          this.resolveExpr(entity, store);
-          const value = entity.state.value;
+          const state = store.state(id);
+          this.resolveExpr(id, store);
+          const value = state.value;
           if (value === undefined) {
             throw new CouldNotResolveEffectError(id, "value not in store");
           }

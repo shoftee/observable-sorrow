@@ -1,3 +1,5 @@
+import { reactive } from "vue";
+
 import { EntityId, PoolId } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
@@ -15,6 +17,31 @@ export interface Persisted {
 
 export abstract class Entity<TId extends EntityId> {
   constructor(readonly id: TId) {}
+}
+
+export abstract class ValueEntity<
+  TId extends EntityId,
+  TState,
+> extends Entity<TId> {
+  readonly state: { value: TState | undefined };
+
+  constructor(readonly id: TId) {
+    super(id);
+
+    this.state = reactive({ value: undefined });
+  }
+
+  watch(watcher: Watcher): void {
+    watcher.watch(this.id, this.state);
+  }
+
+  get(): TState | undefined {
+    return this.state.value;
+  }
+
+  set(value: TState | undefined): void {
+    this.state.value = value;
+  }
 }
 
 export abstract class EntityPool<
