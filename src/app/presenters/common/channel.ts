@@ -1,6 +1,6 @@
 import { customRef, watchSyncEffect } from "vue";
 
-export class Channel<T> {
+export class Channel<T = unknown> {
   private readonly items: T[] = [];
   private readonly trigger = customRef<boolean>((track, trigger) => {
     let v = false;

@@ -10,6 +10,7 @@ import {
   EventId,
   EventPool,
 } from "@/app/interfaces";
+import { getOrAdd } from "@/app/utils/collections";
 
 export interface Watcher {
   watch(id: EntityId, state: unknown): void;
@@ -27,12 +28,7 @@ export class EntityWatcher {
   private readonly buffers = new Map<EventId, EventBuffer>();
 
   pooled(poolId: PoolId = "singletons"): Watcher {
-    let pool = this.pools.get(poolId);
-    if (pool === undefined) {
-      pool = new WatchedPool(poolId);
-      this.pools.set(poolId, pool);
-    }
-
+    const pool = getOrAdd(this.pools, poolId, (k) => new WatchedPool(k));
     return this.watcher(pool);
   }
 
@@ -70,12 +66,7 @@ export class EntityWatcher {
   }
 
   buffered(id: EventId): Buffer {
-    let buffer = this.buffers.get(id);
-    if (buffer === undefined) {
-      buffer = new EventBuffer(id);
-      this.buffers.set(id, buffer);
-    }
-
+    const buffer = getOrAdd(this.buffers, id, (k) => new EventBuffer(k));
     return this.wrapBuffer(buffer);
   }
 

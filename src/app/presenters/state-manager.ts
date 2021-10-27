@@ -38,6 +38,7 @@ import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 import { ShowSign } from "@/app/utils/notation";
 
 import { Channel } from "./common/channel";
+import { getOrAdd } from "../utils/collections";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
@@ -79,68 +80,58 @@ export interface NumberView {
 
 class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
   get buildings(): Map<BuildingId, BuildingState> {
-    return this.getOrAdd("buildings") as unknown as Map<
+    return this.ensure("buildings") as unknown as Map<
       BuildingId,
       BuildingState
     >;
   }
 
   get jobs(): Map<JobId, JobState> {
-    return this.getOrAdd("jobs") as unknown as Map<JobId, JobState>;
+    return this.ensure("jobs") as unknown as Map<JobId, JobState>;
   }
 
   get numbers(): Map<NumberEffectId, EffectState<number>> {
-    return this.getOrAdd("numbers") as unknown as Map<
+    return this.ensure("numbers") as unknown as Map<
       NumberEffectId,
       EffectState<number>
     >;
   }
 
   get pops(): Map<PopId, PopState> {
-    return this.getOrAdd("pops") as unknown as Map<PopId, PopState>;
+    return this.ensure("pops") as unknown as Map<PopId, PopState>;
   }
 
   get recipes(): Map<RecipeId, RecipeState> {
-    return this.getOrAdd("recipes") as unknown as Map<RecipeId, RecipeState>;
+    return this.ensure("recipes") as unknown as Map<RecipeId, RecipeState>;
   }
 
   get resources(): Map<ResourceId, ResourceState> {
-    return this.getOrAdd("resources") as unknown as Map<
+    return this.ensure("resources") as unknown as Map<
       ResourceId,
       ResourceState
     >;
   }
 
   get sections(): Map<SectionId, SectionState> {
-    return this.getOrAdd("sections") as unknown as Map<SectionId, SectionState>;
+    return this.ensure("sections") as unknown as Map<SectionId, SectionState>;
   }
 
   get techs(): Map<TechId, TechState> {
-    return this.getOrAdd("techs") as unknown as Map<TechId, TechState>;
+    return this.ensure("techs") as unknown as Map<TechId, TechState>;
   }
 
-  getOrAdd(id: PoolId): Map<string, PropertyBag> {
-    let existing = this.get(id);
-    if (!existing) {
-      existing = reactive(new Map<string, PropertyBag>());
-      this.set(id, existing);
-    }
-    return existing;
+  ensure(id: PoolId): Map<string, PropertyBag> {
+    return getOrAdd(this, id, () => reactive(new Map<string, PropertyBag>()));
   }
 }
 
-class EventPools extends Map<EventId, Channel<unknown>> {
+class EventPools extends Map<EventId, Channel> {
   get history(): Channel<HistoryEvent> {
-    return this.getOrAdd<HistoryEvent>("history");
+    return this.ensure("history") as Channel<HistoryEvent>;
   }
 
-  getOrAdd<TEvent>(id: EventId): Channel<TEvent> {
-    let existing = this.get(id);
-    if (!existing) {
-      existing = new Channel<TEvent>();
-      this.set(id, existing);
-    }
-    return existing as Channel<TEvent>;
+  ensure(id: EventId): Channel {
+    return getOrAdd(this, id, () => new Channel());
   }
 }
 
@@ -155,7 +146,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
 
   acceptMutations(mutations: MutationPool[]): void {
     for (const pool of mutations) {
-      const values = this.pools.getOrAdd(pool.poolId);
+      const values = this.pools.ensure(pool.poolId);
       if (pool.added) {
         for (const [id, state] of pool.added) {
           values.set(id, reactive(state));
@@ -176,7 +167,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
 
   acceptEvents(events: EventPool[]): void {
     for (const pool of events) {
-      const channel = this.events.getOrAdd(pool.id);
+      const channel = this.events.ensure(pool.id);
       channel.push(pool.events);
     }
   }
@@ -232,8 +223,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   section(id: SectionId): SectionState {
-    const pool = this.pools.getOrAdd("sections");
-    return pool.get(id) as unknown as SectionState;
+    return this.pools.sections.get(id) as SectionState;
   }
 
   techs(): Enumerable<TechId> {
@@ -241,27 +231,26 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   tech(id: TechId): TechState {
-    const pool = this.pools.getOrAdd("techs");
-    return pool.get(id) as unknown as TechState;
+    return this.pools.techs.get(id) as TechState;
   }
 
   environment(): EnvironmentState {
-    const pool = this.pools.getOrAdd("singletons");
+    const pool = this.pools.ensure("singletons");
     return pool.get("environment") as unknown as EnvironmentState;
   }
 
   player(): PlayerState {
-    const pool = this.pools.getOrAdd("singletons");
+    const pool = this.pools.ensure("singletons");
     return pool.get("player") as unknown as PlayerState;
   }
 
   society(): SocietyState {
-    const pool = this.pools.getOrAdd("singletons");
+    const pool = this.pools.ensure("singletons");
     return pool.get("society") as unknown as SocietyState;
   }
 
   time(): TimeState {
-    const pool = this.pools.getOrAdd("singletons");
+    const pool = this.pools.ensure("singletons");
     return pool.get("time") as unknown as TimeState;
   }
 

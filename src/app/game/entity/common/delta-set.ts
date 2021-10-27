@@ -1,4 +1,5 @@
 import { ResourceId } from "@/app/interfaces";
+import { getOrAdd } from "@/app/utils/collections";
 
 import { ResourceDelta, Delta } from "..";
 
@@ -8,7 +9,7 @@ export class DeltaSet {
   constructor(private readonly base?: DeltaSet | undefined) {}
 
   getDebit(id: ResourceId, shallow: boolean = false): number {
-    const local = this.delta(id).debit;
+    const local = this.ensure(id).debit;
     if (!shallow) {
       return local + (this.base?.getDebit(id) ?? 0);
     }
@@ -16,7 +17,7 @@ export class DeltaSet {
   }
 
   getCredit(id: ResourceId, shallow: boolean = false): number {
-    const local = this.delta(id).credit;
+    const local = this.ensure(id).credit;
     if (!shallow) {
       return local + (this.base?.getCredit(id) ?? 0);
     }
@@ -24,11 +25,11 @@ export class DeltaSet {
   }
 
   addDebit(id: ResourceId, amount: number): void {
-    this.delta(id).addDebit(amount);
+    this.ensure(id).addDebit(amount);
   }
 
   addCredit(id: ResourceId, amount: number): void {
-    this.delta(id).addCredit(amount);
+    this.ensure(id).addCredit(amount);
   }
 
   *deltas(): IterableIterator<[ResourceId, Delta]> {
@@ -40,7 +41,7 @@ export class DeltaSet {
   }
 
   addDelta(key: ResourceId, delta: ResourceDelta): void {
-    const existing = this.delta(key);
+    const existing = this.ensure(key);
     existing.addDebit(delta.debit);
     existing.addCredit(delta.credit);
   }
@@ -64,12 +65,7 @@ export class DeltaSet {
     this.map.clear();
   }
 
-  private delta(key: ResourceId): ResourceDelta {
-    let value = this.map.get(key);
-    if (!value) {
-      value = new ResourceDelta();
-      this.map.set(key, value);
-    }
-    return value;
+  private ensure(key: ResourceId): ResourceDelta {
+    return getOrAdd(this.map, key, () => new ResourceDelta());
   }
 }

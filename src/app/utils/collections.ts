@@ -51,3 +51,16 @@ export function count<T>(
   }
   return count;
 }
+
+export function getOrAdd<K, V>(
+  map: Map<K, V>,
+  key: K,
+  factory: (key: K) => V,
+): V {
+  let existing = map.get(key);
+  if (existing === undefined) {
+    existing = factory(key);
+    map.set(key, existing);
+  }
+  return existing;
+}
