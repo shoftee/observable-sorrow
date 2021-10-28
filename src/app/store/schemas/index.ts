@@ -1,22 +1,41 @@
-import { IDBPDatabase } from "idb";
-import { OsSchemaV1 } from "./v1";
-import { OsSchemaV2 } from "./v2";
+import { IDBPDatabase, IDBPTransaction, StoreNames } from "idb";
+
+import { migrateV1 } from "./v1";
+import { migrateV2, OsSchemaV2 } from "./v2";
 
 export const DatabaseName = "os-data";
 export const LatestVersion = 2;
 export type LatestSchema = OsSchemaV2;
+export type UpgradeTransaction<TSchema = LatestSchema> = IDBPTransaction<
+  TSchema,
+  StoreNames<TSchema>[],
+  "versionchange"
+>;
+
+type Migration = {
+  version: number;
+  run: (
+    database: IDBPDatabase<LatestSchema>,
+    transaction: UpgradeTransaction,
+  ) => Promise<void>;
+};
+
+const migrations: Migration[] = [
+  { version: 1, run: migrateV1 },
+  { version: 2, run: migrateV2 },
+];
 
 export async function migrate(
   db: IDBPDatabase<LatestSchema>,
   oldVersion: number,
+  newVersion: number | null,
+  transaction: UpgradeTransaction,
 ): Promise<void> {
-  if (oldVersion < 1) {
-    // initial version
-    const v0 = db as unknown as IDBPDatabase<OsSchemaV1>;
-    v0.createObjectStore("general");
-    v0.createObjectStore("saves", { autoIncrement: true });
+  let range = migrations.filter((m) => oldVersion < m.version);
+  if (newVersion !== null) {
+    range = range.filter((m) => m.version <= newVersion);
   }
-  if (oldVersion < 2) {
-    // added science, no need for explicit migration
+  for (const migration of range) {
+    await migration.run(db, transaction);
   }
 }

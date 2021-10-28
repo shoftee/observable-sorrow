@@ -27,8 +27,11 @@ export class SaveSlotVersionMismatchError extends Error {
 
 function openStore() {
   return openDB<LatestSchema>(DatabaseName, LatestVersion, {
-    async upgrade(db, oldVersion) {
-      await migrate(db, oldVersion);
+    async upgrade(db, oldVersion, newVersion, transaction) {
+      if (newVersion !== null && newVersion < LatestVersion) {
+        throw new Error("tried to migrate to version older than latest");
+      }
+      await migrate(db, oldVersion, newVersion, transaction);
     },
   });
 }

@@ -1,4 +1,4 @@
-import { DBSchema } from "idb";
+import { DBSchema, IDBPDatabase } from "idb";
 
 import {
   ResourceId,
@@ -9,6 +9,7 @@ import {
 } from "@/app/interfaces";
 
 import { AtomicState, DeepPartial } from "..";
+import { LatestSchema, UpgradeTransaction } from ".";
 
 export interface OsSchemaV1 extends DBSchema {
   general: {
@@ -58,4 +59,14 @@ export interface OsSchemaV1 extends DBSchema {
       }>;
     };
   };
+}
+
+export async function migrateV1(
+  database: IDBPDatabase<LatestSchema>,
+  _transaction: UpgradeTransaction,
+): Promise<void> {
+  // initial version
+  const v1 = database as unknown as IDBPDatabase<OsSchemaV1>;
+  v1.createObjectStore("general");
+  v1.createObjectStore("saves", { autoIncrement: true });
 }
