@@ -32,8 +32,7 @@ export class NumberFormatter {
   v(view: NumberView): string {
     const precision = view.rounded === true ? 0 : this.options.precision;
     const showSign = view.showSign ?? "negative";
-    let value = view.value;
-    if (view.style.invert) value = -value;
+    const value = view.style.invert === true ? -view.value : view.value;
     switch (view.style.unit) {
       case UnitKind.Percent:
         return this.notation.number(value * 100, precision, showSign) + "%";

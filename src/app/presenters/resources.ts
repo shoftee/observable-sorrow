@@ -2,8 +2,8 @@ import { computed, reactive } from "vue";
 
 import { DeltaEffectId, NumberEffectId, ResourceId } from "@/app/interfaces";
 import {
-  EffectTreeMetadataType,
   Meta,
+  NumberStyle,
   ResourceMetadataType,
   ResourceState,
   UnitKind,
@@ -96,8 +96,8 @@ export class ResourcesPresenter {
   ): Iterable<EffectTreeNode> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     for (const childId of manager.effectTree().get(id)!) {
-      const childMeta = Meta.effectTree(childId);
-      switch (childMeta.disposition) {
+      const style = Meta.numberStyle(childId);
+      switch (style.disposition) {
         case "hide":
           // completely ignore hidden children
           continue;
@@ -107,23 +107,23 @@ export class ResourcesPresenter {
           continue;
 
         default:
-          yield this.newEffectNode(childId, childMeta, manager);
+          yield this.newEffectNode(childId, style, manager);
       }
     }
   }
 
   private newEffectNode(
     id: NumberEffectId,
-    meta: EffectTreeMetadataType,
+    style: NumberStyle,
     manager: IStateManager,
   ): EffectTreeNode {
     return reactive({
       id: id,
-      label: meta.label,
+      label: style.label,
       value: computed(() => manager.numberView(id)),
       // Don't collect children of collapsed nodes
       nodes:
-        meta.disposition === "collapse"
+        style.disposition === "collapse"
           ? []
           : Array.from(this.collectEffectNodes(id, manager)),
     });
