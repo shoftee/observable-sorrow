@@ -6,9 +6,9 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "unit": "vue-cli-service test:unit",
-    "unit:debug": "vue-cli-service test:unit --inspect --watch",
-    "unit:cover": "cross-env coverage=true nyc vue-cli-service test:unit"
+    "test": "vue-cli-service test:unit",
+    "test:debug": "vue-cli-service test:unit --inspect --watch",
+    "test:cover": "cross-env coverage=true nyc vue-cli-service test:unit"
   },
   "dependencies": {
     "bootstrap": "^5.1.1",
