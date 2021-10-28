@@ -1,6 +1,7 @@
 import {
   BuildingId,
   JobId,
+  NumberEffectId,
   ResourceId,
   SeasonId,
   SectionId,
@@ -12,6 +13,8 @@ import {
   BonfireMetadataType,
   BuildingMetadata,
   BuildingMetadataType,
+  EffectTreeMetadata,
+  EffectTreeMetadataType,
   JobMetadata,
   JobMetadataType,
   RecipeMetadata,
@@ -40,6 +43,10 @@ export const Meta = {
 
   building(id: BuildingId): BuildingMetadataType {
     return BuildingMetadata[id];
+  },
+
+  effectTree(id: NumberEffectId): EffectTreeMetadataType {
+    return EffectTreeMetadata[id];
   },
 
   jobs(): Enumerable<JobMetadataType> {

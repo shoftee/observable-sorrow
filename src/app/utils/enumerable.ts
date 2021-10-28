@@ -13,6 +13,13 @@ export class Enumerable<T> implements Iterable<T> {
     return Array.from(this);
   }
 
+  toMap<K, V>(
+    keySelector: (item: T) => K,
+    valueSelector: (item: T) => V,
+  ): Map<K, V> {
+    return new Map<K, V>(this.map((i) => [keySelector(i), valueSelector(i)]));
+  }
+
   map<TResult>(selector: (item: T) => TResult): Enumerable<TResult> {
     const that = this as Iterable<T>;
     return new Enumerable(
@@ -78,6 +85,19 @@ export class Enumerable<T> implements Iterable<T> {
         for (const item of that) {
           if (selector(item)) {
             yield item;
+          }
+        }
+      })(),
+    );
+  }
+
+  defined(): Enumerable<Exclude<T, undefined>> {
+    const that = this as Iterable<T>;
+    return new Enumerable(
+      (function* () {
+        for (const item of that) {
+          if (item !== undefined) {
+            yield item as Exclude<T, undefined>;
           }
         }
       })(),

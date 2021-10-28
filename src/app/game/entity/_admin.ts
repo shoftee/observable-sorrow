@@ -37,6 +37,7 @@ import {
   TimeEntity,
   Persisted,
   HistoryEntity,
+  EffectTreeEntity,
 } from ".";
 
 export class EntityAdmin {
@@ -50,6 +51,7 @@ export class EntityAdmin {
   private readonly _sections: SectionsPool;
   private readonly _techs: TechsPool;
 
+  private readonly _effectTree: EffectTreeEntity;
   private readonly _environment: EnvironmentEntity;
   private readonly _history: HistoryEntity;
   private readonly _player: PlayerEntity;
@@ -67,6 +69,9 @@ export class EntityAdmin {
     this._resources = new ResourcesPool(this.watcher.pooled("resources"));
     this._sections = new SectionsPool(this.watcher.pooled("sections"));
     this._techs = new TechsPool(this.watcher.pooled("techs"));
+
+    this._effectTree = new EffectTreeEntity();
+    this._effectTree.watch(this.watcher.pooled());
 
     this._environment = new EnvironmentEntity();
     this._environment.watch(this.watcher.pooled());
@@ -189,6 +194,10 @@ export class EntityAdmin {
 
   society(): SocietyEntity {
     return this._society;
+  }
+
+  effectTree(): EffectTreeEntity {
+    return this._effectTree;
   }
 
   time(): TimeEntity {

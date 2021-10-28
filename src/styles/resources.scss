@@ -1,0 +1,39 @@
+@import "spacer-utils.scss";
+
+.no-resources {
+  @include p(2);
+}
+
+.base-resources {
+  @include flex-column();
+
+  ul {
+    @include list-flush();
+
+    > li {
+      @extend .small;
+      @include p(1);
+
+      > .item-container {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .resource-modifier {
+        margin-inline-start: bsize(1);
+      }
+    }
+  }
+}
+
+.effect-tree {
+  ul.effects-list {
+    > li {
+      @include pxy(2, 1);
+      > .amount {
+        margin-left: bsize(4);
+        float: right;
+      }
+    }
+  }
+}

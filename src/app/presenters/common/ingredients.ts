@@ -1,7 +1,7 @@
 import { reactive, computed } from "vue";
 
-import { ResourceId, UnitKind } from "@/app/interfaces";
-import { IngredientState, Meta } from "@/app/state";
+import { ResourceId } from "@/app/interfaces";
+import { IngredientState, Meta, UnitKind } from "@/app/state";
 
 import { NumberView } from "..";
 
@@ -37,7 +37,7 @@ function fulfillmentTime(ingredient: IngredientState): NumberView | undefined {
   } else {
     return {
       value: ingredient.fulfillmentTime,
-      unit: UnitKind.Tick,
+      style: { unit: UnitKind.Tick, invert: false },
       rounded: true,
       showSign: "negative",
     };

@@ -11,6 +11,7 @@ export * from "./_admin";
 export * from "./_watcher";
 export * from "./boolean-effects";
 export * from "./building";
+export * from "./effect-tree";
 export * from "./environment";
 export * from "./job";
 export * from "./logs";

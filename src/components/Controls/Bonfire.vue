@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import BuildingButton from "./BuildingButton.vue";
+import BuildingButton from "./Building/Button.vue";
 import { injectChannel } from "@/composables/game-channel";
 
 const { presenters } = injectChannel();

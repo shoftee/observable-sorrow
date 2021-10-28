@@ -11,6 +11,7 @@ import {
 } from "@/app/interfaces";
 
 export type SingletonEntityId =
+  | "effect-tree"
   | "environment"
   | "player"
   | "prng"

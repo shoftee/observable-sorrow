@@ -21,3 +21,11 @@
   display: flex;
   flex-direction: row;
 }
+
+@mixin list-flush() {
+  @extend .list-group, .list-group-flush;
+  > li {
+    @extend .list-group-item;
+    @include py(1);
+  }
+}

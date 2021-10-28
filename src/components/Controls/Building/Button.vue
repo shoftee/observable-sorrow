@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Ingredients from "./Ingredients.vue";
-import Effects from "./Effects.vue";
+import Detail from "./Detail.vue"
 
 import { BonfireItemId } from "@/app/interfaces";
 import { BonfireItem } from "@/app/presenters";
 import { injectChannel } from "@/composables/game-channel";
-import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
 const { item } = defineProps<{ item: BonfireItem }>();
 const { t } = useI18n();
-const events = inject(KeyboardEventsKey);
 
 const level = computed(() => item.level ?? 0)
-const ingredients = computed(() => item.ingredients ?? []);
-const effects = computed(() => item.effects ?? []);
 
 const interactors = injectChannel().interactors;
 
@@ -41,18 +36,7 @@ async function buildItem(id: BonfireItemId): Promise<void> {
       </button>
     </div>
     <template #content>
-      <div>
-        <div class="card-header">
-          <p class="description">{{ t(item.description) }}</p>
-          <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
-        </div>
-        <Ingredients v-if="ingredients.length > 0" :items="ingredients" />
-        <Effects v-if="effects.length > 0" :items="effects">
-          <template
-            #title
-          >{{ t(events?.shift ? "effects.buildings.total" : "effects.buildings.per-level") }}</template>
-        </Effects>
-      </div>
+      <Detail :item="item" />
     </template>
   </tippy>
 </template>

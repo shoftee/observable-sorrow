@@ -1,9 +1,11 @@
 import { watchSyncEffect } from "vue";
 
+import { NumberEffectId } from "@/app/interfaces";
 import { EffectState } from "@/app/state";
+import { getOrAdd } from "@/app/utils/collections";
 
-import { BooleanExprs, EntityAdmin, Expr, NumberExprs } from "../entity";
 import { System } from ".";
+import { BooleanExprs, EntityAdmin, Expr, NumberExprs } from "../entity";
 
 export class EffectsSystem extends System {
   constructor(admin: EntityAdmin) {
@@ -25,6 +27,13 @@ export class EffectsSystem extends System {
       {
         expr: (id) => NumberExprs[id],
         state: (id) => this.admin.number(id).state,
+        addTreeNode: (parent, child) => {
+          getOrAdd(
+            this.admin.effectTree().state,
+            parent,
+            () => new Set<NumberEffectId>(),
+          ).add(child);
+        },
       },
     );
     resolver.resolveExprs(
@@ -40,6 +49,7 @@ export class EffectsSystem extends System {
 interface EffectStore<T, TId extends string> {
   expr(id: TId): Expr<T, TId>;
   state(id: TId): EffectState<T>;
+  addTreeNode?(parent: TId, child: TId): void;
 }
 
 class Resolver {
@@ -84,12 +94,13 @@ class Resolver {
     if (expr instanceof Function) {
       return expr({
         admin: this.admin,
-        val: (id) => {
-          const state = store.state(id);
-          this.resolveExpr(id, store);
-          const value = state.value;
+        val: (innerId) => {
+          this.resolveExpr(innerId, store);
+          store.addTreeNode?.(id, innerId);
+
+          const value = store.state(innerId).value;
           if (value === undefined) {
-            throw new CouldNotResolveEffectError(id, "value not in store");
+            throw new CouldNotResolveEffectError(innerId, "value not in store");
           }
           return value;
         },

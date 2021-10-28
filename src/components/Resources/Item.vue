@@ -2,6 +2,8 @@
 import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
+import EffectTree from "./EffectTree.vue";
+
 import { ResourceItem } from "@/app/presenters/resources";
 import { injectChannel } from "@/composables/game-channel";
 
@@ -16,7 +18,7 @@ const { amount, capacity, change, modifier } = toRefs(item);
 </script>
 
 <template>
-  <div class="d-inline-flex align-items-center">
+  <div class="item-container">
     <div class="name col-3">
       <span>{{ t(item.label) }}</span>
       <span
@@ -38,10 +40,25 @@ const { amount, capacity, change, modifier } = toRefs(item);
       <div class="col-3 no-capacity"></div>
     </template>
     <template v-if="change.value">
-      <div
-        class="col-3 number change"
-        :class="{ 'text-danger': change.value < 0 }"
-      >{{ fmt.v(change) }}</div>
+      <template v-if="item.deltaTree">
+        <tippy class="col-3">
+          <div
+            class="number change"
+            :class="{ 'text-danger': change.value < 0 }"
+          >{{ fmt.v(change) }}</div>
+          <template #content>
+            <div class="effect-tree">
+              <EffectTree :nodes="item.deltaTree.nodes" />
+            </div>
+          </template>
+        </tippy>
+      </template>
+      <template v-else>
+        <div
+          class="col-3 number change"
+          :class="{ 'text-danger': change.value < 0 }"
+        >{{ fmt.v(change) }}</div>
+      </template>
     </template>
     <template v-else>
       <div class="col-3 no-change"></div>

@@ -127,6 +127,16 @@
       "total": "Effects (total)"
     }
   },
+  "effect-tree": {
+    "catnip-fields": "Catnip fields",
+    "libraries": "Libraries",
+    "weather": "Weather",
+    "bonus": "Bonus",
+    "village-demand": "Demand",
+    "woodcutting": "Woodcutting",
+    "researching": "Researching",
+    "farming": "Farming"
+  },
 
   "buildings": {
     "catnip-field": {

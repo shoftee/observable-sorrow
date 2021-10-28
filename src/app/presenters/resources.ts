@@ -1,7 +1,13 @@
 import { computed, reactive } from "vue";
 
-import { ResourceId, UnitKind } from "@/app/interfaces";
-import { Meta, ResourceMetadataType, ResourceState } from "@/app/state";
+import { DeltaEffectId, NumberEffectId, ResourceId } from "@/app/interfaces";
+import {
+  EffectTreeMetadataType,
+  Meta,
+  ResourceMetadataType,
+  ResourceState,
+  UnitKind,
+} from "@/app/state";
 
 import { IStateManager, NumberView } from ".";
 
@@ -31,17 +37,17 @@ export class ResourcesPresenter {
           : this.kittensChange(manager);
       }),
       capacity: computed(() => res.capacity),
-      modifier:
-        meta.id !== "catnip"
-          ? undefined
-          : computed(() => this.catnipModifier(manager)),
+      modifier: computed(() => this.modifier(meta.id, manager)),
+      deltaTree: computed(() =>
+        this.newEffectTree(meta.effects.delta, manager),
+      ),
     });
   }
 
   private resourceChange(res: ResourceState): NumberView {
     return {
       value: res.change,
-      unit: UnitKind.PerTick,
+      style: { unit: UnitKind.PerTick, invert: false },
       showSign: "always",
     };
   }
@@ -49,13 +55,18 @@ export class ResourcesPresenter {
   private kittensChange(manager: IStateManager): NumberView {
     return {
       value: manager.society().stockpile,
-      unit: UnitKind.Percent,
+      style: { unit: UnitKind.Percent, invert: false },
       showSign: "negative",
       rounded: true,
     };
   }
 
-  private catnipModifier(manager: IStateManager): NumberView | undefined {
+  private modifier(
+    id: ResourceId,
+    manager: IStateManager,
+  ): NumberView | undefined {
+    if (id !== "catnip") return undefined;
+
     const catnipField = manager.building("catnip-field");
 
     const weatherModifier = manager.numberView("weather.ratio");
@@ -65,6 +76,57 @@ export class ResourcesPresenter {
     } else {
       return undefined;
     }
+  }
+
+  private newEffectTree(
+    id: DeltaEffectId | undefined,
+    manager: IStateManager,
+  ): EffectTree | undefined {
+    if (id === undefined) {
+      return undefined;
+    }
+    return reactive({
+      nodes: Array.from(this.collectEffectNodes(id, manager)),
+    });
+  }
+
+  private *collectEffectNodes(
+    id: NumberEffectId,
+    manager: IStateManager,
+  ): Iterable<EffectTreeNode> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    for (const childId of manager.effectTree().get(id)!) {
+      const childMeta = Meta.effectTree(childId);
+      switch (childMeta.disposition) {
+        case "hide":
+          // completely ignore hidden children
+          continue;
+        case "inline":
+          // treat children-of-child as direct children
+          yield* this.collectEffectNodes(childId, manager);
+          continue;
+
+        default:
+          yield this.newEffectNode(childId, childMeta, manager);
+      }
+    }
+  }
+
+  private newEffectNode(
+    id: NumberEffectId,
+    meta: EffectTreeMetadataType,
+    manager: IStateManager,
+  ): EffectTreeNode {
+    return reactive({
+      id: id,
+      label: meta.label,
+      value: computed(() => manager.numberView(id)),
+      // Don't collect children of collapsed nodes
+      nodes:
+        meta.disposition === "collapse"
+          ? []
+          : Array.from(this.collectEffectNodes(id, manager)),
+    });
   }
 }
 
@@ -76,4 +138,16 @@ export interface ResourceItem {
   change: NumberView;
   capacity?: number;
   modifier?: NumberView;
+  deltaTree?: EffectTree;
+}
+
+export interface EffectTree {
+  nodes: EffectTreeNode[];
+}
+
+export interface EffectTreeNode {
+  id: NumberEffectId;
+  value: NumberView;
+  label?: string;
+  nodes: EffectTreeNode[];
 }

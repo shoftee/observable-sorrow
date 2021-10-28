@@ -21,7 +21,7 @@ async function research(id: TechId): Promise<void> {
 <template>
   <tippy>
     <!-- We need a container div because tippy listens to hover events to trigger and buttons don't fire events when disabled.-->
-    <div class="col-12">
+    <div>
       <button
         type="button"
         class="btn btn-outline-secondary w-100"

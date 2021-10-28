@@ -59,27 +59,3 @@ export type NumberEffectId =
   | LibraryEffectId
   | PopulationEffectId
   | JobEffectId;
-
-export enum UnitKind {
-  None,
-  Tick,
-  PerTick,
-  Percent,
-}
-
-export const EffectUnits: Partial<Record<NumberEffectId, UnitKind>> = {
-  "catnip.delta": UnitKind.PerTick,
-  "catnip-field.catnip": UnitKind.PerTick,
-  "catnip-field.catnip.base": UnitKind.PerTick,
-  "weather.ratio": UnitKind.Percent,
-  "jobs.woodcutter.wood": UnitKind.PerTick,
-  "jobs.woodcutter.wood.base": UnitKind.PerTick,
-  "jobs.scholar.science": UnitKind.PerTick,
-  "jobs.scholar.science.base": UnitKind.PerTick,
-  "jobs.farmer.catnip": UnitKind.PerTick,
-  "jobs.farmer.catnip.base": UnitKind.PerTick,
-  "weather.season-ratio": UnitKind.Percent,
-  "weather.severity-ratio": UnitKind.Percent,
-  "library.science-ratio": UnitKind.Percent,
-  "library.science-ratio.base": UnitKind.Percent,
-};

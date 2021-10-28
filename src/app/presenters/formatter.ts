@@ -1,4 +1,4 @@
-import { UnitKind } from "@/app/interfaces";
+import { UnitKind } from "@/app/state";
 import { INumberNotation, ShowSign } from "@/app/utils/notation";
 
 import { IStateManager, NumberView } from ".";
@@ -30,10 +30,11 @@ export class NumberFormatter {
   }
 
   v(view: NumberView): string {
-    const { value, unit } = view;
     const precision = view.rounded === true ? 0 : this.options.precision;
     const showSign = view.showSign ?? "negative";
-    switch (unit) {
+    let value = view.value;
+    if (view.style.invert) value = -value;
+    switch (view.style.unit) {
       case UnitKind.Percent:
         return this.notation.number(value * 100, precision, showSign) + "%";
       case UnitKind.Tick: {

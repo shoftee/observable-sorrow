@@ -4,7 +4,6 @@ import { reactive } from "vue";
 import {
   BuildingId,
   MutationPool,
-  EffectUnits,
   IPresenterChangeSink,
   JobId,
   NumberEffectId,
@@ -15,13 +14,14 @@ import {
   ResourceId,
   SectionId,
   TechId,
-  UnitKind,
   EventPool,
   EventId,
 } from "@/app/interfaces";
 import {
   BuildingState,
   EffectState,
+  EffectTreeState,
+  EffectNumberStyleMetadata,
   EnvironmentState,
   HistoryEvent,
   JobState,
@@ -33,6 +33,7 @@ import {
   SocietyState,
   TechState,
   TimeState,
+  NumberStyle,
 } from "@/app/state";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 import { ShowSign } from "@/app/utils/notation";
@@ -63,6 +64,7 @@ export interface IStateManager {
   techs(): Enumerable<TechId>;
   tech(id: TechId): TechState;
 
+  effectTree(): EffectTreeState;
   environment(): EnvironmentState;
   player(): PlayerState;
   society(): SocietyState;
@@ -73,7 +75,7 @@ export interface IStateManager {
 
 export interface NumberView {
   value: number;
-  unit: UnitKind;
+  style: NumberStyle;
   rounded?: boolean;
   showSign?: ShowSign;
 }
@@ -184,7 +186,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     const number = this.pools.numbers.get(id) as EffectState<number>;
     return {
       value: number.value ?? 0,
-      unit: EffectUnits[id] ?? UnitKind.None,
+      style: EffectNumberStyleMetadata[id],
       rounded: false,
       showSign: "always",
     };
@@ -232,6 +234,11 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
 
   tech(id: TechId): TechState {
     return this.pools.techs.get(id) as TechState;
+  }
+
+  effectTree(): EffectTreeState {
+    const pool = this.pools.ensure("singletons");
+    return pool.get("effect-tree") as unknown as EffectTreeState;
   }
 
   environment(): EnvironmentState {

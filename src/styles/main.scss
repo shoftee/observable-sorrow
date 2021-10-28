@@ -4,6 +4,7 @@
 
 @import "utils.scss";
 @import "tippy.scss";
+@import "resources.scss";
 
 // Global changes
 body {
@@ -190,13 +191,11 @@ main .nav {
   }
 
   ul.ingredients-list {
-    @extend .list-group, .list-group-flush;
+    @include list-flush();
 
     > li {
       display: inline-flex;
       align-items: center;
-      @include py(1);
-      @extend .list-group-item;
 
       > .label {
         margin-right: auto;
@@ -208,43 +207,14 @@ main .nav {
       }
     }
   }
+}
 
-  ul.effects-list {
-    @extend .list-group, .list-group-flush;
-
-    > li {
-      @include py(1);
-      @extend .list-group-item;
-    }
-  }
+ul.effects-list {
+  @include list-flush();
 }
 
 .number {
   font-family: var(--bs-font-monospace);
-}
-
-// resources
-.resources-container {
-  .no-resources {
-    @include p(2);
-  }
-
-  .base-resources {
-    @include flex-column();
-
-    ul {
-      @extend .list-group, .list-group-flush;
-
-      > li {
-        @include p(1);
-        @extend .list-group-item, .small;
-
-        .resource-modifier {
-          margin-inline-start: bsize(1);
-        }
-      }
-    }
-  }
 }
 
 // buttons
