@@ -7,8 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit",
-    "test:debug": "vue-cli-service test:unit --inspect --watch",
-    "test:cover": "cross-env coverage=true nyc vue-cli-service test:unit"
+    "test:debug": "vue-cli-service test:unit --inspect --watch"
   },
   "dependencies": {
     "bootstrap": "^5.1.1",
@@ -42,12 +41,9 @@
     "@vue/eslint-config-typescript": "^7.0.0",
     "@vue/test-utils": "^2.0.0-0",
     "chai": "^4.2.0",
-    "cross-env": "^7.0.3",
     "eslint": "^7.20.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.2.0",
-    "istanbul-instrumenter-loader": "^3.0.1",
-    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",

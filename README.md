@@ -27,7 +27,7 @@ yarn lint
 ### Runs unit tests
 
 ```
-yarn unit
+yarn test
 ```
 
 ### Game dev tools
