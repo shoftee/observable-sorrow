@@ -40,6 +40,35 @@ export class BuildingEntity extends Entity<BuildingId> implements Watched {
   watch(watcher: Watcher): void {
     watcher.watch(this.id, this.state);
   }
+
+  saveTo(store: NonNullable<SaveState["buildings"]>): void {
+    const stored = store[this.id];
+    if (stored === undefined) {
+      store[this.id] = {
+        level: this.state.level,
+        unlocked: this.state.unlocked,
+      };
+    } else {
+      stored.level = this.state.level;
+      stored.unlocked = this.state.unlocked;
+    }
+  }
+
+  loadFrom(store: NonNullable<SaveState["buildings"]>): void {
+    const stored = store[this.id];
+    if (stored !== undefined) {
+      this.state.level = stored.level;
+      this.state.unlocked = stored.unlocked;
+
+      // HACK: these should update automatically.
+      const multiplier = Math.pow(this.meta.prices.ratio, this.state.level);
+
+      for (const ingredient of this.state.ingredients) {
+        const base = this.meta.prices.base[ingredient.resourceId] ?? 0;
+        ingredient.requirement = base * multiplier;
+      }
+    }
+  }
 }
 
 export class BuildingsPool
@@ -55,35 +84,17 @@ export class BuildingsPool
 
   loadState(save: SaveState): void {
     const buildings = save?.buildings;
-
     if (buildings !== undefined) {
       for (const building of this.enumerate()) {
-        const buildingState = buildings[building.id];
-        if (buildingState?.level !== undefined) {
-          building.state.level = buildingState.level;
-
-          // HACK: these should update automatically.
-          const multiplier = Math.pow(
-            building.meta.prices.ratio,
-            building.state.level,
-          );
-
-          for (const ingredient of building.state.ingredients) {
-            const base = building.meta.prices.base[ingredient.resourceId] ?? 0;
-            ingredient.requirement = base * multiplier;
-          }
-        }
+        building.loadFrom(buildings);
       }
     }
   }
 
   saveState(save: SaveState): void {
     save.buildings = {};
-
     for (const building of this.enumerate()) {
-      save.buildings[building.id] = {
-        level: building.state.level,
-      };
+      building.saveTo(save.buildings);
     }
   }
 }

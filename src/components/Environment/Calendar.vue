@@ -5,9 +5,8 @@ import { injectChannel } from "@/composables/game-channel";
 
 const { t } = useI18n();
 
-const { presenters } = injectChannel();
-const state = presenters.environment.calendar;
-const fmt = presenters.formatter;
+const { environment, formatter: fmt } = injectChannel().presenters;
+const state = environment.calendar;
 </script>
 
 <template>
