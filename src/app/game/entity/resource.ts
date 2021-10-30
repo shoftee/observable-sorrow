@@ -6,6 +6,8 @@ import { SaveState } from "@/app/store";
 
 import { Entity, EntityPool, ResourceDelta, Watched, Watcher } from ".";
 
+type ResourceStore = NonNullable<SaveState["resources"]>[ResourceId];
+
 export class ResourceEntity extends Entity<ResourceId> implements Watched {
   readonly state: ResourceState;
   readonly delta: ResourceDelta = new ResourceDelta();
@@ -23,6 +25,20 @@ export class ResourceEntity extends Entity<ResourceId> implements Watched {
   watch(watcher: Watcher): void {
     watcher.watch(this.id, this.state);
   }
+
+  load(store: ResourceStore): void {
+    if (store) {
+      this.state.amount = store.amount;
+      this.state.unlocked = store.unlocked;
+    }
+  }
+
+  save(): ResourceStore {
+    return {
+      amount: this.state.amount,
+      unlocked: this.state.unlocked,
+    };
+  }
 }
 
 export class ResourcesPool extends EntityPool<ResourceId, ResourceEntity> {
@@ -37,10 +53,7 @@ export class ResourcesPool extends EntityPool<ResourceId, ResourceEntity> {
     const resources = save.resources;
     if (resources !== undefined) {
       for (const resource of this.enumerate()) {
-        const state = resources[resource.id];
-        if (state?.amount !== undefined) {
-          resource.state.amount = state.amount;
-        }
+        resource.load(resources[resource.id]);
       }
     }
   }
@@ -48,9 +61,7 @@ export class ResourcesPool extends EntityPool<ResourceId, ResourceEntity> {
   saveState(save: SaveState): void {
     save.resources = {};
     for (const resource of this.enumerate()) {
-      save.resources[resource.id] = {
-        amount: resource.state.amount,
-      };
+      save.resources[resource.id] = resource.save();
     }
   }
 }

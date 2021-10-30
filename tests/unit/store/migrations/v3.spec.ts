@@ -1,7 +1,9 @@
-import { SaveSlot } from "@/app/store/db";
-import { UpgradeTransaction } from "@/app/store/schemas";
-import { migrateV3 } from "@/app/store/schemas/v3";
 import { expect } from "chai";
+
+import { SaveSlot } from "@/app/store/db";
+import { migrateV3 } from "@/app/store/schemas/v3";
+
+import { mockCursor } from "./utils";
 
 describe("migrateV3", () => {
   it("should fill unlocked field for buildings", async () => {
@@ -13,16 +15,21 @@ describe("migrateV3", () => {
           return {
             version: 1,
             state: {
-              buildings: { "catnip-field": { level: 1 }, hut: { level: 0 } },
+              buildings: {
+                "catnip-field": { level: 1 },
+                hut: { level: 0 },
+              },
             },
           } as SaveSlot;
         },
         save(save: SaveSlot) {
-          const catnipField = (save.state.buildings ?? {})["catnip-field"];
+          const buildings = save.state.buildings ?? {};
+
+          const catnipField = buildings["catnip-field"];
           expect(catnipField?.level).to.equal(1);
           expect(catnipField?.unlocked).to.be.true;
 
-          const hut = (save.state.buildings ?? {})["hut"];
+          const hut = buildings["hut"];
           expect(hut?.level).to.equal(0);
           expect(hut?.unlocked).to.be.false;
         },
@@ -30,33 +37,3 @@ describe("migrateV3", () => {
     );
   });
 });
-
-function asPromise<T>(value: T): Promise<T> {
-  return new Promise((resolve) => resolve(value));
-}
-
-function mockCursor(handlers: {
-  load(): SaveSlot;
-  save(state: SaveSlot): void;
-}) {
-  return {
-    objectStore() {
-      return {
-        openCursor() {
-          return asPromise({
-            get value() {
-              return handlers.load();
-            },
-            continue() {
-              return asPromise(undefined);
-            },
-            update(s: SaveSlot) {
-              handlers.save(s);
-              return asPromise(undefined);
-            },
-          });
-        },
-      };
-    },
-  } as unknown as UpgradeTransaction;
-}

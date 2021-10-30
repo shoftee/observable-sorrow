@@ -2,11 +2,12 @@ import { IDBPDatabase, IDBPTransaction, StoreNames } from "idb";
 
 import { migrateV1 } from "./v1";
 import { migrateV2 } from "./v2";
-import { migrateV3, OsSchemaV3 } from "./v3";
+import { migrateV3 } from "./v3";
+import { migrateV4, OsSchemaV4 } from "./v4";
 
 export const DatabaseName = "os-data";
-export const LatestVersion = 3;
-export type LatestSchema = OsSchemaV3;
+export const LatestVersion = 4;
+export type LatestSchema = OsSchemaV4;
 export type UpgradeTransaction<TSchema = LatestSchema> = IDBPTransaction<
   TSchema,
   StoreNames<TSchema>[],
@@ -25,6 +26,7 @@ const migrations: Migration[] = [
   { version: 1, run: migrateV1 },
   { version: 2, run: migrateV2 },
   { version: 3, run: migrateV3 },
+  { version: 4, run: migrateV4 },
 ];
 
 export async function migrate(
