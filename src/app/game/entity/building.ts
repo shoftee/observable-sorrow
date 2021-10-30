@@ -13,6 +13,8 @@ import {
   Watcher,
 } from ".";
 
+type BuildingStore = NonNullable<SaveState["buildings"]>[BuildingId];
+
 export class BuildingEntity extends Entity<BuildingId> implements Watched {
   readonly state: BuildingState;
 
@@ -33,21 +35,14 @@ export class BuildingEntity extends Entity<BuildingId> implements Watched {
     watcher.watch(this.id, this.state);
   }
 
-  saveTo(store: NonNullable<SaveState["buildings"]>): void {
-    const stored = store[this.id];
-    if (stored === undefined) {
-      store[this.id] = {
-        level: this.state.level,
-        unlocked: this.state.unlocked,
-      };
-    } else {
-      stored.level = this.state.level;
-      stored.unlocked = this.state.unlocked;
-    }
+  save(): BuildingStore {
+    return {
+      level: this.state.level,
+      unlocked: this.state.unlocked,
+    };
   }
 
-  loadFrom(store: NonNullable<SaveState["buildings"]>): void {
-    const stored = store[this.id];
+  load(stored: BuildingStore): void {
     if (stored !== undefined) {
       this.state.level = stored.level;
       this.state.unlocked = stored.unlocked;
@@ -70,7 +65,7 @@ export class BuildingsPool
     const buildings = save?.buildings;
     if (buildings !== undefined) {
       for (const building of this.enumerate()) {
-        building.loadFrom(buildings);
+        building.load(buildings[building.id]);
       }
     }
   }
@@ -78,7 +73,7 @@ export class BuildingsPool
   saveState(save: SaveState): void {
     save.buildings = {};
     for (const building of this.enumerate()) {
-      building.saveTo(save.buildings);
+      save.buildings[building.id] = building.save();
     }
   }
 }
