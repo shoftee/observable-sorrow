@@ -37,7 +37,8 @@ export class AstronomySystem extends System {
   }
 
   private handleRareEvent() {
-    if (!this.admin.boolean("unlock.section.science")) {
+    const unlocked = this.admin.boolean("unlock.section.science").state;
+    if (unlocked.value !== true) {
       // these only occur after science has been unlocked
       return;
     }
