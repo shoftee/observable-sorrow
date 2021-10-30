@@ -69,6 +69,15 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
+  culture: {
+    id: "culture",
+    label: "resources.culture.label",
+    effects: {
+      delta: "culture.delta",
+      limit: "culture.limit",
+    },
+    flags: {},
+  },
 };
 
 export interface ResourceState {

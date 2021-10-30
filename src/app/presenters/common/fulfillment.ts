@@ -49,7 +49,7 @@ function fulfillmentTime(ingredient: IngredientState): NumberView | undefined {
   } else {
     return {
       value: ingredient.fulfillmentTime,
-      style: { unit: UnitKind.Tick, invert: false },
+      style: { unit: UnitKind.Tick },
       rounded: true,
       showSign: "negative",
     };

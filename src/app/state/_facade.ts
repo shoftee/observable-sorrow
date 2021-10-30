@@ -13,10 +13,10 @@ import {
   BonfireMetadataType,
   BuildingMetadata,
   BuildingMetadataType,
-  EffectNumberStyleMetadata,
+  EffectDisplayStyles,
   JobMetadata,
   JobMetadataType,
-  NumberStyle,
+  EffectDisplayStyle,
   RecipeMetadata,
   RecipeMetadataType,
   ResourceMetadata,
@@ -45,8 +45,8 @@ export const Meta = {
     return BuildingMetadata[id];
   },
 
-  numberStyle(id: NumberEffectId): NumberStyle {
-    return EffectNumberStyleMetadata[id];
+  effectDisplay(id: NumberEffectId): EffectDisplayStyle {
+    return EffectDisplayStyles[id];
   },
 
   jobs(): Enumerable<JobMetadataType> {

@@ -2,7 +2,11 @@ export type ProductionEffectId =
   | "catnip.production"
   | "wood.production"
   | "science.production";
-export type DeltaEffectId = "catnip.delta" | "wood.delta" | "science.delta";
+export type DeltaEffectId =
+  | "catnip.delta"
+  | "wood.delta"
+  | "science.delta"
+  | "culture.delta";
 export type RatioEffectId =
   | "science.ratio"
   | "weather.season-ratio"

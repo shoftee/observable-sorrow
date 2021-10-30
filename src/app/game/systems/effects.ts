@@ -13,20 +13,34 @@ export class EffectsSystem extends System {
   }
 
   init(): void {
-    watchSyncEffect(() => this.resolveEffectValues());
+    this.resolveEffectValues();
   }
 
   update(): void {
+    // everything happens in reactivity calls, no need for explicit updates here
     return;
   }
 
   private resolveEffectValues() {
     const resolver = new Resolver(this.admin);
     resolver.resolveExprs(
+      this.admin.booleans().map((m) => m.id),
+      {
+        expr: (id) => BooleanExprs[id],
+        get: (id) => this.admin.boolean(id).state.value ?? false,
+        set: (id, v: boolean) => {
+          this.admin.boolean(id).state.value = v;
+        },
+      },
+    );
+    resolver.resolveExprs(
       this.admin.numbers().map((m) => m.id),
       {
         expr: (id) => NumberExprs[id],
-        state: (id) => this.admin.number(id).state,
+        get: (id) => this.admin.number(id).state,
+        set: (id, v: EffectState<number>) => {
+          this.admin.number(id).state.value = v.value;
+        },
         addTreeNode: (parent, child) => {
           getOrAdd(
             this.admin.effectTree().state,
@@ -36,19 +50,13 @@ export class EffectsSystem extends System {
         },
       },
     );
-    resolver.resolveExprs(
-      this.admin.booleans().map((m) => m.id),
-      {
-        expr: (id) => BooleanExprs[id],
-        state: (id) => this.admin.boolean(id).state,
-      },
-    );
   }
 }
 
 interface EffectStore<T, TId extends string> {
   expr(id: TId): Expr<T, TId>;
-  state(id: TId): EffectState<T>;
+  get(id: TId): T;
+  set(id: TId, value: T): void;
   addTreeNode?(parent: TId, child: TId): void;
 }
 
@@ -82,10 +90,9 @@ class Resolver {
     // Add current calculation to resolving stack.
     // This allows us to detect cycles.
     this.resolving.add(id);
-    const calculatedValue = this.unwrap(id, store);
+    watchSyncEffect(() => store.set(id, this.unwrap(id, store)));
     this.resolving.delete(id);
 
-    store.state(id).value = calculatedValue;
     this.resolved.add(id);
   }
 
@@ -97,12 +104,7 @@ class Resolver {
         val: (innerId) => {
           this.resolveExpr(innerId, store);
           store.addTreeNode?.(id, innerId);
-
-          const value = store.state(innerId).value;
-          if (value === undefined) {
-            throw new CouldNotResolveEffectError(innerId, "value not in store");
-          }
-          return value;
+          return store.get(innerId);
         },
       });
     } else {

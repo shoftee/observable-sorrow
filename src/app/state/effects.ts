@@ -11,14 +11,14 @@ export enum UnitKind {
   Percent,
 }
 
-export type NumberStyle = Readonly<{
+export type EffectDisplayStyle = Readonly<{
   unit: UnitKind;
   invert?: boolean;
   label?: string;
   disposition?: "none" | "hide" | "inline" | "collapse";
 }>;
 
-export const EffectNumberStyleMetadata: Record<NumberEffectId, NumberStyle> = {
+export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   // Deltas
   // Catnip
   "catnip.delta": { unit: UnitKind.PerTick, disposition: "inline" },
@@ -79,6 +79,9 @@ export const EffectNumberStyleMetadata: Record<NumberEffectId, NumberStyle> = {
   },
   "library.science-ratio": { unit: UnitKind.Percent },
   "library.science-ratio.base": { unit: UnitKind.Percent },
+
+  // Culture
+  "culture.delta": { unit: UnitKind.PerTick },
 
   // Limits
   // Catnip

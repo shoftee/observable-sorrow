@@ -3,8 +3,8 @@ import { reactive } from "vue";
 
 import {
   BuildingId,
-  EventPool,
   EventId,
+  EventPool,
   FulfillmentId,
   IPresenterChangeSink,
   JobId,
@@ -25,12 +25,12 @@ import {
   BuildingState,
   EffectState,
   EffectTreeState,
-  EffectNumberStyleMetadata,
+  EffectDisplayStyles,
+  EffectDisplayStyle,
   EnvironmentState,
   FulfillmentState,
   HistoryEvent,
   JobState,
-  NumberStyle,
   PlayerState,
   PopState,
   RecipeState,
@@ -49,7 +49,7 @@ export interface IStateManager {
 
   fulfillment(id: FulfillmentId): FulfillmentState;
 
-  numberView(id: NumberEffectId): NumberView;
+  numberView(id: NumberEffectId): NumberView | undefined;
 
   jobs(): Enumerable<[JobId, JobState]>;
   job(id: JobId): JobState;
@@ -78,7 +78,7 @@ export interface IStateManager {
 
 export interface NumberView {
   value: number;
-  style: NumberStyle;
+  style: EffectDisplayStyle;
   rounded?: boolean;
   showSign?: ShowSign;
 }
@@ -211,14 +211,16 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.jobs.get(id) as JobState;
   }
 
-  numberView(id: NumberEffectId): NumberView {
+  numberView(id: NumberEffectId): NumberView | undefined {
     const number = this.pools.numbers.get(id) as EffectState<number>;
-    return {
-      value: number.value ?? 0,
-      style: EffectNumberStyleMetadata[id],
-      rounded: false,
-      showSign: "always",
-    };
+    return number.value !== undefined
+      ? {
+          value: number.value,
+          style: EffectDisplayStyles[id],
+          rounded: false,
+          showSign: "always",
+        }
+      : undefined;
   }
 
   pops(): Enumerable<[PopId, PopState]> {

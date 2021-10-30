@@ -98,6 +98,6 @@ export interface BonfireItem {
 export interface EffectItem {
   id: string;
   label: string;
-  singleAmount: NumberView;
-  totalAmount: NumberView;
+  singleAmount: NumberView | undefined;
+  totalAmount: NumberView | undefined;
 }

@@ -56,7 +56,7 @@ export abstract class EntityPool<
   protected readonly pool: Map<TId, TEntity>;
 
   constructor(readonly id: PoolId, private readonly watcher: Watcher) {
-    this.pool = new Map<TId, TEntity>();
+    this.pool = reactive(new Map<TId, TEntity>());
   }
 
   protected add(entity: TEntity): void {

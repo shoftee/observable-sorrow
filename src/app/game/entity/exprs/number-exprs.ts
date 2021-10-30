@@ -1,39 +1,94 @@
-import { BuildingId, JobId, NumberEffectId } from "@/app/interfaces";
-import { asEnumerable } from "@/app/utils/enumerable";
+import {
+  BuildingId,
+  JobId,
+  NumberEffectId,
+  ResourceId,
+} from "@/app/interfaces";
+import { EffectState } from "@/app/state";
+import { reduce } from "@/app/utils/collections";
 
 import { effect, unwrap, Expr, ExprContext } from "./common";
 
-export type NumberExpr = Expr<number, NumberEffectId>;
-type Ctx = ExprContext<number, NumberEffectId>;
+export type NumberExpr = Expr<EffectState<number>, NumberEffectId>;
+type Ctx = ExprContext<EffectState<number>, NumberEffectId>;
 
-const level = (id: BuildingId) => (ctx: Ctx) =>
-  ctx.admin.building(id).state.level;
+const building = (id: BuildingId) => (ctx: Ctx) => {
+  const building = ctx.admin.building(id).state;
+  return { value: building.unlocked ? building.level : undefined };
+};
 
-const workers = (id: JobId) => (ctx: Ctx) =>
-  ctx.admin.pops().withJob(id).count();
+const resource = (id: ResourceId) => (ctx: Ctx) => {
+  const resource = ctx.admin.resource(id).state;
+  return { value: resource.unlocked ? resource.amount : undefined };
+};
+
+const workers = (id: JobId) => (ctx: Ctx) => ({
+  value: ctx.admin.pops().withJob(id).count(),
+});
+
+const lockedResourceConstant = (c: number, id: ResourceId) => (ctx: Ctx) => ({
+  value: ctx.admin.resource(id).state.unlocked ? c : undefined,
+});
+
+const fallback = (check: NumberExpr, fallback: NumberExpr) => (ctx: Ctx) => {
+  const checked = unwrap(check, ctx);
+  return checked.value === undefined ? unwrap(fallback, ctx) : checked;
+};
+
+const constant = (c: number) => (_: Ctx) => ({ value: c });
 
 const sum =
   (...exprs: NumberExpr[]) =>
-  (ctx: Ctx) =>
-    asEnumerable(exprs).reduce(0, (acc, expr) => acc + unwrap(expr, ctx));
+  (ctx: Ctx) => ({
+    value: reduce(
+      exprs,
+      (m) => unwrap(m, ctx).value,
+      (acc, value) =>
+        acc === undefined || value === undefined ? undefined : acc + value,
+      0,
+    ),
+  });
 
-const subtract = (lhs: NumberExpr, rhs: NumberExpr) => (ctx: Ctx) =>
-  unwrap(lhs, ctx) - unwrap(rhs, ctx);
+const subtract = (lhs: NumberExpr, rhs: NumberExpr) => (ctx: Ctx) => {
+  const lhsVal = unwrap(lhs, ctx).value;
+  const rhsVal = unwrap(rhs, ctx).value;
+  return {
+    value:
+      lhsVal === undefined || rhsVal === undefined
+        ? undefined
+        : lhsVal - rhsVal,
+  };
+};
 
 const prod =
   (...exprs: NumberExpr[]) =>
-  (ctx: Ctx) =>
-    asEnumerable(exprs).reduce(1, (acc, expr) => acc * unwrap(expr, ctx));
+  (ctx: Ctx) => ({
+    value: reduce(
+      exprs,
+      (m) => unwrap(m, ctx).value,
+      (acc, value) =>
+        acc === undefined || value === undefined ? undefined : acc * value,
+      1,
+    ),
+  });
 
-const ratio = (base: NumberExpr, ratio: NumberExpr) => (ctx: Ctx) =>
-  unwrap(base, ctx) * (1 + unwrap(ratio, ctx));
+const ratio = (base: NumberExpr, ratio: NumberExpr) => (ctx: Ctx) => {
+  const baseVal = unwrap(base, ctx).value;
+  const ratioVal = unwrap(ratio, ctx).value;
+  return {
+    value:
+      baseVal === undefined || ratioVal === undefined
+        ? undefined
+        : baseVal * (1 + ratioVal),
+  };
+};
 
 export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   // Limits and other stuff
-  "catnip.limit.base": 5000,
+  "catnip.limit.base": constant(5000),
   "catnip.limit": effect("catnip.limit.base"),
 
-  "wood.limit.base": 200,
+  "wood.limit.base": constant(200),
   "wood.limit": effect("wood.limit.base"),
 
   "kittens.limit": effect("hut.kittens-limit"),
@@ -62,71 +117,75 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("jobs.scholar.science"),
     effect("science.ratio"),
   ),
-  "astronomy.rare-event.reward.base": 25,
+  "astronomy.rare-event.reward.base": constant(25),
   "astronomy.rare-event.reward": ratio(
     effect("astronomy.rare-event.reward.base"),
     effect("science.ratio"),
   ),
 
+  // Culture
+  "culture.delta": constant(0),
+
   // Catnip fields
-  "catnip-field.catnip.base": 0.125,
+  "catnip-field.catnip.base": constant(0.125),
   "catnip-field.catnip": prod(
     effect("catnip-field.catnip.base"),
-    level("catnip-field"),
+    building("catnip-field"),
   ),
 
   // Huts
-  "hut.kittens-limit.base": 2,
-  "hut.kittens-limit": prod(effect("hut.kittens-limit.base"), level("hut")),
-  "hut.catpower-limit.base": 75,
-  "hut.catpower-limit": prod(effect("hut.catpower-limit.base"), level("hut")),
+  "hut.kittens-limit.base": constant(2),
+  "hut.kittens-limit": prod(effect("hut.kittens-limit.base"), building("hut")),
+  "hut.catpower-limit.base": lockedResourceConstant(75, "catpower"),
+  "hut.catpower-limit": prod(
+    effect("hut.catpower-limit.base"),
+    building("hut"),
+  ),
 
   // Libraries
-  "library.science-limit.base": 250,
+  "library.science-limit.base": constant(250),
   "library.science-limit": prod(
     effect("library.science-limit.base"),
-    level("library"),
+    building("library"),
   ),
-  "library.science-ratio.base": 0.1,
+  "library.science-ratio.base": constant(0.1),
   "library.science-ratio": prod(
     effect("library.science-ratio.base"),
-    level("library"),
+    building("library"),
   ),
-  "library.culture-limit.base": 10,
+  "library.culture-limit.base": lockedResourceConstant(10, "culture"),
   "library.culture-limit": prod(
     effect("library.culture-limit.base"),
-    level("library"),
+    building("library"),
   ),
 
   // Population
-  "population.catnip-demand.base": 0.85,
+  "population.catnip-demand.base": constant(0.85),
   "population.catnip-demand": prod(
     effect("population.catnip-demand.base"),
-    ({ admin }) => admin.resource("kittens").state.amount,
+    fallback(resource("kittens"), constant(0)),
   ),
 
   // Weather
   "weather.season-ratio": ({ admin }) => {
     switch (admin.environment().state.season) {
       case "spring":
-        return +0.5;
-
+        return { value: +0.5 };
       case "winter":
-        return -0.75;
-
+        return { value: -0.75 };
       case "autumn":
       case "summer":
-        return 0;
+        return { value: 0 };
     }
   },
   "weather.severity-ratio": ({ admin }) => {
     switch (admin.environment().state.weather) {
       case "warm":
-        return +0.15;
+        return { value: +0.15 };
       case "cold":
-        return -0.15;
+        return { value: -0.15 };
       case "neutral":
-        return 0;
+        return { value: 0 };
     }
   },
   "weather.ratio": sum(
@@ -135,17 +194,17 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   ),
 
   // Jobs
-  "jobs.woodcutter.wood.base": 0.018,
+  "jobs.woodcutter.wood.base": constant(0.018),
   "jobs.woodcutter.wood": prod(
     effect("jobs.woodcutter.wood.base"),
     workers("woodcutter"),
   ),
-  "jobs.scholar.science.base": 0.035,
+  "jobs.scholar.science.base": constant(0.035),
   "jobs.scholar.science": prod(
     effect("jobs.scholar.science.base"),
     workers("scholar"),
   ),
-  "jobs.farmer.catnip.base": 1,
+  "jobs.farmer.catnip.base": constant(1),
   "jobs.farmer.catnip": prod(
     effect("jobs.farmer.catnip.base"),
     workers("farmer"),

@@ -18,17 +18,24 @@ const fmt = presenters.formatter;
       <slot name="title">Effects</slot>
     </div>
     <ul class="effects-list">
-      <li v-for="item in items" :key="item.id">
-        <i18n-t scope="global" :keypath="item.label" tag="span">
-          <template #amount>
-            <span class="number">
-              {{
-                fmt.v(events?.shift ? item.totalAmount : item.singleAmount)
-              }}
-            </span>
-          </template>
-        </i18n-t>
-      </li>
+      <template v-if="events?.shift">
+        <li v-for="item in items.filter(i => i.totalAmount !== undefined)" :key="item.id">
+          <i18n-t scope="global" :keypath="item.label" tag="span">
+            <template #amount>
+              <span class="number">{{ fmt.v(item.totalAmount!) }}</span>
+            </template>
+          </i18n-t>
+        </li>
+      </template>
+      <template v-else>
+        <li v-for="item in items.filter(i => i.singleAmount !== undefined)" :key="item.id">
+          <i18n-t scope="global" :keypath="item.label" tag="span">
+            <template #amount>
+              <span class="number">{{ fmt.v(item.singleAmount!) }}</span>
+            </template>
+          </i18n-t>
+        </li>
+      </template>
     </ul>
   </div>
 </template>

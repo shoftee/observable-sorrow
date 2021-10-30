@@ -3,7 +3,6 @@ import { computed, reactive } from "vue";
 import { DeltaEffectId, NumberEffectId, ResourceId } from "@/app/interfaces";
 import {
   Meta,
-  NumberStyle,
   ResourceMetadataType,
   ResourceState,
   UnitKind,
@@ -37,7 +36,9 @@ export class ResourcesPresenter {
           : this.kittensChange(manager);
       }),
       capacity: computed(() => res.capacity),
-      modifier: computed(() => this.modifier(meta.id, manager)),
+      modifier: computed(() =>
+        meta.id === "catnip" ? manager.numberView("weather.ratio") : undefined,
+      ),
       deltaTree: computed(() =>
         this.newEffectTree(meta.effects.delta, manager),
       ),
@@ -47,7 +48,7 @@ export class ResourcesPresenter {
   private resourceChange(res: ResourceState): NumberView {
     return {
       value: res.change,
-      style: { unit: UnitKind.PerTick, invert: false },
+      style: { unit: UnitKind.PerTick },
       showSign: "always",
     };
   }
@@ -55,27 +56,10 @@ export class ResourcesPresenter {
   private kittensChange(manager: IStateManager): NumberView {
     return {
       value: manager.stockpile("kitten-growth").amount,
-      style: { unit: UnitKind.Percent, invert: false },
+      style: { unit: UnitKind.Percent },
       showSign: "negative",
       rounded: true,
     };
-  }
-
-  private modifier(
-    id: ResourceId,
-    manager: IStateManager,
-  ): NumberView | undefined {
-    if (id !== "catnip") return undefined;
-
-    const catnipField = manager.building("catnip-field");
-
-    const weatherModifier = manager.numberView("weather.ratio");
-
-    if (catnipField.level > 0 && weatherModifier.value !== 0) {
-      return weatherModifier;
-    } else {
-      return undefined;
-    }
   }
 
   private newEffectTree(
@@ -96,7 +80,7 @@ export class ResourcesPresenter {
   ): Iterable<EffectTreeNode> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     for (const childId of manager.effectTree().get(id)!) {
-      const style = Meta.numberStyle(childId);
+      const style = Meta.effectDisplay(childId);
       switch (style.disposition) {
         case "hide":
           // completely ignore hidden children
@@ -107,26 +91,18 @@ export class ResourcesPresenter {
           continue;
 
         default:
-          yield this.newEffectNode(childId, style, manager);
+          yield reactive({
+            id: childId,
+            label: style.label,
+            value: computed(() => manager.numberView(childId)),
+            // Don't collect children of collapsed nodes
+            nodes:
+              style.disposition === "collapse"
+                ? []
+                : Array.from(this.collectEffectNodes(childId, manager)),
+          });
       }
     }
-  }
-
-  private newEffectNode(
-    id: NumberEffectId,
-    style: NumberStyle,
-    manager: IStateManager,
-  ): EffectTreeNode {
-    return reactive({
-      id: id,
-      label: style.label,
-      value: computed(() => manager.numberView(id)),
-      // Don't collect children of collapsed nodes
-      nodes:
-        style.disposition === "collapse"
-          ? []
-          : Array.from(this.collectEffectNodes(id, manager)),
-    });
   }
 }
 
@@ -147,7 +123,7 @@ export interface EffectTree {
 
 export interface EffectTreeNode {
   id: NumberEffectId;
-  value: NumberView;
+  value: NumberView | undefined;
   label?: string;
   nodes: EffectTreeNode[];
 }
