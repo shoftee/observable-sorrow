@@ -45,7 +45,7 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
 
   latestEpoch().events.unshift({
     id: e.detail.id,
-    text: e.detail.resolve(t),
+    text: e.detail.resolve(t, fmt),
   });
 });
 </script>

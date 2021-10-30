@@ -1,8 +1,10 @@
 {
   "game": {
+    "blurb": "You are a kitten in a catnip forest.",
     "control": {
       "pawse": "Pawse",
-      "unpawse": "Unpawse"
+      "unpawse": "Unpawse",
+      "clear-log": "Clear log"
     }
   },
   "sections": {
@@ -191,5 +193,10 @@
       "flavor": "Best thing since sliced bread!",
       "effect": "Unlocks Farmers and Barns."
     }
+  },
+
+  "astronomy": {
+    "rare-event": "A rare astronomical event occurred in the sky",
+    "science-reward": "Gained {amount} science!"
   }
 }

@@ -1,6 +1,6 @@
 import { useI18n } from "vue-i18n";
 
-import { StateManager } from ".";
+import { NumberFormatter, StateManager } from ".";
 import { Disposition, HistoryEvent, Kind } from "../state";
 
 export class LogPresenter {
@@ -12,7 +12,10 @@ export class LogPresenter {
         if (event.disposition !== Disposition.Ignore) {
           document.dispatchEvent(
             new CustomEvent<LogItem>("onlogmessage", {
-              detail: { id: this.eventId++, resolve: (t) => resolve(t, event) },
+              detail: {
+                id: this.eventId++,
+                resolve: (t, fmt) => resolve(t, fmt, event),
+              },
             }),
           );
         }
@@ -23,13 +26,29 @@ export class LogPresenter {
 
 type TextComposer = ReturnType<typeof useI18n>["t"];
 
-function resolve(t: TextComposer, event: HistoryEvent): string {
+function resolve(
+  t: TextComposer,
+  fmt: NumberFormatter,
+  event: HistoryEvent,
+): string {
+  const named = event.named ?? {};
+
+  // format numbers
+  for (const key in named) {
+    if (Object.prototype.hasOwnProperty.call(event.named, key)) {
+      const element = named[key];
+      if (typeof element === "number") {
+        named[key] = fmt.number(element);
+      }
+    }
+  }
+
   switch (event.kind) {
     case Kind.Label:
-      return t(event.label, event.named ?? {});
+      return t(event.label, named ?? {});
 
     case Kind.PluralLabel:
-      return t(event.label, event.named ?? {}, event.plural);
+      return t(event.label, named ?? {}, event.plural);
 
     default:
       throw new Error("unexpected event kind");
@@ -38,7 +57,7 @@ function resolve(t: TextComposer, event: HistoryEvent): string {
 
 export interface LogItem {
   id: number;
-  resolve: (t: TextComposer) => string;
+  resolve: (t: TextComposer, fmt: NumberFormatter) => string;
 }
 
 interface LogItemEventMap {
