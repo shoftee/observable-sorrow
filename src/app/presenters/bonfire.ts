@@ -1,6 +1,6 @@
 import { computed, reactive } from "vue";
 
-import { BonfireItemId, BuildingId } from "@/app/interfaces";
+import { BonfireItemId, BuildingId, Intent } from "@/app/interfaces";
 import { BonfireMetadataType, Meta } from "@/app/state";
 
 import { NumberView, IStateManager } from ".";
@@ -19,12 +19,10 @@ export class BonfirePresenter {
     meta: BonfireMetadataType,
     manager: IStateManager,
   ): BonfireItem {
-    if (meta.intent.kind === "gather-catnip") {
+    if (meta.intent.id === "gather-catnip") {
       return reactive({
-        id: meta.id,
-        label: meta.label,
-        description: meta.description,
-        flavor: meta.flavor,
+        ...this.staticData(meta),
+
         unlocked: true,
         fulfillment: {
           capped: false,
@@ -32,33 +30,38 @@ export class BonfirePresenter {
           ingredients: [],
         },
       });
-    } else if (meta.intent.kind === "refine-catnip") {
-      const recipeId = meta.intent.recipeId;
+    } else if (meta.intent.kind === "workshop") {
+      const recipeId = meta.intent.recipe;
       return reactive({
-        id: meta.id,
-        label: meta.label,
-        description: meta.description,
-        flavor: meta.flavor,
-        unlocked: true,
+        ...this.staticData(meta),
 
+        unlocked: true,
         fulfillment: computed(() => fulfillment(recipeId, manager)),
       });
-    } else {
-      const buildingId = meta.intent.buildingId;
+    } else if (meta.intent.kind === "construction") {
+      const buildingId = meta.intent.building;
       const state = manager.building(buildingId);
       return reactive({
-        id: meta.id,
-        label: meta.label,
-        description: meta.description,
-        flavor: meta.flavor,
+        ...this.staticData(meta),
 
         unlocked: computed(() => state.unlocked),
         level: computed(() => state.level),
-
         fulfillment: computed(() => fulfillment(buildingId, manager)),
         effects: computed(() => this.effects(buildingId, manager)),
       });
+    } else {
+      throw new Error(`unexpected intent ${JSON.stringify(meta.intent)}`);
     }
+  }
+
+  private staticData(meta: BonfireMetadataType) {
+    return {
+      id: meta.id,
+      intent: meta.intent,
+      label: meta.label,
+      description: meta.description,
+      flavor: meta.flavor,
+    };
   }
 
   private effects(
@@ -79,6 +82,7 @@ export class BonfirePresenter {
 
 export interface BonfireItem {
   id: BonfireItemId;
+  intent: Intent;
 
   label: string;
   description: string;

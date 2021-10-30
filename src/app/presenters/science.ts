@@ -1,7 +1,7 @@
 import { computed, ComputedRef, reactive } from "vue";
 
-import { TechId } from "@/app/interfaces";
-import { Meta } from "@/app/state";
+import { ResearchIntent, TechId } from "@/app/interfaces";
+import { Meta, TechMetadataType } from "@/app/state";
 
 import { StateManager } from ".";
 import { FulfillmentItem, fulfillment } from "./common/fulfillment";
@@ -22,10 +22,9 @@ export class SciencePresenter {
     const meta = Meta.tech(id);
     const state = manager.tech(id);
     return reactive({
-      id: meta.id,
-      label: meta.label,
-      description: meta.description,
-      flavor: meta.flavor,
+      ...this.staticData(meta),
+      intent: { kind: "research", id: "research-tech", tech: meta.id },
+
       unlocked: computed(() => state.unlocked),
       researched: computed(() => state.researched),
 
@@ -33,10 +32,20 @@ export class SciencePresenter {
       effects: meta.effects,
     });
   }
+
+  private staticData(meta: TechMetadataType) {
+    return {
+      id: meta.id,
+      label: meta.label,
+      description: meta.description,
+      flavor: meta.flavor,
+    };
+  }
 }
 
 export interface TechItem {
   id: TechId;
+  intent: ResearchIntent;
   label: string;
   description: string;
   flavor: string | undefined;

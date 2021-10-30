@@ -1,12 +1,10 @@
 import { proxy, releaseProxy, RemoteObject, wrap } from "comlink";
 
 import {
-  IBonfireInteractor,
+  IDispatcher,
   IDevToolsInteractor,
   IGameController,
   IRootInteractor,
-  IScienceInteractor,
-  ISocietyInteractor,
   IStoreInteractor,
   OnEventHandler,
   OnMutationHandler,
@@ -28,11 +26,9 @@ import { loadOrInitGeneral } from "./store/db";
 
 export type Channel = {
   interactors: {
-    bonfire: RemoteObject<IBonfireInteractor>;
     controller: RemoteObject<IGameController>;
     devTools: RemoteObject<IDevToolsInteractor>;
-    society: RemoteObject<ISocietyInteractor>;
-    science: RemoteObject<IScienceInteractor>;
+    dispatcher: RemoteObject<IDispatcher>;
     store: RemoteObject<IStoreInteractor>;
   };
   presenters: {
@@ -89,9 +85,6 @@ export async function Setup(): Promise<Channel> {
       society: presenters.society,
     },
     interactors: {
-      bonfire: {
-        buildItem: root.buildItem,
-      },
       controller: {
         start: root.start,
         stop: root.stop,
@@ -102,12 +95,8 @@ export async function Setup(): Promise<Channel> {
         setGatherCatnip: root.setGatherCatnip,
         setTimeAcceleration: root.setTimeAcceleration,
       },
-      society: {
-        assignJob: root.assignJob,
-        unassignJob: root.unassignJob,
-      },
-      science: {
-        researchTech: root.researchTech,
+      dispatcher: {
+        send: root.send,
       },
       store: {
         save: root.save,

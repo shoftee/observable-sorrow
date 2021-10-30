@@ -1,4 +1,4 @@
-import { BonfireItemId, EventId, JobId, PoolId, TechId } from ".";
+import { EventId, Intent, PoolId } from ".";
 
 export type PropertyBag = Record<string, unknown>;
 
@@ -20,11 +20,9 @@ export interface IPresenterChangeSink {
 }
 
 export interface IRootInteractor
-  extends IBonfireInteractor,
+  extends IDispatcher,
     IDevToolsInteractor,
     IGameController,
-    IScienceInteractor,
-    ISocietyInteractor,
     IStoreInteractor {
   initialize(
     onTicked: OnMutationHandler,
@@ -33,17 +31,8 @@ export interface IRootInteractor
   ): Promise<void>;
 }
 
-export interface IBonfireInteractor {
-  buildItem(id: BonfireItemId): void;
-}
-
-export interface IScienceInteractor {
-  researchTech(id: TechId): void;
-}
-
-export interface ISocietyInteractor {
-  assignJob(id: JobId): void;
-  unassignJob(id: JobId): void;
+export interface IDispatcher {
+  send(intent: Intent): Promise<void>;
 }
 
 export interface IStoreInteractor {

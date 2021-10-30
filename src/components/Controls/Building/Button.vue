@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Detail from "./Detail.vue"
 
-import { BonfireItemId } from "@/app/interfaces";
 import { BonfireItem } from "@/app/presenters";
 import { injectChannel } from "@/composables/game-channel";
+import { Intent } from "@/app/interfaces";
 
 const { item } = defineProps<{ item: BonfireItem }>();
 const { t } = useI18n();
 
 const level = computed(() => item.level ?? 0)
 
-const interactors = injectChannel().interactors;
+const { dispatcher } = injectChannel().interactors;
 
-async function buildItem(id: BonfireItemId): Promise<void> {
-  await interactors.bonfire.buildItem(id)
+async function dispatch(intent: Intent): Promise<void> {
+  await dispatcher.send(toRaw(intent))
 }
 </script>
 
@@ -29,7 +29,7 @@ async function buildItem(id: BonfireItemId): Promise<void> {
         class="btn btn-outline-secondary w-100"
         :class="{ capped: item.fulfillment.capped }"
         :disabled="!item.fulfillment.fulfilled"
-        @click="buildItem(item.id)"
+        @click="dispatch(item.intent)"
       >
         {{ t(item.label) }}
         <span v-if="level > 0" class="number-annotation border">{{ level }}</span>

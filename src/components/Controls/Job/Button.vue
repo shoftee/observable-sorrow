@@ -15,13 +15,14 @@ const events = inject(KeyboardEventsKey);
 
 const effects = computed(() => item.effects ?? []);
 
-const interactors = injectChannel().interactors;
+const { dispatcher } = injectChannel().interactors;
 
 async function assignJob(id: JobId): Promise<void> {
-  await interactors.society.assignJob(id);
+  await dispatcher.send({ kind: "society", id: "assign-job", "job": id })
 }
+
 async function unassignJob(id: JobId): Promise<void> {
-  await interactors.society.unassignJob(id);
+  await dispatcher.send({ kind: "society", id: "unassign-job", "job": id })
 }
 </script>
 

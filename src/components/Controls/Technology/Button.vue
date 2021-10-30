@@ -7,14 +7,14 @@ import { TechId } from "@/app/interfaces";
 import { TechItem } from "@/app/presenters";
 
 import { injectChannel } from "@/composables/game-channel";
-const interactors = injectChannel().interactors;
+const { dispatcher } = injectChannel().interactors;
 
 const { t } = useI18n();
 
 const { tech } = defineProps<{ tech: TechItem }>();
 
 async function research(id: TechId): Promise<void> {
-  await interactors.science.researchTech(id);
+  await dispatcher.send({ kind: "research", id: "research-tech", tech: id })
 }
 </script>
 

@@ -1,12 +1,10 @@
 import { expose } from "comlink";
 
 import {
-  BonfireItemId,
+  Intent,
   IRootInteractor,
-  JobId,
   OnEventHandler,
   OnMutationHandler,
-  TechId,
 } from "@/app/interfaces";
 
 import { Runner } from "./runner";
@@ -48,20 +46,9 @@ const interactor: IRootInteractor = {
   async save() {
     await runner.interactor.store.save();
   },
-  // bonfire
-  buildItem(id: BonfireItemId) {
-    runner.interactor.bonfire.buildItem(id);
-  },
-  // society
-  assignJob(id: JobId) {
-    runner.interactor.society.assignJob(id);
-  },
-  unassignJob(id: JobId) {
-    runner.interactor.society.unassignJob(id);
-  },
-  // science
-  researchTech(id: TechId) {
-    runner.interactor.science.researchTech(id);
+  // command dispatch
+  async send(intent: Intent) {
+    await runner.interactor.dispatcher.send(intent);
   },
   // devtools
   turnDevToolsOn() {
