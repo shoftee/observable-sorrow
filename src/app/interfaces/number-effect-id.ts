@@ -8,6 +8,10 @@ export type RatioEffectId =
   | "weather.season-ratio"
   | "weather.severity-ratio";
 
+export type AstronomyEffectId =
+  | "astronomy.rare-event.reward"
+  | "astronomy.rare-event.reward.base";
+
 export type LimitEffectId =
   | "catnip.limit"
   | "catnip.limit.base"
@@ -54,6 +58,7 @@ export type NumberEffectId =
   | DeltaEffectId
   | RatioEffectId
   | LimitEffectId
+  | AstronomyEffectId
   | CatnipFieldEffectId
   | HutEffectId
   | LibraryEffectId

@@ -6,7 +6,7 @@ export type RecipeId = "refine-catnip";
 export type ResourceId = "catnip" | "wood" | "kittens" | "catpower" | "science";
 export type SeasonId = "spring" | "summer" | "autumn" | "winter";
 export type SectionId = "bonfire" | "society" | "science";
-export type StockpileId = "kitten-growth";
+export type StockpileId = "kitten-growth" | "observe-sky";
 export type TechId = "calendar" | "agriculture";
 export type WeatherId = "neutral" | "warm" | "cold";
 

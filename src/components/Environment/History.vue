@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+
+import ObserveSky from './ObserveSky.vue';
 import Pawse from './Pawse.vue';
 
 import { endpoint } from '@/composables/game-endpoint';
@@ -53,9 +55,14 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
 <template>
   <section unscrollable class="history-container">
     <div class="game-controls-container">
-      <div>You are a kitten in a catnip forest.</div>
+      <div>{{ t("game.blurb") }}</div>
       <div class="btn-group">
-        <button type="button" class="btn btn-outline-secondary" @click="clearLog">Clear log</button>
+        <ObserveSky class="btn btn-outline-secondary" />
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          @click="clearLog"
+        >{{ t("game.control.clear-log") }}</button>
         <Pawse class="btn btn-outline-secondary" />
       </div>
     </div>

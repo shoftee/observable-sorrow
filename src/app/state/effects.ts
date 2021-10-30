@@ -98,6 +98,8 @@ export const EffectNumberStyleMetadata: Record<NumberEffectId, NumberStyle> = {
   "science.limit": { unit: UnitKind.None, disposition: "inline" },
   "library.science-limit": { unit: UnitKind.None, disposition: "collapse" },
   "library.science-limit.base": { unit: UnitKind.None },
+  "astronomy.rare-event.reward": { unit: UnitKind.None },
+  "astronomy.rare-event.reward.base": { unit: UnitKind.None },
 
   // Catpower
   "catpower.limit": { unit: UnitKind.None, disposition: "inline" },

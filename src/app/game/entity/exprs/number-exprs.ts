@@ -62,6 +62,11 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("jobs.scholar.science"),
     effect("science.ratio"),
   ),
+  "astronomy.rare-event.reward.base": 25,
+  "astronomy.rare-event.reward": ratio(
+    effect("astronomy.rare-event.reward.base"),
+    effect("science.ratio"),
+  ),
 
   // Catnip fields
   "catnip-field.catnip.base": 0.125,

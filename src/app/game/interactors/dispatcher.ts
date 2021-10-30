@@ -44,7 +44,10 @@ export class Dispatcher implements IDispatcher {
         break;
 
       case "observe-sky": {
-        throw new Error("not implemented");
+        if (this.admin.stockpile("observe-sky").state.amount > 0) {
+          this.admin.environment().observedSky = true;
+        }
+        break;
       }
     }
   }

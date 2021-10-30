@@ -11,6 +11,8 @@ export class EnvironmentEntity
 {
   readonly state: EnvironmentState;
 
+  observedSky: boolean;
+
   constructor() {
     super("environment");
 
@@ -22,6 +24,8 @@ export class EnvironmentEntity
       calendarLabel: "calendar.basic.no-weather",
       epochLabel: "calendar.epoch.basic",
     });
+
+    this.observedSky = false;
   }
 
   watch(watcher: Watcher): void {

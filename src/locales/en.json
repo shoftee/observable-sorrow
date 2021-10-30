@@ -4,7 +4,8 @@
     "control": {
       "pawse": "Pawse",
       "unpawse": "Unpawse",
-      "clear-log": "Clear log"
+      "clear-log": "Clear log",
+      "observe-sky": "Observe sky"
     }
   },
   "sections": {

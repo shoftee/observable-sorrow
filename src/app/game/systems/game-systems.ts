@@ -14,9 +14,11 @@ import {
   ResourceLimitsSystem,
   TimeSystem,
   SectionsSystem,
+  AstronomySystem,
 } from ".";
 
 export class GameSystems {
+  private readonly astronomy: AstronomySystem;
   private readonly buildings: BuildingSystem;
   private readonly crafting: CraftingSystem;
   private readonly effects: EffectsSystem;
@@ -31,6 +33,7 @@ export class GameSystems {
   private readonly time: TimeSystem;
 
   constructor(admin: EntityAdmin) {
+    this.astronomy = new AstronomySystem(admin);
     this.buildings = new BuildingSystem(admin);
     this.crafting = new CraftingSystem(admin);
     this.effects = new EffectsSystem(admin);
@@ -56,6 +59,7 @@ export class GameSystems {
     this.time.update(dt);
 
     // Update environment.
+    this.astronomy.update();
     this.environment.update();
 
     // Handle orders.

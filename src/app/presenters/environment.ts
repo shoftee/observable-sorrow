@@ -24,6 +24,9 @@ export class EnvironmentPresenter {
       epochLabel: computed(() => state.epochLabel),
       seasonLabel: computed(() => Meta.season(state.season).label),
       weatherLabel: computed(() => Meta.weather(state.weather).label),
+      showObserveSky: computed(
+        () => manager.stockpile("observe-sky").amount > 0,
+      ),
     });
   }
 }
@@ -37,4 +40,5 @@ export interface Calendar {
   epochLabel: string;
   seasonLabel: string;
   weatherLabel: string | undefined;
+  showObserveSky: boolean;
 }

@@ -41,6 +41,7 @@ export class StockpilesPool
   constructor(watcher: Watcher) {
     super("stockpiles", watcher);
     this.add(new StockpileEntity("kitten-growth"));
+    this.add(new StockpileEntity("observe-sky"));
   }
 
   loadState(state: SaveState): void {

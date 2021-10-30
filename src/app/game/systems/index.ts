@@ -1,6 +1,7 @@
 export * from "./common/orders";
 export * from "./common/system";
 
+export * from "./astronomy";
 export * from "./buildings";
 export * from "./crafting";
 export * from "./environment";
