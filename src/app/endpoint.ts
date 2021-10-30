@@ -24,7 +24,7 @@ import {
 } from "./presenters";
 import { loadOrInitGeneral } from "./store/db";
 
-export type Channel = {
+export type Endpoint = {
   interactors: {
     controller: RemoteObject<IGameController>;
     devTools: RemoteObject<IDevToolsInteractor>;
@@ -45,7 +45,7 @@ export type Channel = {
 
 let release: () => void;
 
-export async function Setup(): Promise<Channel> {
+export async function Setup(): Promise<Endpoint> {
   // release old proxies if they're around
   release?.();
 

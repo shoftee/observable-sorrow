@@ -17,8 +17,8 @@ import ScienceControls from "./Controls/Science.vue";
 import { SectionId } from "@/app/interfaces";
 import { SectionItem } from "@/app/presenters";
 
-import { injectChannel } from "@/composables/game-channel";
-const { interactors, presenters } = injectChannel();
+import { endpoint } from "@/composables/game-endpoint";
+const { interactors, presenters } = endpoint();
 
 onMounted(async () => {
   // Start the game

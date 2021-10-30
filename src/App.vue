@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { provide, ref } from "vue";
-import { Channel } from "./app/channel";
+import { Endpoint } from "./app/endpoint";
 
 import GameLoader from "./components/GameLoader.vue";
 import Main from "./components/Main.vue"
 
-import { ChannelKey } from "./composables/game-channel";
+import { EndpointKey } from "./composables/game-endpoint";
 import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
 provide(KeyboardEventsKey, getKeyboardEvents());
 
-let channel = ref<Channel>();
-provide(ChannelKey, channel);
+let endpoint = ref<Endpoint>();
+provide(EndpointKey, endpoint);
 
 let loaded = ref(false);
-function onLoaded(c: Channel) {
+function onLoaded(ep: Endpoint) {
   loaded.value = true;
-  channel.value = c;
+  endpoint.value = ep;
 }
 </script>
 

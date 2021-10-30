@@ -4,8 +4,8 @@ import { useI18n } from "vue-i18n";
 
 import TechButton from "./Technology/Button.vue";
 
-import { injectChannel } from "@/composables/game-channel";
-const { science } = injectChannel().presenters;
+import { endpoint } from "@/composables/game-endpoint";
+const { science } = endpoint().presenters;
 
 const { t } = useI18n();
 

@@ -3,12 +3,12 @@ import { inject } from "vue";
 
 import { EffectItem } from "@/app/presenters";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 
 const { items } = defineProps<{ items: EffectItem[] }>()
 const events = inject(KeyboardEventsKey);
 
-const { presenters } = injectChannel();
+const { presenters } = endpoint();
 const fmt = presenters.formatter;
 </script>
 

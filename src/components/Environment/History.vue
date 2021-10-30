@@ -3,13 +3,13 @@ import { reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Pawse from './Pawse.vue';
 
-import { injectChannel } from '@/composables/game-channel';
+import { endpoint } from '@/composables/game-endpoint';
 import { LogItem } from '@/app/presenters';
 import { useLogItemEvent } from '@/composables/use-event-listener';
 
 import { LogEpoch, newLogEpoch, removeClippedEvents } from './_types';
 
-const { environment, formatter: fmt } = injectChannel().presenters;
+const { environment, formatter: fmt } = endpoint().presenters;
 const { t } = useI18n();
 
 let epochId = ref(0);

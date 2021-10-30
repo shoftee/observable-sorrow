@@ -6,8 +6,8 @@ import Detail from "./Detail.vue";
 import { TechId } from "@/app/interfaces";
 import { TechItem } from "@/app/presenters";
 
-import { injectChannel } from "@/composables/game-channel";
-const { dispatcher } = injectChannel().interactors;
+import { endpoint } from "@/composables/game-endpoint";
+const { dispatcher } = endpoint().interactors;
 
 const { t } = useI18n();
 

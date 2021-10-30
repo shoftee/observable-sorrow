@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 
 const { t } = useI18n();
 
-const { environment, formatter: fmt } = injectChannel().presenters;
+const { environment, formatter: fmt } = endpoint().presenters;
 const state = environment.calendar;
 </script>
 

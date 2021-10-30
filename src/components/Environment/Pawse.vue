@@ -2,10 +2,10 @@
 import { ref } from 'vue';
 
 import { useI18n } from 'vue-i18n';
-import { injectChannel } from '@/composables/game-channel';
+import { endpoint } from '@/composables/game-endpoint';
 
 const { t } = useI18n();
-const { controller } = injectChannel().interactors;
+const { controller } = endpoint().interactors;
 
 const paused = ref(false);
 async function pause() {

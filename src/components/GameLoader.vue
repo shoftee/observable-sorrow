@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
-import { Channel, Setup } from "@/app/channel";
+import { Endpoint, Setup } from "@/app/endpoint";
 
 const emit = defineEmits<{
-  (e: "loaded", channel: Channel): void,
+  (e: "loaded", endpoint: Endpoint): void,
 }>();
 
 onMounted(async () => {
-  const channel = await Setup();
-  emit("loaded", channel);
+  const endpoint = await Setup();
+  emit("loaded", endpoint);
 });
 </script>
 

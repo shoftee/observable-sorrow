@@ -3,11 +3,10 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { EffectTreeNode } from '@/app/presenters';
-import { injectChannel } from '@/composables/game-channel';
-const { presenters } = injectChannel();
+import { endpoint } from '@/composables/game-endpoint';
 
 const { nodes } = defineProps<{ nodes: EffectTreeNode[] }>();
-const fmt = presenters.formatter;
+const { formatter: fmt } = endpoint().presenters;
 
 const { t } = useI18n();
 

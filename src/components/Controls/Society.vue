@@ -5,9 +5,9 @@ import { useI18n } from "vue-i18n";
 import JobButton from "./Job/Button.vue";
 
 import { count } from "@/app/utils/collections";
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 
-const { society } = injectChannel().presenters;
+const { society } = endpoint().presenters;
 const { t } = useI18n();
 
 const jobs = computed(() => unref(society.jobs).filter(item => item.unlocked));
@@ -21,7 +21,7 @@ const idle = computed(() => count(society.pops.values, item => item.job === unde
       <div class="card-body text-center">{{ t("jobs.status.empty") }}</div>
     </template>
     <template v-else>
-      <div class="card-header">{{ t("jobs.title") }}</div>
+      <div class="card-header">{{ t(" jobs.title") }}</div>
       <div class="card-body">
         <div>
           <p v-if="idle === 0">{{ t("jobs.status.good") }}</p>

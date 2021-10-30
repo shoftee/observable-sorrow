@@ -2,9 +2,9 @@
 import { computed } from "vue";
 
 import BuildingButton from "./Building/Button.vue";
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 
-const { presenters } = injectChannel();
+const { presenters } = endpoint();
 const items = computed(() => {
   return presenters.bonfire.all.filter((b) => b.unlocked);
 });

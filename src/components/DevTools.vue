@@ -2,11 +2,11 @@
 import { ref, watch } from "vue";
 import { Offcanvas } from "bootstrap"
 
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 import { useKeyboardEvent } from "@/composables/use-event-listener";
 
-const { devTools } = injectChannel().interactors;
-const { player } = injectChannel().presenters;
+const { devTools } = endpoint().interactors;
+const { player } = endpoint().presenters;
 
 const dt = window.__OS_DEVTOOLS__;
 watch(() => dt.on, async (newValue, oldValue) => {

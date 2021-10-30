@@ -5,14 +5,13 @@ import { useI18n } from "vue-i18n";
 import EffectTree from "./EffectTree.vue";
 
 import { ResourceItem } from "@/app/presenters/resources";
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 
 const { item } = defineProps<{ item: ResourceItem }>();
 
 const { t } = useI18n();
 
-const { presenters } = injectChannel();
-const fmt = presenters.formatter;
+const { formatter: fmt } = endpoint().presenters;
 
 const { amount, capacity, change, modifier } = toRefs(item);
 </script>

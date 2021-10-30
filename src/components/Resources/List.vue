@@ -4,21 +4,22 @@ import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
-import { injectChannel } from "@/composables/game-channel";
-
-const { t } = useI18n();
+import { endpoint } from "@/composables/game-endpoint";
 
 const show = ref(true);
-const { presenters } = injectChannel();
-const resources = computed(() => {
-  return presenters.resources.all.filter((r) => r.unlocked);
+
+const { resources } = endpoint().presenters;
+const items = computed(() => {
+  return resources.all.filter((r) => r.unlocked);
 });
+
+const { t } = useI18n();
 </script>
 
 <template>
   <div class="resources-container">
     <div class="card">
-      <div v-if="resources.length === 0" class="no-resources">{{ t("resources.section.empty") }}</div>
+      <div v-if="items.length === 0" class="no-resources">{{ t("resources.section.empty") }}</div>
       <div v-else class="base-resources">
         <button class="btn shadow-none" @click="show = !show">
           <div class="clearfix">
@@ -29,8 +30,8 @@ const resources = computed(() => {
           </div>
         </button>
         <ul v-if="show">
-          <li v-for="resource in resources" :key="resource.id">
-            <Item :item="resource" class="w-100" />
+          <li v-for="item in items" :key="item.id">
+            <Item :item="item" class="w-100" />
           </li>
         </ul>
       </div>

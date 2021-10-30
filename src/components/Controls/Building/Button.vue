@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 import Detail from "./Detail.vue"
 
 import { BonfireItem } from "@/app/presenters";
-import { injectChannel } from "@/composables/game-channel";
+import { endpoint } from "@/composables/game-endpoint";
 import { Intent } from "@/app/interfaces";
 
 const { item } = defineProps<{ item: BonfireItem }>();
@@ -13,7 +13,7 @@ const { t } = useI18n();
 
 const level = computed(() => item.level ?? 0)
 
-const { dispatcher } = injectChannel().interactors;
+const { dispatcher } = endpoint().interactors;
 
 async function dispatch(intent: Intent): Promise<void> {
   await dispatcher.send(toRaw(intent))

@@ -1,7 +1,11 @@
 import { EntityAdmin } from "../entity";
 
-import { DevToolsInteractor, GameController, StoreInteractor } from ".";
-import { Dispatcher } from "./command";
+import {
+  DevToolsInteractor,
+  Dispatcher,
+  GameController,
+  StoreInteractor,
+} from ".";
 
 export class InteractorFacade {
   readonly devTools: DevToolsInteractor;
