@@ -161,12 +161,21 @@
     },
     "library": {
       "label": "Library",
-      "description": "A library to store sacred catkind knowledge. Increases science output.",
+      "description": "A library to store sacred catkind knowledge. Each level increases science output.",
       "flavor": "All in Catonese",
       "effects": {
         "science-limit": "Maximum science {amount}",
         "science-ratio": "Science output bonus {amount}",
         "culture-limit": "Maximum culture {amount}"
+      }
+    },
+    "barn": {
+      "label": "Barn",
+      "description": "A space to store more of your resources.",
+      "flavor": "Rats ain't a problem for us!",
+      "effects": {
+        "catnip-limit": "Maximum catnip {amount}",
+        "wood-limit": "Maximum wood {amount}"
       }
     }
   },

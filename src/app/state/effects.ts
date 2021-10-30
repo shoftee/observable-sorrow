@@ -84,10 +84,14 @@ export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   // Catnip
   "catnip.limit": { unit: UnitKind.None, disposition: "inline" },
   "catnip.limit.base": { unit: UnitKind.None },
+  "barn.catnip-limit": { unit: UnitKind.None, disposition: "inline" },
+  "barn.catnip-limit.base": { unit: UnitKind.None },
 
   // Wood
   "wood.limit": { unit: UnitKind.None, disposition: "inline" },
   "wood.limit.base": { unit: UnitKind.None },
+  "barn.wood-limit": { unit: UnitKind.None, disposition: "inline" },
+  "barn.wood-limit.base": { unit: UnitKind.None },
 
   // Kittens
   "kittens.limit": { unit: UnitKind.None, disposition: "inline" },

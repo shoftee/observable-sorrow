@@ -1,4 +1,4 @@
-export type BonfireBuildingId = "catnip-field" | "hut" | "library";
+export type BonfireBuildingId = "catnip-field" | "hut" | "library" | "barn";
 export type BuildingId = BonfireBuildingId;
 export type JobId = "woodcutter" | "scholar" | "farmer";
 export type PopId = `pop-${number}`;

@@ -96,6 +96,31 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
       },
     ],
   },
+  barn: {
+    id: "barn",
+    unlock: {
+      priceRatio: 0.3,
+      unlockEffect: "unlock.building.barn",
+    },
+    prices: {
+      base: { wood: 50 },
+      ratio: 1.75,
+    },
+    effects: [
+      {
+        id: "catnip-limit",
+        per: "barn.catnip-limit.base",
+        total: "barn.catnip-limit",
+        label: "buildings.barn.effects.catnip-limit",
+      },
+      {
+        id: "wood-limit",
+        per: "barn.wood-limit.base",
+        total: "barn.wood-limit",
+        label: "buildings.barn.effects.wood-limit",
+      },
+    ],
+  },
 };
 
 export interface BuildingState {

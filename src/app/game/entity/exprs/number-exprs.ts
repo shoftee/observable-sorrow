@@ -99,10 +99,13 @@ const constant = (value: number | undefined) => (_: Ctx) => value;
 export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   // Limits and other stuff
   "catnip.limit.base": constant(5000),
-  "catnip.limit": looseSum(effect("catnip.limit.base")),
+  "catnip.limit": looseSum(
+    effect("catnip.limit.base"),
+    effect("barn.catnip-limit"),
+  ),
 
   "wood.limit.base": constant(200),
-  "wood.limit": looseSum(effect("wood.limit.base")),
+  "wood.limit": looseSum(effect("wood.limit.base"), effect("barn.wood-limit")),
 
   "kittens.limit": effect("hut.kittens-limit"),
   "science.limit": effect("library.science-limit"),
@@ -158,6 +161,18 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "library.science-ratio": strictProd(
     effect("library.science-ratio.base"),
     fallback(building("library"), constant(0)),
+  ),
+
+  // Barns
+  "barn.catnip-limit.base": constant(5000),
+  "barn.catnip-limit": strictProd(
+    effect("barn.catnip-limit.base"),
+    building("barn"),
+  ),
+  "barn.wood-limit.base": constant(200),
+  "barn.wood-limit": strictProd(
+    effect("barn.wood-limit.base"),
+    building("barn"),
   ),
 
   // Population
