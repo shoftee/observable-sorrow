@@ -68,6 +68,11 @@ main {
   @include flex-row();
   @include p(2);
   max-width: 1920px;
+
+  > .unscrollable,
+  > [unscrollable] {
+    @include pt(1);
+  }
 }
 
 .env-container {
