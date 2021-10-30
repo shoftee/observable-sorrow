@@ -97,7 +97,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "population.catnip-demand.base": 0.85,
   "population.catnip-demand": prod(
     effect("population.catnip-demand.base"),
-    ({ admin }) => admin.pops().size,
+    ({ admin }) => admin.resource("kittens").state.amount,
   ),
 
   // Weather

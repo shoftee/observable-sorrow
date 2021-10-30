@@ -1,7 +1,6 @@
 import { JobId } from "@/app/interfaces";
 
 export interface SocietyState {
-  stockpile: number;
   totalPops: number;
   idlePops: number;
 }
@@ -13,4 +12,8 @@ export interface JobState {
 export interface PopState {
   job: JobId | undefined;
   name: string;
+}
+
+export interface StockpileState {
+  amount: number;
 }

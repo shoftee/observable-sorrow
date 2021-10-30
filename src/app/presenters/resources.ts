@@ -54,7 +54,7 @@ export class ResourcesPresenter {
 
   private kittensChange(manager: IStateManager): NumberView {
     return {
-      value: manager.society().stockpile,
+      value: manager.stockpile("kitten-growth").amount,
       style: { unit: UnitKind.Percent, invert: false },
       showSign: "negative",
       rounded: true,

@@ -7,6 +7,7 @@ import {
   RecipeId,
   ResourceId,
   SectionId,
+  StockpileId,
   TechId,
 } from "@/app/interfaces";
 
@@ -15,7 +16,6 @@ export type SingletonEntityId =
   | "environment"
   | "player"
   | "prng"
-  | "society"
   | "time"
   | "logs";
 
@@ -33,6 +33,7 @@ export interface PoolIdMap {
   recipes: RecipeId;
   resources: ResourceId;
   sections: SectionId;
+  stockpiles: StockpileId;
   techs: TechId;
 }
 

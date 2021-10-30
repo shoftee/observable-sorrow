@@ -7,6 +7,7 @@ import {
   RecipeId,
   ResourceId,
   SectionId,
+  StockpileId,
   TechId,
 } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
@@ -38,7 +39,8 @@ import {
   Saved,
   SectionEntity,
   SectionsPool,
-  SocietyEntity,
+  StockpileEntity,
+  StockpilesPool,
   TechsPool,
   TechEntity,
   TimeEntity,
@@ -54,6 +56,7 @@ export class EntityAdmin {
   private readonly _recipes: RecipesPool;
   private readonly _resources: ResourcesPool;
   private readonly _sections: SectionsPool;
+  private readonly _stockpiles: StockpilesPool;
   private readonly _techs: TechsPool;
 
   private readonly _effectTree: EffectTreeEntity;
@@ -61,7 +64,6 @@ export class EntityAdmin {
   private readonly _history: HistoryEntity;
   private readonly _player: PlayerEntity;
   private readonly _prng: PrngEntity;
-  private readonly _society: SocietyEntity;
   private readonly _time: TimeEntity;
 
   constructor(private readonly watcher: EntityWatcher) {
@@ -76,6 +78,7 @@ export class EntityAdmin {
     this._recipes = new RecipesPool(this.watcher.pooled("recipes"));
     this._resources = new ResourcesPool(this.watcher.pooled("resources"));
     this._sections = new SectionsPool(this.watcher.pooled("sections"));
+    this._stockpiles = new StockpilesPool(this.watcher.pooled("stockpiles"));
     this._techs = new TechsPool(this.watcher.pooled("techs"));
 
     this._effectTree = new EffectTreeEntity();
@@ -88,9 +91,6 @@ export class EntityAdmin {
     this._player.watch(this.watcher.pooled());
 
     this._prng = new PrngEntity();
-
-    this._society = new SocietyEntity();
-    this._society.watch(this.watcher.pooled());
 
     this._time = new TimeEntity();
     this._time.watch(this.watcher.pooled());
@@ -188,6 +188,10 @@ export class EntityAdmin {
     return this._sections.enumerate();
   }
 
+  stockpile(id: StockpileId): StockpileEntity {
+    return this._stockpiles.get(id);
+  }
+
   tech(id: TechId): TechEntity {
     return this._techs.get(id);
   }
@@ -206,10 +210,6 @@ export class EntityAdmin {
 
   prng(): PrngEntity {
     return this._prng;
-  }
-
-  society(): SocietyEntity {
-    return this._society;
   }
 
   effectTree(): EffectTreeEntity {

@@ -9,29 +9,30 @@ export class PopulationSystem extends System {
 
   update(): void {
     this.updatePops();
-    this.updateSociety();
     this.updateStockpile();
   }
 
   private updatePops() {
-    const society = this.admin.society();
-    const state = society.state;
-    const effectiveStockpile = trunc(state.stockpile);
+    const stockpile = this.admin.stockpile("kitten-growth").state;
+    const effectiveStockpile = trunc(stockpile.amount);
     if (effectiveStockpile >= 1) {
       // A new pop has grown
       const count = effectiveStockpile;
       this.admin.pops().grow(count);
-      state.stockpile -= count;
+      stockpile.amount -= count;
 
       this.kittensArrived(count);
     } else if (effectiveStockpile <= -1) {
       // A full pop has starved
       const count = Math.abs(effectiveStockpile);
       this.admin.pops().kill(count);
-      state.stockpile += count;
+      stockpile.amount += count;
 
       this.kittensStarved(count);
     }
+
+    const kittens = this.admin.resource("kittens").state;
+    kittens.amount = this.admin.pops().size;
   }
 
   private kittensArrived(count: number) {
@@ -48,41 +49,30 @@ export class PopulationSystem extends System {
     this.admin.history().push(event);
   }
 
-  private updateSociety() {
-    const society = this.admin.society();
-
-    const kittens = this.admin.resource("kittens");
-
-    const pops = this.admin.pops();
-    society.state.totalPops = pops.size;
-    society.state.idlePops = pops.withJob(undefined).count();
-
-    kittens.state.amount = pops.size;
-  }
-
   private updateStockpile() {
     const dt = this.admin.time().ticks.delta;
-    const society = this.admin.society().state;
     const kittens = this.admin.resource("kittens");
     const catnip = this.admin.resource("catnip");
+
+    const stockpile = this.admin.stockpile("kitten-growth").state;
     const kittenCapacity = kittens.state.capacity ?? 0;
     if (catnip.state.amount > 0 && kittens.state.amount < kittenCapacity) {
       // grow pops as long as there's catnip and capacity for them
-      if (society.stockpile < 0) {
+      if (stockpile.amount < 0) {
         // if we had fractional starvation, void it
-        society.stockpile = 0;
+        stockpile.amount = 0;
       }
-      society.stockpile += dt * this.growthPerTick;
+      stockpile.amount += dt * this.growthPerTick;
     } else if (catnip.state.amount == 0 && kittens.state.amount > 0) {
       // starve existing pops when catnip is 0
-      if (society.stockpile > 0) {
+      if (stockpile.amount > 0) {
         // if we had fractional growth, void it
-        society.stockpile = 0;
+        stockpile.amount = 0;
       }
-      society.stockpile += dt * this.starvationPerTick;
+      stockpile.amount += dt * this.starvationPerTick;
     } else {
       // otherwise, population is not going to be changing right now, reset state
-      society.stockpile = 0;
+      stockpile.amount = 0;
     }
   }
 }

@@ -3,9 +3,12 @@ import { reactive } from "vue";
 
 import {
   BuildingId,
-  MutationPool,
+  EventPool,
+  EventId,
+  FulfillmentId,
   IPresenterChangeSink,
   JobId,
+  MutationPool,
   NumberEffectId,
   PoolId,
   PopId,
@@ -14,9 +17,7 @@ import {
   ResourceId,
   SectionId,
   TechId,
-  EventPool,
-  EventId,
-  FulfillmentId,
+  StockpileId,
 } from "@/app/interfaces";
 import {
   BuildingState,
@@ -24,18 +25,18 @@ import {
   EffectTreeState,
   EffectNumberStyleMetadata,
   EnvironmentState,
+  FulfillmentState,
   HistoryEvent,
   JobState,
+  NumberStyle,
   PlayerState,
   PopState,
   RecipeState,
   ResourceState,
   SectionState,
-  SocietyState,
+  StockpileState,
   TechState,
   TimeState,
-  NumberStyle,
-  FulfillmentState,
 } from "@/app/state";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 import { ShowSign } from "@/app/utils/notation";
@@ -63,13 +64,14 @@ export interface IStateManager {
   sections(): Enumerable<[SectionId, SectionState]>;
   section(id: SectionId): SectionState;
 
+  stockpile(id: StockpileId): StockpileState;
+
   techs(): Enumerable<TechId>;
   tech(id: TechId): TechState;
 
   effectTree(): EffectTreeState;
   environment(): EnvironmentState;
   player(): PlayerState;
-  society(): SocietyState;
   time(): TimeState;
 
   history(): Channel<HistoryEvent>;
@@ -125,6 +127,13 @@ class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
 
   get sections(): Map<SectionId, SectionState> {
     return this.ensure("sections") as unknown as Map<SectionId, SectionState>;
+  }
+
+  get stockpiles(): Map<StockpileId, StockpileState> {
+    return this.ensure("stockpiles") as unknown as Map<
+      StockpileId,
+      StockpileState
+    >;
   }
 
   get techs(): Map<TechId, TechState> {
@@ -233,6 +242,10 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.sections.get(id) as SectionState;
   }
 
+  stockpile(id: StockpileId): StockpileState {
+    return this.pools.stockpiles.get(id) as StockpileState;
+  }
+
   techs(): Enumerable<TechId> {
     return asEnumerable(this.pools.techs.keys());
   }
@@ -254,11 +267,6 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   player(): PlayerState {
     const pool = this.pools.ensure("singletons");
     return pool.get("player") as unknown as PlayerState;
-  }
-
-  society(): SocietyState {
-    const pool = this.pools.ensure("singletons");
-    return pool.get("society") as unknown as SocietyState;
   }
 
   time(): TimeState {

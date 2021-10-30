@@ -6,11 +6,11 @@ export class SectionsSystem extends System {
   }
 
   private updateSociety() {
-    const section = this.admin.section("society").state;
-    const society = this.admin.society().state;
+    const pops = this.admin.pops();
 
-    section.label = this.societyLabel(society.totalPops);
-    section.alert = this.societyAlert(society.idlePops);
+    const section = this.admin.section("society").state;
+    section.label = this.societyLabel(pops.size);
+    section.alert = this.societyAlert(pops.withJob(undefined).count());
   }
 
   private societyLabel(totalPops: number): string {
