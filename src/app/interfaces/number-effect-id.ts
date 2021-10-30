@@ -2,11 +2,7 @@ export type ProductionEffectId =
   | "catnip.production"
   | "wood.production"
   | "science.production";
-export type DeltaEffectId =
-  | "catnip.delta"
-  | "wood.delta"
-  | "science.delta"
-  | "culture.delta";
+export type DeltaEffectId = "catnip.delta" | "wood.delta" | "science.delta";
 export type RatioEffectId =
   | "science.ratio"
   | "weather.season-ratio"
@@ -22,28 +18,20 @@ export type LimitEffectId =
   | "wood.limit"
   | "wood.limit.base"
   | "kittens.limit"
-  | "catpower.limit"
-  | "science.limit"
-  | "culture.limit";
+  | "science.limit";
 
 export type CatnipFieldEffectId =
   | "weather.ratio"
   | "catnip-field.catnip"
   | "catnip-field.catnip.base";
 
-export type HutEffectId =
-  | "hut.catpower-limit"
-  | "hut.catpower-limit.base"
-  | "hut.kittens-limit"
-  | "hut.kittens-limit.base";
+export type HutEffectId = "hut.kittens-limit" | "hut.kittens-limit.base";
 
 export type LibraryEffectId =
   | "library.science-limit"
   | "library.science-limit.base"
   | "library.science-ratio"
-  | "library.science-ratio.base"
-  | "library.culture-limit"
-  | "library.culture-limit.base";
+  | "library.science-ratio.base";
 
 export type JobEffectId =
   | "jobs.woodcutter.wood.base"

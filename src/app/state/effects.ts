@@ -80,9 +80,6 @@ export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   "library.science-ratio": { unit: UnitKind.Percent },
   "library.science-ratio.base": { unit: UnitKind.Percent },
 
-  // Culture
-  "culture.delta": { unit: UnitKind.PerTick },
-
   // Limits
   // Catnip
   "catnip.limit": { unit: UnitKind.None, disposition: "inline" },
@@ -103,14 +100,4 @@ export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   "library.science-limit.base": { unit: UnitKind.None },
   "astronomy.rare-event.reward": { unit: UnitKind.None },
   "astronomy.rare-event.reward.base": { unit: UnitKind.None },
-
-  // Catpower
-  "catpower.limit": { unit: UnitKind.None, disposition: "inline" },
-  "hut.catpower-limit": { unit: UnitKind.None, disposition: "collapse" },
-  "hut.catpower-limit.base": { unit: UnitKind.None },
-
-  // Culture
-  "culture.limit": { unit: UnitKind.None, disposition: "inline" },
-  "library.culture-limit": { unit: UnitKind.None, disposition: "collapse" },
-  "library.culture-limit.base": { unit: UnitKind.None },
 };

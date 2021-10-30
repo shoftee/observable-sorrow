@@ -52,29 +52,12 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
-  catpower: {
-    id: "catpower",
-    label: "resources.catpower.label",
-    effects: {
-      limit: "catpower.limit",
-    },
-    flags: {},
-  },
   science: {
     id: "science",
     label: "resources.science.label",
     effects: {
       delta: "science.delta",
       limit: "science.limit",
-    },
-    flags: {},
-  },
-  culture: {
-    id: "culture",
-    label: "resources.culture.label",
-    effects: {
-      delta: "culture.delta",
-      limit: "culture.limit",
     },
     flags: {},
   },

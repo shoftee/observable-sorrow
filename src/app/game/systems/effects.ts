@@ -1,7 +1,6 @@
 import { watchSyncEffect } from "vue";
 
 import { NumberEffectId } from "@/app/interfaces";
-import { EffectState } from "@/app/state";
 import { getOrAdd } from "@/app/utils/collections";
 
 import { System } from ".";
@@ -37,9 +36,9 @@ export class EffectsSystem extends System {
       this.admin.numbers().map((m) => m.id),
       {
         expr: (id) => NumberExprs[id],
-        get: (id) => this.admin.number(id).state,
-        set: (id, v: EffectState<number>) => {
-          this.admin.number(id).state.value = v.value;
+        get: (id) => this.admin.number(id).state.value,
+        set: (id, v: number | undefined) => {
+          this.admin.number(id).state.value = v;
         },
         addTreeNode: (parent, child) => {
           getOrAdd(

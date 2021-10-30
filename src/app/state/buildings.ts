@@ -67,12 +67,6 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
     unlock: { priceRatio: 0.3 },
     effects: [
       {
-        id: "catpower-limit",
-        per: "hut.catpower-limit.base",
-        total: "hut.catpower-limit",
-        label: "buildings.hut.effects.catpower-limit",
-      },
-      {
         id: "kittens-limit",
         per: "hut.kittens-limit.base",
         total: "hut.kittens-limit",
@@ -99,12 +93,6 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
         per: "library.science-ratio.base",
         total: "library.science-ratio",
         label: "buildings.library.effects.science-ratio",
-      },
-      {
-        id: "culture-limit",
-        per: "library.culture-limit.base",
-        total: "library.culture-limit",
-        label: "buildings.library.effects.culture-limit",
       },
     ],
   },
