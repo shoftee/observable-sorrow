@@ -4,25 +4,7 @@ import { TechId } from "@/app/interfaces";
 import { Meta } from "@/app/state";
 
 import { StateManager } from ".";
-import { IngredientItem, fromIngredients } from "./common/ingredients";
-
-export interface TechItem {
-  id: TechId;
-  label: string;
-  description: string;
-  flavor: string | undefined;
-  unlocked: boolean;
-  researched: boolean;
-  effects: TechEffectItem[];
-  ingredients: IngredientItem[];
-  fulfilled: boolean;
-  capped: boolean;
-}
-
-export interface TechEffectItem {
-  id: string;
-  label: string;
-}
+import { FulfillmentItem, fulfillment } from "./common/fulfillment";
 
 export class SciencePresenter {
   readonly items: ComputedRef<TechItem[]>;
@@ -47,11 +29,24 @@ export class SciencePresenter {
       unlocked: computed(() => state.unlocked),
       researched: computed(() => state.researched),
 
-      ingredients: computed(() => fromIngredients(state.ingredients)),
-      fulfilled: computed(() => state.fulfilled),
-      capped: computed(() => state.capped),
-
+      fulfillment: computed(() => fulfillment(meta.id, manager)),
       effects: meta.effects,
     });
   }
+}
+
+export interface TechItem {
+  id: TechId;
+  label: string;
+  description: string;
+  flavor: string | undefined;
+  unlocked: boolean;
+  researched: boolean;
+  effects: TechEffectItem[];
+  fulfillment: FulfillmentItem;
+}
+
+export interface TechEffectItem {
+  id: string;
+  label: string;
 }

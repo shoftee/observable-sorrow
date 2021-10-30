@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import { IngredientItem } from "@/app/presenters/common/ingredients";
+import { IngredientItem } from "@/app/presenters/common/fulfillment";
 import { injectChannel } from "@/composables/game-channel";
 
 const { item } = defineProps<{ item: IngredientItem }>();

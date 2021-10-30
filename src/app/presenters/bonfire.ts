@@ -4,7 +4,7 @@ import { BonfireItemId, BuildingId } from "@/app/interfaces";
 import { BonfireMetadataType, Meta } from "@/app/state";
 
 import { NumberView, IStateManager } from ".";
-import { fromIngredients, IngredientItem } from "./common/ingredients";
+import { fulfillment, FulfillmentItem } from "./common/fulfillment";
 
 export class BonfirePresenter {
   readonly all: BonfireItem[];
@@ -25,23 +25,23 @@ export class BonfirePresenter {
         label: meta.label,
         description: meta.description,
         flavor: meta.flavor,
-
         unlocked: true,
-        capped: false,
-        fulfilled: true,
+        fulfillment: {
+          capped: false,
+          fulfilled: true,
+          ingredients: [],
+        },
       });
     } else if (meta.intent.kind === "refine-catnip") {
-      const state = manager.recipe(meta.intent.recipeId);
+      const recipeId = meta.intent.recipeId;
       return reactive({
         id: meta.id,
         label: meta.label,
         description: meta.description,
         flavor: meta.flavor,
-
         unlocked: true,
-        ingredients: computed(() => fromIngredients(state.ingredients)),
-        capped: computed(() => state.capped),
-        fulfilled: computed(() => state.fulfilled),
+
+        fulfillment: computed(() => fulfillment(recipeId, manager)),
       });
     } else {
       const buildingId = meta.intent.buildingId;
@@ -54,10 +54,8 @@ export class BonfirePresenter {
 
         unlocked: computed(() => state.unlocked),
         level: computed(() => state.level),
-        ingredients: computed(() => fromIngredients(state.ingredients)),
-        capped: computed(() => state.capped),
-        fulfilled: computed(() => state.fulfilled),
 
+        fulfillment: computed(() => fulfillment(buildingId, manager)),
         effects: computed(() => this.effects(buildingId, manager)),
       });
     }
@@ -88,10 +86,8 @@ export interface BonfireItem {
 
   unlocked: boolean;
   level?: number;
-  fulfilled: boolean;
-  capped: boolean;
 
-  ingredients?: IngredientItem[];
+  fulfillment: FulfillmentItem;
   effects?: EffectItem[];
 }
 

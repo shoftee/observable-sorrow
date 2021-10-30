@@ -10,10 +10,15 @@ export interface Watched {
   watch(watcher: Watcher): void;
 }
 
-export interface Persisted {
+export interface Loaded {
   loadState(state: SaveState): void;
+}
+
+export interface Saved {
   saveState(state: SaveState): void;
 }
+
+export interface Persisted extends Loaded, Saved {}
 
 export abstract class Entity<TId extends EntityId> {
   constructor(readonly id: TId) {}

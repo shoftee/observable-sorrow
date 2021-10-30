@@ -19,11 +19,14 @@ export type SingletonEntityId =
   | "time"
   | "logs";
 
+export type FulfillmentId = BuildingId | RecipeId | TechId;
+
 export interface PoolIdMap {
   singletons: SingletonEntityId;
 
   booleans: BooleanEffectId;
   buildings: BuildingId;
+  fulfillments: FulfillmentId;
   jobs: JobId;
   numbers: NumberEffectId;
   pops: PopId;

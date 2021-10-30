@@ -16,6 +16,7 @@ import {
   TechId,
   EventPool,
   EventId,
+  FulfillmentId,
 } from "@/app/interfaces";
 import {
   BuildingState,
@@ -34,6 +35,7 @@ import {
   TechState,
   TimeState,
   NumberStyle,
+  FulfillmentState,
 } from "@/app/state";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 import { ShowSign } from "@/app/utils/notation";
@@ -45,6 +47,8 @@ export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
   building(id: BuildingId): BuildingState;
 
+  fulfillment(id: FulfillmentId): FulfillmentState;
+
   numberView(id: NumberEffectId): NumberView;
 
   jobs(): Enumerable<[JobId, JobState]>;
@@ -52,10 +56,8 @@ export interface IStateManager {
 
   pops(): Enumerable<[PopId, PopState]>;
 
-  recipes(): Enumerable<[RecipeId, RecipeState]>;
   recipe(id: RecipeId): RecipeState;
 
-  resources(): Enumerable<[ResourceId, ResourceState]>;
   resource(id: ResourceId): ResourceState;
 
   sections(): Enumerable<[SectionId, SectionState]>;
@@ -85,6 +87,13 @@ class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
     return this.ensure("buildings") as unknown as Map<
       BuildingId,
       BuildingState
+    >;
+  }
+
+  get fulfillments(): Map<FulfillmentId, FulfillmentState> {
+    return this.ensure("fulfillments") as unknown as Map<
+      FulfillmentId,
+      FulfillmentState
     >;
   }
 
@@ -182,14 +191,8 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.buildings.get(id) as BuildingState;
   }
 
-  numberView(id: NumberEffectId): NumberView {
-    const number = this.pools.numbers.get(id) as EffectState<number>;
-    return {
-      value: number.value ?? 0,
-      style: EffectNumberStyleMetadata[id],
-      rounded: false,
-      showSign: "always",
-    };
+  fulfillment(id: FulfillmentId): FulfillmentState {
+    return this.pools.fulfillments.get(id) as FulfillmentState;
   }
 
   jobs(): Enumerable<[JobId, JobState]> {
@@ -200,20 +203,22 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.jobs.get(id) as JobState;
   }
 
+  numberView(id: NumberEffectId): NumberView {
+    const number = this.pools.numbers.get(id) as EffectState<number>;
+    return {
+      value: number.value ?? 0,
+      style: EffectNumberStyleMetadata[id],
+      rounded: false,
+      showSign: "always",
+    };
+  }
+
   pops(): Enumerable<[PopId, PopState]> {
     return asEnumerable(this.pools.pops.entries());
   }
 
-  recipes(): Enumerable<[RecipeId, RecipeState]> {
-    return asEnumerable(this.pools.recipes.entries());
-  }
-
   recipe(id: RecipeId): RecipeState {
     return this.pools.recipes.get(id) as RecipeState;
-  }
-
-  resources(): Enumerable<[ResourceId, ResourceState]> {
-    return asEnumerable(this.pools.resources.entries());
   }
 
   resource(id: ResourceId): ResourceState {

@@ -1,5 +1,5 @@
 import { RecipeId } from "@/app/interfaces";
-import { FulfillmentState, ResourceMap, ResourcesType } from "@/app/state";
+import { ResourceMap, ResourcesType } from "@/app/state";
 
 export type RecipeMetadataType = Readonly<{
   id: RecipeId;
@@ -17,6 +17,6 @@ export const RecipeMetadata: Record<RecipeId, RecipeMetadataType> = {
   },
 };
 
-export interface RecipeState extends FulfillmentState {
+export interface RecipeState {
   readonly products: ResourceMap;
 }

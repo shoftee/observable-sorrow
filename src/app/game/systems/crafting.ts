@@ -39,10 +39,8 @@ export class CraftingSystem extends System {
 
   private applyIngredients(context: OrderContext<RecipeId>): OrderResult {
     const { order, transaction, admin } = context;
-
-    const entity = admin.recipe(order);
-    const ingredients = entity.state.ingredients;
-    for (const { resourceId, requirement } of ingredients.values()) {
+    const fulfillment = admin.fulfillment(order);
+    for (const { resourceId, requirement } of fulfillment.state.ingredients) {
       transaction.addCredit(resourceId, requirement);
 
       if (!this.satisfiesRequirementAfterDelta(context, resourceId)) {

@@ -117,7 +117,8 @@ export class LockToggleSystem extends System {
         return;
       }
 
-      for (const ingredient of building.state.ingredients) {
+      const fulfillment = this.admin.fulfillment(building.id);
+      for (const ingredient of fulfillment.state.ingredients) {
         const threshold = ingredient.requirement * ratio;
         if (ingredient.fulfillment >= threshold) {
           building.state.unlocked = true;

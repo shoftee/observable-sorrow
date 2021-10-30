@@ -2,7 +2,7 @@
 import { computed, inject } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Effects from "./Effects.vue";
+import Effects from "../Effects.vue";
 
 import { JobId } from "@/app/interfaces";
 import { JobItem } from "@/app/presenters";

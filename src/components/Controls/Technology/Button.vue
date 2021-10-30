@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import Ingredients from "@/components/Controls/Ingredients.vue"
+import Detail from "./Detail.vue";
 
 import { TechId } from "@/app/interfaces";
 import { TechItem } from "@/app/presenters";
@@ -25,8 +25,8 @@ async function research(id: TechId): Promise<void> {
       <button
         type="button"
         class="btn btn-outline-secondary w-100"
-        :class="{ capped: tech.capped }"
-        :disabled="!tech.fulfilled || tech.researched"
+        :class="{ capped: tech.fulfillment.capped }"
+        :disabled="!tech.fulfillment.fulfilled || tech.researched"
         @click="research(tech.id)"
       >
         <span v-if="tech.researched" class="bi bi-check"></span>
@@ -34,18 +34,7 @@ async function research(id: TechId): Promise<void> {
       </button>
     </div>
     <template #content>
-      <div>
-        <div class="card-header">
-          <p class="description">{{ t(tech.description) }}</p>
-          <p class="flavor" v-if="tech.flavor">{{ t(tech.flavor) }}</p>
-        </div>
-        <Ingredients class="border-bottom" v-if="!tech.researched" :items="tech.ingredients" />
-        <ul class="effects-list">
-          <li v-for="effect in tech.effects" :key="effect.id">
-            <span>{{ t(effect.label) }}</span>
-          </li>
-        </ul>
-      </div>
+      <Detail :item="tech" />
     </template>
   </tippy>
 </template>

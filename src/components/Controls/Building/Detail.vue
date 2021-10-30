@@ -12,7 +12,7 @@ const { item } = defineProps<{ item: BonfireItem }>();
 const { t } = useI18n();
 const events = inject(KeyboardEventsKey);
 
-const ingredients = computed(() => item.ingredients ?? []);
+const ingredients = computed(() => item.fulfillment.ingredients);
 const effects = computed(() => item.effects ?? []);
 </script>
 <template>

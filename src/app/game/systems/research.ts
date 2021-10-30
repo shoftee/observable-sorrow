@@ -39,9 +39,8 @@ export class ResearchSystem extends System {
   private applyResearchTech(context: OrderContext<TechId>): OrderResult {
     const { order, transaction, admin } = context;
 
-    const tech = admin.tech(order);
-    const ingredients = tech.state.ingredients;
-    for (const { resourceId, requirement } of ingredients) {
+    const fulfillment = admin.fulfillment(order);
+    for (const { resourceId, requirement } of fulfillment.state.ingredients) {
       transaction.addCredit(resourceId, requirement);
 
       const state = admin.resource(resourceId).state;

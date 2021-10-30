@@ -4,7 +4,7 @@ import {
   BuildingUnlockEffectId,
 } from "@/app/interfaces";
 
-import { FulfillmentState, ResourcesType } from "./common/types";
+import { ResourcesType } from "./common/types";
 
 export type BuildingEffectType = Readonly<{
   /** A unique key for the effect. */
@@ -110,7 +110,7 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
 };
 
-export interface BuildingState extends FulfillmentState {
+export interface BuildingState {
   /** Whether the building is unlocked or not. */
   unlocked: boolean;
   /** The level of the building. */

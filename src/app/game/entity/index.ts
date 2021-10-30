@@ -13,6 +13,7 @@ export * from "./boolean-effects";
 export * from "./building";
 export * from "./effect-tree";
 export * from "./environment";
+export * from "./fulfillment";
 export * from "./job";
 export * from "./logs";
 export * from "./number-effects";

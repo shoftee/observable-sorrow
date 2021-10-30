@@ -1,13 +1,7 @@
 import { reactive } from "vue";
 
 import { TechId } from "@/app/interfaces";
-import {
-  ingredientsFromObject,
-  Meta,
-  TechMetadataType,
-  TechState,
-} from "@/app/state";
-
+import { Meta, TechMetadataType, TechState } from "@/app/state";
 import {
   Entity,
   EntityPool,
@@ -25,12 +19,9 @@ export class TechEntity extends Entity<TechId> implements Watched {
   constructor(meta: TechMetadataType) {
     super(meta.id);
 
-    this.state = reactive({
+    this.state = reactive<TechState>({
       unlocked: false,
       researched: false,
-      ingredients: ingredientsFromObject(meta.ingredients),
-      fulfilled: false,
-      capped: false,
     });
 
     this.status = OrderStatus.EMPTY;

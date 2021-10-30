@@ -3,34 +3,16 @@ import { all, any } from "@/app/utils/collections";
 
 import { System } from ".";
 
-type Fulfillment = {
-  ingredients: IngredientState[];
-  fulfilled: boolean;
-  capped: boolean;
-};
-
 export class FulfillmentSystem extends System {
   update(): void {
-    for (const fulfillment of this.fulfillments()) {
-      const ingredients = fulfillment.ingredients;
+    for (const { state } of this.admin.fulfillments()) {
+      const ingredients = state.ingredients;
       for (const ingredient of ingredients) {
         this.updateIngredient(ingredient);
       }
 
-      fulfillment.capped = any(ingredients, (i) => i.capped);
-      fulfillment.fulfilled = all(ingredients, (i) => i.fulfilled);
-    }
-  }
-
-  private *fulfillments(): Iterable<Fulfillment> {
-    for (const recipe of this.admin.recipes()) {
-      yield recipe.state;
-    }
-    for (const building of this.admin.buildings()) {
-      yield building.state;
-    }
-    for (const tech of this.admin.techs()) {
-      yield tech.state;
+      state.capped = any(ingredients, (i) => i.capped);
+      state.fulfilled = all(ingredients, (i) => i.fulfilled);
     }
   }
 

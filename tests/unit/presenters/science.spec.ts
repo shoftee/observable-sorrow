@@ -24,22 +24,17 @@ describe("science presenter", () => {
     const techs = presenter.items;
     expect(techs.value).to.have.lengthOf(0);
 
-    manager.acceptMutations([calendarAddedPool()]);
-
     const calendar = manager.tech("calendar");
-    expect(calendar.fulfilled).to.be.false;
-    expect(calendar.ingredients[0].fulfillment).to.equal(0);
-
-    manager.acceptMutations([calendarFulfilledPool()]);
-    expect(calendar.fulfilled).to.be.true;
-    expect(calendar.ingredients[0].fulfilled).to.be.true;
-    expect(calendar.ingredients[0].fulfillment).to.equal(42);
-
     const agriculture = manager.tech("agriculture");
+
+    manager.acceptMutations([calendarAddedPool()]);
+    expect(unref(techs)).to.have.lengthOf(1);
+    expect(calendar.unlocked).to.be.true;
+
     manager.acceptMutations([calendarResearchedPool()]);
     expect(unref(techs)).to.have.lengthOf(2);
-    expect(agriculture.fulfilled).to.be.true;
-    expect(agriculture.ingredients[0].fulfillment).to.equal(200);
+    expect(calendar.researched).to.be.true;
+    expect(agriculture.unlocked).to.be.true;
   });
 });
 
@@ -51,57 +46,14 @@ function calendarAddedPool(): MutationPool {
         "calendar",
         {
           unlocked: true,
-          capped: false,
           researched: false,
-          fulfilled: false,
-          ingredients: [
-            {
-              resourceId: "science",
-              fulfillment: 0,
-              requirement: 30,
-              capped: false,
-              fulfilled: false,
-            },
-          ],
         },
       ],
       [
         "agriculture",
         {
           unlocked: false,
-          capped: false,
           researched: false,
-          fulfilled: false,
-          ingredients: [
-            {
-              resourceId: "science",
-              fulfillment: 0,
-              requirement: 100,
-              capped: false,
-              fulfilled: false,
-            },
-          ],
-        },
-      ],
-    ]),
-  };
-}
-
-function calendarFulfilledPool(): MutationPool {
-  return {
-    poolId: "techs",
-    updated: new Map<string, PropertyBag>([
-      [
-        "calendar",
-        {
-          fulfilled: true,
-          ingredients: [
-            {
-              resourceId: "science",
-              fulfillment: 42,
-              fulfilled: true,
-            },
-          ],
         },
       ],
     ]),
@@ -113,16 +65,7 @@ function calendarResearchedPool(): MutationPool {
     poolId: "techs",
     updated: new Map<string, PropertyBag>([
       ["calendar", { researched: true }],
-      [
-        "agriculture",
-        {
-          unlocked: true,
-          fulfilled: true,
-          ingredients: [
-            { resourceId: "science", fulfillment: 200, fulfilled: true },
-          ],
-        },
-      ],
+      ["agriculture", { unlocked: true }],
     ]),
   };
 }

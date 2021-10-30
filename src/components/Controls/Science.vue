@@ -2,7 +2,7 @@
 import { computed, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import TechButton from "./TechButton.vue";
+import TechButton from "./Technology/Button.vue";
 
 import { injectChannel } from "@/composables/game-channel";
 const { science } = injectChannel().presenters;

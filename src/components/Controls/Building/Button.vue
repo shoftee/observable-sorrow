@@ -27,8 +27,8 @@ async function buildItem(id: BonfireItemId): Promise<void> {
       <button
         type="button"
         class="btn btn-outline-secondary w-100"
-        :class="{ capped: item.capped }"
-        :disabled="!item.fulfilled"
+        :class="{ capped: item.fulfillment.capped }"
+        :disabled="!item.fulfillment.fulfilled"
         @click="buildItem(item.id)"
       >
         {{ t(item.label) }}

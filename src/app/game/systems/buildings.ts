@@ -39,9 +39,8 @@ export class BuildingSystem extends System {
   private applyBuyBuilding(context: OrderContext<BuildingId>): OrderResult {
     const { order, transaction, admin } = context;
 
-    const building = admin.building(order);
-    const ingredients = building.state.ingredients;
-    for (const { resourceId, requirement } of ingredients) {
+    const fulfillment = admin.fulfillment(order);
+    for (const { resourceId, requirement } of fulfillment.state.ingredients) {
       transaction.addCredit(resourceId, requirement);
 
       const state = admin.resource(resourceId).state;
@@ -60,9 +59,9 @@ export class BuildingSystem extends System {
   }
 
   private updateRequirements(context: OrderContext<BuildingId>): void {
-    const { order } = context;
+    const { admin, order } = context;
 
-    const building = context.admin.building(order);
+    const building = admin.building(order);
     const meta = building.meta;
     const state = building.state;
 
@@ -70,7 +69,8 @@ export class BuildingSystem extends System {
 
     const multiplier = Math.pow(meta.prices.ratio, state.level);
 
-    for (const ingredient of state.ingredients) {
+    const fulfillment = admin.fulfillment(order);
+    for (const ingredient of fulfillment.state.ingredients) {
       const base = meta.prices.base[ingredient.resourceId] ?? 0;
       ingredient.requirement = base * multiplier;
     }

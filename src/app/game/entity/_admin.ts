@@ -1,6 +1,7 @@
 import {
   BooleanEffectId,
   BuildingId,
+  FulfillmentId,
   JobId,
   NumberEffectId,
   RecipeId,
@@ -16,10 +17,15 @@ import {
   BooleanEffectsPool,
   BuildingEntity,
   BuildingsPool,
+  EffectTreeEntity,
   EntityWatcher,
   EnvironmentEntity,
+  FulfillmentsPool,
+  FulfillmentEntity,
+  HistoryEntity,
   JobEntity,
   JobsPool,
+  Loaded,
   NumberEffectEntity,
   NumberEffectsPool,
   PlayerEntity,
@@ -29,20 +35,19 @@ import {
   RecipesPool,
   ResourceEntity,
   ResourcesPool,
+  Saved,
   SectionEntity,
   SectionsPool,
   SocietyEntity,
   TechsPool,
   TechEntity,
   TimeEntity,
-  Persisted,
-  HistoryEntity,
-  EffectTreeEntity,
 } from ".";
 
 export class EntityAdmin {
   private readonly _booleans: BooleanEffectsPool;
   private readonly _buildings: BuildingsPool;
+  private readonly _fulfillments: FulfillmentsPool;
   private readonly _jobs: JobsPool;
   private readonly _numbers: NumberEffectsPool;
   private readonly _pops: PopsPool;
@@ -62,6 +67,9 @@ export class EntityAdmin {
   constructor(private readonly watcher: EntityWatcher) {
     this._booleans = new BooleanEffectsPool(this.watcher.pooled("booleans"));
     this._buildings = new BuildingsPool(this.watcher.pooled("buildings"));
+    this._fulfillments = new FulfillmentsPool(
+      this.watcher.pooled("fulfillments"),
+    );
     this._jobs = new JobsPool(this.watcher.pooled("jobs"));
     this._numbers = new NumberEffectsPool(this.watcher.pooled("numbers"));
     this._pops = new PopsPool(this.watcher.pooled("pops"));
@@ -93,7 +101,7 @@ export class EntityAdmin {
   loadState(state: SaveState): void {
     for (const key in this) {
       if (Object.prototype.hasOwnProperty.call(this, key)) {
-        const element = this[key] as Partial<Persisted>;
+        const element = this[key] as Partial<Loaded>;
         if (element.loadState) {
           element.loadState(state);
         }
@@ -104,7 +112,7 @@ export class EntityAdmin {
   saveState(state: SaveState): void {
     for (const key in this) {
       if (Object.prototype.hasOwnProperty.call(this, key)) {
-        const element = this[key] as Partial<Persisted>;
+        const element = this[key] as Partial<Saved>;
         if (element.saveState) {
           element.saveState(state);
         }
@@ -126,6 +134,14 @@ export class EntityAdmin {
 
   buildings(): Iterable<BuildingEntity> {
     return this._buildings.enumerate();
+  }
+
+  fulfillments(): Iterable<FulfillmentEntity> {
+    return this._fulfillments.enumerate();
+  }
+
+  fulfillment(id: FulfillmentId): FulfillmentEntity {
+    return this._fulfillments.get(id);
   }
 
   job(id: JobId): JobEntity {

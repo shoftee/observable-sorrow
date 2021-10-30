@@ -1,4 +1,4 @@
-import { FulfillmentState, ResourcesType } from ".";
+import { ResourcesType } from ".";
 import { TechId } from "../interfaces";
 
 export type TechMetadataType = Readonly<{
@@ -37,7 +37,7 @@ export const TechMetadata: Record<TechId, TechMetadataType> = {
   },
 };
 
-export interface TechState extends FulfillmentState {
+export interface TechState {
   unlocked: boolean;
   researched: boolean;
 }

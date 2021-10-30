@@ -2,7 +2,6 @@ import { reactive } from "vue";
 
 import { RecipeId } from "@/app/interfaces";
 import {
-  ingredientsFromObject,
   Meta,
   RecipeMetadataType,
   RecipeState,
@@ -18,11 +17,8 @@ export class RecipeEntity extends Entity<RecipeId> implements Watched {
 
   constructor(readonly meta: RecipeMetadataType) {
     super(meta.id);
-    this.state = reactive({
-      ingredients: ingredientsFromObject(meta.ingredients),
+    this.state = reactive<RecipeState>({
       products: ResourceMap.fromObject(meta.products),
-      capped: false,
-      fulfilled: false,
     });
 
     this.status = OrderStatus.EMPTY;

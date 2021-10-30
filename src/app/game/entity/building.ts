@@ -1,12 +1,7 @@
 import { reactive } from "vue";
 
 import { BuildingId } from "@/app/interfaces";
-import {
-  BuildingMetadataType,
-  BuildingState,
-  ingredientsFromObject,
-  Meta,
-} from "@/app/state";
+import { BuildingMetadataType, BuildingState, Meta } from "@/app/state";
 import { SaveState } from "@/app/store";
 
 import {
@@ -26,12 +21,9 @@ export class BuildingEntity extends Entity<BuildingId> implements Watched {
   constructor(readonly meta: BuildingMetadataType) {
     super(meta.id);
 
-    this.state = reactive({
-      ingredients: ingredientsFromObject(meta.prices.base),
+    this.state = reactive<BuildingState>({
       unlocked: false,
       level: 0,
-      capped: false,
-      fulfilled: false,
     });
 
     this.status = OrderStatus.EMPTY;
@@ -59,14 +51,6 @@ export class BuildingEntity extends Entity<BuildingId> implements Watched {
     if (stored !== undefined) {
       this.state.level = stored.level;
       this.state.unlocked = stored.unlocked;
-
-      // HACK: these should update automatically.
-      const multiplier = Math.pow(this.meta.prices.ratio, this.state.level);
-
-      for (const ingredient of this.state.ingredients) {
-        const base = this.meta.prices.base[ingredient.resourceId] ?? 0;
-        ingredient.requirement = base * multiplier;
-      }
     }
   }
 }
