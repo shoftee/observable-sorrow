@@ -15,7 +15,7 @@ describe("science presenter", () => {
     const techs = presenter.items;
     expect(techs.value).to.have.lengthOf(0);
 
-    manager.acceptMutations([calendarAddedPool()]);
+    manager.acceptMutations([fulfillmentsAddedPool(), calendarAddedPool()]);
     expect(unref(techs)).to.have.lengthOf(2);
 
     manager.acceptMutations([]);
@@ -24,19 +24,44 @@ describe("science presenter", () => {
     const techs = presenter.items;
     expect(techs.value).to.have.lengthOf(0);
 
-    const calendar = manager.tech("calendar");
-    const agriculture = manager.tech("agriculture");
+    manager.acceptMutations([fulfillmentsAddedPool(), calendarAddedPool()]);
+    expect(unref(techs)).to.have.lengthOf(2);
 
-    manager.acceptMutations([calendarAddedPool()]);
-    expect(unref(techs)).to.have.lengthOf(1);
+    const calendar = manager.tech("calendar");
     expect(calendar.unlocked).to.be.true;
 
+    const agriculture = manager.tech("agriculture");
+    expect(agriculture.unlocked).to.be.false;
+
     manager.acceptMutations([calendarResearchedPool()]);
-    expect(unref(techs)).to.have.lengthOf(2);
     expect(calendar.researched).to.be.true;
     expect(agriculture.unlocked).to.be.true;
   });
 });
+
+function fulfillmentsAddedPool(): MutationPool {
+  return {
+    poolId: "fulfillments",
+    added: new Map<string, PropertyBag>([
+      [
+        "calendar",
+        {
+          ingredients: [],
+          fulfilled: true,
+          capped: false,
+        },
+      ],
+      [
+        "agriculture",
+        {
+          ingredients: [],
+          fulfilled: true,
+          capped: false,
+        },
+      ],
+    ]),
+  };
+}
 
 function calendarAddedPool(): MutationPool {
   return {
