@@ -21,7 +21,7 @@ const idle = computed(() => count(society.pops.values, item => item.job === unde
       <div class="card-body text-center">{{ t("jobs.status.empty") }}</div>
     </template>
     <template v-else>
-      <div class="card-header">{{ t(" jobs.title") }}</div>
+      <div class="card-header">{{ t("jobs.title") }}</div>
       <div class="card-body">
         <div>
           <p v-if="idle === 0">{{ t("jobs.status.good") }}</p>
