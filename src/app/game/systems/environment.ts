@@ -4,21 +4,11 @@ import { SeasonId, WeatherId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 import { choose } from "@/app/utils/probability";
 
-import { EnvironmentEntity, TimeEntity } from "../entity";
-
 import { System } from ".";
 
 export class EnvironmentSystem extends System {
-  get environment(): EnvironmentEntity {
-    return this.admin.environment();
-  }
-
-  get time(): TimeEntity {
-    return this.admin.time();
-  }
-
   init(): void {
-    const environment = this.environment.state;
+    const environment = this.admin.environment().state;
     const calendar = this.admin.tech("calendar").state;
     watchSyncEffect(() => {
       if (calendar.researched) {
@@ -40,34 +30,30 @@ export class EnvironmentSystem extends System {
   }
 
   update(): void {
-    const environment = this.environment;
+    const environment = this.admin.environment().state;
 
-    const days = this.time.days;
+    const { days } = this.admin.time();
     if (days.wholeTicks > 0) {
-      environment.state.day += days.wholeTicks;
+      environment.day += days.wholeTicks;
 
       const daysPerSeason = TimeConstants.DaysPerSeason;
-      while (environment.state.day >= daysPerSeason) {
-        environment.state.day -= daysPerSeason;
+      while (environment.day >= daysPerSeason) {
+        environment.day -= daysPerSeason;
         this.progressToNextSeason();
       }
     }
   }
 
   private progressToNextSeason() {
-    const environment = this.environment;
-    const newSeason = this.calculateNextSeason(environment.state.season);
-    environment.state.season = newSeason;
+    const environment = this.admin.environment().state;
+    const newSeason = this.calculateNextSeason(environment.season);
+    environment.season = newSeason;
 
     if (newSeason === "spring") {
-      environment.state.year++;
+      environment.year++;
     }
 
-    this.updateWeather();
-  }
-
-  private updateWeather() {
-    this.environment.state.weather = this.chooseWeather();
+    environment.weather = this.chooseWeather();
   }
 
   private calculateNextSeason(currentSeason: SeasonId): SeasonId {
@@ -84,8 +70,9 @@ export class EnvironmentSystem extends System {
   }
 
   private chooseWeather(): WeatherId {
+    const environment = this.admin.environment().state;
     // Weather is handicapped to neutral during the first four years.
-    const year = this.environment.state.year;
+    const year = environment.year;
     if (0 <= year && year <= 3) {
       return "neutral";
     }

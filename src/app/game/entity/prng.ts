@@ -14,7 +14,7 @@ export class PrngEntity extends Entity<"prng"> implements Persisted {
   }
 
   loadState(save: SaveState): void {
-    if (save.seeds) {
+    if (save.seeds?.environment !== undefined) {
       this._environment = random(save.seeds.environment);
     }
   }

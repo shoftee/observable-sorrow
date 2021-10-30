@@ -18,7 +18,9 @@ import {
   SectionId,
   TechId,
   StockpileId,
+  ShowSign,
 } from "@/app/interfaces";
+import { Channel } from "@/app/presenters/common/channel";
 import {
   BuildingState,
   EffectState,
@@ -38,11 +40,8 @@ import {
   TechState,
   TimeState,
 } from "@/app/state";
+import { getOrAdd } from "@/app/utils/collections";
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
-import { ShowSign } from "@/app/utils/notation";
-
-import { Channel } from "./common/channel";
-import { getOrAdd } from "../utils/collections";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;

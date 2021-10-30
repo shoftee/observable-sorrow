@@ -36,7 +36,7 @@ export class PopulationSystem extends System {
   }
 
   private kittensArrived(count: number) {
-    const event = pluralLabel("population.kitten.arrived", count);
+    const event = pluralLabel("population.kitten.arrived", count, { count });
     if (this.admin.pops().size > 10) {
       // Once past 10 pops, these messages are not so interesting.
       event.disposition = Disposition.Ignore;
@@ -45,7 +45,7 @@ export class PopulationSystem extends System {
   }
 
   private kittensStarved(count: number) {
-    const event = pluralLabel("population.kitten.starved", count);
+    const event = pluralLabel("population.kitten.starved", count, { count });
     this.admin.history().push(event);
   }
 

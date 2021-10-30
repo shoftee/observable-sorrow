@@ -1,5 +1,6 @@
-import { Channel } from "@/app/presenters/common/channel";
 import { expect } from "chai";
+
+import { Channel } from "@/app/presenters/common/channel";
 
 describe("channel", () => {
   describe("push", () => {

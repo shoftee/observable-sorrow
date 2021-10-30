@@ -1,5 +1,3 @@
-import { SandcastleBuilderNotation } from "@/app/utils/notation";
-
 import {
   BonfirePresenter,
   EnvironmentPresenter,
@@ -34,10 +32,9 @@ export class PresenterFacade {
     this.sections = new SectionsPresenter(this.manager);
     this.society = new SocietyPresenter(this.manager);
 
-    this.formatter = new NumberFormatter(
-      this.manager,
-      new SandcastleBuilderNotation(),
-      { precision: 3, units: "seconds" },
-    );
+    this.formatter = new NumberFormatter(this.manager, {
+      precision: 3,
+      units: "seconds",
+    });
   }
 }

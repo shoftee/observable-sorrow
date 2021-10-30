@@ -4,3 +4,4 @@ export * from "./entity-id";
 export * from "./id";
 export * from "./intent";
 export * from "./number-effect-id";
+export * from "./numbers";

@@ -22,10 +22,14 @@ type PluralLabel = {
 
 export type HistoryEvent = Label | PluralLabel;
 
-export function label(label: string): Label {
-  return { kind: Kind.Label, label };
+export function label(label: string, named?: Record<string, unknown>): Label {
+  return { kind: Kind.Label, label, named };
 }
 
-export function pluralLabel(label: string, plural: number): PluralLabel {
-  return { kind: Kind.PluralLabel, label, plural };
+export function pluralLabel(
+  label: string,
+  plural: number,
+  named?: Record<string, unknown>,
+): PluralLabel {
+  return { kind: Kind.PluralLabel, label, plural, named };
 }

@@ -1,7 +1,8 @@
 import { UnitKind } from "@/app/state";
-import { INumberNotation, ShowSign } from "@/app/utils/notation";
 
 import { IStateManager, NumberView } from ".";
+import { ShowSign } from "../interfaces";
+import { SandcastleBuilderFormatter } from "./common/formatter";
 
 export interface FormattingOptions {
   precision: number;
@@ -9,24 +10,23 @@ export interface FormattingOptions {
 }
 
 export class NumberFormatter {
+  private readonly fmt = SandcastleBuilderFormatter;
+
   constructor(
     private readonly manager: IStateManager,
-    private readonly notation: INumberNotation,
     public options: FormattingOptions,
   ) {}
 
   number(v: number, showSign: ShowSign = "negative"): string {
-    return this.notation.number(v, this.options.precision, showSign);
+    return this.fmt(v, this.options.precision, showSign);
   }
 
   percent(v: number, showSign: ShowSign = "negative"): string {
-    return (
-      this.notation.number(v * 100, this.options.precision, showSign) + "%"
-    );
+    return this.fmt(v * 100, this.options.precision, showSign) + "%";
   }
 
   rounded(v: number, showSign: ShowSign = "negative"): string {
-    return this.notation.number(v, 0, showSign);
+    return this.fmt(v, 0, showSign);
   }
 
   v(view: NumberView): string {
@@ -35,13 +35,13 @@ export class NumberFormatter {
     const value = view.style.invert === true ? -view.value : view.value;
     switch (view.style.unit) {
       case UnitKind.Percent:
-        return this.notation.number(value * 100, precision, showSign) + "%";
+        return this.fmt(value * 100, precision, showSign) + "%";
       case UnitKind.Tick: {
         if (this.options.units === "ticks") {
-          return this.notation.number(value, precision, showSign) + "t";
+          return this.fmt(value, precision, showSign) + "t";
         } else {
           return (
-            this.notation.number(
+            this.fmt(
               value / (1000 / this.manager.time().millisPerTick),
               precision,
               showSign,
@@ -51,10 +51,10 @@ export class NumberFormatter {
       }
       case UnitKind.PerTick: {
         if (this.options.units === "ticks") {
-          return this.notation.number(value, precision, showSign) + "/t";
+          return this.fmt(value, precision, showSign) + "/t";
         } else {
           return (
-            this.notation.number(
+            this.fmt(
               value * (1000 / this.manager.time().millisPerTick),
               precision,
               showSign,
@@ -63,7 +63,7 @@ export class NumberFormatter {
         }
       }
       case UnitKind.None:
-        return this.notation.number(value, precision, showSign);
+        return this.fmt(value, precision, showSign);
     }
   }
 }
