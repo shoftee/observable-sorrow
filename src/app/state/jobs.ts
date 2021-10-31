@@ -21,6 +21,7 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
     id: "woodcutter",
     label: "jobs.woodcutter.label",
     description: "jobs.woodcutter.description",
+    flavor: "jobs.woodcutter.flavor",
     effects: [
       {
         id: "wood",
@@ -62,6 +63,7 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
     id: "miner",
     label: "jobs.miner.label",
     description: "jobs.miner.description",
+    flavor: "jobs.miner.flavor",
     unlockEffect: "unlock.job.miner",
     effects: [
       {

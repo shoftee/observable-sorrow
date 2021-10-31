@@ -1,35 +1,29 @@
-export enum Kind {
-  Text = 0,
-  Label = 1,
-  PluralLabel = 2,
-}
-
-export enum Disposition {
-  None = 0,
-  Ignore = 1,
-}
+type HistoryEventDisposition = "none" | "ignore";
 
 type Named = { named?: Record<string, unknown> };
-type AllEvents = { disposition?: Disposition };
+type AllEvents = { disposition?: HistoryEventDisposition };
 
-type Label = { kind: Kind.Label; label: string } & Named & AllEvents;
-type PluralLabel = {
-  kind: Kind.PluralLabel;
+type LabelEvent = { kind: "label"; label: string } & Named & AllEvents;
+type PluralLabelEvent = {
+  kind: "plural-label";
   label: string;
   plural: number;
 } & Named &
   AllEvents;
 
-export type HistoryEvent = Label | PluralLabel;
+export type HistoryEvent = LabelEvent | PluralLabelEvent;
 
-export function label(label: string, named?: Record<string, unknown>): Label {
-  return { kind: Kind.Label, label, named };
+export function label(
+  label: string,
+  named?: Record<string, unknown>,
+): LabelEvent {
+  return { kind: "label", label, named };
 }
 
 export function pluralLabel(
   label: string,
   plural: number,
   named?: Record<string, unknown>,
-): PluralLabel {
-  return { kind: Kind.PluralLabel, label, plural, named };
+): PluralLabelEvent {
+  return { kind: "plural-label", label, plural, named };
 }

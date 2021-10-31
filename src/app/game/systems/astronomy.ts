@@ -1,4 +1,4 @@
-import { Kind, label } from "@/app/state";
+import { label } from "@/app/state";
 import { System } from ".";
 
 export class AstronomySystem extends System {
@@ -46,10 +46,7 @@ export class AstronomySystem extends System {
     const chance = 1 / 400; // ~ once per game calendar year
     const r = this.admin.prng().astronomy();
     if (r < chance) {
-      this.admin.history().push({
-        kind: Kind.Label,
-        label: "astronomy.rare-event",
-      });
+      this.admin.history().push(label("astronomy.rare-event"));
 
       const observe = this.admin.stockpile("observe-sky").state;
       observe.amount = 300; // 60 seconds

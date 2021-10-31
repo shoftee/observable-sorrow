@@ -4,7 +4,6 @@ import {
   NumberEffectId,
   ResourceId,
 } from "@/app/interfaces";
-import { reduce } from "@/app/utils/collections";
 
 import { effect, unwrap, Expr, ExprContext } from "./common";
 
@@ -39,50 +38,44 @@ const ifdef = (check: NumberExpr, result: NumberExpr) => (ctx: Ctx) => {
 // Otherwise, returns the sum of the valued exprs.
 const looseSum =
   (...exprs: NumberExpr[]) =>
-  (ctx: Ctx) =>
-    reduce(
-      exprs,
-      (m) => unwrap(m, ctx),
-      (acc, value) => {
-        // always try to pick a valued expr
-        if (acc === undefined) return value;
-        else if (value === undefined) return acc;
-        else return acc + value;
-      },
-      0,
-    );
+  (ctx: Ctx) => {
+    let sum = undefined;
+    for (const expr of exprs) {
+      const value = unwrap(expr, ctx);
+      if (value === undefined) continue;
+      else if (sum === undefined) sum = value;
+      else sum += value;
+    }
+    return sum;
+  };
 
 // Returns defined iff all provided exprs unwrap to defined.
 // Otherwise, returns undefined.
 const strictSum =
   (...exprs: NumberExpr[]) =>
-  (ctx: Ctx) =>
-    reduce(
-      exprs,
-      (m) => unwrap(m, ctx),
-      (acc, value) => {
-        // always try to pick a valued expr
-        if (acc === undefined || value === undefined) return undefined;
-        else return acc + value;
-      },
-      0,
-    );
+  (ctx: Ctx) => {
+    let sum = 0;
+    for (const expr of exprs) {
+      const value = unwrap(expr, ctx);
+      if (value === undefined) return undefined;
+      sum += value;
+    }
+    return sum;
+  };
 
 // Returns defined iff all provided exprs unwrap to defined.
 // Otherwise, returns undefined.
 const strictProd =
   (...exprs: NumberExpr[]) =>
-  (ctx: Ctx) =>
-    reduce(
-      exprs,
-      (m) => unwrap(m, ctx),
-      (acc, value) => {
-        // propagate any undefined expr we encounter
-        if (acc === undefined || value === undefined) return undefined;
-        else return acc * value;
-      },
-      1,
-    );
+  (ctx: Ctx) => {
+    let prod = 1;
+    for (const expr of exprs) {
+      const value = unwrap(expr, ctx);
+      if (value === undefined) return undefined;
+      prod *= value;
+    }
+    return prod;
+  };
 
 const subtract = (lhs: NumberExpr, rhs: NumberExpr) => (ctx: Ctx) => {
   const lhsVal = unwrap(lhs, ctx);
@@ -103,7 +96,7 @@ const ratio = (base: NumberExpr, ratio: NumberExpr) => (ctx: Ctx) => {
 const constant = (value: number | undefined) => (_: Ctx) => value;
 
 export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
-  // Limits and other stuff
+  // Limits
   "catnip.limit.base": constant(5000),
   "catnip.limit": looseSum(
     effect("catnip.limit.base"),
@@ -118,11 +111,9 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("minerals.limit.base"),
     effect("barn.minerals-limit"),
   ),
-  "minerals.ratio": effect("mine.minerals-ratio"),
 
-  "kittens.limit": effect("hut.kittens-limit"),
   "science.limit": effect("library.science-limit"),
-  "science.ratio": effect("library.science-ratio"),
+  "kittens.limit": effect("hut.kittens-limit"),
 
   // Catnip
   "catnip.delta": subtract(
@@ -144,6 +135,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("jobs.miner.minerals"),
     fallback(effect("minerals.ratio"), constant(0)),
   ),
+  "minerals.ratio": effect("mine.minerals-ratio"),
 
   // Science
   "science.delta": effect("science.production"),
@@ -156,6 +148,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("astronomy.rare-event.reward.base"),
     fallback(effect("science.ratio"), constant(0)),
   ),
+  "science.ratio": effect("library.science-ratio"),
 
   // Catnip fields
   "catnip-field.catnip.base": constant(0.125),

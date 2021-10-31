@@ -27,8 +27,8 @@ export type LimitEffectId =
   | "wood.limit.base"
   | "minerals.limit"
   | "minerals.limit.base"
-  | "kittens.limit"
-  | "science.limit";
+  | "science.limit"
+  | "kittens.limit";
 
 export type CatnipFieldEffectId =
   | "weather.ratio"

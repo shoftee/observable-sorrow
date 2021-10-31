@@ -1,7 +1,7 @@
 import { useI18n } from "vue-i18n";
 
 import { NumberFormatter, StateManager } from ".";
-import { Disposition, HistoryEvent, Kind } from "../state";
+import { HistoryEvent } from "../state";
 
 export class LogPresenter {
   private eventId = 0;
@@ -9,7 +9,7 @@ export class LogPresenter {
   constructor(manager: StateManager) {
     manager.history().subscribe((events) => {
       for (const event of events) {
-        if (event.disposition !== Disposition.Ignore) {
+        if (event.disposition !== "ignore") {
           document.dispatchEvent(
             new CustomEvent<LogItem>("onlogmessage", {
               detail: {
@@ -44,10 +44,10 @@ function resolve(
   }
 
   switch (event.kind) {
-    case Kind.Label:
+    case "label":
       return t(event.label, named ?? {});
 
-    case Kind.PluralLabel:
+    case "plural-label":
       return t(event.label, named ?? {}, event.plural);
 
     default:

@@ -11,120 +11,119 @@ export enum UnitKind {
   Percent,
 }
 
+type EffectStyleDisposition = "none" | "hide" | "inline" | "collapse";
+
 export type EffectDisplayStyle = Readonly<{
   unit: UnitKind;
   invert?: boolean;
   label?: string;
-  disposition?: "none" | "hide" | "inline" | "collapse";
+  disposition?: EffectStyleDisposition;
 }>;
 
 export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   // Deltas
   // Catnip
-  "catnip.delta": { unit: UnitKind.PerTick, disposition: "inline" },
-  "catnip.production": { unit: UnitKind.PerTick, disposition: "inline" },
+  "catnip.delta": perTick("inline"),
+  "catnip.production": perTick("inline"),
   "catnip-field.catnip": {
-    unit: UnitKind.PerTick,
+    ...perTick("collapse"),
     label: "effect-tree.catnip-fields",
-    disposition: "collapse",
   },
-  "catnip-field.catnip.base": { unit: UnitKind.PerTick },
-  "weather.ratio": {
-    unit: UnitKind.Percent,
-    label: "effect-tree.weather",
-    disposition: "collapse",
-  },
-  "weather.season-ratio": { unit: UnitKind.Percent },
-  "weather.severity-ratio": { unit: UnitKind.Percent },
+  "catnip-field.catnip.base": perTick(),
+  "weather.ratio": { ...percent("collapse"), label: "effect-tree.weather" },
+  "weather.season-ratio": percent(),
+  "weather.severity-ratio": percent(),
   "jobs.farmer.catnip": {
-    unit: UnitKind.PerTick,
+    ...perTick("collapse"),
     label: "effect-tree.farming",
-    disposition: "collapse",
   },
-  "jobs.farmer.catnip.base": { unit: UnitKind.PerTick },
+  "jobs.farmer.catnip.base": perTick(),
   "population.catnip-demand": {
-    unit: UnitKind.PerTick,
-    invert: true,
+    ...perTick("collapse"),
     label: "effect-tree.village-demand",
-    disposition: "collapse",
-  },
-  "population.catnip-demand.base": {
-    unit: UnitKind.PerTick,
     invert: true,
   },
+  "population.catnip-demand.base": { ...perTick(), invert: true },
 
   // Wood
-  "wood.delta": { unit: UnitKind.PerTick, disposition: "inline" },
-  "wood.production": { unit: UnitKind.PerTick, disposition: "inline" },
+  "wood.delta": perTick("inline"),
+  "wood.production": perTick("inline"),
   "jobs.woodcutter.wood": {
-    unit: UnitKind.PerTick,
+    ...perTick("collapse"),
     label: "effect-tree.woodcutting",
-    disposition: "collapse",
   },
-  "jobs.woodcutter.wood.base": { unit: UnitKind.PerTick },
+  "jobs.woodcutter.wood.base": perTick(),
 
   // Minerals
-  "minerals.delta": { unit: UnitKind.PerTick, disposition: "inline" },
-  "minerals.production": { unit: UnitKind.PerTick, disposition: "inline" },
+  "minerals.delta": perTick("inline"),
+  "minerals.production": perTick("inline"),
   "jobs.miner.minerals": {
-    unit: UnitKind.PerTick,
+    ...perTick("collapse"),
     label: "effect-tree.mining",
-    disposition: "collapse",
   },
-  "jobs.miner.minerals.base": { unit: UnitKind.PerTick },
-  "minerals.ratio": {
-    unit: UnitKind.Percent,
-    label: "effect-tree.bonus",
-    disposition: "collapse",
-  },
-  "mine.minerals-ratio": { unit: UnitKind.Percent },
-  "mine.minerals-ratio.base": { unit: UnitKind.Percent },
+  "jobs.miner.minerals.base": perTick(),
+  "minerals.ratio": { ...percent("collapse"), label: "effect-tree.bonus" },
+  "mine.minerals-ratio": percent(),
+  "mine.minerals-ratio.base": percent(),
 
   // Science
-  "science.delta": { unit: UnitKind.PerTick, disposition: "inline" },
-  "science.production": { unit: UnitKind.PerTick, disposition: "inline" },
+  "science.delta": perTick("inline"),
+  "science.production": perTick("inline"),
   "jobs.scholar.science": {
-    unit: UnitKind.PerTick,
+    ...perTick("collapse"),
     label: "effect-tree.researching",
-    disposition: "collapse",
   },
-  "jobs.scholar.science.base": { unit: UnitKind.PerTick },
-  "science.ratio": {
-    unit: UnitKind.Percent,
-    label: "effect-tree.bonus",
-    disposition: "collapse",
-  },
-  "library.science-ratio": { unit: UnitKind.Percent },
-  "library.science-ratio.base": { unit: UnitKind.Percent },
+  "jobs.scholar.science.base": perTick(),
+  "science.ratio": { ...percent("collapse"), label: "effect-tree.bonus" },
+  "library.science-ratio": percent(),
+  "library.science-ratio.base": percent(),
 
   // Limits
   // Catnip
-  "catnip.limit": { unit: UnitKind.None, disposition: "inline" },
-  "catnip.limit.base": { unit: UnitKind.None },
-  "barn.catnip-limit": { unit: UnitKind.None, disposition: "inline" },
-  "barn.catnip-limit.base": { unit: UnitKind.None },
+  "catnip.limit": noUnit("inline"),
+  "catnip.limit.base": noUnit(),
+  "barn.catnip-limit": noUnit("inline"),
+  "barn.catnip-limit.base": noUnit(),
 
   // Wood
-  "wood.limit": { unit: UnitKind.None, disposition: "inline" },
-  "wood.limit.base": { unit: UnitKind.None },
-  "barn.wood-limit": { unit: UnitKind.None, disposition: "inline" },
-  "barn.wood-limit.base": { unit: UnitKind.None },
+  "wood.limit": noUnit("inline"),
+  "wood.limit.base": noUnit(),
+  "barn.wood-limit": noUnit("inline"),
+  "barn.wood-limit.base": noUnit(),
 
   // Minerals
-  "minerals.limit": { unit: UnitKind.None, disposition: "inline" },
-  "minerals.limit.base": { unit: UnitKind.None },
-  "barn.minerals-limit": { unit: UnitKind.None, disposition: "inline" },
-  "barn.minerals-limit.base": { unit: UnitKind.None },
-
-  // Kittens
-  "kittens.limit": { unit: UnitKind.None, disposition: "inline" },
-  "hut.kittens-limit": { unit: UnitKind.None, disposition: "collapse" },
-  "hut.kittens-limit.base": { unit: UnitKind.None },
+  "minerals.limit": noUnit("inline"),
+  "minerals.limit.base": noUnit(),
+  "barn.minerals-limit": noUnit("inline"),
+  "barn.minerals-limit.base": noUnit(),
 
   // Science
-  "science.limit": { unit: UnitKind.None, disposition: "inline" },
-  "library.science-limit": { unit: UnitKind.None, disposition: "collapse" },
-  "library.science-limit.base": { unit: UnitKind.None },
-  "astronomy.rare-event.reward": { unit: UnitKind.None },
-  "astronomy.rare-event.reward.base": { unit: UnitKind.None },
+  "science.limit": noUnit("inline"),
+  "library.science-limit": noUnit("collapse"),
+  "library.science-limit.base": noUnit(),
+  "astronomy.rare-event.reward": noUnit(),
+  "astronomy.rare-event.reward.base": noUnit(),
+
+  // Kittens
+  "kittens.limit": noUnit("inline"),
+  "hut.kittens-limit": noUnit("collapse"),
+  "hut.kittens-limit.base": noUnit(),
 };
+
+function noUnit(disposition?: EffectStyleDisposition): EffectDisplayStyle {
+  if (disposition) {
+    return { unit: UnitKind.None, disposition };
+  } else {
+    return { unit: UnitKind.None };
+  }
+}
+
+function perTick(disposition?: EffectStyleDisposition): EffectDisplayStyle {
+  if (disposition) return { unit: UnitKind.PerTick, disposition };
+  else return { unit: UnitKind.PerTick };
+}
+
+function percent(disposition?: EffectStyleDisposition): EffectDisplayStyle {
+  if (disposition) return { unit: UnitKind.Percent, disposition };
+  else return { unit: UnitKind.Percent };
+}

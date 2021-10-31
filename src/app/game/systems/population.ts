@@ -1,4 +1,4 @@
-import { pluralLabel, Disposition } from "@/app/state";
+import { pluralLabel } from "@/app/state";
 import { trunc } from "@/app/utils/mathx";
 
 import { System } from ".";
@@ -39,7 +39,7 @@ export class PopulationSystem extends System {
     const event = pluralLabel("population.kitten.arrived", count, { count });
     if (this.admin.pops().size > 10) {
       // Once past 10 pops, these messages are not so interesting.
-      event.disposition = Disposition.Ignore;
+      event.disposition = "ignore";
     }
     this.admin.history().push(event);
   }

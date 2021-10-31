@@ -32,7 +32,8 @@
     },
     "woodcutter": {
       "label": "Woodcutter",
-      "description": "Use your mystical kitten powers and get back to chopping!",
+      "description": "Chop some forest trees for wood.",
+      "flavor": "Must. Not. Scratch.",
       "effects": {
         "wood": "Wood production {amount}"
       }
@@ -54,6 +55,7 @@
     "miner": {
       "label": "Miner",
       "description": "Dig into the depths of Cath for minerals.",
+      "flavor": "How do I hold a pick with my paws…?",
       "effects": {
         "minerals": "Mineral production {amount}"
       }
