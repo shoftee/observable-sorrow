@@ -9,8 +9,8 @@ import {
   WeatherId,
 } from "@/app/interfaces";
 import {
-  BonfireMetadata,
-  BonfireMetadataType,
+  BonfireItemId,
+  BonfireItems,
   BuildingMetadata,
   BuildingMetadataType,
   EffectDisplayStyles,
@@ -33,8 +33,8 @@ import {
 import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
 
 export const Meta = {
-  bonfireItems(): Enumerable<BonfireMetadataType> {
-    return asEnumerable(Object.values(BonfireMetadata));
+  bonfireItems(): Enumerable<BonfireItemId> {
+    return asEnumerable(BonfireItems);
   },
 
   buildings(): Enumerable<BuildingMetadataType> {

@@ -1,10 +1,10 @@
 import { computed, reactive } from "vue";
 
-import { BonfireItemId, BuildingId, Intent } from "@/app/interfaces";
-import { BonfireMetadataType, Meta } from "@/app/state";
+import { BuildingId, Intent } from "@/app/interfaces";
+import { Meta, BonfireItemId, BonfireBuildingId } from "@/app/state";
 
-import { NumberView, IStateManager } from ".";
-import { fulfillment, FulfillmentItem } from "./common/fulfillment";
+import { IStateManager } from ".";
+import { fulfillment, EffectItem, FulfillmentItem } from "./common";
 
 export class BonfirePresenter {
   readonly all: BonfireItem[];
@@ -16,52 +16,74 @@ export class BonfirePresenter {
   }
 
   private newBonfireItem(
-    meta: BonfireMetadataType,
+    id: BonfireItemId,
     manager: IStateManager,
   ): BonfireItem {
-    if (meta.intent.id === "gather-catnip") {
-      return reactive({
-        ...this.staticData(meta),
-
-        unlocked: true,
-        fulfillment: {
-          capped: false,
-          fulfilled: true,
-          ingredients: [],
-        },
-      });
-    } else if (meta.intent.kind === "workshop") {
-      const recipeId = meta.intent.recipe;
-      return reactive({
-        ...this.staticData(meta),
-
-        unlocked: true,
-        fulfillment: computed(() => fulfillment(recipeId, manager)),
-      });
-    } else if (meta.intent.kind === "construction") {
-      const buildingId = meta.intent.building;
-      const state = manager.building(buildingId);
-      return reactive({
-        ...this.staticData(meta),
-
-        unlocked: computed(() => state.unlocked),
-        level: computed(() => state.level),
-        fulfillment: computed(() => fulfillment(buildingId, manager)),
-        effects: computed(() => this.effects(buildingId, manager)),
-      });
-    } else {
-      throw new Error(`unexpected intent ${JSON.stringify(meta.intent)}`);
+    switch (id) {
+      case "gather-catnip":
+        return this.gatherCatnip();
+      case "refine-catnip":
+        return this.refineCatnip(manager);
+      default:
+        return this.buyBuilding(id, manager);
     }
   }
 
-  private staticData(meta: BonfireMetadataType) {
-    return {
-      id: meta.id,
-      intent: meta.intent,
-      label: meta.label,
-      description: meta.description,
-      flavor: meta.flavor,
-    };
+  private gatherCatnip(): BonfireItem {
+    return reactive({
+      id: "gather-catnip",
+      intent: { kind: "bonfire", id: "gather-catnip" },
+      label: "bonfire.gather-catnip.label",
+      description: "bonfire.gather-catnip.description",
+
+      unlocked: true,
+      fulfillment: {
+        capped: false,
+        fulfilled: true,
+        ingredients: [],
+      },
+    });
+  }
+
+  private refineCatnip(manager: IStateManager): BonfireItem {
+    return reactive({
+      id: "refine-catnip",
+      intent: {
+        kind: "workshop",
+        id: "craft-recipe",
+        recipe: "refine-catnip",
+      },
+      label: "bonfire.refine-catnip.label",
+      description: "bonfire.refine-catnip.description",
+      flavor: "bonfire.refine-catnip.flavor",
+
+      unlocked: true,
+      fulfillment: computed(() => fulfillment("refine-catnip", manager)),
+    });
+  }
+
+  private buyBuilding(
+    id: BonfireBuildingId,
+    manager: IStateManager,
+  ): BonfireItem {
+    const building = Meta.building(id);
+    const state = manager.building(building.id);
+    return reactive({
+      id: id,
+      intent: {
+        kind: "construction",
+        id: "buy-building",
+        building: building.id,
+      },
+      label: building.label,
+      description: building.description,
+      flavor: building.flavor,
+
+      unlocked: computed(() => state.unlocked),
+      level: computed(() => state.level),
+      fulfillment: computed(() => fulfillment(building.id, manager)),
+      effects: computed(() => this.effects(building.id, manager)),
+    });
   }
 
   private effects(
@@ -93,11 +115,4 @@ export interface BonfireItem {
 
   fulfillment: FulfillmentItem;
   effects?: EffectItem[];
-}
-
-export interface EffectItem {
-  id: string;
-  label: string;
-  singleAmount: NumberView | undefined;
-  totalAmount: NumberView | undefined;
 }

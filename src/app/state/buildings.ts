@@ -26,6 +26,10 @@ type BuildingPricesType = Readonly<{
 
 export type BuildingMetadataType = Readonly<{
   id: BuildingId;
+  label: string;
+  description: string;
+  flavor?: string;
+
   /** Unlock requirements for the building. */
   unlock?: BuildingUnlockType;
   /** Price definition for the building. */
@@ -44,6 +48,9 @@ export type BuildingUnlockType = Readonly<{
 export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   "catnip-field": {
     id: "catnip-field",
+    label: "buildings.catnip-field.label",
+    description: "buildings.catnip-field.description",
+    flavor: "buildings.catnip-field.flavor",
     prices: {
       ratio: 1.12,
       base: { catnip: 10 },
@@ -60,6 +67,9 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
   hut: {
     id: "hut",
+    label: "buildings.hut.label",
+    description: "buildings.hut.description",
+    flavor: "buildings.hut.flavor",
     prices: {
       ratio: 2.5,
       base: { wood: 5 },
@@ -76,6 +86,9 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
   library: {
     id: "library",
+    label: "buildings.library.label",
+    description: "buildings.library.description",
+    flavor: "buildings.library.flavor",
     prices: {
       base: { wood: 25 },
       ratio: 1.15,
@@ -98,6 +111,9 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
   barn: {
     id: "barn",
+    label: "buildings.barn.label",
+    description: "buildings.barn.description",
+    flavor: "buildings.barn.flavor",
     unlock: {
       priceRatio: 0.3,
       unlockEffect: "unlock.building.barn",
@@ -129,6 +145,9 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
   },
   mine: {
     id: "mine",
+    label: "buildings.mine.label",
+    description: "buildings.mine.description",
+    flavor: "buildings.mine.flavor",
     unlock: {
       priceRatio: 0.15,
       unlockEffect: "unlock.building.mine",

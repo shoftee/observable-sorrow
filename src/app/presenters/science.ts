@@ -4,7 +4,7 @@ import { ResearchIntent, TechId } from "@/app/interfaces";
 import { Meta, TechMetadataType } from "@/app/state";
 
 import { StateManager } from ".";
-import { FulfillmentItem, fulfillment } from "./common/fulfillment";
+import { fulfillment, FulfillmentItem } from "./common";
 
 export class SciencePresenter {
   readonly items: ComputedRef<TechItem[]>;

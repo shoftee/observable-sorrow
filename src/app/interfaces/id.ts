@@ -1,10 +1,4 @@
-export type BonfireBuildingId =
-  | "catnip-field"
-  | "hut"
-  | "library"
-  | "barn"
-  | "mine";
-export type BuildingId = BonfireBuildingId;
+export type BuildingId = "catnip-field" | "hut" | "library" | "mine" | "barn";
 export type JobId = "woodcutter" | "scholar" | "farmer" | "miner";
 export type PopId = `pop-${number}`;
 export type RecipeId = "refine-catnip";
@@ -14,8 +8,3 @@ export type SectionId = "bonfire" | "society" | "science";
 export type StockpileId = "kitten-growth" | "observe-sky";
 export type TechId = "calendar" | "agriculture" | "mining";
 export type WeatherId = "neutral" | "warm" | "cold";
-
-export type BonfireItemId =
-  | "gather-catnip"
-  | "refine-catnip"
-  | BonfireBuildingId;

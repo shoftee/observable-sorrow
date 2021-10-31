@@ -3,7 +3,8 @@ import { computed, ComputedRef, reactive } from "vue";
 import { JobId, PopId } from "@/app/interfaces";
 import { JobEffectType, JobState, Meta, PopState } from "@/app/state";
 
-import { EffectItem, IStateManager } from ".";
+import { IStateManager } from ".";
+import { EffectItem } from "./common";
 
 export interface PopItem {
   id: string;
