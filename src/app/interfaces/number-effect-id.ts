@@ -1,12 +1,18 @@
 export type ProductionEffectId =
   | "catnip.production"
   | "wood.production"
+  | "minerals.production"
   | "science.production";
 
-export type DeltaEffectId = "catnip.delta" | "wood.delta" | "science.delta";
+export type DeltaEffectId =
+  | "catnip.delta"
+  | "wood.delta"
+  | "minerals.delta"
+  | "science.delta";
 
 export type RatioEffectId =
   | "science.ratio"
+  | "minerals.ratio"
   | "weather.season-ratio"
   | "weather.severity-ratio";
 
@@ -19,6 +25,8 @@ export type LimitEffectId =
   | "catnip.limit.base"
   | "wood.limit"
   | "wood.limit.base"
+  | "minerals.limit"
+  | "minerals.limit.base"
   | "kittens.limit"
   | "science.limit";
 
@@ -39,7 +47,11 @@ export type BarnEffectId =
   | "barn.catnip-limit"
   | "barn.catnip-limit.base"
   | "barn.wood-limit"
-  | "barn.wood-limit.base";
+  | "barn.wood-limit.base"
+  | "barn.minerals-limit"
+  | "barn.minerals-limit.base";
+
+export type MineEffectId = "mine.minerals-ratio" | "mine.minerals-ratio.base";
 
 export type JobEffectId =
   | "jobs.woodcutter.wood.base"
@@ -47,7 +59,9 @@ export type JobEffectId =
   | "jobs.scholar.science.base"
   | "jobs.scholar.science"
   | "jobs.farmer.catnip.base"
-  | "jobs.farmer.catnip";
+  | "jobs.farmer.catnip"
+  | "jobs.miner.minerals.base"
+  | "jobs.miner.minerals";
 
 export type PopulationEffectId =
   | "population.catnip-demand"
@@ -63,5 +77,6 @@ export type NumberEffectId =
   | HutEffectId
   | LibraryEffectId
   | BarnEffectId
+  | MineEffectId
   | PopulationEffectId
   | JobEffectId;

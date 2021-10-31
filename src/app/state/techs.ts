@@ -35,6 +35,15 @@ export const TechMetadata: Record<TechId, TechMetadataType> = {
     effects: [{ id: "default", label: "tech.agriculture.effect" }],
     dependsOn: ["calendar"],
   },
+  mining: {
+    id: "mining",
+    label: "tech.mining.label",
+    description: "tech.mining.description",
+    flavor: "tech.mining.flavor",
+    ingredients: { science: 300 },
+    effects: [{ id: "default", label: "tech.mining.effect" }],
+    dependsOn: ["agriculture"],
+  },
 };
 
 export interface TechState {

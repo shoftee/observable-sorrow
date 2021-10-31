@@ -50,6 +50,13 @@
       "effects": {
         "catnip": "Catnip production {amount}"
       }
+    },
+    "miner": {
+      "label": "Miner",
+      "description": "Dig into the depths of Cath for minerals.",
+      "effects": {
+        "minerals": "Mineral production {amount}"
+      }
     }
   },
 
@@ -63,6 +70,9 @@
     },
     "wood": {
       "label": "wood"
+    },
+    "minerals": {
+      "label": "minerals"
     },
     "kittens": {
       "label": "kittens"
@@ -132,13 +142,13 @@
   },
   "effect-tree": {
     "catnip-fields": "Catnip fields",
-    "libraries": "Libraries",
     "weather": "Weather",
     "bonus": "Bonus",
     "village-demand": "Demand",
     "woodcutting": "Woodcutting",
     "researching": "Researching",
-    "farming": "Farming"
+    "farming": "Farming",
+    "mining": "Mining"
   },
 
   "buildings": {
@@ -175,7 +185,16 @@
       "flavor": "Rats ain't a problem for us!",
       "effects": {
         "catnip-limit": "Maximum catnip {amount}",
-        "wood-limit": "Maximum wood {amount}"
+        "wood-limit": "Maximum wood {amount}",
+        "minerals-limit": "Maximum minerals {amount}"
+      }
+    },
+    "mine": {
+      "label": "Mine",
+      "description": "Allows the acquisition of minerals. Each level increases mineral output.",
+      "flavor": "100 days without diggor mortis",
+      "effects": {
+        "minerals-ratio": "Minerals output bonus {amount}"
       }
     }
   },
@@ -202,6 +221,12 @@
       "description": "The basis of all civilised life. Allows the working of land for food.",
       "flavor": "Best thing since sliced bread!",
       "effect": "Unlocks Farmers and Barns."
+    },
+    "mining": {
+      "label": "Mining",
+      "description": "Develops the ability to extract mineral resources from the bowels fo Cath.",
+      "flavor": "Pickaxes are easier to hold with opposable thumbs",
+      "effect": "Unlocks Mines."
     }
   },
 

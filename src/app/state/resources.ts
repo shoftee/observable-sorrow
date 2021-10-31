@@ -43,6 +43,15 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
+  minerals: {
+    id: "minerals",
+    label: "resources.minerals.label",
+    effects: {
+      limit: "minerals.limit",
+      delta: "minerals.delta",
+    },
+    flags: {},
+  },
   kittens: {
     id: "kittens",
     label: "resources.kittens.label",

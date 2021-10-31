@@ -51,6 +51,13 @@ export const BonfireMetadata: Record<BonfireItemId, BonfireMetadataType> = {
     description: "buildings.barn.description",
     flavor: "buildings.barn.flavor",
   },
+  mine: {
+    id: "mine",
+    intent: buyBuilding("mine"),
+    label: "buildings.mine.label",
+    description: "buildings.mine.description",
+    flavor: "buildings.mine.flavor",
+  },
 };
 
 function buyBuilding(id: BuildingId): ConstructionIntent {

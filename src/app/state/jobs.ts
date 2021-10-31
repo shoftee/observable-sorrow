@@ -58,4 +58,18 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
       },
     ],
   },
+  miner: {
+    id: "miner",
+    label: "jobs.miner.label",
+    description: "jobs.miner.description",
+    unlockEffect: "unlock.job.miner",
+    effects: [
+      {
+        id: "minerals",
+        label: "jobs.miner.effects.minerals",
+        base: "jobs.miner.minerals.base",
+        total: "jobs.miner.minerals",
+      },
+    ],
+  },
 };

@@ -119,6 +119,31 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
         total: "barn.wood-limit",
         label: "buildings.barn.effects.wood-limit",
       },
+      {
+        id: "minerals-limit",
+        per: "barn.minerals-limit.base",
+        total: "barn.minerals-limit",
+        label: "buildings.barn.effects.minerals-limit",
+      },
+    ],
+  },
+  mine: {
+    id: "mine",
+    unlock: {
+      priceRatio: 0.15,
+      unlockEffect: "unlock.building.mine",
+    },
+    prices: {
+      base: { wood: 100 },
+      ratio: 1.15,
+    },
+    effects: [
+      {
+        id: "mineral-ratio",
+        per: "mine.minerals-ratio.base",
+        total: "mine.minerals-ratio",
+        label: "buildings.mine.effects.minerals-ratio",
+      },
     ],
   },
 };

@@ -29,6 +29,12 @@ const fallback = (check: NumberExpr, fallback: NumberExpr) => (ctx: Ctx) => {
   return checked === undefined ? unwrap(fallback, ctx) : checked;
 };
 
+const ifdef = (check: NumberExpr, result: NumberExpr) => (ctx: Ctx) => {
+  const checked = unwrap(check, ctx);
+  if (checked !== undefined) return unwrap(result, ctx);
+  else return undefined;
+};
+
 // Returns undefined iff all provided exprs unwrap to undefined.
 // Otherwise, returns the sum of the valued exprs.
 const looseSum =
@@ -107,6 +113,13 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "wood.limit.base": constant(200),
   "wood.limit": looseSum(effect("wood.limit.base"), effect("barn.wood-limit")),
 
+  "minerals.limit.base": constant(250),
+  "minerals.limit": looseSum(
+    effect("minerals.limit.base"),
+    effect("barn.minerals-limit"),
+  ),
+  "minerals.ratio": effect("mine.minerals-ratio"),
+
   "kittens.limit": effect("hut.kittens-limit"),
   "science.limit": effect("library.science-limit"),
   "science.ratio": effect("library.science-ratio"),
@@ -124,6 +137,13 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   // Wood
   "wood.delta": effect("wood.production"),
   "wood.production": looseSum(effect("jobs.woodcutter.wood")),
+
+  // Minerals
+  "minerals.delta": effect("minerals.production"),
+  "minerals.production": ratio(
+    effect("jobs.miner.minerals"),
+    fallback(effect("minerals.ratio"), constant(0)),
+  ),
 
   // Science
   "science.delta": effect("science.production"),
@@ -173,6 +193,18 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "barn.wood-limit": strictProd(
     effect("barn.wood-limit.base"),
     building("barn"),
+  ),
+  "barn.minerals-limit.base": ifdef(resource("minerals"), constant(250)),
+  "barn.minerals-limit": strictProd(
+    effect("barn.minerals-limit.base"),
+    building("barn"),
+  ),
+
+  // Mines
+  "mine.minerals-ratio.base": constant(0.2),
+  "mine.minerals-ratio": strictProd(
+    effect("mine.minerals-ratio.base"),
+    building("mine"),
   ),
 
   // Population
@@ -224,5 +256,10 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "jobs.farmer.catnip": strictProd(
     effect("jobs.farmer.catnip.base"),
     workers("farmer"),
+  ),
+  "jobs.miner.minerals.base": constant(0.05),
+  "jobs.miner.minerals": strictProd(
+    effect("jobs.miner.minerals.base"),
+    workers("miner"),
   ),
 };

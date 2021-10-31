@@ -63,6 +63,23 @@ export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   },
   "jobs.woodcutter.wood.base": { unit: UnitKind.PerTick },
 
+  // Minerals
+  "minerals.delta": { unit: UnitKind.PerTick, disposition: "inline" },
+  "minerals.production": { unit: UnitKind.PerTick, disposition: "inline" },
+  "jobs.miner.minerals": {
+    unit: UnitKind.PerTick,
+    label: "effect-tree.mining",
+    disposition: "collapse",
+  },
+  "jobs.miner.minerals.base": { unit: UnitKind.PerTick },
+  "minerals.ratio": {
+    unit: UnitKind.Percent,
+    label: "effect-tree.bonus",
+    disposition: "collapse",
+  },
+  "mine.minerals-ratio": { unit: UnitKind.Percent },
+  "mine.minerals-ratio.base": { unit: UnitKind.Percent },
+
   // Science
   "science.delta": { unit: UnitKind.PerTick, disposition: "inline" },
   "science.production": { unit: UnitKind.PerTick, disposition: "inline" },
@@ -92,6 +109,12 @@ export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   "wood.limit.base": { unit: UnitKind.None },
   "barn.wood-limit": { unit: UnitKind.None, disposition: "inline" },
   "barn.wood-limit.base": { unit: UnitKind.None },
+
+  // Minerals
+  "minerals.limit": { unit: UnitKind.None, disposition: "inline" },
+  "minerals.limit.base": { unit: UnitKind.None },
+  "barn.minerals-limit": { unit: UnitKind.None, disposition: "inline" },
+  "barn.minerals-limit.base": { unit: UnitKind.None },
 
   // Kittens
   "kittens.limit": { unit: UnitKind.None, disposition: "inline" },
