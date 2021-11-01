@@ -32,7 +32,9 @@ export class BuildingSystem extends System {
 
     this.orders.consume({
       pipeline: [(ctx) => this.applyBuyBuilding(ctx)],
-      success: (ctx) => this.updateRequirements(ctx),
+      success: ({ admin, order }) => {
+        admin.building(order).state.level++;
+      },
     });
   }
 
@@ -56,23 +58,5 @@ export class BuildingSystem extends System {
     }
 
     return { success: true };
-  }
-
-  private updateRequirements(context: OrderContext<BuildingId>): void {
-    const { admin, order } = context;
-
-    const building = admin.building(order);
-    const meta = building.meta;
-    const state = building.state;
-
-    state.level++;
-
-    const multiplier = Math.pow(meta.prices.ratio, state.level);
-
-    const fulfillment = admin.fulfillment(order);
-    for (const ingredient of fulfillment.state.ingredients) {
-      const base = meta.prices.base[ingredient.resourceId] ?? 0;
-      ingredient.requirement = base * multiplier;
-    }
   }
 }

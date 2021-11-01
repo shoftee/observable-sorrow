@@ -1,6 +1,26 @@
+import { watchSyncEffect } from "vue";
+
 import { System } from ".";
 
 export class FulfillmentSystem extends System {
+  init(): void {
+    // reactive update of building prices
+    for (const { id, meta, state } of this.admin.buildings()) {
+      const basePrices = meta.prices.base;
+      const priceRatio = meta.prices.ratio;
+
+      const fulfillment = this.admin.fulfillment(id).state;
+      for (const ingredient of fulfillment.ingredients) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const basePrice = basePrices[ingredient.resourceId]!;
+        watchSyncEffect(() => {
+          ingredient.requirement =
+            basePrice * Math.pow(priceRatio, state.level);
+        });
+      }
+    }
+  }
+
   update(): void {
     for (const { state } of this.admin.fulfillments()) {
       let listCapped = false;

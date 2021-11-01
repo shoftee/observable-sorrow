@@ -32,7 +32,9 @@ export class ResearchSystem extends System {
 
     this.orders.consume({
       pipeline: [(ctx) => this.applyResearchTech(ctx)],
-      success: (ctx) => this.setResearched(ctx),
+      success: ({ admin, order }) => {
+        admin.tech(order).state.researched = true;
+      },
     });
   }
 
@@ -56,12 +58,5 @@ export class ResearchSystem extends System {
     }
 
     return { success: true };
-  }
-
-  private setResearched(context: OrderContext<TechId>): void {
-    const { order, admin } = context;
-
-    const tech = admin.tech(order);
-    tech.state.researched = true;
   }
 }

@@ -1,16 +1,19 @@
+import { watchSyncEffect } from "vue";
 import { System } from ".";
 
 export class SectionsSystem extends System {
-  update(): void {
-    this.updateSociety();
+  init(): void {
+    watchSyncEffect(() => {
+      const pops = this.admin.pops();
+
+      const section = this.admin.section("society").state;
+      section.label = this.societyLabel(pops.size);
+      section.alert = this.societyAlert(pops.withJob(undefined).count());
+    });
   }
 
-  private updateSociety() {
-    const pops = this.admin.pops();
-
-    const section = this.admin.section("society").state;
-    section.label = this.societyLabel(pops.size);
-    section.alert = this.societyAlert(pops.withJob(undefined).count());
+  update(): void {
+    // sections are fully reactive
   }
 
   private societyLabel(totalPops: number): string {
