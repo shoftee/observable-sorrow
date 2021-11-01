@@ -51,13 +51,19 @@ export class FulfillmentSystem extends System {
         ingredient.fulfilled = fulfilled;
         listFulfilled &&= fulfilled;
 
-        const capped = capacity !== undefined && requirement > capacity;
+        // if the ingredient is fulfilled, it's automatically non-capped
+        // this is done to handle overcapped resources correctly
+        const capped =
+          !fulfilled && capacity !== undefined && requirement > capacity;
         listCapped ||= capped;
         ingredient.capped = capped;
       }
 
       state.fulfilled = listFulfilled;
-      state.capped = listCapped;
+
+      // if the whole thing is fulfilled, it's automatically non-capped
+      // this is done to handle overcapped resources correctly
+      state.capped = !listFulfilled && listCapped;
     }
   }
 }
