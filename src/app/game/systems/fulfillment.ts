@@ -1,51 +1,44 @@
-import { IngredientState } from "@/app/state";
-import { all, any } from "@/app/utils/collections";
-
 import { System } from ".";
 
 export class FulfillmentSystem extends System {
   update(): void {
     for (const { state } of this.admin.fulfillments()) {
+      let listCapped = false;
+      let listFulfilled = true;
       const ingredients = state.ingredients;
       for (const ingredient of ingredients) {
-        this.updateIngredient(ingredient);
-      }
+        const resource = this.admin.resource(ingredient.resourceId).state;
+        const { amount, change, capacity } = resource;
 
-      state.capped = any(ingredients, (i) => i.capped);
-      state.fulfilled = all(ingredients, (i) => i.fulfilled);
-    }
-  }
-
-  private updateIngredient(ingredient: IngredientState) {
-    const resource = this.admin.resource(ingredient.resourceId).state;
-    ingredient.fulfillment = resource.amount;
-
-    if (ingredient.fulfillment >= ingredient.requirement) {
-      ingredient.fulfilled = true;
-      ingredient.fulfillmentTime = undefined;
-    } else {
-      ingredient.fulfilled = false;
-      if (resource.change > 0) {
-        if (
-          resource.capacity !== undefined &&
-          resource.capacity < ingredient.requirement
-        ) {
-          // requirement won't be fulfilled
-          ingredient.fulfillmentTime = Number.POSITIVE_INFINITY;
+        let fulfilled = false;
+        let fulfillmentTime = undefined;
+        const requirement = ingredient.requirement;
+        if (amount >= requirement) {
+          fulfilled = true;
         } else {
-          // calculate remaining time based on change
-          const remaining = ingredient.requirement - ingredient.fulfillment;
-          ingredient.fulfillmentTime = remaining / resource.change;
+          if (change > 0) {
+            if (capacity !== undefined && capacity < requirement) {
+              // requirement won't be fulfilled
+              fulfillmentTime = Number.POSITIVE_INFINITY;
+            } else {
+              fulfillmentTime = (requirement - amount) / change;
+            }
+          }
         }
-      } else {
-        // resource is not accumulating
-        ingredient.fulfillmentTime = undefined;
-      }
-    }
 
-    // capped if resource has capacity and requirement is above it
-    ingredient.capped =
-      resource.capacity !== undefined &&
-      ingredient.requirement > resource.capacity;
+        ingredient.fulfillment = amount;
+        ingredient.fulfillmentTime = fulfillmentTime;
+
+        ingredient.fulfilled = fulfilled;
+        listFulfilled &&= fulfilled;
+
+        const capped = capacity !== undefined && requirement > capacity;
+        listCapped ||= capped;
+        ingredient.capped = capped;
+      }
+
+      state.fulfilled = listFulfilled;
+      state.capped = listCapped;
+    }
   }
 }

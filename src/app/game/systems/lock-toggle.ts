@@ -1,10 +1,10 @@
-import { BooleanEffectId, TechId } from "@/app/interfaces";
-import { Flag, Meta, UnlockMode } from "@/app/state";
-import { asEnumerable } from "@/app/utils/enumerable";
+import { watchSyncEffect } from "vue";
 
-import { ResourceEntity, BuildingEntity } from "../entity";
+import { BooleanEffectId } from "@/app/interfaces";
+import { Flag, Meta, UnlockMode } from "@/app/state";
 
 import { System } from ".";
+import { ResourceEntity, BuildingEntity } from "../entity";
 
 type Unlockable = {
   meta: {
@@ -16,15 +16,21 @@ type Unlockable = {
 };
 
 export class LockToggleSystem extends System {
-  private readonly techDeps = new Map<TechId, Set<TechId>>();
-
   init(): void {
-    for (const tech of Meta.techs()) {
-      const deps = this.techDeps.get(tech.id) ?? new Set<TechId>();
-      for (const dep of tech.dependsOn) {
-        deps.add(dep);
-      }
-      this.techDeps.set(tech.id, deps);
+    // configure reactive unlocking of techs
+    for (const meta of Meta.techs()) {
+      watchSyncEffect(() => {
+        const tech = this.admin.tech(meta.id).state;
+        if (!tech.unlocked) {
+          for (const dep of meta.dependsOn) {
+            if (!this.admin.tech(dep).state.researched) {
+              return;
+            }
+          }
+
+          tech.unlocked = true;
+        }
+      });
     }
   }
 
@@ -40,15 +46,6 @@ export class LockToggleSystem extends System {
     for (const building of this.admin.buildings()) {
       this.updateBuildingUnlocked(building);
     }
-
-    for (const [id, deps] of this.techDeps) {
-      const tech = this.admin.tech(id);
-      if (!tech.state.unlocked) {
-        tech.state.unlocked = asEnumerable(deps)
-          .map((id) => this.admin.tech(id))
-          .all((dep) => dep.state.researched);
-      }
-    }
   }
 
   private *unlockables(): Iterable<Unlockable> {
@@ -61,42 +58,47 @@ export class LockToggleSystem extends System {
   }
 
   private applyUnlockEffect(entity: Unlockable): void {
-    const unlockEffect = entity.meta.unlockEffect;
-    if (entity.state.unlocked || unlockEffect === undefined) {
+    const { state, meta } = entity;
+    const unlockEffect = meta.unlockEffect;
+    if (state.unlocked || unlockEffect === undefined) {
       return;
     }
 
     const effect = this.admin.boolean(unlockEffect);
-    entity.state.unlocked = effect.state.value ?? false;
+    state.unlocked = effect.state.value ?? false;
   }
 
   private updateResourceUnlocked(resource: ResourceEntity): void {
-    const state = resource.state;
-    const meta = resource.meta;
-    if (!state.unlocked) {
+    const { state, meta } = resource;
+
+    const isUnlocked = state.unlocked;
+    if (!isUnlocked) {
       const unlockMode = meta.unlockMode ?? UnlockMode.FirstQuantity;
       switch (unlockMode) {
         case UnlockMode.FirstQuantity:
           if (state.amount > 0) state.unlocked = true;
           break;
-        case UnlockMode.FirstCapacity:
-          if (state.capacity && state.capacity > 0) state.unlocked = true;
+        case UnlockMode.FirstCapacity: {
+          const capacity = state.capacity;
+          if (capacity !== undefined && capacity > 0) state.unlocked = true;
           break;
+        }
       }
     } else {
       // some resources re-lock when they are depleted
-      if (state.unlocked && meta.flags[Flag.RelockWhenDepleted]) {
+      if (isUnlocked && meta.flags[Flag.RelockWhenDepleted]) {
         state.unlocked = false;
       }
     }
   }
 
   private updateBuildingUnlocked(building: BuildingEntity): void {
-    if (!building.state.unlocked) {
-      const unlock = building.meta.unlock;
+    const { state, meta } = building;
+    if (!state.unlocked) {
+      const unlock = meta.unlock;
       if (unlock === undefined) {
         // unlock requirements not specified, unlock automatically
-        building.state.unlocked = true;
+        state.unlocked = true;
         return;
       }
 
@@ -113,15 +115,15 @@ export class LockToggleSystem extends System {
       const ratio = unlock.priceRatio;
       if (ratio === undefined) {
         // price ratio not specified, unlock automatically.
-        building.state.unlocked = true;
+        state.unlocked = true;
         return;
       }
 
-      const fulfillment = this.admin.fulfillment(building.id);
-      for (const ingredient of fulfillment.state.ingredients) {
+      const fulfillment = this.admin.fulfillment(building.id).state;
+      for (const ingredient of fulfillment.ingredients) {
         const threshold = ingredient.requirement * ratio;
         if (ingredient.fulfillment >= threshold) {
-          building.state.unlocked = true;
+          state.unlocked = true;
           return;
         }
       }

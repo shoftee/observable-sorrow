@@ -16,7 +16,7 @@ export class EffectsSystem extends System {
   }
 
   update(): void {
-    // everything happens in reactivity calls, no need for explicit updates here
+    // effects are fully reactive
     return;
   }
 

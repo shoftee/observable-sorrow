@@ -8,52 +8,59 @@ import { System } from ".";
 
 export class EnvironmentSystem extends System {
   init(): void {
-    const environment = this.admin.environment().state;
-    const calendar = this.admin.tech("calendar").state;
     watchSyncEffect(() => {
+      // change epoch label depending on Calendar research.
+      const calendar = this.admin.tech("calendar").state;
+      const environment = this.admin.environment().state;
+      environment.epochLabel = calendar.researched
+        ? "calendar.epoch.full"
+        : "calendar.epoch.basic";
+    });
+    watchSyncEffect(() => {
+      // change calendar label depending on Calendar research and weather
+      const environment = this.admin.environment().state;
+      const calendar = this.admin.tech("calendar").state;
+
+      const hasWeather = environment.weather !== "neutral";
       if (calendar.researched) {
-        environment.epochLabel = "calendar.epoch.full";
-        if (environment.weather !== "neutral") {
-          environment.calendarLabel = "calendar.full.weather";
-        } else {
-          environment.calendarLabel = "calendar.full.no-weather";
-        }
+        environment.calendarLabel = hasWeather
+          ? "calendar.full.weather"
+          : "calendar.full.no-weather";
       } else {
-        environment.epochLabel = "calendar.epoch.basic";
-        if (environment.weather !== "neutral") {
-          environment.calendarLabel = "calendar.basic.weather";
-        } else {
-          environment.calendarLabel = "calendar.basic.no-weather";
-        }
+        environment.calendarLabel = hasWeather
+          ? "calendar.basic.weather"
+          : "calendar.basic.no-weather";
       }
     });
   }
 
   update(): void {
     const environment = this.admin.environment().state;
+    let currentDay = environment.day;
 
     const { days } = this.admin.time();
     if (days.wholeTicks > 0) {
-      environment.day += days.wholeTicks;
+      currentDay += 1;
 
-      const daysPerSeason = TimeConstants.DaysPerSeason;
-      while (environment.day >= daysPerSeason) {
-        environment.day -= daysPerSeason;
-        this.progressToNextSeason();
+      if (currentDay >= TimeConstants.DaysPerSeason) {
+        currentDay = 0;
+
+        const newSeason = this.calculateNextSeason(environment.season);
+        environment.season = newSeason;
+
+        let year = environment.year;
+        if (newSeason === "spring") {
+          environment.year = ++year;
+        }
+
+        if (year > 3) {
+          // Weather is handicapped to neutral during the first four years.
+          environment.weather = this.chooseWeather();
+        }
       }
+
+      environment.day = currentDay;
     }
-  }
-
-  private progressToNextSeason() {
-    const environment = this.admin.environment().state;
-    const newSeason = this.calculateNextSeason(environment.season);
-    environment.season = newSeason;
-
-    if (newSeason === "spring") {
-      environment.year++;
-    }
-
-    environment.weather = this.chooseWeather();
   }
 
   private calculateNextSeason(currentSeason: SeasonId): SeasonId {
@@ -70,13 +77,6 @@ export class EnvironmentSystem extends System {
   }
 
   private chooseWeather(): WeatherId {
-    const environment = this.admin.environment().state;
-    // Weather is handicapped to neutral during the first four years.
-    const year = environment.year;
-    if (0 <= year && year <= 3) {
-      return "neutral";
-    }
-
     return choose(
       [
         {

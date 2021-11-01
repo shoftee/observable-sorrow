@@ -1,6 +1,6 @@
-import { ResourceState } from "@/app/state";
+import { watchSyncEffect } from "vue";
 
-import { EntityAdmin, ResourceDelta } from "../entity";
+import { EntityAdmin } from "../entity";
 
 import { System } from ".";
 
@@ -10,64 +10,47 @@ export class ResourceAmountsSystem extends System {
   }
 
   init(): void {
-    this.updateChange();
+    watchSyncEffect(() => {
+      for (const { meta, state } of this.admin.resources()) {
+        const deltaEffect = meta.effects.delta;
+        if (deltaEffect) {
+          state.change = this.admin.number(deltaEffect).get() ?? 0;
+        }
+      }
+    });
   }
 
   update(): void {
-    this.updateChange();
-
     const dt = this.admin.time().ticks.delta;
-    for (const resource of this.admin.resources()) {
-      if (resource.state.change) {
-        // calculate new amounts based on fractional ticks
-        const change = dt * resource.state.change;
-
-        if (change > 0) {
-          // change is positive, add value as debit
-          resource.delta.addDebit(change);
-        } else if (change < 0) {
-          // change is negative, add absolute value as credit
-          resource.delta.addCredit(Math.abs(change));
-        }
+    for (const { state, delta } of this.admin.resources()) {
+      const change = dt * state.change;
+      if (change > 0) {
+        // change is positive, add value as debit
+        delta.addDebit(change);
+      } else if (change < 0) {
+        // change is negative, add absolute value as credit
+        delta.addCredit(Math.abs(change));
       }
 
-      this.updateAmount(resource.state, resource.delta);
+      state.amount = this.calculateAmount(
+        state.amount,
+        // Assume capacity is infinite when undefined
+        state.capacity ?? Number.POSITIVE_INFINITY,
+        delta.debit,
+        delta.credit,
+      );
+
+      // clear delta
+      delta.reset();
     }
-  }
-
-  private updateChange() {
-    for (const resource of this.admin.resources()) {
-      const deltaEffect = resource.meta.effects.delta;
-      if (deltaEffect) {
-        resource.state.change = this.admin.number(deltaEffect).get() ?? 0;
-      }
-    }
-  }
-
-  private updateAmount(state: ResourceState, delta: ResourceDelta): void {
-    const newValue = this.calculateAmount(
-      state.amount,
-      state.capacity,
-      delta.debit,
-      delta.credit,
-    );
-
-    // set newly calculated value
-    state.amount = newValue;
-
-    // clear delta
-    delta.reset();
   }
 
   private calculateAmount(
     currentValue: number,
-    capacity: number | undefined,
+    capacity: number,
     debit: number,
     credit: number,
   ): number {
-    // Assume capacity is infinite when undefined
-    capacity = capacity ?? Number.POSITIVE_INFINITY;
-
     // subtract losses first
     let newValue = currentValue - credit;
     if (newValue < capacity) {

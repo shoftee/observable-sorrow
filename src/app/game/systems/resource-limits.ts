@@ -1,3 +1,5 @@
+import { watchSyncEffect } from "vue";
+
 import { EntityAdmin } from "../entity";
 
 import { System } from ".";
@@ -8,19 +10,18 @@ export class ResourceLimitsSystem extends System {
   }
 
   init(): void {
-    this.updateLimits();
+    watchSyncEffect(() => {
+      for (const { state, meta } of this.admin.resources()) {
+        const limitEffect = meta.effects.limit;
+        if (limitEffect) {
+          state.capacity = this.admin.number(limitEffect).get();
+        }
+      }
+    });
   }
 
   update(): void {
-    this.updateLimits();
-  }
-
-  private updateLimits() {
-    for (const resource of this.admin.resources()) {
-      const limitEffect = resource.meta.effects.limit;
-      if (limitEffect) {
-        resource.state.capacity = this.admin.number(limitEffect).get();
-      }
-    }
+    // limits are fully reactive
+    return;
   }
 }

@@ -1,3 +1,5 @@
+import { watchSyncEffect } from "vue";
+
 import { pluralLabel } from "@/app/state";
 import { trunc } from "@/app/utils/mathx";
 
@@ -6,6 +8,13 @@ import { System } from ".";
 export class PopulationSystem extends System {
   private readonly growthPerTick = 0.01;
   private readonly starvationPerTick = -0.2;
+
+  init(): void {
+    watchSyncEffect(() => {
+      const kittens = this.admin.resource("kittens").state;
+      kittens.amount = this.admin.pops().size;
+    });
+  }
 
   update(): void {
     this.updatePops();
@@ -30,9 +39,6 @@ export class PopulationSystem extends System {
 
       this.kittensStarved(count);
     }
-
-    const kittens = this.admin.resource("kittens").state;
-    kittens.amount = this.admin.pops().size;
   }
 
   private kittensArrived(count: number) {
@@ -51,27 +57,30 @@ export class PopulationSystem extends System {
 
   private updateStockpile() {
     const dt = this.admin.time().ticks.delta;
-    const kittens = this.admin.resource("kittens");
-    const catnip = this.admin.resource("catnip");
 
     const stockpile = this.admin.stockpile("kitten-growth").state;
-    const kittenCapacity = kittens.state.capacity ?? 0;
-    if (catnip.state.amount > 0 && kittens.state.amount < kittenCapacity) {
-      // grow pops as long as there's catnip and capacity for them
-      if (stockpile.amount < 0) {
-        // if we had fractional starvation, void it
-        stockpile.amount = 0;
-      }
-      stockpile.amount += dt * this.growthPerTick;
-    } else if (catnip.state.amount == 0 && kittens.state.amount > 0) {
-      // starve existing pops when catnip is 0
-      if (stockpile.amount > 0) {
-        // if we had fractional growth, void it
-        stockpile.amount = 0;
-      }
-      stockpile.amount += dt * this.starvationPerTick;
+
+    const catnipAmount = this.admin.resource("catnip").state.amount;
+
+    const kittens = this.admin.resource("kittens").state;
+    const kittenAmount = kittens.amount;
+    const kittenCapacity = kittens.capacity ?? 0;
+
+    if (catnipAmount > 0 && kittenAmount < kittenCapacity) {
+      // if catnip is nonzero and kittens aren't at capacity, they should grow
+
+      // void any fractional starvation
+      const oldAmount = Math.max(0, stockpile.amount);
+
+      stockpile.amount = oldAmount + dt * this.growthPerTick;
+    } else if (catnipAmount == 0 && kittenAmount > 0) {
+      // if catnip is 0 and we have kittens, they should starve
+
+      // void any fractional growth
+      const oldAmount = Math.min(0, stockpile.amount);
+
+      stockpile.amount = oldAmount + dt * this.starvationPerTick;
     } else {
-      // otherwise, population is not going to be changing right now, reset state
       stockpile.amount = 0;
     }
   }
