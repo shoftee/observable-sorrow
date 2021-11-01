@@ -32,6 +32,7 @@ module.exports = {
       { ignoreParameters: true },
     ],
     "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-non-null-assertion": "off",
   },
 
   overrides: [

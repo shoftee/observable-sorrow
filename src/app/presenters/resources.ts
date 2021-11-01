@@ -78,28 +78,28 @@ export class ResourcesPresenter {
     id: NumberEffectId,
     manager: IStateManager,
   ): Iterable<EffectTreeNode> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    for (const childId of manager.effectTree().get(id)!) {
-      const style = Meta.effectDisplay(childId);
+    const children = manager.effectTree().get(id);
+    for (const child of children!) {
+      const style = Meta.effectDisplay(child);
       switch (style.disposition) {
         case "hide":
           // completely ignore hidden children
           continue;
         case "inline":
           // treat children-of-child as direct children
-          yield* this.collectEffectNodes(childId, manager);
+          yield* this.collectEffectNodes(child, manager);
           continue;
 
         default:
           yield reactive({
-            id: childId,
+            id: child,
             label: style.label,
-            value: computed(() => manager.numberView(childId)),
+            value: computed(() => manager.numberView(child)),
             // Don't collect children of collapsed nodes
             nodes:
               style.disposition === "collapse"
                 ? []
-                : Array.from(this.collectEffectNodes(childId, manager)),
+                : Array.from(this.collectEffectNodes(child, manager)),
           });
       }
     }

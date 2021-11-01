@@ -9,7 +9,6 @@ import { mockCursor } from "./utils";
 describe("migrateV5", () => {
   it("should move stockpile value to new section", async () => {
     await migrateV5(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       null!,
       mockCursor({
         load() {

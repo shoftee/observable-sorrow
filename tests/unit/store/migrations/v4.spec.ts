@@ -8,7 +8,6 @@ import { mockCursor } from "./utils";
 describe("migrateV4", () => {
   it("should fill unlocked field for resources", async () => {
     await migrateV4(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       null!,
       mockCursor({
         load() {

@@ -11,11 +11,10 @@ export class FulfillmentSystem extends System {
 
       const fulfillment = this.admin.fulfillment(id).state;
       for (const ingredient of fulfillment.ingredients) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const basePrice = basePrices[ingredient.resourceId]!;
+        const basePrice = basePrices[ingredient.resourceId];
         watchSyncEffect(() => {
           ingredient.requirement =
-            basePrice * Math.pow(priceRatio, state.level);
+            basePrice! * Math.pow(priceRatio, state.level);
         });
       }
     }
