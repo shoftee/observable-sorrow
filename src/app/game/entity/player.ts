@@ -17,7 +17,8 @@ export class PlayerEntity
     this.state = reactive({
       dev: false,
       gatherCatnip: 1,
-      timeAcceleration: 1,
+      timeAcceleration: 0,
+      slowness: 0,
     });
   }
 

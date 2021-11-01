@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { Offcanvas } from "bootstrap"
 
 import { endpoint } from "@/composables/game-endpoint";
@@ -19,7 +19,13 @@ watch(() => dt.on, async (newValue, oldValue) => {
 
 const options = player.state;
 const gatherCatnip = ref(options.gatherCatnip);
-const timeAcceleration = ref(options.timeAcceleration);
+
+const timeAcceleration = computed({
+  get: () => options.timeAcceleration,
+  set: async (newValue: number) => {
+    await devTools.setTimeAcceleration(newValue)
+  }
+});
 
 useKeyboardEvent("keyup", (e) => {
   if (e.code === "Backquote") {
@@ -55,19 +61,19 @@ useKeyboardEvent("keyup", (e) => {
             />
           </div>
           <div class="row">
-            <label
-              for="time-acceleration"
-              class="form-label"
-            >Time Acceleration = {{ timeAcceleration }}</label>
+            <label for="time-acceleration" class="form-label">
+              Time Acceleration =
+              10
+              <sup>{{ timeAcceleration }}</sup>
+            </label>
             <input
               id="time-acceleration"
               type="range"
               class="form-range"
-              min="0.5"
-              max="10"
+              min="0"
+              max="2"
               step="0.1"
               v-model.number="timeAcceleration"
-              @change="devTools.setTimeAcceleration(timeAcceleration)"
             />
           </div>
         </div>

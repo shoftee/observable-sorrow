@@ -1,37 +1,41 @@
 import { IDevToolsInteractor } from "@/app/interfaces";
+import { PlayerState } from "@/app/state";
 
-import { EntityAdmin, PlayerEntity } from "../entity";
+import { EntityAdmin } from "../entity";
 
 export class DevToolsInteractor implements IDevToolsInteractor {
   constructor(private readonly admin: EntityAdmin) {}
 
-  private get player(): PlayerEntity {
-    return this.admin.player();
+  private get player(): PlayerState {
+    return this.admin.player().state;
   }
 
   turnDevToolsOn(): void {
-    if (this.player.state.dev) return;
-    this.player.state.dev = true;
+    if (this.player.dev) return;
+    this.player.dev = true;
   }
 
   turnDevToolsOff(): void {
-    if (!this.player.state.dev) return;
-    this.player.state.dev = false;
-    this.player.state.gatherCatnip = 1;
-    this.player.state.timeAcceleration = 1;
+    const player = this.player;
+    if (!player.dev) return;
+    player.dev = false;
+    player.gatherCatnip = 1;
+    player.timeAcceleration = 0;
   }
 
   setGatherCatnip(amount: number): void {
-    if (!this.player.state.dev) {
+    const player = this.player;
+    if (!player.dev) {
       throw new Error("devtools are off");
     }
-    this.player.state.gatherCatnip = amount;
+    player.gatherCatnip = amount;
   }
 
   setTimeAcceleration(factor: number): void {
-    if (!this.player.state.dev) {
+    const player = this.player;
+    if (!player.dev) {
       throw new Error("devtools are off");
     }
-    this.player.state.timeAcceleration = factor;
+    player.timeAcceleration = factor;
   }
 }

@@ -21,6 +21,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-# code coverage
-.nyc_output/
-coverage/
+# profiling
+.profiles/

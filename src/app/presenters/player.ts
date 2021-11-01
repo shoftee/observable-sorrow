@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 
 import { IStateManager } from ".";
 
@@ -9,10 +9,11 @@ export interface PlayerItem {
 
 export class PlayerPresenter {
   readonly state: PlayerItem;
+
   constructor(manager: IStateManager) {
     this.state = reactive({
-      gatherCatnip: manager.player().gatherCatnip,
-      timeAcceleration: manager.player().timeAcceleration,
+      gatherCatnip: computed(() => manager.player().gatherCatnip),
+      timeAcceleration: computed(() => manager.player().timeAcceleration),
     });
   }
 }

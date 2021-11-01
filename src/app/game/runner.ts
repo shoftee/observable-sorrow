@@ -30,6 +30,7 @@ export class Runner {
     const controller = new GameController(
       this.admin,
       (dt) => this.update(dt),
+      () => this.render(),
       new SystemTimestamp(),
     );
 
@@ -38,18 +39,19 @@ export class Runner {
 
     this.systems = new GameSystems(this.admin);
     this.systems.init();
+
+    // Run a virtual tick.
     this.update(0);
+    this.render();
   }
 
   private update(dt: number): void {
     // Run updates on all systems.
     this.systems.update(dt);
-
-    // Push changes to presenter.
-    this.flushChanges();
   }
 
-  private flushChanges() {
+  private render() {
+    // Push changes to presenter.
     this.watcher.flushMutations((changes) => {
       this.onTickedHandler(changes);
     });
