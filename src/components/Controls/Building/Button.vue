@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 import Detail from "./Detail.vue"
 
 import { BonfireItem } from "@/app/presenters";
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 import { Intent } from "@/app/interfaces";
 
 const { item } = defineProps<{ item: BonfireItem }>();
@@ -13,7 +13,11 @@ const { t } = useI18n();
 
 const level = computed(() => item.level ?? 0)
 
-const { dispatcher } = endpoint().interactors;
+const { dispatcher } = useEndpoint(ep => {
+  return {
+    dispatcher: ep.interactors.dispatcher
+  }
+})
 
 async function dispatch(intent: Intent): Promise<void> {
   await dispatcher.send(toRaw(intent))

@@ -7,9 +7,6 @@ import { StateManager } from ".";
 
 export class SectionsPresenter {
   readonly items: Map<SectionId, SectionItem>;
-  readonly unlocked = computed(() =>
-    Array.from(this.items.values()).filter((x) => x.unlocked),
-  );
 
   constructor(manager: StateManager) {
     this.items = manager.sections().toMap(

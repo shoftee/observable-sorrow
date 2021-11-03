@@ -12,13 +12,12 @@ import SectionContent from "./Sections/Content.vue";
 
 import { SectionId } from "@/app/interfaces";
 
-import { withEndpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 
-const { controller, store, section } = withEndpoint(ep => {
+const { controller, store } = useEndpoint(ep => {
   return {
     controller: ep.interactors.controller,
     store: ep.interactors.store,
-    section: ep.presenters.section
   };
 });
 
@@ -27,7 +26,6 @@ onMounted(async () => {
   await controller.start();
 })
 
-const sections = section.unlocked;
 const activeSection = ref<SectionId>("bonfire");
 
 async function save(): Promise<void> {
@@ -39,7 +37,7 @@ const devtools = window.__OS_DEVTOOLS__;
 
 <template>
   <div class="nav-container">
-    <SectionTabs :sections="sections" :active="activeSection" @changed="activeSection = $event" />
+    <SectionTabs :active="activeSection" @changed="activeSection = $event" />
     <div unscrollable class="main-container gap-2">
       <div unscrollable class="col">
         <Resources />

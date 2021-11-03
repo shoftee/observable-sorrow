@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { endpoint } from '@/composables/game-endpoint';
+import { useEndpoint } from '@/composables/game-endpoint';
 
-const { environment } = endpoint().presenters;
-const { dispatcher } = endpoint().interactors;
+const { environment, dispatcher } = useEndpoint(ep => {
+  return {
+    environment: ep.presenters.environment,
+    dispatcher: ep.interactors.dispatcher,
+  }
+})
+
 const { t } = useI18n();
 
 async function observeSky(): Promise<void> {

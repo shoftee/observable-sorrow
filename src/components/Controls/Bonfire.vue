@@ -2,12 +2,15 @@
 import { computed } from "vue";
 
 import BuildingButton from "./Building/Button.vue";
-import { endpoint } from "@/composables/game-endpoint";
 
-const { presenters } = endpoint();
-const items = computed(() => {
-  return presenters.bonfire.all.filter((b) => b.unlocked);
-});
+import { useEndpoint } from "@/composables/game-endpoint";
+const { bonfire } = useEndpoint(ep => {
+  return {
+    bonfire: ep.presenters.bonfire
+  }
+})
+
+const items = computed(() => bonfire.all.filter(b => b.unlocked));
 </script>
 
 <template>

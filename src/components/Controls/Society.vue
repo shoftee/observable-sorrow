@@ -5,19 +5,22 @@ import { useI18n } from "vue-i18n";
 import JobButton from "./Job/Button.vue";
 
 import { count } from "@/app/utils/collections";
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 
-const { society } = endpoint().presenters;
 const { t } = useI18n();
 
+const { society } = useEndpoint(ep => {
+  return { society: ep.presenters.society };
+})
+
 const jobs = computed(() => unref(society.jobs).filter(item => item.unlocked));
-const totalPops = computed(() => society.pops.values.length);
-const idle = computed(() => count(society.pops.values, item => item.job === undefined))
+const total = computed(() => unref(society.pops).length);
+const idle = computed(() => count(unref(society.pops), item => item.job === undefined))
 </script>
 
 <template>
   <div class="card">
-    <template v-if="totalPops === 0">
+    <template v-if="total === 0">
       <div class="card-body text-center">{{ t("jobs.status.empty") }}</div>
     </template>
     <template v-else>

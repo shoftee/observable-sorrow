@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { inject } from "vue";
 
-import { EffectItem } from "@/app/presenters";
+import { EffectItem } from "@/app/presenters/common/effects";
+
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { items } = defineProps<{ items: EffectItem[] }>()
 const events = inject(KeyboardEventsKey);
 
-const { presenters } = endpoint();
-const fmt = presenters.formatter;
+const { fmt } = useEndpoint(ep => {
+  return { fmt: ep.presenters.formatter };
+})
 </script>
 
 <template>

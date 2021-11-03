@@ -6,12 +6,17 @@ import Detail from "./Detail.vue";
 import { TechId } from "@/app/interfaces";
 import { TechItem } from "@/app/presenters";
 
-import { endpoint } from "@/composables/game-endpoint";
-const { dispatcher } = endpoint().interactors;
-
-const { t } = useI18n();
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { tech } = defineProps<{ tech: TechItem }>();
+
+const { dispatcher } = useEndpoint(ep => {
+  return {
+    dispatcher: ep.interactors.dispatcher
+  }
+})
+
+const { t } = useI18n();
 
 async function research(id: TechId): Promise<void> {
   await dispatcher.send({ kind: "research", id: "research-tech", tech: id })

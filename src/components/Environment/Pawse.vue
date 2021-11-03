@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-
 import { useI18n } from 'vue-i18n';
-import { endpoint } from '@/composables/game-endpoint';
+
+import { useEndpoint } from '@/composables/game-endpoint';
+
+const { controller } = useEndpoint(ep => {
+  return { controller: ep.interactors.controller }
+})
 
 const { t } = useI18n();
-const { controller } = endpoint().interactors;
 
 const paused = ref(false);
 async function pause() {

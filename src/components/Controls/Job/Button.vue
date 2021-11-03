@@ -6,7 +6,7 @@ import Effects from "../Effects.vue";
 
 import { JobId } from "@/app/interfaces";
 import { JobItem } from "@/app/presenters";
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
 const { item } = defineProps<{ item: JobItem, noIdle: boolean }>();
@@ -15,7 +15,11 @@ const events = inject(KeyboardEventsKey);
 
 const effects = computed(() => item.effects ?? []);
 
-const { dispatcher } = endpoint().interactors;
+const { dispatcher } = useEndpoint(ep => {
+  return {
+    dispatcher: ep.interactors.dispatcher
+  }
+})
 
 async function assignJob(id: JobId): Promise<void> {
   await dispatcher.send({ kind: "society", id: "assign-job", "job": id })

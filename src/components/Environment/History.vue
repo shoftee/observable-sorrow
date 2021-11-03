@@ -5,13 +5,19 @@ import { useI18n } from 'vue-i18n';
 import ObserveSky from './ObserveSky.vue';
 import Pawse from './Pawse.vue';
 
-import { endpoint } from '@/composables/game-endpoint';
+import { useEndpoint } from '@/composables/game-endpoint';
 import { LogItem } from '@/app/presenters';
 import { useLogItemEvent } from '@/composables/use-event-listener';
 
 import { LogEpoch, newLogEpoch, removeClippedEvents } from './_types';
 
-const { environment, formatter: fmt } = endpoint().presenters;
+const { environment, fmt } = useEndpoint(ep => {
+  return {
+    environment: ep.presenters.environment,
+    fmt: ep.presenters.formatter,
+  }
+})
+
 const { t } = useI18n();
 
 let epochId = ref(0);

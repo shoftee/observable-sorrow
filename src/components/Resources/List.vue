@@ -4,16 +4,18 @@ import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
-import { endpoint } from "@/composables/game-endpoint";
-
-const show = ref(true);
-
-const { resources } = endpoint().presenters;
-const items = computed(() => {
-  return resources.all.filter((r) => r.unlocked);
-});
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { t } = useI18n();
+
+const show = ref(true);
+const { resources } = useEndpoint(ep => {
+  return {
+    resources: ep.presenters.resources,
+  }
+});
+
+const items = computed(() => resources.all.filter(r => r.unlocked));
 </script>
 
 <template>

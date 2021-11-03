@@ -7,10 +7,10 @@ import Science from "../Controls/Science.vue";
 
 import { SectionId } from '@/app/interfaces';
 
-const { active } = defineProps<{ active: SectionId }>();
+const props = defineProps<{ active: SectionId }>();
 
 const content = computed(() => {
-  const sectionId = active;
+  const sectionId = props.active;
   switch (sectionId) {
     case "bonfire": return Bonfire;
     case "society": return Society;

@@ -2,13 +2,15 @@
 import { useI18n } from "vue-i18n";
 
 import { IngredientItem } from "@/app/presenters/common";
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { item } = defineProps<{ item: IngredientItem }>();
 
-const { t } = useI18n();
+const { fmt } = useEndpoint(ep => {
+  return { fmt: ep.presenters.formatter };
+})
 
-const { formatter: fmt } = endpoint().presenters;
+const { t } = useI18n();
 </script>
 
 <template>

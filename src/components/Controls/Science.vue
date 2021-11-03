@@ -4,8 +4,12 @@ import { useI18n } from "vue-i18n";
 
 import TechButton from "./Technology/Button.vue";
 
-import { endpoint } from "@/composables/game-endpoint";
-const { science } = endpoint().presenters;
+import { useEndpoint } from "@/composables/game-endpoint";
+const { science } = useEndpoint(ep => {
+  return {
+    science: ep.presenters.science,
+  }
+});
 
 const { t } = useI18n();
 

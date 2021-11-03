@@ -27,18 +27,16 @@ export interface Values<T> {
 }
 
 export class SocietyPresenter {
-  readonly pops: Values<PopItem>;
+  readonly pops: ComputedRef<PopItem[]>;
   readonly jobs: ComputedRef<JobItem[]>;
 
   constructor(manager: IStateManager) {
-    this.pops = reactive({
-      values: computed(() =>
-        manager
-          .pops()
-          .map(([id, state]) => this.newPopItem(id, state))
-          .toArray(),
-      ),
-    });
+    this.pops = computed(() =>
+      manager
+        .pops()
+        .map(([id, state]) => this.newPopItem(id, state))
+        .toArray(),
+    );
 
     this.jobs = computed(() =>
       manager

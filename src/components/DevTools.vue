@@ -2,11 +2,15 @@
 import { computed, ref, watch } from "vue";
 import { Offcanvas } from "bootstrap"
 
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 import { useKeyboardEvent } from "@/composables/use-event-listener";
 
-const { devTools } = endpoint().interactors;
-const { player } = endpoint().presenters;
+const { devTools, player } = useEndpoint(ep => {
+  return {
+    devTools: ep.interactors.devTools,
+    player: ep.presenters.player,
+  }
+})
 
 const dt = window.__OS_DEVTOOLS__;
 watch(() => dt.on, async (newValue, oldValue) => {

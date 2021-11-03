@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import { endpoint } from "@/composables/game-endpoint";
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { t } = useI18n();
 
-const { environment, formatter: fmt } = endpoint().presenters;
+const { environment, fmt } = useEndpoint(ep => {
+  return {
+    environment: ep.presenters.environment,
+    fmt: ep.presenters.formatter,
+  }
+})
+
 const state = environment.calendar;
 </script>
 
