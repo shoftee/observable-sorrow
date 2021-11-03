@@ -1,23 +1,31 @@
 import { computed, reactive } from "vue";
 
 import { SectionId } from "@/app/interfaces";
-import { SectionState } from "@/app/state";
+import { Meta, SectionMetadataType, SectionState } from "@/app/state";
 
 import { StateManager } from ".";
 
 export class SectionsPresenter {
-  readonly items: SectionItem[];
+  readonly items: Map<SectionId, SectionItem>;
+  readonly unlocked = computed(() =>
+    Array.from(this.items.values()).filter((x) => x.unlocked),
+  );
 
   constructor(manager: StateManager) {
-    this.items = manager
-      .sections()
-      .map(([id, state]) => this.newSectionItem(id, state))
-      .toArray();
+    this.items = manager.sections().toMap(
+      ([id]) => id,
+      ([id, state]) => this.newSectionItem(id, Meta.section(id), state),
+    );
   }
 
-  private newSectionItem(id: SectionId, state: SectionState): SectionItem {
+  private newSectionItem(
+    id: SectionId,
+    meta: SectionMetadataType,
+    state: SectionState,
+  ): SectionItem {
     return reactive({
       id: id,
+      parentId: meta.parent,
       label: computed(() => state.label),
       unlocked: computed(() => state.unlocked),
       alert: computed(() => state.alert),
@@ -27,6 +35,7 @@ export class SectionsPresenter {
 
 export interface SectionItem {
   readonly id: SectionId;
+  readonly parentId: SectionId | undefined;
   unlocked: boolean;
   label: string;
   alert?: string | undefined;

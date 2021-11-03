@@ -1,5 +1,7 @@
 export type SectionUnlockEffectId =
   | "unlock.section.society"
+  | "unlock.section.management"
+  | "unlock.section.happiness"
   | "unlock.section.science";
 
 export type JobUnlockEffectId =

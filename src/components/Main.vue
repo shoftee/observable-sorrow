@@ -1,76 +1,51 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
+import { onMounted, ref } from "vue";
 
 import Calendar from "./Environment/Calendar.vue";
 import History from "./Environment/History.vue";
-
-import DevTools from "./DevTools.vue";
-
 import Resources from "./Resources/List.vue";
 
-import Sections from "./Controls/Sections.vue";
-import BonfireControls from "./Controls/Bonfire.vue";
-import SocietyControls from "./Controls/Society.vue";
-import ScienceControls from "./Controls/Science.vue";
+import DevTools from "./DevTools.vue"
+
+import SectionTabs from "./Sections/Tabs.vue";
+import SectionContent from "./Sections/Content.vue";
 
 import { SectionId } from "@/app/interfaces";
-import { SectionItem } from "@/app/presenters";
 
-import { endpoint } from "@/composables/game-endpoint";
-const { interactors, presenters } = endpoint();
+import { withEndpoint } from "@/composables/game-endpoint";
+
+const { controller, store, section } = withEndpoint(ep => {
+  return {
+    controller: ep.interactors.controller,
+    store: ep.interactors.store,
+    section: ep.presenters.section
+  };
+});
 
 onMounted(async () => {
   // Start the game
-  await interactors.controller.start();
+  await controller.start();
 })
 
-const { t } = useI18n();
-
-const sections = computed(() => presenters.section.items.filter(s => s.unlocked));
-
+const sections = section.unlocked;
 const activeSection = ref<SectionId>("bonfire");
 
-function sectionChanged(item: SectionItem) {
-  activeSection.value = item.id;
-}
-
 async function save(): Promise<void> {
-  await interactors.store.save();
+  await store.save();
 }
 
-const sectionContent = computed(() => {
-  const sectionId = activeSection.value;
-  switch (sectionId) {
-    case "bonfire": return BonfireControls;
-    case "society": return SocietyControls;
-    case "science": return ScienceControls;
-    default: throw new Error(`unexpected section name ${sectionId}`);
-  }
-});
-
-const dt = window.__OS_DEVTOOLS__;
+const devtools = window.__OS_DEVTOOLS__;
 </script>
 
 <template>
   <div class="nav-container">
-    <Sections :sections="sections" :active="activeSection" @changed="sectionChanged">
-      <template #default="{ section }">
-        {{ t(section.label) }}
-        <span
-          v-if="section.alert"
-          class="number-annotation bg-danger"
-        >{{ section.alert }}</span>
-      </template>
-    </Sections>
+    <SectionTabs :sections="sections" :active="activeSection" @changed="activeSection = $event" />
     <div unscrollable class="main-container gap-2">
       <div unscrollable class="col">
         <Resources />
       </div>
       <div unscrollable class="col-5">
-        <div>
-          <component :is="sectionContent" />
-        </div>
+        <SectionContent :active="activeSection" />
       </div>
       <div unscrollable class="env-container col">
         <Calendar />
@@ -80,8 +55,8 @@ const dt = window.__OS_DEVTOOLS__;
     <teleport to=".header-end">
       <button class="btn btn-link p-0 m-0" @click="save">Save</button>
     </teleport>
-    <suspense>
-      <DevTools v-if="dt && dt.on" />
-    </suspense>
+    <teleport to=".app-container">
+      <DevTools v-if="devtools?.on" />
+    </teleport>
   </div>
 </template>

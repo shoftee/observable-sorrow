@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { provide, ref } from "vue";
-import { Endpoint } from "./app/endpoint";
-
-import GameLoader from "./components/GameLoader.vue";
-import Main from "./components/Main.vue"
+import { defineAsyncComponent, provide, ref } from "vue";
+import { Endpoint, Setup } from "./app/endpoint";
 
 import { EndpointKey } from "./composables/game-endpoint";
 import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
@@ -12,11 +9,10 @@ provide(KeyboardEventsKey, getKeyboardEvents());
 let endpoint = ref<Endpoint>();
 provide(EndpointKey, endpoint);
 
-let loaded = ref(false);
-function onLoaded(ep: Endpoint) {
-  loaded.value = true;
-  endpoint.value = ep;
-}
+const Main = defineAsyncComponent(async () => {
+  endpoint.value = await Setup();
+  return import("./components/Main.vue")
+})
 </script>
 
 <template>
@@ -32,8 +28,18 @@ function onLoaded(ep: Endpoint) {
       <div class="header-end"></div>
     </header>
     <main unscrollable>
-      <GameLoader v-if="!loaded" @loaded="onLoaded" />
-      <Main v-else class="w-100 h-100" />
+      <suspense>
+        <template #default>
+          <Main class="w-100 h-100" />
+        </template>
+        <template #fallback>
+          <div class="loader">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </template>
+      </suspense>
     </main>
     <footer>
       <div>

@@ -12,3 +12,7 @@ export function endpoint(): Endpoint {
 
   return ep.value;
 }
+
+export function withEndpoint<T>(fn: (endpoint: Endpoint) => T): T {
+  return fn(endpoint());
+}
