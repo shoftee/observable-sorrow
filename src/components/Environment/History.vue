@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { reactive, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
-import ObserveSky from './ObserveSky.vue';
-import Pawse from './Pawse.vue';
+import ObserveSky from "./ObserveSky.vue";
+import Pawse from "./Pawse.vue";
 
-import { useEndpoint } from '@/composables/game-endpoint';
-import { LogItem } from '@/app/presenters';
-import { useLogItemEvent } from '@/composables/use-event-listener';
+import { useEndpoint } from "@/composables/game-endpoint";
+import { LogItem } from "@/app/presenters";
+import { useLogItemEvent } from "@/composables/use-event-listener";
 
-import { LogEpoch, newLogEpoch, removeClippedEvents } from './_types';
+import { LogEpoch, newLogEpoch, removeClippedEvents } from "./_types";
 
 const { environment, fmt } = useEndpoint(ep => {
   return {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-import { useEndpoint } from '@/composables/game-endpoint';
+import { useI18n } from "vue-i18n";
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { environment, dispatcher } = useEndpoint(ep => {
   return {

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-import { EffectTreeNode } from '@/app/presenters';
-import { useEndpoint } from '@/composables/game-endpoint';
+import { EffectTreeNode } from "@/app/presenters/common";
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { nodes } = defineProps<{ nodes: EffectTreeNode[] }>();
 
