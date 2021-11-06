@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import BuildingButton from "./Building/Button.vue";
+import BuildingButton from "@/components/Controls/Building/Button.vue";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 const { bonfire } = useEndpoint(ep => {

@@ -2,7 +2,7 @@
 import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
-import EffectTree from "./EffectTree.vue";
+import EffectTree from "@/components/Controls/EffectTree.vue";
 
 import { ResourceItem } from "@/app/presenters/resources";
 import { useEndpoint } from "@/composables/game-endpoint";

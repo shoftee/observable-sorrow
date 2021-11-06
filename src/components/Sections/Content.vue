@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import Bonfire from "../Controls/Bonfire.vue";
-import Society from "../Controls/Society.vue";
-import Science from "../Controls/Science.vue";
+import Bonfire from "./Bonfire.vue";
+import Society from "./Society.vue";
+import Science from "./Science.vue";
 
 import { SectionId } from '@/app/interfaces';
 

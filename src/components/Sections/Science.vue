@@ -2,7 +2,7 @@
 import { computed, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import TechButton from "./Technology/Button.vue";
+import TechButton from "@/components/Controls/Technology/Button.vue";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 const { science } = useEndpoint(ep => {

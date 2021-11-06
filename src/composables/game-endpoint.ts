@@ -7,7 +7,7 @@ export const EndpointKey: InjectionKey<Ref<Endpoint>> = Symbol("GameEndpoint");
 export function useEndpoint<T>(fn: (endpoint: Endpoint) => T): T {
   const ep = inject(EndpointKey);
   if (ep === undefined) {
-    throw new Error("Could not inject endpoint, maybe you didn't set it up?");
+    throw new Error("could not inject endpoint");
   }
 
   return fn(ep.value);
