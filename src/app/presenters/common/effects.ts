@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 
 import { NumberEffectId } from "@/app/interfaces";
 import { Meta } from "@/app/state";
@@ -27,9 +27,9 @@ export interface EffectTreeNode {
 export function effectTree(
   id: NumberEffectId,
   manager: IStateManager,
-): EffectTree | undefined {
+): EffectTree {
   return reactive({
-    nodes: Array.from(collectEffectNodes(id, manager)),
+    nodes: computed(() => Array.from(collectEffectNodes(id, manager))),
   });
 }
 
@@ -37,8 +37,8 @@ function* collectEffectNodes(
   id: NumberEffectId,
   manager: IStateManager,
 ): Iterable<EffectTreeNode> {
-  const children = manager.effectTree().get(id);
-  for (const child of children!) {
+  const children = manager.effectTree().get(id) ?? [];
+  for (const child of children) {
     const style = Meta.effectDisplay(child);
     switch (style.disposition) {
       case "hide":
@@ -53,7 +53,7 @@ function* collectEffectNodes(
         yield reactive({
           id: child,
           label: style.label,
-          value: numberView(child, manager),
+          value: computed(() => numberView(manager, child)),
           // Don't collect children of collapsed nodes
           nodes:
             style.disposition === "collapse"

@@ -201,6 +201,27 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   ),
 
   // Population
+  // Happiness
+  "population.happiness.base": constant(1),
+  "population.unhappiness": effect("population.overpopulation"),
+  "population.overpopulation.base": constant(0.02),
+  "population.overpopulation.severity": ({ admin }) => {
+    const popCount = admin.pops().size;
+    if (popCount < 5) {
+      // overpopulation is not in effect
+      return undefined;
+    }
+    return popCount - 5;
+  },
+  "population.overpopulation": strictProd(
+    effect("population.overpopulation.base"),
+    effect("population.overpopulation.severity"),
+  ),
+  "population.happiness.total": subtract(
+    effect("population.happiness.base"),
+    effect("population.unhappiness"),
+  ),
+  // Catnip demand
   "population.catnip-demand.base": constant(0.85),
   "population.catnip-demand": strictProd(
     effect("population.catnip-demand.base"),

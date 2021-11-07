@@ -25,15 +25,3 @@
     }
   }
 }
-
-.effect-tree {
-  ul.effects-list {
-    > li {
-      @include pxy(2, 1);
-      > .amount {
-        margin-left: bsize(4);
-        float: right;
-      }
-    }
-  }
-}

@@ -1,25 +1,34 @@
 import { computed, reactive } from "vue";
 
 import { SectionId } from "@/app/interfaces";
-import { Meta, SectionMetadataType, SectionState } from "@/app/state";
+import { Meta } from "@/app/state";
 
 import { IStateManager } from ".";
 
 export class SectionsPresenter {
-  readonly items: Map<SectionId, SectionItem>;
+  readonly bonfire: SectionItem;
+  readonly society: SectionItem;
+  readonly jobs: SectionItem;
+  readonly management: SectionItem;
+  readonly science: SectionItem;
+  readonly technologies: SectionItem;
+
+  readonly topLevelSections;
 
   constructor(manager: IStateManager) {
-    this.items = manager.sections().toMap(
-      ([id]) => id,
-      ([id, state]) => this.newSectionItem(id, Meta.section(id), state),
-    );
+    this.bonfire = this.newSectionItem("bonfire", manager);
+    this.society = this.newSectionItem("society", manager);
+    this.jobs = this.newSectionItem("jobs", manager);
+    this.management = this.newSectionItem("management", manager);
+    this.science = this.newSectionItem("science", manager);
+    this.technologies = this.newSectionItem("technologies", manager);
+
+    this.topLevelSections = [this.bonfire, this.society, this.science];
   }
 
-  private newSectionItem(
-    id: SectionId,
-    meta: SectionMetadataType,
-    state: SectionState,
-  ): SectionItem {
+  private newSectionItem(id: SectionId, manager: IStateManager): SectionItem {
+    const meta = Meta.section(id);
+    const state = manager.section(id);
     return reactive({
       id: id,
       parentId: meta.parent,

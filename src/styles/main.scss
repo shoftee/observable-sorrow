@@ -29,7 +29,6 @@ footer {
 header {
   @include flex-row();
   align-items: center;
-  justify-content: space-between;
 
   .header-start,
   .header-middle,
@@ -37,6 +36,16 @@ header {
     display: flex;
     gap: bsize(1);
     align-items: center;
+  }
+
+  .header-start {
+    justify-content: start;
+  }
+  .header-middle {
+    justify-content: center;
+  }
+  .header-end {
+    justify-content: end;
   }
 }
 
@@ -114,6 +123,11 @@ main {
 .button-stack {
   @include flex-column();
   gap: bsize(2);
+}
+
+.section-stack {
+  @include flex-column();
+  row-gap: bsize(2);
 }
 
 footer {
@@ -216,6 +230,18 @@ main .nav {
 
 ul.effects-list {
   @include list-flush();
+}
+
+.effect-tree {
+  ul.effects-list {
+    > li {
+      @include pxy(2, 1);
+      > .amount {
+        margin-left: bsize(4);
+        float: right;
+      }
+    }
+  }
 }
 
 .number {

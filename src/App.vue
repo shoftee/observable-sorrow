@@ -17,15 +17,21 @@ const Main = defineAsyncComponent(async () => {
 
 <template>
   <div class="app-container">
-    <header>
-      <div class="header-start d-flex gap-1 align-items-center">
-        <div>Observable Sorrow</div>
-        <div class="badge bg-success">
-          <i class="bi bi-droplet"></i> &beta;
+    <header class="row">
+      <div class="col">
+        <div class="header-start d-flex gap-1 align-items-center">
+          <div>Observable Sorrow</div>
+          <div class="badge bg-success">
+            <i class="bi bi-droplet"></i> &beta;
+          </div>
         </div>
       </div>
-      <div class="header-middle"></div>
-      <div class="header-end"></div>
+      <div class="col">
+        <div class="header-middle"></div>
+      </div>
+      <div class="col">
+        <div class="header-end"></div>
+      </div>
     </header>
     <main unscrollable>
       <suspense>

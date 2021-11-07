@@ -158,9 +158,6 @@ class WatchedPool {
     if (this.added.has(id)) {
       // no need to send a change, just remove entry
       this.added.delete(id);
-      console.log(
-        `Entity ${id} was added and then removed in the span of a single tick`,
-      );
     } else {
       this.updated.delete(id);
       this.removed.add(id);

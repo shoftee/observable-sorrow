@@ -102,13 +102,15 @@ interface NumberProvider {
 }
 
 export function numberView(
-  id: NumberEffectId,
   manager: NumberProvider,
+  id: NumberEffectId,
+  showSign?: ShowSign,
+  rounded?: boolean,
 ): NumberView {
   return {
     value: manager.number(id).value,
     style: EffectDisplayStyles[id],
-    rounded: false,
-    showSign: "always",
+    showSign: showSign ?? "always",
+    rounded: rounded ?? false,
   };
 }

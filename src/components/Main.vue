@@ -6,6 +6,7 @@ import History from "./Environment/History.vue";
 import Resources from "./Resources/List.vue";
 
 import DevTools from "./DevTools.vue"
+import Happiness from "./Controls/Happiness.vue";
 
 import SectionTabs from "./Sections/Tabs.vue";
 import SectionContent from "./Sections/Content.vue";
@@ -50,6 +51,9 @@ const devtools = window.__OS_DEVTOOLS__;
         <History />
       </div>
     </div>
+    <teleport to=".header-middle">
+      <Happiness />
+    </teleport>
     <teleport to=".header-end">
       <button class="btn btn-link p-0 m-0" @click="save">Save</button>
     </teleport>

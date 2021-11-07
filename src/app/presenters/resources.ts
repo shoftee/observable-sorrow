@@ -38,7 +38,7 @@ export class ResourcesPresenter {
       ),
       capacity: computed(() => res.capacity),
       modifier: computed(() =>
-        meta.id === "catnip" ? numberView("weather.ratio", manager) : undefined,
+        meta.id === "catnip" ? numberView(manager, "weather.ratio") : undefined,
       ),
       deltaTree: computed(() =>
         meta.effects.delta !== undefined

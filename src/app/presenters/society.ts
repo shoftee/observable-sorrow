@@ -4,7 +4,13 @@ import { JobId, PopId } from "@/app/interfaces";
 import { JobEffectType, JobState, Meta, PopState } from "@/app/state";
 
 import { IStateManager } from ".";
-import { EffectItem, numberView } from "./common";
+import {
+  EffectItem,
+  effectTree,
+  EffectTree,
+  NumberView,
+  numberView,
+} from "./common";
 
 export interface PopItem {
   id: string;
@@ -22,13 +28,16 @@ export interface JobItem {
   unlocked: boolean;
 }
 
-export interface Values<T> {
-  values: T[];
+export interface HappinessItem {
+  view: NumberView;
+  effectTree: EffectTree;
 }
 
 export class SocietyPresenter {
   readonly pops: ComputedRef<PopItem[]>;
   readonly jobs: ComputedRef<JobItem[]>;
+
+  readonly happiness: HappinessItem;
 
   constructor(manager: IStateManager) {
     this.pops = computed(() =>
@@ -44,6 +53,13 @@ export class SocietyPresenter {
         .map(([id, state]) => this.newJobItem(id, state, manager))
         .toArray(),
     );
+
+    this.happiness = reactive({
+      view: computed(() =>
+        numberView(manager, "population.happiness.total", "negative"),
+      ),
+      effectTree: effectTree("population.happiness.total", manager),
+    });
   }
 
   private newJobItem(
@@ -72,8 +88,8 @@ export class SocietyPresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: computed(() => numberView(meta.base, manager)),
-        totalAmount: computed(() => numberView(meta.total, manager)),
+        singleAmount: computed(() => numberView(manager, meta.base)),
+        totalAmount: computed(() => numberView(manager, meta.total)),
       }),
     );
   }

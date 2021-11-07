@@ -64,6 +64,12 @@ export type JobEffectId =
   | "jobs.miner.minerals";
 
 export type PopulationEffectId =
+  | "population.happiness.total"
+  | "population.happiness.base"
+  | "population.unhappiness"
+  | "population.overpopulation"
+  | "population.overpopulation.base"
+  | "population.overpopulation.severity"
   | "population.catnip-demand"
   | "population.catnip-demand.base";
 

@@ -95,8 +95,8 @@ export class BonfirePresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: computed(() => numberView(meta.per, manager)),
-        totalAmount: computed(() => numberView(meta.total, manager)),
+        singleAmount: computed(() => numberView(manager, meta.per)),
+        totalAmount: computed(() => numberView(manager, meta.total)),
       }),
     );
   }

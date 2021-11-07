@@ -10,15 +10,15 @@ const emit = defineEmits<{
   (e: "changed", section: SectionId): void,
 }>();
 
-const { sections } = useEndpoint(ep => {
+const { topLevelSections } = useEndpoint(ep => {
   return {
-    sections: Array.from(ep.presenters.section.items.values()),
+    topLevelSections: Array.from(ep.presenters.section.topLevelSections),
   }
 })
 
 const { t } = useI18n();
 const active = ref(props.active);
-const topLevelSections = computed(() => sections.filter(s => s.unlocked && s.parentId === undefined));
+const items = computed(() => topLevelSections.filter(s => s.unlocked));
 
 function onTabClick(id: SectionId) {
   active.value = id
@@ -27,12 +27,12 @@ function onTabClick(id: SectionId) {
 </script>
 <template>
   <ul class="nav nav-pills">
-    <li class="nav-item" v-for="section in topLevelSections" :key="section.id">
+    <li class="nav-item" v-for="section in items" :key="section.id">
       <button
         class="btn nav-link"
         :class="{
           active: section.id === active,
-          disabled: sections.length < 2
+          disabled: items.length < 2
         }"
         @click="onTabClick(section.id)"
       >

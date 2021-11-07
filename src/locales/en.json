@@ -62,6 +62,15 @@
     }
   },
 
+  "management": {
+    "title": "Management",
+    "happiness": {
+      "detail": {
+        "0": "Happiness affects your workers' production and consumption of catnip. Rare resources will increase this value whilst overpopulation will reduce it."
+      }
+    }
+  },
+
   "resources": {
     "section": {
       "label": "Resources",
@@ -143,14 +152,17 @@
     }
   },
   "effect-tree": {
-    "catnip-fields": "Catnip fields",
-    "weather": "Weather",
+    "base": "Base",
     "bonus": "Bonus",
-    "village-demand": "Demand",
-    "woodcutting": "Woodcutting",
-    "researching": "Researching",
+    "catnip-fields": "Catnip fields",
     "farming": "Farming",
-    "mining": "Mining"
+    "happiness": "Happiness",
+    "mining": "Mining",
+    "overpopulation": "Overpopulation",
+    "researching": "Researching",
+    "village-demand": "Demand",
+    "weather": "Weather",
+    "woodcutting": "Woodcutting"
   },
 
   "buildings": {
