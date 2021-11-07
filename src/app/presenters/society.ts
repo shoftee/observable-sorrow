@@ -4,7 +4,7 @@ import { JobId, PopId } from "@/app/interfaces";
 import { JobEffectType, JobState, Meta, PopState } from "@/app/state";
 
 import { IStateManager } from ".";
-import { EffectItem } from "./common";
+import { EffectItem, numberView } from "./common";
 
 export interface PopItem {
   id: string;
@@ -72,8 +72,8 @@ export class SocietyPresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: computed(() => manager.numberView(meta.base)),
-        totalAmount: computed(() => manager.numberView(meta.total)),
+        singleAmount: computed(() => numberView(meta.base, manager)),
+        totalAmount: computed(() => numberView(meta.total, manager)),
       }),
     );
   }

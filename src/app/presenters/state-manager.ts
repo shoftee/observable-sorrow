@@ -18,15 +18,12 @@ import {
   SectionId,
   TechId,
   StockpileId,
-  ShowSign,
 } from "@/app/interfaces";
 import { Channel } from "@/app/presenters/common/channel";
 import {
   BuildingState,
   EffectState,
   EffectTreeState,
-  EffectDisplayStyles,
-  EffectDisplayStyle,
   EnvironmentState,
   FulfillmentState,
   HistoryEvent,
@@ -49,7 +46,7 @@ export interface IStateManager {
 
   fulfillment(id: FulfillmentId): FulfillmentState;
 
-  numberView(id: NumberEffectId): NumberView | undefined;
+  number(id: NumberEffectId): EffectState<number>;
 
   jobs(): Enumerable<[JobId, JobState]>;
   job(id: JobId): JobState;
@@ -74,13 +71,6 @@ export interface IStateManager {
   time(): TimeState;
 
   history(): Channel<HistoryEvent>;
-}
-
-export interface NumberView {
-  value: number;
-  style: EffectDisplayStyle;
-  rounded?: boolean;
-  showSign?: ShowSign;
 }
 
 class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
@@ -211,16 +201,8 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.jobs.get(id) as JobState;
   }
 
-  numberView(id: NumberEffectId): NumberView | undefined {
-    const number = this.pools.numbers.get(id) as EffectState<number>;
-    return number.value !== undefined
-      ? {
-          value: number.value,
-          style: EffectDisplayStyles[id],
-          rounded: false,
-          showSign: "always",
-        }
-      : undefined;
+  number(id: NumberEffectId): EffectState<number> {
+    return this.pools.numbers.get(id) as EffectState<number>;
   }
 
   pops(): Enumerable<[PopId, PopState]> {

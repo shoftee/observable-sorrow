@@ -1,6 +1,6 @@
 import { computed, reactive } from "vue";
 
-import { DeltaEffectId, NumberEffectId, ResourceId } from "@/app/interfaces";
+import { ResourceId } from "@/app/interfaces";
 import {
   Meta,
   ResourceMetadataType,
@@ -8,7 +8,8 @@ import {
   UnitKind,
 } from "@/app/state";
 
-import { IStateManager, NumberView } from ".";
+import { IStateManager } from ".";
+import { numberView, effectTree, NumberView, EffectTree } from "./common";
 
 export class ResourcesPresenter {
   readonly all: ResourceItem[];
@@ -30,17 +31,19 @@ export class ResourcesPresenter {
       label: meta.label,
       unlocked: computed(() => res.unlocked),
       amount: computed(() => res.amount),
-      change: computed(() => {
-        return meta.id !== "kittens"
+      change: computed(() =>
+        meta.id !== "kittens"
           ? this.resourceChange(res)
-          : this.kittensChange(manager);
-      }),
+          : this.kittensChange(manager),
+      ),
       capacity: computed(() => res.capacity),
       modifier: computed(() =>
-        meta.id === "catnip" ? manager.numberView("weather.ratio") : undefined,
+        meta.id === "catnip" ? numberView("weather.ratio", manager) : undefined,
       ),
       deltaTree: computed(() =>
-        this.newEffectTree(meta.effects.delta, manager),
+        meta.effects.delta !== undefined
+          ? effectTree(meta.effects.delta, manager)
+          : undefined,
       ),
     });
   }
@@ -61,49 +64,6 @@ export class ResourcesPresenter {
       rounded: true,
     };
   }
-
-  private newEffectTree(
-    id: DeltaEffectId | undefined,
-    manager: IStateManager,
-  ): EffectTree | undefined {
-    if (id === undefined) {
-      return undefined;
-    }
-    return reactive({
-      nodes: Array.from(this.collectEffectNodes(id, manager)),
-    });
-  }
-
-  private *collectEffectNodes(
-    id: NumberEffectId,
-    manager: IStateManager,
-  ): Iterable<EffectTreeNode> {
-    const children = manager.effectTree().get(id);
-    for (const child of children!) {
-      const style = Meta.effectDisplay(child);
-      switch (style.disposition) {
-        case "hide":
-          // completely ignore hidden children
-          continue;
-        case "inline":
-          // treat children-of-child as direct children
-          yield* this.collectEffectNodes(child, manager);
-          continue;
-
-        default:
-          yield reactive({
-            id: child,
-            label: style.label,
-            value: computed(() => manager.numberView(child)),
-            // Don't collect children of collapsed nodes
-            nodes:
-              style.disposition === "collapse"
-                ? []
-                : Array.from(this.collectEffectNodes(child, manager)),
-          });
-      }
-    }
-  }
 }
 
 export interface ResourceItem {
@@ -115,15 +75,4 @@ export interface ResourceItem {
   capacity?: number;
   modifier?: NumberView;
   deltaTree?: EffectTree;
-}
-
-export interface EffectTree {
-  nodes: EffectTreeNode[];
-}
-
-export interface EffectTreeNode {
-  id: NumberEffectId;
-  value: NumberView | undefined;
-  label?: string;
-  nodes: EffectTreeNode[];
 }

@@ -3,12 +3,12 @@ import { computed, reactive } from "vue";
 import { SectionId } from "@/app/interfaces";
 import { Meta, SectionMetadataType, SectionState } from "@/app/state";
 
-import { StateManager } from ".";
+import { IStateManager } from ".";
 
 export class SectionsPresenter {
   readonly items: Map<SectionId, SectionItem>;
 
-  constructor(manager: StateManager) {
+  constructor(manager: IStateManager) {
     this.items = manager.sections().toMap(
       ([id]) => id,
       ([id, state]) => this.newSectionItem(id, Meta.section(id), state),

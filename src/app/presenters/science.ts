@@ -3,13 +3,13 @@ import { computed, ComputedRef, reactive } from "vue";
 import { ResearchIntent, TechId } from "@/app/interfaces";
 import { Meta, TechMetadataType } from "@/app/state";
 
-import { StateManager } from ".";
+import { IStateManager } from ".";
 import { fulfillment, FulfillmentItem } from "./common";
 
 export class SciencePresenter {
   readonly items: ComputedRef<TechItem[]>;
 
-  constructor(manager: StateManager) {
+  constructor(manager: IStateManager) {
     this.items = computed(() =>
       manager
         .techs()
@@ -18,7 +18,7 @@ export class SciencePresenter {
     );
   }
 
-  private newTechItem(id: TechId, manager: StateManager): TechItem {
+  private newTechItem(id: TechId, manager: IStateManager): TechItem {
     const meta = Meta.tech(id);
     const state = manager.tech(id);
     return reactive({

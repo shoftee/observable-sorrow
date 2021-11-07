@@ -1,8 +1,8 @@
+import { ShowSign } from "@/app/interfaces";
 import { UnitKind } from "@/app/state";
 
-import { IStateManager, NumberView } from ".";
-import { ShowSign } from "../interfaces";
-import { SandcastleBuilderFormatter } from "./common/formatter";
+import { IStateManager } from ".";
+import { SandcastleBuilderFormatter, NumberView } from "./common";
 
 export interface FormattingOptions {
   precision: number;
@@ -30,6 +30,10 @@ export class NumberFormatter {
   }
 
   v(view: NumberView): string {
+    if (view.value === undefined) {
+      return "";
+    }
+
     const precision = view.rounded === true ? 0 : this.options.precision;
     const showSign = view.showSign ?? "negative";
     const value = view.style.invert === true ? -view.value : view.value;
@@ -40,30 +44,22 @@ export class NumberFormatter {
         if (this.options.units === "ticks") {
           return this.fmt(value, precision, showSign) + "t";
         } else {
-          return (
-            this.fmt(
-              value / (1000 / this.manager.time().millisPerTick),
-              precision,
-              showSign,
-            ) + "s"
-          );
+          return this.fmt(value / this.tps, precision, showSign) + "s";
         }
       }
       case UnitKind.PerTick: {
         if (this.options.units === "ticks") {
           return this.fmt(value, precision, showSign) + "/t";
         } else {
-          return (
-            this.fmt(
-              value * (1000 / this.manager.time().millisPerTick),
-              precision,
-              showSign,
-            ) + "/s"
-          );
+          return this.fmt(value * this.tps, precision, showSign) + "/s";
         }
       }
       case UnitKind.None:
         return this.fmt(value, precision, showSign);
     }
+  }
+
+  private get tps(): number {
+    return 1000 / this.manager.time().millisPerTick;
   }
 }

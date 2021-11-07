@@ -3,7 +3,8 @@ import { reactive, computed } from "vue";
 import { FulfillmentId, ResourceId } from "@/app/interfaces";
 import { IngredientState, Meta, UnitKind } from "@/app/state";
 
-import { IStateManager, NumberView } from "..";
+import { IStateManager } from "..";
+import { NumberView } from ".";
 
 export interface IngredientItem {
   readonly id: ResourceId;

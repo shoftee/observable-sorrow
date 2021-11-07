@@ -4,7 +4,7 @@ import { BuildingId, Intent } from "@/app/interfaces";
 import { Meta, BonfireItemId, BonfireBuildingId } from "@/app/state";
 
 import { IStateManager } from ".";
-import { fulfillment, EffectItem, FulfillmentItem } from "./common";
+import { fulfillment, EffectItem, numberView, FulfillmentItem } from "./common";
 
 export class BonfirePresenter {
   readonly all: BonfireItem[];
@@ -95,8 +95,8 @@ export class BonfirePresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: computed(() => manager.numberView(meta.per)),
-        totalAmount: computed(() => manager.numberView(meta.total)),
+        singleAmount: computed(() => numberView(meta.per, manager)),
+        totalAmount: computed(() => numberView(meta.total, manager)),
       }),
     );
   }

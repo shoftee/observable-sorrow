@@ -1,4 +1,9 @@
-import { ShowSign } from "@/app/interfaces";
+import { NumberEffectId, ShowSign } from "@/app/interfaces";
+import {
+  EffectDisplayStyle,
+  EffectDisplayStyles,
+  EffectState,
+} from "@/app/state";
 import { round } from "@/app/utils/mathx";
 
 function scale(limit: number, divisor: number, postfix: string) {
@@ -84,3 +89,26 @@ export const SandcastleBuilderFormatter = (
 
   return signString + valueString;
 };
+
+export interface NumberView {
+  value: number | undefined;
+  style: EffectDisplayStyle;
+  rounded?: boolean;
+  showSign?: ShowSign;
+}
+
+interface NumberProvider {
+  number(id: NumberEffectId): EffectState<number>;
+}
+
+export function numberView(
+  id: NumberEffectId,
+  manager: NumberProvider,
+): NumberView {
+  return {
+    value: manager.number(id).value,
+    style: EffectDisplayStyles[id],
+    rounded: false,
+    showSign: "always",
+  };
+}

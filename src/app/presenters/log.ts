@@ -1,12 +1,12 @@
 import { useI18n } from "vue-i18n";
 
-import { NumberFormatter, StateManager } from ".";
+import { IStateManager, NumberFormatter } from ".";
 import { HistoryEvent } from "../state";
 
 export class LogPresenter {
   private eventId = 0;
 
-  constructor(manager: StateManager) {
+  constructor(manager: IStateManager) {
     manager.history().subscribe((events) => {
       for (const event of events) {
         if (event.disposition !== "ignore") {
