@@ -23,11 +23,14 @@ const { happiness } = society;
         <div v-if="happiness.view.value !== undefined" class="col-xl-6 col-12">
           <div class="text-center p-2">
             <tippy>
-              Happiness:
-              <span class="ms-1 number">{{ fmt.v(happiness.view) }}</span>
+              <i18n-t keypath="management.happiness.label" scope="global">
+                <template #amount>
+                  <span class="ms-1 number">{{ fmt.v(happiness.view) }}</span>
+                </template>
+              </i18n-t>
               <template #content>
                 <div>
-                  <div class="card-header">{{ t("management.happiness.detail.0") }}</div>
+                  <div class="card-header">{{ t("management.happiness.detail") }}</div>
                 </div>
               </template>
             </tippy>

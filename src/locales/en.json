@@ -65,9 +65,8 @@
   "management": {
     "title": "Management",
     "happiness": {
-      "detail": {
-        "0": "Happiness affects your workers' production and consumption of catnip. Rare resources will increase this value whilst overpopulation will reduce it."
-      }
+      "label": "Happiness {amount}",
+      "detail": "Happiness affects your workers' production and consumption of catnip. Rare resources will increase this value whilst overpopulation will reduce it."
     }
   },
 
