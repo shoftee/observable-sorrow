@@ -23,9 +23,13 @@ const effects = computed(() => item.effects ?? []);
     </div>
     <Ingredients v-if="ingredients.length > 0" :items="ingredients" />
     <Effects v-if="effects.length > 0" :items="effects">
-      <template
-        #title
-      >{{ t(events?.shift ? "effects.buildings.total" : "effects.buildings.per-level") }}</template>
+      <template #title>{{
+        t(
+          events?.shift
+            ? "effects.buildings.total"
+            : "effects.buildings.per-level",
+        )
+      }}</template>
     </Effects>
   </div>
 </template>

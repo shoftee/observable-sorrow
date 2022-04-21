@@ -12,13 +12,16 @@ const props = defineProps<{ active: SectionId }>();
 const content = computed(() => {
   const sectionId = props.active;
   switch (sectionId) {
-    case "bonfire": return Bonfire;
-    case "society": return Society;
-    case "science": return Science;
-    default: throw new Error(`unexpected section name ${sectionId}`);
+    case "bonfire":
+      return Bonfire;
+    case "society":
+      return Society;
+    case "science":
+      return Science;
+    default:
+      throw new Error(`unexpected section name ${sectionId}`);
   }
 });
-
 </script>
 
 <template>

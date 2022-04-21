@@ -5,12 +5,12 @@ import { useEndpoint } from "@/composables/game-endpoint";
 
 const { t } = useI18n();
 
-const { society, fmt } = useEndpoint(ep => {
+const { society, fmt } = useEndpoint((ep) => {
   return {
     society: ep.presenters.society,
     fmt: ep.presenters.formatter,
-  }
-})
+  };
+});
 
 const { happiness } = society;
 </script>
@@ -30,7 +30,9 @@ const { happiness } = society;
               </i18n-t>
               <template #content>
                 <div>
-                  <div class="card-header">{{ t("management.happiness.detail") }}</div>
+                  <div class="card-header">
+                    {{ t("management.happiness.detail") }}
+                  </div>
                 </div>
               </template>
             </tippy>

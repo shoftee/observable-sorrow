@@ -11,12 +11,12 @@ import { useLogItemEvent } from "@/composables/use-event-listener";
 
 import { LogEpoch, newLogEpoch, removeClippedEvents } from "./_types";
 
-const { environment, fmt } = useEndpoint(ep => {
+const { environment, fmt } = useEndpoint((ep) => {
   return {
     environment: ep.presenters.environment,
     fmt: ep.presenters.formatter,
-  }
-})
+  };
+});
 
 const { t } = useI18n();
 
@@ -24,9 +24,12 @@ let epochId = ref(0);
 const epochs: LogEpoch[] = reactive([]);
 const requireNewEpoch = ref(true);
 
-watch(() => environment.calendar.season, () => {
-  requireNewEpoch.value = true;
-})
+watch(
+  () => environment.calendar.season,
+  () => {
+    requireNewEpoch.value = true;
+  },
+);
 
 function clearLog() {
   epochs.length = 0;
@@ -36,7 +39,7 @@ function clearLog() {
 function latestEpoch(): LogEpoch {
   if (requireNewEpoch.value) {
     const newEpoch = newLogEpoch(epochId.value++, environment.calendar);
-    epochs.unshift(newEpoch)
+    epochs.unshift(newEpoch);
     requireNewEpoch.value = false;
   }
 
@@ -68,7 +71,9 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
           type="button"
           class="btn btn-outline-secondary"
           @click="clearLog"
-        >{{ t("game.control.clear-log") }}</button>
+        >
+          {{ t("game.control.clear-log") }}
+        </button>
         <Pawse class="btn btn-outline-secondary" />
       </div>
     </div>
@@ -92,7 +97,9 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
           v-for="event in epoch.events"
           :key="event.id"
           :ref="el => { if (el) event.ref = el as Element }"
-        >{{ event.text }}</div>
+        >
+          {{ event.text }}
+        </div>
       </div>
     </div>
   </section>

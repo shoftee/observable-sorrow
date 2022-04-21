@@ -2,12 +2,12 @@
 import { useI18n } from "vue-i18n";
 import { useEndpoint } from "@/composables/game-endpoint";
 
-const { environment, dispatcher } = useEndpoint(ep => {
+const { environment, dispatcher } = useEndpoint((ep) => {
   return {
     environment: ep.presenters.environment,
     dispatcher: ep.interactors.dispatcher,
-  }
-})
+  };
+});
 
 const { t } = useI18n();
 

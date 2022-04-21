@@ -4,10 +4,9 @@ import Management from "./Management.vue";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 
-const { management } = useEndpoint(ep => {
-  return { management: ep.presenters.section.management }
-})
-
+const { management } = useEndpoint((ep) => {
+  return { management: ep.presenters.section.management };
+});
 </script>
 
 <template>

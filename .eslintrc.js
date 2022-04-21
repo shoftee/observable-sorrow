@@ -14,9 +14,8 @@ module.exports = {
 
   extends: [
     "plugin:vue/essential",
+    "plugin:prettier/recommended",
     "eslint:recommended",
-    "prettier",
-    "prettier/vue",
     "@vue/typescript/recommended",
   ],
 
@@ -33,6 +32,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "@typescript-eslint/no-non-null-assertion": "off",
+    "prettier/prettier": ["error", { endOfLine: "auto" }],
   },
 
   overrides: [

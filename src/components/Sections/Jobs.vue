@@ -9,13 +9,17 @@ import { useEndpoint } from "@/composables/game-endpoint";
 
 const { t } = useI18n();
 
-const { society } = useEndpoint(ep => {
+const { society } = useEndpoint((ep) => {
   return { society: ep.presenters.society };
-})
+});
 
-const jobs = computed(() => unref(society.jobs).filter(item => item.unlocked));
+const jobs = computed(() =>
+  unref(society.jobs).filter((item) => item.unlocked),
+);
 const total = computed(() => unref(society.pops).length);
-const idle = computed(() => count(unref(society.pops), item => item.job === undefined))
+const idle = computed(() =>
+  count(unref(society.pops), (item) => item.job === undefined),
+);
 </script>
 
 <template>

@@ -9,24 +9,24 @@ import { JobItem } from "@/app/presenters";
 import { useEndpoint } from "@/composables/game-endpoint";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
-const { item } = defineProps<{ item: JobItem, noIdle: boolean }>();
+const { item } = defineProps<{ item: JobItem; noIdle: boolean }>();
 const { t } = useI18n();
 const events = inject(KeyboardEventsKey);
 
 const effects = computed(() => item.effects ?? []);
 
-const { dispatcher } = useEndpoint(ep => {
+const { dispatcher } = useEndpoint((ep) => {
   return {
-    dispatcher: ep.interactors.dispatcher
-  }
-})
+    dispatcher: ep.interactors.dispatcher,
+  };
+});
 
 async function assignJob(id: JobId): Promise<void> {
-  await dispatcher.send({ kind: "society", id: "assign-job", "job": id })
+  await dispatcher.send({ kind: "society", id: "assign-job", job: id });
 }
 
 async function unassignJob(id: JobId): Promise<void> {
-  await dispatcher.send({ kind: "society", id: "unassign-job", "job": id })
+  await dispatcher.send({ kind: "society", id: "unassign-job", job: id });
 }
 </script>
 
@@ -67,7 +67,9 @@ async function unassignJob(id: JobId): Promise<void> {
           <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
         </div>
         <Effects v-if="effects.length > 0" :items="effects">
-          <template #title>{{ t(events?.shift ? "effects.jobs.total" : "effects.jobs.per-worker") }}</template>
+          <template #title>{{
+            t(events?.shift ? "effects.jobs.total" : "effects.jobs.per-worker")
+          }}</template>
         </Effects>
       </div>
     </template>

@@ -9,19 +9,21 @@ import { useEndpoint } from "@/composables/game-endpoint";
 const { t } = useI18n();
 
 const show = ref(true);
-const { resources } = useEndpoint(ep => {
+const { resources } = useEndpoint((ep) => {
   return {
     resources: ep.presenters.resources,
-  }
+  };
 });
 
-const items = computed(() => resources.all.filter(r => r.unlocked));
+const items = computed(() => resources.all.filter((r) => r.unlocked));
 </script>
 
 <template>
   <div class="resources-container">
     <div class="card">
-      <div v-if="items.length === 0" class="no-resources">{{ t("resources.section.empty") }}</div>
+      <div v-if="items.length === 0" class="no-resources">
+        {{ t("resources.section.empty") }}
+      </div>
       <div v-else class="base-resources">
         <button class="btn shadow-none" @click="show = !show">
           <div class="clearfix">

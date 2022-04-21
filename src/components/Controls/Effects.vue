@@ -6,12 +6,12 @@ import { EffectItem } from "@/app/presenters/common/effects";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 import { useEndpoint } from "@/composables/game-endpoint";
 
-const { items } = defineProps<{ items: EffectItem[] }>()
+const { items } = defineProps<{ items: EffectItem[] }>();
 const events = inject(KeyboardEventsKey);
 
-const { fmt } = useEndpoint(ep => {
+const { fmt } = useEndpoint((ep) => {
   return { fmt: ep.presenters.formatter };
-})
+});
 </script>
 
 <template>
@@ -21,7 +21,10 @@ const { fmt } = useEndpoint(ep => {
     </div>
     <ul class="effects-list">
       <template v-if="events?.shift">
-        <li v-for="item in items.filter(i => i.totalAmount !== undefined)" :key="item.id">
+        <li
+          v-for="item in items.filter((i) => i.totalAmount !== undefined)"
+          :key="item.id"
+        >
           <i18n-t scope="global" :keypath="item.label" tag="span">
             <template #amount>
               <span class="number">{{ fmt.v(item.totalAmount!) }}</span>
@@ -30,7 +33,10 @@ const { fmt } = useEndpoint(ep => {
         </li>
       </template>
       <template v-else>
-        <li v-for="item in items.filter(i => i.singleAmount !== undefined)" :key="item.id">
+        <li
+          v-for="item in items.filter((i) => i.singleAmount !== undefined)"
+          :key="item.id"
+        >
           <i18n-t scope="global" :keypath="item.label" tag="span">
             <template #amount>
               <span class="number">{{ fmt.v(item.singleAmount!) }}</span>

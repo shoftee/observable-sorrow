@@ -3,7 +3,10 @@ import { defineAsyncComponent, provide, ref } from "vue";
 import { Endpoint, Setup } from "./app/endpoint";
 
 import { EndpointKey } from "./composables/game-endpoint";
-import { KeyboardEventsKey, getKeyboardEvents } from "./composables/keyboard-events";
+import {
+  KeyboardEventsKey,
+  getKeyboardEvents,
+} from "./composables/keyboard-events";
 provide(KeyboardEventsKey, getKeyboardEvents());
 
 let endpoint = ref<Endpoint>();
@@ -11,8 +14,8 @@ provide(EndpointKey, endpoint);
 
 const Main = defineAsyncComponent(async () => {
   endpoint.value = await Setup();
-  return import("./components/Main.vue")
-})
+  return import("./components/Main.vue");
+});
 </script>
 
 <template>

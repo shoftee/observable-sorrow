@@ -6,9 +6,9 @@ import { useEndpoint } from "@/composables/game-endpoint";
 
 const { item } = defineProps<{ item: IngredientItem }>();
 
-const { fmt } = useEndpoint(ep => {
+const { fmt } = useEndpoint((ep) => {
   return { fmt: ep.presenters.formatter };
-})
+});
 
 const { t } = useI18n();
 </script>
@@ -20,10 +20,11 @@ const { t } = useI18n();
       <template v-if="!item.fulfilled">
         {{ fmt.number(item.fulfillment) }} /
         {{ fmt.number(item.requirement) }}
-        <template
-          v-if="item.fulfillmentTime !== undefined"
-        >
-          <template v-if="item.fulfillmentTime.value === Number.POSITIVE_INFINITY">(&infin;)</template>
+        <template v-if="item.fulfillmentTime !== undefined">
+          <template
+            v-if="item.fulfillmentTime.value === Number.POSITIVE_INFINITY"
+            >(&infin;)</template
+          >
           <template v-else>({{ fmt.v(item.fulfillmentTime) }})</template>
         </template>
       </template>

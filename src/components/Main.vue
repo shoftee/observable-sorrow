@@ -5,7 +5,7 @@ import Calendar from "./Environment/Calendar.vue";
 import History from "./Environment/History.vue";
 import Resources from "./Resources/List.vue";
 
-import DevTools from "./DevTools.vue"
+import DevTools from "./DevTools.vue";
 import Happiness from "./Controls/Happiness.vue";
 
 import SectionTabs from "./Sections/Tabs.vue";
@@ -15,7 +15,7 @@ import { SectionId } from "@/app/interfaces";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 
-const { controller, store } = useEndpoint(ep => {
+const { controller, store } = useEndpoint((ep) => {
   return {
     controller: ep.interactors.controller,
     store: ep.interactors.store,
@@ -25,7 +25,7 @@ const { controller, store } = useEndpoint(ep => {
 onMounted(async () => {
   // Start the game
   await controller.start();
-})
+});
 
 const activeSection = ref<SectionId>("bonfire");
 

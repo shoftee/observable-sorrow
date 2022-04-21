@@ -2,7 +2,7 @@
 import { computed, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Detail from "./Detail.vue"
+import Detail from "./Detail.vue";
 
 import { BonfireItem } from "@/app/presenters";
 import { useEndpoint } from "@/composables/game-endpoint";
@@ -11,16 +11,16 @@ import { Intent } from "@/app/interfaces";
 const { item } = defineProps<{ item: BonfireItem }>();
 const { t } = useI18n();
 
-const level = computed(() => item.level ?? 0)
+const level = computed(() => item.level ?? 0);
 
-const { dispatcher } = useEndpoint(ep => {
+const { dispatcher } = useEndpoint((ep) => {
   return {
-    dispatcher: ep.interactors.dispatcher
-  }
-})
+    dispatcher: ep.interactors.dispatcher,
+  };
+});
 
 async function dispatch(intent: Intent): Promise<void> {
-  await dispatcher.send(toRaw(intent))
+  await dispatcher.send(toRaw(intent));
 }
 </script>
 
@@ -36,7 +36,9 @@ async function dispatch(intent: Intent): Promise<void> {
         @click="dispatch(item.intent)"
       >
         {{ t(item.label) }}
-        <span v-if="level > 0" class="number-annotation border">{{ level }}</span>
+        <span v-if="level > 0" class="number-annotation border">{{
+          level
+        }}</span>
       </button>
     </div>
     <template #content>

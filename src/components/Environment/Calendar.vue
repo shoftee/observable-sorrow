@@ -5,12 +5,12 @@ import { useEndpoint } from "@/composables/game-endpoint";
 
 const { t } = useI18n();
 
-const { environment, fmt } = useEndpoint(ep => {
+const { environment, fmt } = useEndpoint((ep) => {
   return {
     environment: ep.presenters.environment,
     fmt: ep.presenters.formatter,
-  }
-})
+  };
+});
 
 const state = environment.calendar;
 </script>

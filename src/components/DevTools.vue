@@ -1,25 +1,29 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { Offcanvas } from "bootstrap"
+import { Offcanvas } from "bootstrap";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 import { useKeyboardEvent } from "@/composables/use-event-listener";
 
-const { devTools, player } = useEndpoint(ep => {
+const { devTools, player } = useEndpoint((ep) => {
   return {
     devTools: ep.interactors.devTools,
     player: ep.presenters.player,
-  }
-})
+  };
+});
 
 const dt = window.__OS_DEVTOOLS__;
-watch(() => dt.on, async (newValue, oldValue) => {
-  if (!newValue && oldValue) {
-    await devTools.turnDevToolsOff();
-  } else if (newValue && !oldValue) {
-    await devTools.turnDevToolsOn();
-  }
-}, { immediate: true });
+watch(
+  () => dt.on,
+  async (newValue, oldValue) => {
+    if (!newValue && oldValue) {
+      await devTools.turnDevToolsOff();
+    } else if (newValue && !oldValue) {
+      await devTools.turnDevToolsOn();
+    }
+  },
+  { immediate: true },
+);
 
 const options = player.state;
 const gatherCatnip = ref(options.gatherCatnip);
@@ -27,8 +31,8 @@ const gatherCatnip = ref(options.gatherCatnip);
 const timeAcceleration = computed({
   get: () => options.timeAcceleration,
   set: async (newValue: number) => {
-    await devTools.setTimeAcceleration(newValue)
-  }
+    await devTools.setTimeAcceleration(newValue);
+  },
 });
 
 useKeyboardEvent("keyup", (e) => {
@@ -52,7 +56,9 @@ useKeyboardEvent("keyup", (e) => {
       <div class="offcanvas-header">Dev Tools</div>
       <div class="offcanvas-body">
         <div class="row">
-          <label for="gather-catnip" class="form-label">Gather Catnip = {{ gatherCatnip }}</label>
+          <label for="gather-catnip" class="form-label"
+            >Gather Catnip = {{ gatherCatnip }}</label
+          >
           <input
             id="gather-catnip"
             type="range"
@@ -65,8 +71,7 @@ useKeyboardEvent("keyup", (e) => {
         </div>
         <div class="row">
           <label for="time-acceleration" class="form-label">
-            Time Acceleration =
-            10
+            Time Acceleration = 10
             <sup>{{ timeAcceleration }}</sup>
           </label>
           <input

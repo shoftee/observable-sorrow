@@ -5,15 +5,17 @@ import { useI18n } from "vue-i18n";
 import TechButton from "@/components/Controls/Technology/Button.vue";
 
 import { useEndpoint } from "@/composables/game-endpoint";
-const { science } = useEndpoint(ep => {
+const { science } = useEndpoint((ep) => {
   return {
     science: ep.presenters.science,
-  }
+  };
 });
 
 const { t } = useI18n();
 
-const techs = computed(() => unref(science.items).filter(item => item.unlocked));
+const techs = computed(() =>
+  unref(science.items).filter((item) => item.unlocked),
+);
 </script>
 
 <template>

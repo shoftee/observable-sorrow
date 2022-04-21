@@ -7,13 +7,15 @@ import { useEndpoint } from "@/composables/game-endpoint";
 
 const { nodes } = defineProps<{ nodes: EffectTreeNode[] }>();
 
-const { fmt } = useEndpoint(ep => {
-  return { fmt: ep.presenters.formatter }
-})
+const { fmt } = useEndpoint((ep) => {
+  return { fmt: ep.presenters.formatter };
+});
 
 const { t } = useI18n();
 
-const nonZeroNodes = computed(() => nodes.filter(node => (node.value?.value ?? 0) !== 0))
+const nonZeroNodes = computed(() =>
+  nodes.filter((node) => (node.value?.value ?? 0) !== 0),
+);
 </script>
 
 <template>

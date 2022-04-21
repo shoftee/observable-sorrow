@@ -11,9 +11,9 @@ const { item } = defineProps<{ item: ResourceItem }>();
 
 const { t } = useI18n();
 
-const { fmt } = useEndpoint(ep => {
-  return { fmt: ep.presenters.formatter }
-})
+const { fmt } = useEndpoint((ep) => {
+  return { fmt: ep.presenters.formatter };
+});
 
 const { amount, capacity, change, modifier } = toRefs(item);
 </script>
@@ -29,7 +29,8 @@ const { amount, capacity, change, modifier } = toRefs(item);
           'bg-success': modifier.value > 0,
           'bg-danger': modifier.value < 0,
         }"
-      >{{ fmt.v(modifier) }}</span>
+        >{{ fmt.v(modifier) }}</span
+      >
     </div>
     <div class="col-3 number amount">{{ fmt.number(amount, "negative") }}</div>
     <template v-if="capacity">
@@ -46,7 +47,9 @@ const { amount, capacity, change, modifier } = toRefs(item);
           <div
             class="number change"
             :class="{ 'text-danger': change.value < 0 }"
-          >{{ fmt.v(change) }}</div>
+          >
+            {{ fmt.v(change) }}
+          </div>
           <template #content>
             <div class="effect-tree">
               <EffectTree :nodes="item.deltaTree.nodes" />
@@ -58,7 +61,9 @@ const { amount, capacity, change, modifier } = toRefs(item);
         <div
           class="col-3 number change"
           :class="{ 'text-danger': change.value < 0 }"
-        >{{ fmt.v(change) }}</div>
+        >
+          {{ fmt.v(change) }}
+        </div>
       </template>
     </template>
     <template v-else>

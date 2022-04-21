@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import Ingredients from "@/components/Controls/Ingredients.vue"
+import Ingredients from "@/components/Controls/Ingredients.vue";
 
 import { TechItem } from "@/app/presenters";
 

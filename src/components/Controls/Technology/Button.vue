@@ -10,16 +10,16 @@ import { useEndpoint } from "@/composables/game-endpoint";
 
 const { tech } = defineProps<{ tech: TechItem }>();
 
-const { dispatcher } = useEndpoint(ep => {
+const { dispatcher } = useEndpoint((ep) => {
   return {
-    dispatcher: ep.interactors.dispatcher
-  }
-})
+    dispatcher: ep.interactors.dispatcher,
+  };
+});
 
 const { t } = useI18n();
 
 async function research(id: TechId): Promise<void> {
-  await dispatcher.send({ kind: "research", id: "research-tech", tech: id })
+  await dispatcher.send({ kind: "research", id: "research-tech", tech: id });
 }
 </script>
 
