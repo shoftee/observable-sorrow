@@ -52,12 +52,12 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
-  kittens: {
-    id: "kittens",
-    label: "resources.kittens.label",
-    unlockMode: UnlockMode.FirstCapacity,
+  catpower: {
+    id: "catpower",
+    label: "resources.catpower.label",
     effects: {
-      limit: "kittens.limit",
+      delta: "catpower.delta",
+      limit: "catpower.limit",
     },
     flags: {},
   },
@@ -70,12 +70,12 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
-  catpower: {
-    id: "catpower",
-    label: "resources.catpower.label",
+  kittens: {
+    id: "kittens",
+    label: "resources.kittens.label",
+    unlockMode: UnlockMode.FirstCapacity,
     effects: {
-      delta: "catpower.delta",
-      limit: "catpower.limit",
+      limit: "kittens.limit",
     },
     flags: {},
   },

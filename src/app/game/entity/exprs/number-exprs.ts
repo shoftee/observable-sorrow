@@ -3,6 +3,7 @@ import {
   JobId,
   NumberEffectId,
   ResourceId,
+  TechId,
 } from "@/app/interfaces";
 
 import { effect, unwrap, Expr, ExprContext } from "./common";
@@ -41,11 +42,10 @@ const coalesce =
     return undefined;
   };
 
-type Unlockable = { state: { unlocked: boolean } };
-
-const unlocked =
-  (check: (ctx: Ctx) => Unlockable, then: NumberExpr) => (ctx: Ctx) =>
-    check(ctx).state.unlocked ? unwrap(then, ctx) : undefined;
+// Returns undefined if tech is not researched.
+// Otherwise, resolves expr and returns the value.
+const researched = (tech: TechId, expr: NumberExpr) => (ctx: Ctx) =>
+  ctx.admin.tech(tech).state.researched ? unwrap(expr, ctx) : undefined;
 
 // Returns undefined iff all provided exprs unwrap to undefined.
 // Otherwise, returns the sum of the valued exprs.
@@ -217,10 +217,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("hut.kittens-limit.base"),
     coalesce(building("hut"), constant(0)),
   ),
-  "hut.catpower-limit.base": unlocked(
-    ({ admin }) => admin.resource("catpower"),
-    constant(75),
-  ),
+  "hut.catpower-limit.base": researched("archery", constant(75)),
   "hut.catpower-limit": strictProd(
     effect("hut.catpower-limit.base"),
     coalesce(building("hut"), constant(0)),
@@ -249,10 +246,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("barn.wood-limit.base"),
     building("barn"),
   ),
-  "barn.minerals-limit.base": unlocked(
-    ({ admin }) => admin.resource("minerals"),
-    constant(250),
-  ),
+  "barn.minerals-limit.base": researched("mining", constant(250)),
   "barn.minerals-limit": strictProd(
     effect("barn.minerals-limit.base"),
     building("barn"),
