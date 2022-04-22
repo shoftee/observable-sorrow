@@ -7,6 +7,7 @@ export type SectionUnlockEffectId =
 export type JobUnlockEffectId =
   | "unlock.job.scholar"
   | "unlock.job.farmer"
+  | "unlock.job.hunter"
   | "unlock.job.miner";
 
 export type BuildingUnlockEffectId =

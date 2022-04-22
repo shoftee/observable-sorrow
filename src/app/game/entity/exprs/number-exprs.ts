@@ -23,16 +23,29 @@ const resource = (id: ResourceId) => (ctx: Ctx) => {
 const workers = (id: JobId) => (ctx: Ctx) =>
   ctx.admin.pops().withJob(id).count();
 
-const fallback = (check: NumberExpr, fallback: NumberExpr) => (ctx: Ctx) => {
-  const checked = unwrap(check, ctx);
-  return checked === undefined ? unwrap(fallback, ctx) : checked;
+const withHappiness = (expr: NumberExpr) => {
+  return looseProd(expr, (ctx: Ctx) => ctx.val("population.happiness.total"));
 };
 
-const ifdef = (check: NumberExpr, result: NumberExpr) => (ctx: Ctx) => {
-  const checked = unwrap(check, ctx);
-  if (checked !== undefined) return unwrap(result, ctx);
-  else return undefined;
-};
+// Unwraps the provided exprs one by one and returns the first that resolves to a non-undefined value.
+// Returns undefined if all exprs resolve to undefined.
+const coalesce =
+  (...exprs: NumberExpr[]) =>
+  (ctx: Ctx) => {
+    for (const expr of exprs) {
+      const checked = unwrap(expr, ctx);
+      if (checked !== undefined) {
+        return checked;
+      }
+    }
+    return undefined;
+  };
+
+type Unlockable = { state: { unlocked: boolean } };
+
+const unlocked =
+  (check: (ctx: Ctx) => Unlockable, then: NumberExpr) => (ctx: Ctx) =>
+    check(ctx).state.unlocked ? unwrap(then, ctx) : undefined;
 
 // Returns undefined iff all provided exprs unwrap to undefined.
 // Otherwise, returns the sum of the valued exprs.
@@ -59,6 +72,21 @@ const strictSum =
       const value = unwrap(expr, ctx);
       if (value === undefined) return undefined;
       sum += value;
+    }
+    return sum;
+  };
+
+// Returns undefined iff all provided exprs resolve to undefined.
+// Otherwise, returns the product of all resolved exprs.
+const looseProd =
+  (...exprs: NumberExpr[]) =>
+  (ctx: Ctx) => {
+    let sum = undefined;
+    for (const expr of exprs) {
+      const value = unwrap(expr, ctx);
+      if (value === undefined) continue;
+      else if (sum === undefined) sum = value;
+      else sum *= value;
     }
     return sum;
   };
@@ -133,7 +161,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "minerals.delta": effect("minerals.production"),
   "minerals.production": ratio(
     effect("jobs.miner.minerals"),
-    fallback(effect("minerals.ratio"), constant(0)),
+    coalesce(effect("minerals.ratio"), constant(0)),
   ),
   "minerals.ratio": effect("mine.minerals-ratio"),
 
@@ -141,12 +169,12 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "science.delta": effect("science.production"),
   "science.production": ratio(
     effect("jobs.scholar.science"),
-    fallback(effect("science.ratio"), constant(0)),
+    coalesce(effect("science.ratio"), constant(0)),
   ),
   "astronomy.rare-event.reward.base": constant(25),
   "astronomy.rare-event.reward": ratio(
     effect("astronomy.rare-event.reward.base"),
-    fallback(effect("science.ratio"), constant(0)),
+    coalesce(effect("science.ratio"), constant(0)),
   ),
   "science.ratio": effect("library.science-ratio"),
 
@@ -154,26 +182,26 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "catnip-field.catnip.base": constant(0.125),
   "catnip-field.catnip": strictProd(
     effect("catnip-field.catnip.base"),
-    fallback(building("catnip-field"), constant(0)),
+    coalesce(building("catnip-field"), constant(0)),
   ),
 
   // Huts
   "hut.kittens-limit.base": constant(2),
   "hut.kittens-limit": strictProd(
     effect("hut.kittens-limit.base"),
-    fallback(building("hut"), constant(0)),
+    coalesce(building("hut"), constant(0)),
   ),
 
   // Libraries
   "library.science-limit.base": constant(250),
   "library.science-limit": strictProd(
     effect("library.science-limit.base"),
-    fallback(building("library"), constant(0)),
+    coalesce(building("library"), constant(0)),
   ),
   "library.science-ratio.base": constant(0.1),
   "library.science-ratio": strictProd(
     effect("library.science-ratio.base"),
-    fallback(building("library"), constant(0)),
+    coalesce(building("library"), constant(0)),
   ),
 
   // Barns
@@ -187,7 +215,10 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("barn.wood-limit.base"),
     building("barn"),
   ),
-  "barn.minerals-limit.base": ifdef(resource("minerals"), constant(250)),
+  "barn.minerals-limit.base": unlocked(
+    (ctx) => ctx.admin.resource("minerals"),
+    constant(250),
+  ),
   "barn.minerals-limit": strictProd(
     effect("barn.minerals-limit.base"),
     building("barn"),
@@ -203,8 +234,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   // Population
   // Happiness
   "population.happiness.base": constant(1),
-  "population.unhappiness": effect("population.overpopulation"),
-  "population.overpopulation.base": constant(0.02),
+  "population.overpopulation.base": constant(-0.02),
   "population.overpopulation.severity": ({ admin }) => {
     const popCount = admin.pops().size;
     if (popCount < 5) {
@@ -217,15 +247,15 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("population.overpopulation.base"),
     effect("population.overpopulation.severity"),
   ),
-  "population.happiness.total": subtract(
+  "population.happiness.total": strictSum(
     effect("population.happiness.base"),
-    effect("population.unhappiness"),
+    effect("population.overpopulation"),
   ),
   // Catnip demand
   "population.catnip-demand.base": constant(0.85),
   "population.catnip-demand": strictProd(
     effect("population.catnip-demand.base"),
-    fallback(resource("kittens"), constant(0)),
+    coalesce(resource("kittens"), constant(0)),
   ),
 
   // Weather
@@ -256,22 +286,27 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   ),
 
   // Jobs
-  "jobs.woodcutter.wood.base": constant(0.018),
+  "jobs.woodcutter.wood.base": withHappiness(constant(0.018)),
   "jobs.woodcutter.wood": strictProd(
     effect("jobs.woodcutter.wood.base"),
     workers("woodcutter"),
   ),
-  "jobs.scholar.science.base": constant(0.035),
+  "jobs.scholar.science.base": withHappiness(constant(0.035)),
   "jobs.scholar.science": strictProd(
     effect("jobs.scholar.science.base"),
     workers("scholar"),
   ),
-  "jobs.farmer.catnip.base": constant(1),
+  "jobs.farmer.catnip.base": withHappiness(constant(1)),
   "jobs.farmer.catnip": strictProd(
     effect("jobs.farmer.catnip.base"),
     workers("farmer"),
   ),
-  "jobs.miner.minerals.base": constant(0.05),
+  "jobs.hunter.catpower.base": withHappiness(constant(0.06)),
+  "jobs.hunter.catpower": strictProd(
+    effect("jobs.hunter.catpower.base"),
+    workers("hunter"),
+  ),
+  "jobs.miner.minerals.base": withHappiness(constant(0.05)),
   "jobs.miner.minerals": strictProd(
     effect("jobs.miner.minerals.base"),
     workers("miner"),

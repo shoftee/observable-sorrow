@@ -78,14 +78,19 @@ export const EffectDisplayStyles: Record<NumberEffectId, EffectDisplayStyle> = {
   "library.science-ratio": percent(),
   "library.science-ratio.base": percent(),
 
+  // Catpower
+  "jobs.hunter.catpower.base": perTick(),
+  "jobs.hunter.catpower": perTick(),
+
   // Happiness
-  "population.happiness.total": percent("inline"),
-  "population.happiness.base": { ...percent(), label: "effect-tree.base" },
-  "population.unhappiness": percent("inline"),
+  "population.happiness.total": percent("collapse"),
+  "population.happiness.base": {
+    ...percent(),
+    label: "effect-tree.base",
+  },
   "population.overpopulation": {
     ...percent("collapse"),
     label: "effect-tree.overpopulation",
-    invert: true,
   },
   "population.overpopulation.base": percent(),
   "population.overpopulation.severity": percent(),

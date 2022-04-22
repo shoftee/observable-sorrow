@@ -38,6 +38,13 @@
         "wood": "Wood production {amount}"
       }
     },
+    "farmer": {
+      "label": "Farmer",
+      "description": "Cultivate catnip in the surrounding lands.",
+      "effects": {
+        "catnip": "Catnip production {amount}"
+      }
+    },
     "scholar": {
       "label": "Scholar",
       "description": "Ponder the myriad wonders of the world around you.",
@@ -45,11 +52,11 @@
         "science": "Science production {amount}"
       }
     },
-    "farmer": {
-      "label": "Farmer",
-      "description": "Cultivate catnip in the surrounding lands.",
+    "hunter": {
+      "label": "Hunter",
+      "description": "Organize an elite force.",
       "effects": {
-        "catnip": "Catnip production {amount}"
+        "catpower": "Catpower production {amount}"
       }
     },
     "miner": {
@@ -235,10 +242,16 @@
       "flavor": "Best thing since sliced bread!",
       "effect": "Unlocks Farmers and Barns."
     },
+    "archery": {
+      "label": "Archery",
+      "description": "Develops the ranged weaponry known as a 'bow'.",
+      "flavor": "Aren't cats natural hunters anyway…?",
+      "effect": "Unlocks Hunters."
+    },
     "mining": {
       "label": "Mining",
       "description": "Develops the ability to extract mineral resources from the bowels fo Cath.",
-      "flavor": "Pickaxes are easier to hold with opposable thumbs",
+      "flavor": "Pickaxes are easier to hold with opposable thumbs.",
       "effect": "Unlocks Mines."
     }
   },

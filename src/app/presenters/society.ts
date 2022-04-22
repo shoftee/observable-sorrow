@@ -38,6 +38,7 @@ export class SocietyPresenter {
   readonly jobs: ComputedRef<JobItem[]>;
 
   readonly happiness: HappinessItem;
+  readonly allowSendHunters: ComputedRef<boolean>;
 
   constructor(manager: IStateManager) {
     this.pops = computed(() =>
@@ -60,6 +61,8 @@ export class SocietyPresenter {
       ),
       effectTree: effectTree("population.happiness.total", manager),
     });
+
+    this.allowSendHunters = computed(() => manager.tech("archery").researched);
   }
 
   private newJobItem(

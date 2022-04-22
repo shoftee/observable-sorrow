@@ -20,8 +20,8 @@ const { happiness } = society;
     <div class="card-header">{{ t("management.title") }}</div>
     <div class="card-body">
       <div class="row">
-        <div v-if="happiness.view.value !== undefined" class="col-xl-6 col-12">
-          <div class="text-center p-2">
+        <div class="col-xl-6 col-12">
+          <div v-if="happiness.view.value !== undefined" class="text-center p-2">
             <tippy>
               <i18n-t keypath="management.happiness.label" scope="global">
                 <template #amount>
@@ -37,6 +37,9 @@ const { happiness } = society;
               </template>
             </tippy>
           </div>
+        </div>
+        <div class="col-xl-6 col-12">
+          <div v-if="true"></div>
         </div>
       </div>
     </div>

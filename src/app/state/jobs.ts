@@ -59,6 +59,20 @@ export const JobMetadata: Record<JobId, JobMetadataType> = {
       },
     ],
   },
+  hunter: {
+    id: "hunter",
+    label: "jobs.hunter.label",
+    description: "jobs.hunter.description",
+    unlockEffect: "unlock.job.hunter",
+    effects: [
+      {
+        id: "catpower",
+        label: "jobs.hunter.effects.catpower",
+        base: "jobs.hunter.catpower.base",
+        total: "jobs.hunter.catpower",
+      },
+    ],
+  },
   miner: {
     id: "miner",
     label: "jobs.miner.label",

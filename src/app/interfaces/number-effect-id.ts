@@ -60,13 +60,14 @@ export type JobEffectId =
   | "jobs.scholar.science"
   | "jobs.farmer.catnip.base"
   | "jobs.farmer.catnip"
+  | "jobs.hunter.catpower.base"
+  | "jobs.hunter.catpower"
   | "jobs.miner.minerals.base"
   | "jobs.miner.minerals";
 
 export type PopulationEffectId =
   | "population.happiness.total"
   | "population.happiness.base"
-  | "population.unhappiness"
   | "population.overpopulation"
   | "population.overpopulation.base"
   | "population.overpopulation.severity"
