@@ -2,13 +2,15 @@ export type ProductionEffectId =
   | "catnip.production"
   | "wood.production"
   | "minerals.production"
-  | "science.production";
+  | "science.production"
+  | "catpower.production";
 
 export type DeltaEffectId =
   | "catnip.delta"
   | "wood.delta"
   | "minerals.delta"
-  | "science.delta";
+  | "science.delta"
+  | "catpower.delta";
 
 export type RatioEffectId =
   | "science.ratio"
@@ -28,6 +30,8 @@ export type LimitEffectId =
   | "minerals.limit"
   | "minerals.limit.base"
   | "science.limit"
+  | "catpower.limit"
+  | "catpower.limit.base"
   | "kittens.limit";
 
 export type CatnipFieldEffectId =
@@ -35,7 +39,11 @@ export type CatnipFieldEffectId =
   | "catnip-field.catnip"
   | "catnip-field.catnip.base";
 
-export type HutEffectId = "hut.kittens-limit" | "hut.kittens-limit.base";
+export type HutEffectId =
+  | "hut.kittens-limit"
+  | "hut.kittens-limit.base"
+  | "hut.catpower-limit"
+  | "hut.catpower-limit.base";
 
 export type LibraryEffectId =
   | "library.science-limit"

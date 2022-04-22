@@ -21,10 +21,7 @@ const { fmt } = useEndpoint((ep) => {
     </div>
     <ul class="effects-list">
       <template v-if="events?.shift">
-        <li
-          v-for="item in items.filter((i) => i.totalAmount !== undefined)"
-          :key="item.id"
-        >
+        <li v-for="item in items.filter((i) => i.totalAmount?.value !== undefined)" :key="item.id">
           <i18n-t scope="global" :keypath="item.label" tag="span">
             <template #amount>
               <span class="number">{{ fmt.v(item.totalAmount!) }}</span>
@@ -33,10 +30,7 @@ const { fmt } = useEndpoint((ep) => {
         </li>
       </template>
       <template v-else>
-        <li
-          v-for="item in items.filter((i) => i.singleAmount !== undefined)"
-          :key="item.id"
-        >
+        <li v-for="item in items.filter((i) => i.singleAmount?.value !== undefined)" :key="item.id">
           <i18n-t scope="global" :keypath="item.label" tag="span">
             <template #amount>
               <span class="number">{{ fmt.v(item.singleAmount!) }}</span>

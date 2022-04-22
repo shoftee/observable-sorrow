@@ -124,25 +124,43 @@ const ratio = (base: NumberExpr, ratio: NumberExpr) => (ctx: Ctx) => {
 const constant = (value: number | undefined) => (_: Ctx) => value;
 
 export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
+  // ----------------
   // Limits
+  // ----------------
+  // Catnip
   "catnip.limit.base": constant(5000),
   "catnip.limit": looseSum(
     effect("catnip.limit.base"),
     effect("barn.catnip-limit"),
   ),
 
+  // Wood
   "wood.limit.base": constant(200),
   "wood.limit": looseSum(effect("wood.limit.base"), effect("barn.wood-limit")),
 
+  // Minerals
   "minerals.limit.base": constant(250),
   "minerals.limit": looseSum(
     effect("minerals.limit.base"),
     effect("barn.minerals-limit"),
   ),
 
+  // Science
   "science.limit": effect("library.science-limit"),
+
+  // Catpower
+  "catpower.limit.base": constant(0),
+  "catpower.limit": looseSum(
+    effect("catpower.limit.base"),
+    effect("hut.catpower-limit"),
+  ),
+
+  // Kittens
   "kittens.limit": effect("hut.kittens-limit"),
 
+  // ----------------
+  // Resources
+  // ----------------
   // Catnip
   "catnip.delta": subtract(
     effect("catnip.production"),
@@ -178,6 +196,14 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   ),
   "science.ratio": effect("library.science-ratio"),
 
+  // Catpower
+  "catpower.delta": effect("catpower.production"),
+  "catpower.production": effect("jobs.hunter.catpower"),
+
+  // ----------------
+  // Buildings
+  // ----------------
+
   // Catnip fields
   "catnip-field.catnip.base": constant(0.125),
   "catnip-field.catnip": strictProd(
@@ -189,6 +215,14 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
   "hut.kittens-limit.base": constant(2),
   "hut.kittens-limit": strictProd(
     effect("hut.kittens-limit.base"),
+    coalesce(building("hut"), constant(0)),
+  ),
+  "hut.catpower-limit.base": unlocked(
+    ({ admin }) => admin.resource("catpower"),
+    constant(75),
+  ),
+  "hut.catpower-limit": strictProd(
+    effect("hut.catpower-limit.base"),
     coalesce(building("hut"), constant(0)),
   ),
 
@@ -216,7 +250,7 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     building("barn"),
   ),
   "barn.minerals-limit.base": unlocked(
-    (ctx) => ctx.admin.resource("minerals"),
+    ({ admin }) => admin.resource("minerals"),
     constant(250),
   ),
   "barn.minerals-limit": strictProd(
@@ -231,7 +265,10 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     building("mine"),
   ),
 
+  // ----------------
   // Population
+  // ----------------
+
   // Happiness
   "population.happiness.base": constant(1),
   "population.overpopulation.base": constant(-0.02),
@@ -258,7 +295,9 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     coalesce(resource("kittens"), constant(0)),
   ),
 
+  // ----------------
   // Weather
+  // ----------------
   "weather.season-ratio": ({ admin }) => {
     switch (admin.environment().state.season) {
       case "spring":
@@ -285,7 +324,9 @@ export const NumberExprs: Record<NumberEffectId, NumberExpr> = {
     effect("weather.severity-ratio"),
   ),
 
+  // ----------------
   // Jobs
+  // ----------------
   "jobs.woodcutter.wood.base": withHappiness(constant(0.018)),
   "jobs.woodcutter.wood": strictProd(
     effect("jobs.woodcutter.wood.base"),

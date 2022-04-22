@@ -82,6 +82,12 @@ export const BuildingMetadata: Record<BuildingId, BuildingMetadataType> = {
         total: "hut.kittens-limit",
         label: "buildings.hut.effects.kittens-limit",
       },
+      {
+        id: "catpower-limit",
+        per: "hut.catpower-limit.base",
+        total: "hut.catpower-limit",
+        label: "buildings.hut.effects.catpower-limit",
+      },
     ],
   },
   library: {

@@ -70,6 +70,15 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     },
     flags: {},
   },
+  catpower: {
+    id: "catpower",
+    label: "resources.catpower.label",
+    effects: {
+      delta: "catpower.delta",
+      limit: "catpower.limit",
+    },
+    flags: {},
+  },
 };
 
 export interface ResourceState {

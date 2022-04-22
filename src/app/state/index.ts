@@ -6,6 +6,7 @@ export * from "./bonfire";
 export * from "./buildings";
 export * from "./crafting";
 export * from "./effects";
+export * from "./effect-styles";
 export * from "./environment";
 export * from "./jobs";
 export * from "./history";

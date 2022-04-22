@@ -91,11 +91,14 @@
     "minerals": {
       "label": "minerals"
     },
-    "kittens": {
-      "label": "kittens"
-    },
     "science": {
       "label": "science"
+    },
+    "catpower": {
+      "label": "catpower"
+    },
+    "kittens": {
+      "label": "kittens"
     }
   },
 
