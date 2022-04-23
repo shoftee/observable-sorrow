@@ -260,8 +260,14 @@
   },
 
   "astronomy": {
-    "rare-event": "A rare astronomical event occurred in the sky",
-    "observed-sky-reward": "Observed rare event! Gained {scienceAmount} science!",
-    "fallen-meteor-reward": "A meteor fell near the village! Gained {mineralsAmount} minerals!"
+    "rare-event": "A rare astronomical event occurred in the sky.",
+    "observed-sky-reward": {
+      "gained": "Observed rare event! Gained {scienceAmount} science!",
+      "capped": "Observed rare event! No science, but it was really neat!"
+    },
+    "fallen-meteor-reward": {
+      "gained-minerals": "A meteor fell near the village! Gained {mineralsAmount} minerals!",
+      "capped": "A meteor fell near the village! Cool!"
+    }
   }
 }

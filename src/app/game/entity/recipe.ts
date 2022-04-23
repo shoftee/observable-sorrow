@@ -13,7 +13,7 @@ import { Entity, EntityPool, OrderStatus, Watched, Watcher } from ".";
 export class RecipeEntity extends Entity<RecipeId> implements Watched {
   readonly state: RecipeState;
 
-  status: OrderStatus;
+  orderStatus: OrderStatus;
 
   constructor(readonly meta: RecipeMetadataType) {
     super(meta.id);
@@ -21,7 +21,7 @@ export class RecipeEntity extends Entity<RecipeId> implements Watched {
       products: ResourceMap.fromObject(meta.products),
     });
 
-    this.status = OrderStatus.EMPTY;
+    this.orderStatus = OrderStatus.EMPTY;
   }
 
   watch(watcher: Watcher): void {

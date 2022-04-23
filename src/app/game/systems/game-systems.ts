@@ -2,50 +2,45 @@ import { EntityAdmin } from "../entity";
 
 import {
   System,
-  BuildingSystem,
-  CraftingSystem,
+  AstronomySystem,
   EffectsSystem,
   EnvironmentSystem,
   FulfillmentSystem,
   LockToggleSystem,
   PopulationSystem,
-  ResearchSystem,
   ResourceAmountsSystem,
   ResourceLimitsSystem,
-  TimeSystem,
   SectionsSystem,
-  AstronomySystem,
+  TimeSystem,
+  WorkOrdersSystem,
 } from ".";
+import {} from "./work-orders";
 
 export class GameSystems {
   private readonly astronomy: AstronomySystem;
-  private readonly buildings: BuildingSystem;
-  private readonly crafting: CraftingSystem;
   private readonly effects: EffectsSystem;
   private readonly environment: EnvironmentSystem;
   private readonly fulfillment: FulfillmentSystem;
   private readonly lockToggle: LockToggleSystem;
   private readonly population: PopulationSystem;
-  private readonly research: ResearchSystem;
   private readonly resourceAmounts: ResourceAmountsSystem;
   private readonly resourceLimits: ResourceLimitsSystem;
   private readonly sections: SectionsSystem;
   private readonly time: TimeSystem;
+  private readonly workOrders: WorkOrdersSystem;
 
   constructor(admin: EntityAdmin) {
     this.astronomy = new AstronomySystem(admin);
-    this.buildings = new BuildingSystem(admin);
-    this.crafting = new CraftingSystem(admin);
     this.effects = new EffectsSystem(admin);
     this.environment = new EnvironmentSystem(admin);
     this.fulfillment = new FulfillmentSystem(admin);
     this.lockToggle = new LockToggleSystem(admin);
     this.population = new PopulationSystem(admin);
-    this.research = new ResearchSystem(admin);
     this.resourceAmounts = new ResourceAmountsSystem(admin);
     this.resourceLimits = new ResourceLimitsSystem(admin);
     this.sections = new SectionsSystem(admin);
     this.time = new TimeSystem(admin);
+    this.workOrders = new WorkOrdersSystem(admin);
   }
 
   init(): void {
@@ -62,10 +57,8 @@ export class GameSystems {
     this.astronomy.update();
     this.environment.update();
 
-    // Handle orders.
-    this.research.update();
-    this.buildings.update();
-    this.crafting.update();
+    // Handle work orders.
+    this.workOrders.update();
 
     // Update effects pool.
     this.effects.update();

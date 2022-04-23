@@ -18,7 +18,7 @@ type BuildingStore = NonNullable<SaveState["buildings"]>[BuildingId];
 export class BuildingEntity extends Entity<BuildingId> implements Watched {
   readonly state: BuildingState;
 
-  status: OrderStatus;
+  orderStatus: OrderStatus;
 
   constructor(readonly meta: BuildingMetadataType) {
     super(meta.id);
@@ -28,7 +28,7 @@ export class BuildingEntity extends Entity<BuildingId> implements Watched {
       level: 0,
     });
 
-    this.status = OrderStatus.EMPTY;
+    this.orderStatus = OrderStatus.EMPTY;
   }
 
   watch(watcher: Watcher): void {

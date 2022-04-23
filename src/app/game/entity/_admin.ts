@@ -44,9 +44,11 @@ import {
   TechsPool,
   TechEntity,
   TimeEntity,
+  TransactionsEntity,
 } from ".";
 
 export class EntityAdmin {
+  // pooled entities
   private readonly _booleans: BooleanEffectsPool;
   private readonly _buildings: BuildingsPool;
   private readonly _fulfillments: FulfillmentsPool;
@@ -59,12 +61,18 @@ export class EntityAdmin {
   private readonly _stockpiles: StockpilesPool;
   private readonly _techs: TechsPool;
 
+  // singleton entities
   private readonly _effectTree: EffectTreeEntity;
   private readonly _environment: EnvironmentEntity;
-  private readonly _history: HistoryEntity;
   private readonly _player: PlayerEntity;
-  private readonly _prng: PrngEntity;
   private readonly _time: TimeEntity;
+  private readonly _prng: PrngEntity;
+
+  // channels
+  private readonly _history: HistoryEntity;
+
+  // other
+  private readonly _transactions: TransactionsEntity;
 
   constructor(private readonly watcher: EntityWatcher) {
     this._booleans = new BooleanEffectsPool(this.watcher.pooled("booleans"));
@@ -90,12 +98,14 @@ export class EntityAdmin {
     this._player = new PlayerEntity();
     this._player.watch(this.watcher.pooled());
 
-    this._prng = new PrngEntity();
-
     this._time = new TimeEntity();
     this._time.watch(this.watcher.pooled());
 
     this._history = new HistoryEntity(this.watcher.buffered("history"));
+
+    // entities without watch logic:
+    this._prng = new PrngEntity();
+    this._transactions = new TransactionsEntity();
   }
 
   loadState(state: SaveState): void {
@@ -218,6 +228,10 @@ export class EntityAdmin {
 
   time(): TimeEntity {
     return this._time;
+  }
+
+  transactions(): TransactionsEntity {
+    return this._transactions;
   }
 
   history(): HistoryEntity {

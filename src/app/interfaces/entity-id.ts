@@ -17,7 +17,8 @@ export type SingletonEntityId =
   | "player"
   | "prng"
   | "time"
-  | "logs";
+  | "logs"
+  | "transactions";
 
 export type FulfillmentId = BuildingId | RecipeId | TechId;
 

@@ -1,4 +1,4 @@
-import { label } from "@/app/state";
+import { label, ResourceMap } from "@/app/state";
 import { System } from ".";
 
 export class AstronomySystem extends System {
@@ -13,14 +13,7 @@ export class AstronomySystem extends System {
         environment.observedSky = false;
         observe.amount = 0;
 
-        // calculate reward
-        const amount = this.admin
-          .number("astronomy.rare-event.reward")
-          .getOr(25);
-        this.admin.resource("science").delta.addDebit(amount);
-
-        // show in history log
-        this.observedRareEvent(amount);
+        this.observedRareEvent();
       } else if (ticks.wholeTicks > 0) {
         // decrease existing counter on whole ticks only
         observe.amount--;
@@ -61,28 +54,54 @@ export class AstronomySystem extends System {
       const chance = 1 / 1000;
       const r = this.admin.prng().astronomy();
       if (r < chance) {
-        const mineralsRatio = this.admin.number("minerals.ratio").getOr(0);
-        const mineralsReward = 50 + 25 * mineralsRatio;
-        this.admin.resource("minerals").delta.addDebit(mineralsReward);
-
-        this.minedFallenMeteor(mineralsReward);
+        this.minedFallenMeteor();
       }
     }
   }
 
-  private observedRareEvent(scienceReward: number) {
-    this.admin.history().push(
-      label("astronomy.observed-sky-reward", {
-        scienceAmount: scienceReward,
-      }),
-    );
+  private observedRareEvent() {
+    // calculate reward
+    const rewardAmount = this.admin
+      .number("astronomy.rare-event.reward")
+      .getOr(25);
+    this.admin.transactions().enqueue({
+      debits: ResourceMap.fromObject({ science: rewardAmount }),
+      onFulfilled: (amounts) => {
+        const scienceAmount = amounts.get("science") ?? 0;
+        if (scienceAmount > 0) {
+          this.admin.history().push(
+            label("astronomy.observed-sky-reward.gained", {
+              scienceAmount,
+            }),
+          );
+        } else {
+          this.admin
+            .history()
+            .push(label("astronomy.observed-sky-reward.capped"));
+        }
+      },
+    });
   }
 
-  private minedFallenMeteor(mineralsReward: number) {
-    this.admin.history().push(
-      label("astronomy.fallen-meteor-reward", {
-        mineralsAmount: mineralsReward,
-      }),
-    );
+  private minedFallenMeteor() {
+    const mineralsRatio = this.admin.number("minerals.ratio").getOr(0);
+    const rewardAmount = 50 + 25 * mineralsRatio;
+    this.admin.transactions().enqueue({
+      debits: ResourceMap.fromObject({ minerals: rewardAmount }),
+      onFulfilled: (fulfillment) => {
+        const mineralsAmount = fulfillment.get("minerals") ?? 0;
+        if (mineralsAmount > 0) {
+          this.admin.history().push(
+            label("astronomy.fallen-meteor-reward.gained-minerals", {
+              mineralsAmount,
+            }),
+          );
+        } else {
+          this.admin
+            .history()
+            .push(label("astronomy.fallen-meteor-reward.capped"));
+        }
+      },
+    });
   }
 }

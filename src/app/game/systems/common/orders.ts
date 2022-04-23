@@ -12,26 +12,30 @@ export type OrderContext<T> = {
   order: T;
 };
 
-export type OrderApplierFn<T> = (ctx: OrderContext<T>) => OrderResult;
-export type OrderCtxFn<T> = (ctx: OrderContext<T>) => void;
+type OrderHandlersType<T> = {
+  apply: ApplyOrderFn<T>;
+  success?: OrderCtxFn<T> | undefined;
+  failure?: OrderCtxFn<T> | undefined;
+};
+
+type ApplyOrderFn<T> = (ctx: OrderContext<T>) => OrderResult;
+type OrderCtxFn<T> = (ctx: OrderContext<T>) => void;
 
 export class OrderHandler<T> {
   private readonly queue = new Queue<T>();
 
-  constructor(readonly admin: EntityAdmin) {}
+  constructor(private readonly handlers: OrderHandlersType<T>) {}
 
-  fulfill(order: T): void {
+  enqueue(order: T): void {
     this.queue.enqueue(order);
   }
 
-  consume(handlers: {
-    pipeline: OrderApplierFn<T>[];
-    success?: OrderCtxFn<T> | undefined;
-    failure?: OrderCtxFn<T> | undefined;
-  }): void {
-    const ambient = new DeltaSet();
+  consume(admin: EntityAdmin): void {
+    const { apply, success, failure } = this.handlers;
+
     // Initialize the ambient deltas.
-    for (const { id, delta } of this.admin.resources()) {
+    const ambient = new DeltaSet();
+    for (const { id, delta } of admin.resources()) {
       ambient.addDelta(id, delta);
     }
 
@@ -40,25 +44,25 @@ export class OrderHandler<T> {
       // If the order fails, we can safely discard the whole layer.
       const transaction = new DeltaSet(ambient);
 
-      const context = { admin: this.admin, transaction, order };
-      const result = this.runPipeline(context, handlers.pipeline);
+      const context = { admin: admin, transaction, order };
+      const result = this.applyOrder(context, apply);
 
       if (result.success) {
         // Apply changes to base resource deltas.
         for (const [id, delta] of transaction.deltas()) {
-          const resource = this.admin.resource(id);
+          const resource = admin.resource(id);
           resource.delta.addDelta(delta);
         }
 
         transaction.merge(true);
 
-        if (handlers.success) {
-          handlers.success(context);
+        if (success) {
+          success(context);
         }
       } else {
         // TODO: Send error message back to presenters.
-        if (handlers.failure) {
-          handlers.failure(context);
+        if (failure) {
+          failure(context);
         }
       }
     }
@@ -66,6 +70,7 @@ export class OrderHandler<T> {
     // Clear ambient values.
     ambient.clear();
   }
+
   private *consumeOrders(): IterableIterator<T> {
     let order;
     while ((order = this.queue.dequeue())) {
@@ -73,18 +78,12 @@ export class OrderHandler<T> {
     }
   }
 
-  private runPipeline(
+  private applyOrder(
     context: OrderContext<T>,
-    pipeline: OrderApplierFn<T>[],
+    applier: ApplyOrderFn<T>,
   ): OrderResult {
     try {
-      for (const applier of pipeline) {
-        const result = applier(context);
-        if (!result.success) {
-          return result;
-        }
-      }
-      return { success: true };
+      return applier(context);
     } catch (error) {
       console.log(error);
       if (typeof error === "string") {

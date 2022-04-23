@@ -56,8 +56,8 @@ export class Dispatcher implements IDispatcher {
     switch (intent.id) {
       case "buy-building": {
         const entity = this.admin.building(intent.building);
-        if (entity.status === OrderStatus.EMPTY) {
-          entity.status = OrderStatus.ORDERED;
+        if (entity.orderStatus === OrderStatus.EMPTY) {
+          entity.orderStatus = OrderStatus.ORDERED;
         }
         break;
       }
@@ -68,8 +68,8 @@ export class Dispatcher implements IDispatcher {
     switch (intent.id) {
       case "research-tech": {
         const entity = this.admin.tech(intent.tech);
-        if (entity.status === OrderStatus.EMPTY) {
-          entity.status = OrderStatus.ORDERED;
+        if (entity.orderStatus === OrderStatus.EMPTY) {
+          entity.orderStatus = OrderStatus.ORDERED;
         }
       }
     }
@@ -92,8 +92,8 @@ export class Dispatcher implements IDispatcher {
 
   private handleWorkshop(intent: WorkshopIntent): void {
     const entity = this.admin.recipe(intent.recipe);
-    if (entity.status === OrderStatus.EMPTY) {
-      entity.status = OrderStatus.ORDERED;
+    if (entity.orderStatus === OrderStatus.EMPTY) {
+      entity.orderStatus = OrderStatus.ORDERED;
     }
   }
 }

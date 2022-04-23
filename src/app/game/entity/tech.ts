@@ -14,7 +14,8 @@ import { SaveState } from "@/app/store";
 
 export class TechEntity extends Entity<TechId> implements Watched {
   readonly state: TechState;
-  status: OrderStatus;
+
+  orderStatus: OrderStatus;
 
   constructor(meta: TechMetadataType) {
     super(meta.id);
@@ -24,7 +25,7 @@ export class TechEntity extends Entity<TechId> implements Watched {
       researched: false,
     });
 
-    this.status = OrderStatus.EMPTY;
+    this.orderStatus = OrderStatus.EMPTY;
   }
 
   watch(watcher: Watcher): void {
