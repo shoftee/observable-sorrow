@@ -7,7 +7,7 @@ set +o history
 set -e
 
 # test
-npm run unit
+npm run test
 
 # build
 npm run build
