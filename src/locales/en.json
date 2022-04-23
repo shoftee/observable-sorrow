@@ -261,6 +261,7 @@
 
   "astronomy": {
     "rare-event": "A rare astronomical event occurred in the sky",
-    "science-reward": "Gained {amount} science!"
+    "observed-sky-reward": "Observed rare event! Gained {scienceAmount} science!",
+    "fallen-meteor-reward": "A meteor fell near the village! Gained {mineralsAmount} minerals!"
   }
 }

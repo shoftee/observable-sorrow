@@ -19,7 +19,7 @@ export class AstronomySystem extends System {
         this.admin.resource("science").delta.addDebit(amount);
 
         // show in history log
-        this.gainedScience(amount);
+        this.observedRareEvent(amount);
       } else if (ticks.wholeTicks > 0) {
         // decrease existing counter on whole ticks only
         observe.amount--;
@@ -28,28 +28,60 @@ export class AstronomySystem extends System {
 
     if (days.wholeTicks > 0) {
       // new events only spawn once a day
-      this.handleRareEvent();
+      this.handleCelestialEvents();
     }
   }
 
-  private gainedScience(amount: number) {
-    this.admin.history().push(label("astronomy.science-reward", { amount }));
-  }
-
-  private handleRareEvent() {
-    const unlocked = this.admin.boolean("unlock.section.science").state;
-    if (unlocked.value !== true) {
-      // these only occur after science has been unlocked
+  private handleCelestialEvents() {
+    const scienceUnlocked =
+      this.admin.boolean("unlock.section.science").state.value ?? false;
+    // these only occur after science is unlocked
+    if (!scienceUnlocked) {
       return;
     }
 
-    const chance = 1 / 400; // ~ once per game calendar year
-    const r = this.admin.prng().astronomy();
-    if (r < chance) {
-      this.admin.history().push(label("astronomy.rare-event"));
+    // rare event in the sky
+    {
+      // base chance is 0.25%, around once per game calendar year
+      const chance = 1 / 400;
+      const r = this.admin.prng().astronomy();
+      if (r < chance) {
+        this.admin.history().push(label("astronomy.rare-event"));
 
-      const observe = this.admin.stockpile("observe-sky").state;
-      observe.amount = 300; // 60 seconds
+        const observe = this.admin.stockpile("observe-sky").state;
+        observe.amount = 300; // 60 seconds
+      }
     }
+
+    // meteor fall
+    if (this.admin.tech("mining").state.researched) {
+      // base chance is 0.1%
+      const chance = 1 / 1000;
+      const r = this.admin.prng().astronomy();
+      if (r < chance) {
+        const mineralsRatio =
+          this.admin.number("minerals.ratio").state.value ?? 0;
+        const mineralsReward = 50 + 25 * mineralsRatio;
+        this.admin.resource("minerals").delta.addDebit(mineralsReward);
+
+        this.minedFallenMeteor(mineralsReward);
+      }
+    }
+  }
+
+  private observedRareEvent(scienceReward: number) {
+    this.admin.history().push(
+      label("astronomy.observed-sky-reward", {
+        scienceAmount: scienceReward,
+      }),
+    );
+  }
+
+  private minedFallenMeteor(mineralsReward: number) {
+    this.admin.history().push(
+      label("astronomy.fallen-meteor-reward", {
+        mineralsAmount: mineralsReward,
+      }),
+    );
   }
 }
