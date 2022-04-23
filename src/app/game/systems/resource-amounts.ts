@@ -14,7 +14,7 @@ export class ResourceAmountsSystem extends System {
       for (const { meta, state } of this.admin.resources()) {
         const deltaEffect = meta.effects.delta;
         if (deltaEffect) {
-          state.change = this.admin.number(deltaEffect).get() ?? 0;
+          state.change = this.admin.number(deltaEffect).getOr(0);
         }
       }
     });

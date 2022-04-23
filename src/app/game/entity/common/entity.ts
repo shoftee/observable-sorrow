@@ -28,7 +28,7 @@ export abstract class ValueEntity<
   TId extends EntityId,
   TState,
 > extends Entity<TId> {
-  readonly state: { value: TState | undefined };
+  private readonly state: { value: TState | undefined };
 
   constructor(readonly id: TId) {
     super(id);
@@ -42,6 +42,10 @@ export abstract class ValueEntity<
 
   get(): TState | undefined {
     return this.state.value;
+  }
+
+  getOr(fallback: TState): TState {
+    return this.state.value ?? fallback;
   }
 
   set(value: TState | undefined): void {

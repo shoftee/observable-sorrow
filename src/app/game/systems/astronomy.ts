@@ -14,8 +14,9 @@ export class AstronomySystem extends System {
         observe.amount = 0;
 
         // calculate reward
-        const reward = this.admin.number("astronomy.rare-event.reward").state;
-        const amount = reward.value ?? 25;
+        const amount = this.admin
+          .number("astronomy.rare-event.reward")
+          .getOr(25);
         this.admin.resource("science").delta.addDebit(amount);
 
         // show in history log
@@ -33,8 +34,9 @@ export class AstronomySystem extends System {
   }
 
   private handleCelestialEvents() {
-    const scienceUnlocked =
-      this.admin.boolean("unlock.section.science").state.value ?? false;
+    const scienceUnlocked = this.admin
+      .boolean("unlock.section.science")
+      .getOr(false);
     // these only occur after science is unlocked
     if (!scienceUnlocked) {
       return;
@@ -59,8 +61,7 @@ export class AstronomySystem extends System {
       const chance = 1 / 1000;
       const r = this.admin.prng().astronomy();
       if (r < chance) {
-        const mineralsRatio =
-          this.admin.number("minerals.ratio").state.value ?? 0;
+        const mineralsRatio = this.admin.number("minerals.ratio").getOr(0);
         const mineralsReward = 50 + 25 * mineralsRatio;
         this.admin.resource("minerals").delta.addDebit(mineralsReward);
 

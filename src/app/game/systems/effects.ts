@@ -26,9 +26,9 @@ export class EffectsSystem extends System {
       this.admin.booleans().map((m) => m.id),
       {
         expr: (id) => BooleanExprs[id],
-        get: (id) => this.admin.boolean(id).state.value ?? false,
+        get: (id) => this.admin.boolean(id).getOr(false),
         set: (id, v: boolean) => {
-          this.admin.boolean(id).state.value = v;
+          this.admin.boolean(id).set(v);
         },
       },
     );
@@ -36,9 +36,9 @@ export class EffectsSystem extends System {
       this.admin.numbers().map((m) => m.id),
       {
         expr: (id) => NumberExprs[id],
-        get: (id) => this.admin.number(id).state.value,
+        get: (id) => this.admin.number(id).get(),
         set: (id, v: number | undefined) => {
-          this.admin.number(id).state.value = v;
+          this.admin.number(id).set(v);
         },
         addTreeNode: (parent, child) => {
           getOrAdd(

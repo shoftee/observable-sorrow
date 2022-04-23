@@ -64,8 +64,7 @@ export class LockToggleSystem extends System {
       return;
     }
 
-    const effect = this.admin.boolean(unlockEffect);
-    state.unlocked = effect.state.value ?? false;
+    state.unlocked = this.admin.boolean(unlockEffect).getOr(false);
   }
 
   private updateResourceUnlocked(resource: ResourceEntity): void {
@@ -105,8 +104,7 @@ export class LockToggleSystem extends System {
       const effect = unlock.unlockEffect;
       if (effect !== undefined) {
         // building is gated behind an effect
-        const entity = this.admin.boolean(effect);
-        if (!entity.state.value) {
+        if (!this.admin.boolean(effect).getOr(false)) {
           // effect not satisfied, keep locked
           return;
         }
