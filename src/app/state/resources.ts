@@ -5,12 +5,6 @@ export enum UnlockMode {
   FirstCapacity = 1,
 }
 
-export enum Flag {
-  RelockWhenDepleted,
-}
-
-type Flags = Partial<{ [key in keyof typeof Flag]: boolean }>;
-
 type ResourceEffectsType = Readonly<{
   delta?: DeltaEffectId;
   limit?: LimitEffectId;
@@ -21,7 +15,6 @@ export type ResourceMetadataType = Readonly<{
   label: string;
   unlockMode?: UnlockMode;
   effects: ResourceEffectsType;
-  flags: Flags;
 }>;
 
 export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
@@ -32,7 +25,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
       delta: "catnip.delta",
       limit: "catnip.limit",
     },
-    flags: {},
   },
   wood: {
     id: "wood",
@@ -41,7 +33,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
       limit: "wood.limit",
       delta: "wood.delta",
     },
-    flags: {},
   },
   minerals: {
     id: "minerals",
@@ -50,7 +41,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
       limit: "minerals.limit",
       delta: "minerals.delta",
     },
-    flags: {},
   },
   catpower: {
     id: "catpower",
@@ -59,7 +49,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
       delta: "catpower.delta",
       limit: "catpower.limit",
     },
-    flags: {},
   },
   science: {
     id: "science",
@@ -68,7 +57,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
       delta: "science.delta",
       limit: "science.limit",
     },
-    flags: {},
   },
   kittens: {
     id: "kittens",
@@ -77,7 +65,6 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     effects: {
       limit: "kittens.limit",
     },
-    flags: {},
   },
 };
 

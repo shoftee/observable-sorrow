@@ -1,7 +1,7 @@
 import { watchSyncEffect } from "vue";
 
 import { BooleanEffectId } from "@/app/interfaces";
-import { Flag, Meta, UnlockMode } from "@/app/state";
+import { Meta, UnlockMode } from "@/app/state";
 
 import { System } from ".";
 import { ResourceEntity, BuildingEntity } from "../entity";
@@ -70,23 +70,16 @@ export class LockToggleSystem extends System {
   private updateResourceUnlocked(resource: ResourceEntity): void {
     const { state, meta } = resource;
 
-    const isUnlocked = state.unlocked;
-    if (!isUnlocked) {
+    if (!state.unlocked) {
       const unlockMode = meta.unlockMode ?? UnlockMode.FirstQuantity;
       switch (unlockMode) {
         case UnlockMode.FirstQuantity:
           if (state.amount > 0) state.unlocked = true;
           break;
         case UnlockMode.FirstCapacity: {
-          const capacity = state.capacity;
-          if (capacity !== undefined && capacity > 0) state.unlocked = true;
+          if (state.capacity ?? 0 > 0) state.unlocked = true;
           break;
         }
-      }
-    } else {
-      // some resources re-lock when they are depleted
-      if (isUnlocked && meta.flags[Flag.RelockWhenDepleted]) {
-        state.unlocked = false;
       }
     }
   }
