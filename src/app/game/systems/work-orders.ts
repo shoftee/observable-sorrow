@@ -1,5 +1,5 @@
 import { ResourceId } from "@/app/interfaces";
-import { ResourceMap, TransactionSpec } from "@/app/state";
+import { ResourceMap, RewardSpec } from "@/app/state";
 import { OrderContext as OrderCtx, OrderHandler, OrderResult, System } from ".";
 import {
   BuildingEntity,
@@ -8,12 +8,12 @@ import {
   TechEntity,
 } from "../entity";
 
-type TransactionOrder = TransactionSpec & {
+type RewardOrder = RewardSpec & {
   fulfillment: ResourceMap;
 };
 
 export class WorkOrdersSystem extends System {
-  private readonly transactions = new OrderHandler<TransactionOrder>({
+  private readonly transactions = new OrderHandler<RewardOrder>({
     apply: applyTransactionOrder,
     success: ({ order }) => order.onFulfilled(order.fulfillment),
   });
@@ -35,7 +35,7 @@ export class WorkOrdersSystem extends System {
 
   update(): void {
     // process free-form transactions
-    for (const tx of this.admin.transactions().all()) {
+    for (const tx of this.admin.rewards().all()) {
       this.transactions.enqueue({ ...tx, fulfillment: new ResourceMap() });
     }
     this.transactions.consume(this.admin);
@@ -68,9 +68,7 @@ export class WorkOrdersSystem extends System {
   }
 }
 
-function applyTransactionOrder(
-  context: OrderCtx<TransactionOrder>,
-): OrderResult {
+function applyTransactionOrder(context: OrderCtx<RewardOrder>): OrderResult {
   const { order, transaction, admin } = context;
 
   // Determine if credits put us in the negatives.

@@ -64,7 +64,7 @@ export class AstronomySystem extends System {
     const rewardAmount = this.admin
       .number("astronomy.rare-event.reward")
       .getOr(25);
-    this.admin.transactions().enqueue({
+    this.admin.rewards().enqueue({
       debits: ResourceMap.fromObject({ science: rewardAmount }),
       onFulfilled: (amounts) => {
         const scienceAmount = amounts.get("science") ?? 0;
@@ -86,7 +86,7 @@ export class AstronomySystem extends System {
   private minedFallenMeteor() {
     const mineralsRatio = this.admin.number("minerals.ratio").getOr(0);
     const rewardAmount = 50 + 25 * mineralsRatio;
-    this.admin.transactions().enqueue({
+    this.admin.rewards().enqueue({
       debits: ResourceMap.fromObject({ minerals: rewardAmount }),
       onFulfilled: (fulfillment) => {
         const mineralsAmount = fulfillment.get("minerals") ?? 0;

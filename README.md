@@ -30,9 +30,13 @@ yarn lint
 yarn test
 ```
 
-### Game dev tools
+### Customize configuration
 
-To enable the developer tools for observable-sorrow, open the browser console and run:
+See [Configuration Reference](https://cli.vuejs.org/config/).
+
+## Game dev tools
+
+To enable the developer tools for `observable-sorrow`, open the browser console and run:
 
 ```
 __OS_DEVTOOLS__.on = true
@@ -42,6 +46,15 @@ Once this flag is set, a button will appear in the bottom-end corner of the page
 
 The panel can also be opened by pressing `` ` `` while focus is in the page.
 
-### Customize configuration
+## Roadmap
 
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- Architecture
+
+  - A real ECS implementation as much as JavaScript will allow it...
+  - `SystemSet` capability for better system organization.
+  - Rework all systems to receive only the parts of EntityAdmin they need.
+  - Rework all systems to not need reactivity - will probably speed up simulation _a lot_.
+
+- Gameplay
+
+  - `Send hunters`

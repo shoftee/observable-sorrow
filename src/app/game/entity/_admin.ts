@@ -36,6 +36,7 @@ import {
   RecipesPool,
   ResourceEntity,
   ResourcesPool,
+  RewardsEntity,
   Saved,
   SectionEntity,
   SectionsPool,
@@ -44,7 +45,6 @@ import {
   TechsPool,
   TechEntity,
   TimeEntity,
-  TransactionsEntity,
 } from ".";
 
 export class EntityAdmin {
@@ -72,7 +72,7 @@ export class EntityAdmin {
   private readonly _history: HistoryEntity;
 
   // other
-  private readonly _transactions: TransactionsEntity;
+  private readonly _transactions: RewardsEntity;
 
   constructor(private readonly watcher: EntityWatcher) {
     this._booleans = new BooleanEffectsPool(this.watcher.pooled("booleans"));
@@ -105,7 +105,7 @@ export class EntityAdmin {
 
     // entities without watch logic:
     this._prng = new PrngEntity();
-    this._transactions = new TransactionsEntity();
+    this._transactions = new RewardsEntity();
   }
 
   loadState(state: SaveState): void {
@@ -230,7 +230,7 @@ export class EntityAdmin {
     return this._time;
   }
 
-  transactions(): TransactionsEntity {
+  rewards(): RewardsEntity {
     return this._transactions;
   }
 

@@ -1,6 +1,6 @@
 import { ResourceMap } from ".";
 
-export type TransactionSpec = {
+export type RewardSpec = {
   readonly credits?: ResourceMap;
   readonly debits?: ResourceMap;
   onFulfilled: (fulfillment: ResourceMap) => void;
