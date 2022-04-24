@@ -53,8 +53,8 @@ export class Timer {
   /** Fractional ticks since last update */
   delta = 0;
 
-  /** How many whole ticks passed since last delta */
-  wholeTicks = 0;
+  /** Whether this time step passed an integer tick */
+  isNewTick = false;
 
   /** How many game ticks it takes to progress the timer */
   period = 1;

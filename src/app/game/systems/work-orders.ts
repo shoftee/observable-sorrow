@@ -41,7 +41,7 @@ export class WorkOrdersSystem extends System {
     this.transactions.consume(this.admin);
 
     // process crafting, research, construction
-    const isNewTick = this.admin.time().ticks.wholeTicks > 0;
+    const isNewTick = this.admin.time().ticks.isNewTick;
     this.processOrdered(this.crafting, this.admin.recipes(), isNewTick);
     this.processOrdered(this.research, this.admin.techs(), isNewTick);
     this.processOrdered(this.construction, this.admin.buildings(), isNewTick);

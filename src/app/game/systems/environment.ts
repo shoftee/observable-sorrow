@@ -39,7 +39,7 @@ export class EnvironmentSystem extends System {
     let currentDay = environment.day;
 
     const { days } = this.admin.time();
-    if (days.wholeTicks > 0) {
+    if (days.isNewTick) {
       currentDay += 1;
 
       if (currentDay >= TimeConstants.DaysPerSeason) {

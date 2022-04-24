@@ -24,7 +24,8 @@ export class TimeSystem extends System {
       const lastAbsolute = timer.absolute;
       timer.absolute = round(timer.absolute + timer.delta, 3);
 
-      timer.wholeTicks = Math.floor(timer.absolute) - Math.floor(lastAbsolute);
+      timer.isNewTick =
+        Math.floor(timer.absolute) - Math.floor(lastAbsolute) > 0;
     }
   }
 }

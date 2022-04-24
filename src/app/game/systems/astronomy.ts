@@ -14,13 +14,13 @@ export class AstronomySystem extends System {
         observe.amount = 0;
 
         this.observedRareEvent();
-      } else if (ticks.wholeTicks > 0) {
+      } else if (ticks.isNewTick) {
         // decrease existing counter on whole ticks only
         observe.amount--;
       }
     }
 
-    if (days.wholeTicks > 0) {
+    if (days.isNewTick) {
       // new events only spawn once a day
       this.handleCelestialEvents();
     }
