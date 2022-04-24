@@ -50,6 +50,7 @@ The panel can also be opened by pressing `` ` `` while focus is in the page.
 
 - Architecture
 
+  - Generic event queue system (WIP)
   - A real ECS implementation as much as JavaScript will allow it...
   - `SystemSet` capability for better system organization.
   - Rework all systems to receive only the parts of EntityAdmin they need.

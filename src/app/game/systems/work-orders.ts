@@ -59,8 +59,11 @@ export class WorkOrdersSystem extends System {
 
         // NOTE: Order will be complete by the end of the update so we can set it to READY here.
         entity.orderStatus = OrderStatus.READY;
-      } else if (isNewTick && entity.orderStatus === OrderStatus.READY) {
-        entity.orderStatus = OrderStatus.EMPTY;
+      } else if (entity.orderStatus === OrderStatus.READY) {
+        // Reset status only when tick is complete.
+        if (isNewTick) {
+          entity.orderStatus = OrderStatus.EMPTY;
+        }
       }
     }
 

@@ -7,6 +7,7 @@ import {
   SocietyIntent,
   WorkshopIntent,
 } from "@/app/interfaces";
+import { ResourceMap } from "@/app/state";
 
 import { EntityAdmin, OrderStatus } from "../entity";
 
@@ -38,9 +39,12 @@ export class Dispatcher implements IDispatcher {
   private handleBonfire(intent: BonfireIntent): void {
     switch (intent.id) {
       case "gather-catnip":
-        this.admin
-          .resource("catnip")
-          .delta.addDebit(this.admin.player().state.gatherCatnip);
+        this.admin.rewards().enqueue({
+          debits: ResourceMap.fromObject({
+            catnip: this.admin.player().state.gatherCatnip,
+          }),
+          onFulfilled: () => ({}),
+        });
         break;
 
       case "observe-sky": {
