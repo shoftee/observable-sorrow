@@ -3,10 +3,10 @@ import { all, any, count } from "./collections";
 const TrueFn = (_: unknown) => true;
 
 export class Enumerable<T> implements Iterable<T> {
-  constructor(private readonly iterator: Iterator<T>) {}
+  constructor(private readonly iterable: Iterable<T>) {}
 
-  [Symbol.iterator](): Iterator<T> {
-    return this.iterator;
+  *[Symbol.iterator](): Iterator<T> {
+    yield* this.iterable;
   }
 
   toArray(): T[] {
@@ -59,7 +59,7 @@ export class Enumerable<T> implements Iterable<T> {
   }
 
   first(): T {
-    for (const item of this.take(1)) {
+    for (const item of this) {
       return item;
     }
     throw new Error(`Expected at least one item but iterable was empty.`);
@@ -91,6 +91,12 @@ export class Enumerable<T> implements Iterable<T> {
     );
   }
 
+  filterMap<V>(
+    selector: (item: T) => V | undefined,
+  ): Enumerable<Exclude<V, undefined>> {
+    return this.map(selector).defined();
+  }
+
   defined(): Enumerable<Exclude<T, undefined>> {
     const that = this as Iterable<T>;
     return new Enumerable(
@@ -116,18 +122,8 @@ export class Enumerable<T> implements Iterable<T> {
   }
 }
 
-export function asEnumerable<T>(iterable: Iterable<T>): Enumerable<T> {
-  function* iterator() {
-    for (const item of iterable) {
-      yield item;
-    }
-  }
-
-  return new Enumerable(iterator());
-}
-
 export function fromObject<K extends string, V>(
   o: Record<string, unknown>,
 ): Enumerable<[K, V]> {
-  return asEnumerable(Object.entries(o)).map(([k, v]) => [k as K, v as V]);
+  return new Enumerable(Object.entries(o)).map(([k, v]) => [k as K, v as V]);
 }

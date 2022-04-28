@@ -38,7 +38,7 @@ import {
   TimeState,
 } from "@/app/state";
 import { getOrAdd } from "@/app/utils/collections";
-import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
+import { Enumerable } from "@/app/utils/enumerable";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
@@ -182,7 +182,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   buildings(): Enumerable<[BuildingId, BuildingState]> {
-    return asEnumerable(this.pools.buildings.entries());
+    return new Enumerable(this.pools.buildings.entries());
   }
 
   building(id: BuildingId): BuildingState {
@@ -194,7 +194,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   jobs(): Enumerable<[JobId, JobState]> {
-    return asEnumerable(this.pools.jobs.entries());
+    return new Enumerable(this.pools.jobs.entries());
   }
 
   job(id: JobId): JobState {
@@ -206,7 +206,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   pops(): Enumerable<[PopId, PopState]> {
-    return asEnumerable(this.pools.pops.entries());
+    return new Enumerable(this.pools.pops.entries());
   }
 
   recipe(id: RecipeId): RecipeState {
@@ -218,7 +218,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   sections(): Enumerable<[SectionId, SectionState]> {
-    return asEnumerable(this.pools.sections.entries());
+    return new Enumerable(this.pools.sections.entries());
   }
 
   section(id: SectionId): SectionState {
@@ -230,7 +230,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
   }
 
   techs(): Enumerable<TechId> {
-    return asEnumerable(this.pools.techs.keys());
+    return new Enumerable(this.pools.techs.keys());
   }
 
   tech(id: TechId): TechState {

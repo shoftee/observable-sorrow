@@ -2,7 +2,7 @@ import { reactive } from "vue";
 
 import { EntityId, PoolId } from "@/app/interfaces";
 import { SaveState } from "@/app/store";
-import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
+import { Enumerable } from "@/app/utils/enumerable";
 
 import { Watcher } from "..";
 
@@ -82,7 +82,7 @@ export abstract class EntityPool<
   }
 
   enumerate(): Enumerable<TEntity> {
-    return asEnumerable(this.pool.values());
+    return new Enumerable(this.pool.values());
   }
 
   get size(): number {

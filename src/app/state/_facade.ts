@@ -30,15 +30,15 @@ import {
   WeatherMetadata,
   WeatherMetadataType,
 } from "@/app/state";
-import { asEnumerable, Enumerable } from "@/app/utils/enumerable";
+import { Enumerable } from "@/app/utils/enumerable";
 
 export const Meta = {
   bonfireItems(): Enumerable<BonfireItemId> {
-    return asEnumerable(BonfireItems);
+    return new Enumerable(BonfireItems);
   },
 
   buildings(): Enumerable<BuildingMetadataType> {
-    return asEnumerable(Object.values(BuildingMetadata));
+    return new Enumerable(Object.values(BuildingMetadata));
   },
 
   building(id: BuildingId): BuildingMetadataType {
@@ -50,7 +50,7 @@ export const Meta = {
   },
 
   jobs(): Enumerable<JobMetadataType> {
-    return asEnumerable(Object.values(JobMetadata));
+    return new Enumerable(Object.values(JobMetadata));
   },
 
   job(id: JobId): JobMetadataType {
@@ -58,11 +58,11 @@ export const Meta = {
   },
 
   recipes(): Enumerable<RecipeMetadataType> {
-    return asEnumerable(Object.values(RecipeMetadata));
+    return new Enumerable(Object.values(RecipeMetadata));
   },
 
   resources(): Enumerable<ResourceMetadataType> {
-    return asEnumerable(Object.values(ResourceMetadata));
+    return new Enumerable(Object.values(ResourceMetadata));
   },
 
   resource(id: ResourceId): ResourceMetadataType {
@@ -74,7 +74,7 @@ export const Meta = {
   },
 
   sections(): Enumerable<SectionMetadataType> {
-    return asEnumerable(Object.values(SectionsMetadata));
+    return new Enumerable(Object.values(SectionsMetadata));
   },
 
   section(id: SectionId): SectionMetadataType {
@@ -82,7 +82,7 @@ export const Meta = {
   },
 
   techs(): Enumerable<TechMetadataType> {
-    return asEnumerable(Object.values(TechMetadata));
+    return new Enumerable(Object.values(TechMetadata));
   },
 
   tech(id: TechId): TechMetadataType {
