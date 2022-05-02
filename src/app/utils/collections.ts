@@ -147,6 +147,10 @@ export class TypeSet<V> {
   has<T extends V>(ctor: Constructor<T>): boolean {
     return this.map.has(ctor);
   }
+
+  *entries(): Iterable<[Constructor<V>, V]> {
+    yield* this.map.entries();
+  }
 }
 
 function getConstructorOf<O>(obj: O) {
