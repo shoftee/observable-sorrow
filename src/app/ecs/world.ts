@@ -1,30 +1,27 @@
-import { Constructor, getConstructorOf } from "@/app/utils/types";
-import { getOrAdd, TypeSet } from "@/app/utils/collections";
 import { Queue } from "queue-typescript";
 
-export const Type = Symbol("Type");
+import { Constructor, getConstructorOf } from "@/app/utils/types";
+import { TypeSet, Table } from "@/app/utils/collections";
 
-export const EntityType = Symbol("EntityType");
+import { WorldQuery } from "./query";
+
+export const EntityType = Symbol.for("Entity");
 export class Entity {
-  static readonly [Type] = EntityType;
-  [EntityType]: true;
+  [EntityType]: number;
 }
 
-export const ComponentType = Symbol("Component");
+export const ComponentType = Symbol.for("Component");
 export abstract class Component {
-  static readonly [Type] = ComponentType;
   protected [ComponentType]: true;
 }
 
-export const ResourceType = Symbol("Resource");
+export const ResourceType = Symbol.for("Resource");
 export abstract class Resource {
-  static readonly [Type] = ResourceType;
   protected [ResourceType]: true;
 }
 
-export const EventType = Symbol("Event");
+export const EventType = Symbol.for("Event");
 export abstract class Event {
-  static readonly [Type] = EventType;
   protected [EventType]: true;
 }
 
@@ -45,8 +42,10 @@ export class World {
   private readonly resources = new TypeSet<Resource>();
   private readonly eventQueues = new Map<Constructor<Event>, Queue<Event>>();
 
+  private newEntityId = 1;
+
   spawn(...components: Component[]): Entity {
-    const entity = Object.freeze(new Entity());
+    const entity = Object.freeze({ [EntityType]: this.newEntityId++ });
     this.entities.add(entity);
     this.insertComponents(entity, ...components);
     return entity;
@@ -107,41 +106,128 @@ export class World {
   }
 }
 
-class Table<Row, Column, Cell> {
-  static readonly EMPTY_ROW = new Map();
+type WorldCommand = (world: World) => void;
+type WorldQueryResult<T = unknown> = T extends WorldQuery<infer R> ? R : never;
 
-  private readonly table = new Map<Row, Map<Column, Cell>>();
+export class WorldState {
+  private generation = 0;
+  private readonly fetches = new Map<WorldQuery, FetchCache>();
 
-  cell(row: Row, column: Column): Cell | undefined {
-    const cellColumns = this.table.get(row);
-    return cellColumns?.get(column);
+  constructor(readonly world: World) {}
+
+  private readonly commands = new Queue<WorldCommand>();
+
+  spawn(...components: Component[]): Entity {
+    const entity = this.world.spawn(...components);
+
+    this.notifyChanged(entity);
+
+    return entity;
   }
 
-  row(row: Row): ReadonlyMap<Column, Cell> {
-    const cellColumns = this.table.get(row);
-    return cellColumns || Table.EMPTY_ROW;
+  despawn(entity: Entity): void {
+    this.world.despawn(entity);
+
+    this.notifyChanged(entity);
   }
 
-  add(row: Row, column: Column, setter: (exists: boolean) => Cell | undefined) {
-    const cellColumns = getOrAdd(this.table, row, () => new Map());
-    const newValue = setter(cellColumns.has(column));
-    cellColumns.set(column, newValue);
+  insertComponents(entity: Entity, ...components: Component[]): void {
+    this.world.insertComponents(entity, ...components);
+
+    this.notifyChanged(entity);
   }
 
-  removeCell(row: Row, column: Column): boolean {
-    const cellColumns = this.table.get(row);
-    if (cellColumns && cellColumns.delete(column) && cellColumns.size === 0) {
-      this.table.delete(row);
-      return true;
+  private notifyChanged(entity: Entity) {
+    const newGeneration = this.generation++;
+    const row = this.world.archetype(entity);
+    for (const [, fetch] of this.fetches) {
+      fetch.notify(newGeneration, entity, row);
     }
-    return false;
   }
 
-  removeRow(row: Row): boolean {
-    return this.table.delete(row);
+  addQuery(query: WorldQuery) {
+    if (this.fetches.has(query)) {
+      throw new Error("Query already registered.");
+    }
+
+    const fetch = new FetchCache(query);
+    this.fetches.set(query, fetch);
+    for (const [entity, row] of this.world.archetypes()) {
+      fetch.notify(this.generation, entity, row);
+    }
   }
 
-  *rows(): Iterable<[Row, ReadonlyMap<Column, Cell>]> {
-    yield* this.table;
+  fetchQuery<Q extends WorldQuery>(query: Q): Iterable<WorldQueryResult<Q>> {
+    const fetch = this.fetches.get(query);
+    if (fetch === undefined) {
+      throw new Error("Query is not registered.");
+    }
+    return fetch.results() as Iterable<WorldQueryResult<Q>>;
   }
+
+  insertResource<R extends Resource>(resource: R) {
+    this.world.insertResource(resource);
+  }
+
+  registerEvent<E extends Event>(ctor: Constructor<E>) {
+    this.world.registerEvent(ctor);
+  }
+
+  insertComponentsDeferred(entity: Entity, ...components: Component[]) {
+    this.commands.enqueue((world) =>
+      world.insertComponents(entity, ...components),
+    );
+  }
+
+  despawnDeferred(entity: Entity) {
+    this.commands.enqueue((world) => {
+      world.despawn(entity);
+    });
+  }
+
+  flushDeferred() {
+    let command;
+    while ((command = this.commands.dequeue())) {
+      command(this.world);
+    }
+  }
+}
+
+class FetchCache<F = unknown> {
+  private readonly descriptors = new Map<Entity, CachedQueryResult>();
+
+  constructor(private readonly query: WorldQuery<F>) {}
+
+  notify(generation: number, entity: Entity, archetype: Archetype) {
+    if (archetype.size === 0 || !this.query.match(archetype)) {
+      this.descriptors.delete(entity);
+    } else {
+      const result = this.descriptors.get(entity);
+      if (result !== undefined) {
+        if (result.generation !== generation) {
+          result.generation = generation;
+          result.archetype = archetype;
+        }
+      } else {
+        this.descriptors.set(
+          entity,
+          new CachedQueryResult(entity, archetype, generation),
+        );
+      }
+    }
+  }
+
+  *results(): Iterable<F> {
+    for (const [entity, result] of this.descriptors) {
+      yield this.query.fetch(entity, result.archetype);
+    }
+  }
+}
+
+class CachedQueryResult {
+  constructor(
+    readonly entity: Entity,
+    public archetype: Archetype,
+    public generation: number,
+  ) {}
 }

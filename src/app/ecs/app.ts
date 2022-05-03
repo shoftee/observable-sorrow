@@ -1,8 +1,7 @@
 import { Constructor } from "@/app/utils/types";
 import { MultiMap, TypeSet } from "@/app/utils/collections";
 
-import { Event, Resource, World } from "./world";
-import { WorldState } from "./query";
+import { Event, Resource, World, WorldState } from "./world";
 import { ISystem, SystemCtor } from "./system";
 
 export type SystemStage =

@@ -62,7 +62,7 @@ export class Enumerable<T> implements Iterable<T> {
     for (const item of this) {
       return item;
     }
-    throw new Error(`Expected at least one item but iterable was empty.`);
+    throw new Error("Expected at least one item but iterable was empty.");
   }
 
   take(count: number): Enumerable<T> {

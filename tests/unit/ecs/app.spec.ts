@@ -1,5 +1,5 @@
 import { App, Event, SystemStage } from "@/app/ecs";
-import { Reader, System, Writer } from "@/app/ecs/system";
+import { Receive, System, Dispatch } from "@/app/ecs/system";
 import { MultiMap } from "@/app/utils/collections";
 
 import { expect } from "chai";
@@ -21,8 +21,8 @@ describe("ecs app", () => {
     it("should access multiple event types", () => {
       let dispatcherUpdates = 0;
       const Dispatcher = System(
-        Writer(StringEvent),
-        Writer(NumberEvent),
+        Dispatch(StringEvent),
+        Dispatch(NumberEvent),
       )((strings, numbers) => {
         strings.dispatch(new StringEvent("sent"));
         numbers.dispatch(new NumberEvent(20));
@@ -32,14 +32,14 @@ describe("ecs app", () => {
 
       let receiverUpdates = 0;
       const Receiver = System(
-        Reader(StringEvent),
-        Reader(NumberEvent),
+        Receive(StringEvent),
+        Receive(NumberEvent),
       )((strings, numbers) => {
-        const ev1s = Array.from(strings.receive());
+        const ev1s = Array.from(strings.pull());
         expect(ev1s).lengthOf(1);
         expect(ev1s[0].stringValue).to.eq("sent");
 
-        const ev2s = Array.from(numbers.receive());
+        const ev2s = Array.from(numbers.pull());
         expect(ev2s).lengthOf(1);
         expect(ev2s[0].numberValue).to.eq(20);
 
@@ -61,14 +61,14 @@ describe("ecs app", () => {
     });
     it("should access events over multiple updates", () => {
       let dispatcherUpdates = 0;
-      const Dispatcher = System(Writer(NumberEvent))((numbers) => {
+      const Dispatcher = System(Dispatch(NumberEvent))((numbers) => {
         numbers.dispatch(new NumberEvent(1234));
         dispatcherUpdates++;
       });
 
       let receiverUpdates = 0;
-      const Receiver = System(Reader(NumberEvent))((numbers) => {
-        const evs = Array.from(numbers.receive());
+      const Receiver = System(Receive(NumberEvent))((numbers) => {
+        const evs = Array.from(numbers.pull());
         expect(evs).lengthOf(1);
         expect(evs[0].numberValue).to.eq(1234);
 

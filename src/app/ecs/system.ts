@@ -1,98 +1,82 @@
-import { Constructor } from "@/app/utils/types";
 import { Queue } from "queue-typescript";
-import { QueryParams, ComponentQuery, WorldState, QueryArgs } from "./query";
-import { Component, Entity, Event, Resource } from "./world";
+
+import { Constructor as Ctor } from "@/app/utils/types";
+import { Component, Entity, Event, Resource, WorldState } from "./world";
+import { single } from "../utils/collections";
+import { All, AllResults, AllParams, Filters } from "./query";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-abstract class SystemParam<T = any> {
-  constructor(readonly state: WorldState) {}
-  abstract get(): T;
-}
-
-interface Query<Q extends QueryParams> {
-  all(): Iterable<QueryArgs<Q>>;
-  single(): QueryArgs<Q>;
-}
+type Fetcher<T = any> = {
+  fetch(): T;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SystemParamCtor<T = any> = Constructor<SystemParam<T>>;
+type FetcherFactory<T = any> = {
+  create(state: WorldState): Fetcher<T>;
+};
 
-type QueryCtor<Q extends QueryParams> = SystemParamCtor<Query<Q>>;
-export function Query<Q extends QueryParams>(...params: Q): QueryCtor<Q> {
-  return class extends SystemParam<Query<Q>> {
-    private readonly query: ComponentQuery<Q>;
-    constructor(state: WorldState) {
-      super(state);
-
-      state.addQuery((this.query = new ComponentQuery(...params)));
-    }
-
-    get(): Query<Q> {
+export function Res<R extends Resource>(ctor: Ctor<R>): FetcherFactory<R> {
+  return {
+    create: (state) => {
       return {
-        all: () => this.query.all(this.state.world),
-        single: () => this.query.single(this.state.world),
+        fetch: () => {
+          const res = state.world.resource(ctor);
+          if (res === undefined) {
+            throw new Error("Resource not found.");
+          }
+          return res;
+        },
       };
-    }
+    },
   };
 }
 
-type ResCtor<R extends Resource> = SystemParamCtor<R>;
-export function Res<R extends Resource>(ctor: Constructor<R>): ResCtor<R> {
-  return class extends SystemParam<R> {
-    get(): R {
-      const res = this.state.world.resource(ctor);
-      if (res === undefined) {
-        throw new Error("Resource not found.");
-      }
-      return res;
-    }
-  };
-}
-
-class EventReader<E extends Event> {
+class Receiver<E extends Event> {
   constructor(private readonly queue: Queue<E>) {}
-  *receive(): Iterable<E> {
+
+  *pull(): Iterable<E> {
     let event: E;
     while ((event = this.queue.dequeue())) {
       yield event;
     }
   }
 }
-type EventReaderCtor<E extends Event> = SystemParamCtor<EventReader<E>>;
-export function Reader<E extends Event>(
-  ctor: Constructor<E>,
-): EventReaderCtor<E> {
-  return class extends SystemParam<EventReader<E>> {
-    private readonly events: EventReader<E>;
-    constructor(state: WorldState) {
-      super(state);
-      this.events = new EventReader<E>(this.state.world.events(ctor));
-    }
-    get(): EventReader<E> {
-      return this.events;
-    }
+
+export function Receive<E extends Event>(
+  ctor: Ctor<E>,
+): FetcherFactory<Receiver<E>> {
+  return {
+    create(state) {
+      const receiver = new Receiver(state.world.events(ctor));
+      return {
+        fetch(): Receiver<E> {
+          return receiver;
+        },
+      };
+    },
   };
 }
 
-type EventWriterCtor<E extends Event> = SystemParamCtor<EventWriter<E>>;
-class EventWriter<E extends Event> {
+class Dispatcher<E extends Event> {
   constructor(private readonly queue: Queue<E>) {}
+
   dispatch(event: E): void {
     this.queue.enqueue(event);
   }
 }
-export function Writer<E extends Event>(
-  ctor: Constructor<E>,
-): EventWriterCtor<E> {
-  return class extends SystemParam<EventWriter<E>> {
-    private readonly events: EventWriter<E>;
-    constructor(state: WorldState) {
-      super(state);
-      this.events = new EventWriter<E>(this.state.world.events(ctor));
-    }
-    get(): EventWriter<E> {
-      return this.events;
-    }
+
+export function Dispatch<E extends Event>(
+  ctor: Ctor<E>,
+): FetcherFactory<Dispatcher<E>> {
+  return {
+    create(state: WorldState) {
+      const dispatcher = new Dispatcher<E>(state.world.events(ctor));
+      return {
+        fetch(): Dispatcher<E> {
+          return dispatcher;
+        },
+      };
+    },
   };
 }
 
@@ -100,34 +84,91 @@ type Commands = {
   spawn(...components: Component[]): Entity;
   insertComponents(entity: Entity, ...components: Component[]): void;
 };
-export function Commands(): SystemParamCtor<Commands> {
-  return class extends SystemParam<Commands> {
-    private readonly commands: Commands;
-    constructor(state: WorldState) {
-      super(state);
-      this.commands = {
-        spawn: (...components) => {
+export function Commands(): FetcherFactory<Commands> {
+  return {
+    create(state) {
+      const commands = {
+        spawn(...components: Component[]) {
           const entity = state.spawn();
           state.insertComponentsDeferred(entity, ...components);
           return entity;
         },
-        insertComponents: (entity, ...components) => {
+        insertComponents(entity: Entity, ...components: Component[]) {
           state.insertComponentsDeferred(entity, ...components);
         },
       };
-    }
-
-    get() {
-      return this.commands;
-    }
+      return {
+        fetch() {
+          return commands;
+        },
+      };
+    },
   };
 }
 
-type SystemParams = [...SystemParamCtor[]];
-type SystemArgs<S> = S extends [infer Head, ...infer Tail]
-  ? [UnwrapArg<Head>, ...SystemArgs<Tail>]
+type QueryFetcher<Q extends AllParams> = {
+  all(): Iterable<AllResults<Q>>;
+  single(): AllResults<Q>;
+};
+
+class QueryFactory<Q extends AllParams> {
+  private query;
+
+  constructor(...wq: Q) {
+    this.query = All(...wq);
+  }
+
+  filter<F extends Filters>(...f: F): QueryFactory<Q> {
+    this.query = this.query.filter(...f);
+    return this;
+  }
+
+  create(state: WorldState): Fetcher<QueryFetcher<Q>> {
+    const query = this.query;
+    state.addQuery(query);
+
+    const fetcher = {
+      *all() {
+        yield* state.fetchQuery(query);
+      },
+      single() {
+        return single(state.fetchQuery(query));
+      },
+    };
+    return {
+      fetch() {
+        return fetcher;
+      },
+    };
+  }
+}
+
+export function Query<Q extends AllParams>(...wq: Q): QueryFactory<Q> {
+  return new QueryFactory<Q>(...wq);
+}
+
+type FactoryTuple = [...FetcherFactory[]];
+
+type FetcherTuple<FactoryTuple> = FactoryTuple extends [
+  infer Head,
+  ...infer Tail,
+]
+  ? [...UnwrapFetcherFromFactory<Head>, ...FetcherTuple<Tail>]
   : [];
-type UnwrapArg<T> = T extends SystemParamCtor<infer P> ? P : never;
+
+type UnwrapFetcherFromFactory<Factory> = Factory extends FetcherFactory<infer T>
+  ? [Fetcher<T>]
+  : [];
+
+type ResultTuple<FactoryTuple> = FactoryTuple extends [
+  infer Head,
+  ...infer Tail,
+]
+  ? [...UnwrapResultFromFactory<Head>, ...ResultTuple<Tail>]
+  : [];
+type UnwrapResultFromFactory<Factory> = Factory extends FetcherFactory<infer T>
+  ? [T]
+  : [];
 
 export interface ISystem {
   update(): void;
@@ -136,36 +177,29 @@ export interface ISystem {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SystemCtor = new (state: WorldState, ...args: any) => ISystem;
 
-abstract class SystemImpl<S extends SystemParams = SystemParams> {
-  readonly params: S;
-  constructor(readonly state: WorldState, ...params: S) {
-    this.params = params;
+type RunnerFn<F extends FactoryTuple> = (...args: ResultTuple<F>) => void;
+
+class SystemImpl<F extends FactoryTuple> {
+  private readonly params: FetcherTuple<F>;
+
+  constructor(private readonly runner: RunnerFn<F>, fetchers: FetcherTuple<F>) {
+    this.params = fetchers;
   }
 
   update(): void {
-    const args = new Array(this.params.length);
-    for (let i = 0; i < this.params.length; i++) {
-      const param = this.params[i];
-      args[i] = new param(this.state).get();
-    }
-    this.run(args as SystemArgs<S>);
+    const args = this.params.map((p: Fetcher) => p.fetch()) as ResultTuple<F>;
+    this.runner(...args);
   }
-
-  abstract run(args: SystemArgs<S>): void;
 }
 
-type RunnerFn<S extends SystemParams> = (...args: SystemArgs<S>) => void;
-
-export function System<S extends SystemParams = SystemParams>(
-  ...params: S
-): (runner: RunnerFn<S>) => SystemCtor {
-  return (runner: RunnerFn<S>) => {
-    return class extends SystemImpl<S> {
+export function System<F extends FactoryTuple>(...factories: F) {
+  return (runner: RunnerFn<F>) => {
+    return class extends SystemImpl<F> {
       constructor(state: WorldState) {
-        super(state, ...params);
-      }
-      run(args: SystemArgs<S>): void {
-        runner(...args);
+        const fetchers = factories.map((f) =>
+          f.create(state),
+        ) as FetcherTuple<F>;
+        super(runner, fetchers);
       }
     };
   };

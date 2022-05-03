@@ -3,7 +3,7 @@ import { Timer } from "@/app/ecs/time-plugin";
 import { Commands, Query, System } from "@/app/ecs/system";
 
 import { SeasonId } from "@/app/interfaces";
-import { Mut, Ref, With } from "@/app/ecs/query";
+import { Mut, Read, With } from "@/app/ecs/query";
 import { TimeConstants } from "@/app/state";
 
 import Markers from "./_markers";
@@ -27,7 +27,9 @@ const Startup = System(Commands())((cmds) => {
   cmds.spawn(new Marker(), new DayTimer(), new Calendar());
 });
 
-const advanceDaysQuery = Query(With(Marker), Ref(DayTimer), Mut(Calendar));
+const advanceDaysQuery = Query(Read(DayTimer), Mut(Calendar)).filter(
+  With(Marker),
+);
 const AdvanceDays = System(advanceDaysQuery)((query) => {
   const [days, calendar] = query.single();
   if (days.isNewTick) {
