@@ -149,17 +149,6 @@ export function Query<Q extends AllParams>(...wq: Q): QueryFactory<Q> {
 
 type FactoryTuple = [...FetcherFactory[]];
 
-type FetcherTuple<FactoryTuple> = FactoryTuple extends [
-  infer Head,
-  ...infer Tail,
-]
-  ? [...UnwrapFetcherFromFactory<Head>, ...FetcherTuple<Tail>]
-  : [];
-
-type UnwrapFetcherFromFactory<Factory> = Factory extends FetcherFactory<infer T>
-  ? [Fetcher<T>]
-  : [];
-
 type ResultTuple<FactoryTuple> = FactoryTuple extends [
   infer Head,
   ...infer Tail,
@@ -170,37 +159,43 @@ type UnwrapResultFromFactory<Factory> = Factory extends FetcherFactory<infer T>
   ? [T]
   : [];
 
-export interface ISystem {
-  update(): void;
-}
+type RunnerFn<F extends FactoryTuple, Result> = (
+  ...args: ResultTuple<F>
+) => Result;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SystemCtor = new (state: WorldState, ...args: any) => ISystem;
+export type IntoSystem<R = void> = {
+  intoSystem(state: WorldState): SystemRunner<R>;
+};
 
-type RunnerFn<F extends FactoryTuple> = (...args: ResultTuple<F>) => void;
+export type SystemRunner<Result = void> = {
+  run(): Result;
+};
 
-class SystemImpl<F extends FactoryTuple> {
-  private readonly params: FetcherTuple<F>;
+class SystemBuilder<F extends FactoryTuple, R> {
+  constructor(
+    private readonly factories: F,
+    private readonly run: RunnerFn<F, R>,
+  ) {}
 
-  constructor(private readonly runner: RunnerFn<F>, fetchers: FetcherTuple<F>) {
-    this.params = fetchers;
-  }
-
-  update(): void {
-    const args = this.params.map((p: Fetcher) => p.fetch()) as ResultTuple<F>;
-    this.runner(...args);
-  }
-}
-
-export function System<F extends FactoryTuple>(...factories: F) {
-  return (runner: RunnerFn<F>) => {
-    return class extends SystemImpl<F> {
-      constructor(state: WorldState) {
-        const fetchers = factories.map((f) =>
-          f.create(state),
-        ) as FetcherTuple<F>;
-        super(runner, fetchers);
-      }
+  intoSystem(state: WorldState): SystemRunner<R> {
+    const fetchers = this.factories.map((f) => f.create(state));
+    return {
+      run: () => {
+        const args = fetchers.map((p) => p.fetch()) as ResultTuple<F>;
+        return this.run(...args);
+      },
     };
+  }
+}
+
+export function System<F extends FactoryTuple>(...f: F) {
+  return (runner: RunnerFn<F, void>) => {
+    return new SystemBuilder(f, runner);
+  };
+}
+
+export function RunCondition<F extends FactoryTuple>(...f: F) {
+  return (runner: RunnerFn<F, boolean>) => {
+    return new SystemBuilder(f, runner);
   };
 }

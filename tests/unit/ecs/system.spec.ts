@@ -17,10 +17,10 @@ describe("ecs", () => {
       const state = new WorldState(new World());
       state.spawn(new Id("shoftee"), new Player(20));
       state.spawn(new Id("shoftee"), new Player(20));
-      state.spawn(new Id("shoftee"), new Player(20)); 
+      state.spawn(new Id("shoftee"), new Player(20));
 
-      const system = new PlayerSystem(state);
-      system.update();
+      const system = PlayerSystem.intoSystem(state);
+      system.run();
     });
   });
 });

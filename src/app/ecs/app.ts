@@ -2,7 +2,7 @@ import { Constructor } from "@/app/utils/types";
 import { MultiMap, TypeSet } from "@/app/utils/collections";
 
 import { Event, Resource, World, WorldState } from "./world";
-import { ISystem, SystemCtor } from "./system";
+import { IntoSystem, SystemRunner } from "./system";
 
 export type SystemStage =
   | "startup"
@@ -13,7 +13,7 @@ export type SystemStage =
   | "last";
 
 export class App {
-  private readonly systemCtors = new MultiMap<SystemStage, SystemCtor>();
+  private readonly systemBuilders = new MultiMap<SystemStage, IntoSystem>();
   private readonly resources = new TypeSet<Resource>();
   private readonly events = new Set<Constructor<Event>>();
 
@@ -27,12 +27,12 @@ export class App {
     return this;
   }
 
-  addStartupSystem(system: SystemCtor): App {
+  addStartupSystem(system: IntoSystem): App {
     return this.addSystem(system, "startup");
   }
 
-  addSystem(system: SystemCtor, stage: SystemStage = "update"): App {
-    this.systemCtors.add(stage, system);
+  addSystem(system: IntoSystem, stage: SystemStage = "update"): App {
+    this.systemBuilders.add(stage, system);
     return this;
   }
 
@@ -51,10 +51,10 @@ export class App {
     }
 
     const state = new WorldState(world);
-    const systems = new MultiMap<SystemStage, ISystem>();
-    for (const [stage, systemConstructors] of this.systemCtors) {
-      for (const systemCtor of systemConstructors) {
-        systems.add(stage, new systemCtor(state));
+    const systems = new MultiMap<SystemStage, SystemRunner>();
+    for (const [stage, builders] of this.systemBuilders) {
+      for (const builder of builders) {
+        systems.add(stage, builder.intoSystem(state));
       }
     }
     return new GameRunner(state, systems);
@@ -66,7 +66,7 @@ export class GameRunner {
 
   constructor(
     private readonly state: WorldState,
-    private readonly stages: MultiMap<SystemStage, ISystem>,
+    private readonly stages: MultiMap<SystemStage, SystemRunner>,
   ) {}
 
   start(): () => void {
@@ -87,7 +87,7 @@ export class GameRunner {
 
   private run(stage: SystemStage) {
     for (const system of this.stages.entriesForKey(stage)) {
-      system.update();
+      system.run();
     }
     this.state.flushDeferred();
   }
