@@ -1,6 +1,6 @@
 import { Queue } from "queue-typescript";
 
-import { Constructor, getConstructorOf } from "@/app/utils/types";
+import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { TypeSet, Table } from "@/app/utils/collections";
 
 import { WorldQuery } from "./query";
@@ -25,7 +25,7 @@ export abstract class Event {
   protected [EventType]: true;
 }
 
-export type ComponentCtor<C extends Component = Component> = Constructor<C>;
+export type ComponentCtor<C extends Component = Component> = Ctor<C>;
 
 export type Archetype<C extends Component = Component> = ReadonlyMap<
   ComponentCtor<C>,
@@ -40,7 +40,7 @@ export class World {
   private readonly entities = new Set<Entity>();
   private readonly components = new Table<Entity, ComponentCtor, Component>();
   private readonly resources = new TypeSet<Resource>();
-  private readonly eventQueues = new Map<Constructor<Event>, Queue<Event>>();
+  private readonly eventQueues = new Map<Ctor<Event>, Queue<Event>>();
 
   private newEntityId = 1;
 
@@ -86,18 +86,18 @@ export class World {
     this.resources.add(resource);
   }
 
-  resource<R extends Resource>(ctor: Constructor<R>): R | undefined {
+  resource<R extends Resource>(ctor: Ctor<R>): R | undefined {
     return this.resources.get(ctor);
   }
 
-  registerEvent<E extends Event>(ctor: Constructor<E>) {
+  registerEvent<E extends Event>(ctor: Ctor<E>) {
     if (this.eventQueues.has(ctor)) {
       throw new Error("Event already registered");
     }
     this.eventQueues.set(ctor, new Queue<E>());
   }
 
-  events<E extends Event>(ctor: Constructor<E>): Queue<E> {
+  events<E extends Event>(ctor: Ctor<E>): Queue<E> {
     const queue = this.eventQueues.get(ctor);
     if (queue === undefined) {
       throw new Error("Event not registered");
@@ -169,7 +169,7 @@ export class WorldState {
     this.world.insertResource(resource);
   }
 
-  registerEvent<E extends Event>(ctor: Constructor<E>) {
+  registerEvent<E extends Event>(ctor: Ctor<E>) {
     this.world.registerEvent(ctor);
   }
 
