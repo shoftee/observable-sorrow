@@ -27,7 +27,6 @@ export interface IRootInteractor
   initialize(
     onTicked: OnMutationHandler,
     onLogEvent: OnEventHandler,
-    saveSlot: number | undefined,
   ): Promise<void>;
 }
 
@@ -36,6 +35,7 @@ export interface IDispatcher {
 }
 
 export interface IStoreInteractor {
+  load(): Promise<void>;
   save(): Promise<void>;
 }
 

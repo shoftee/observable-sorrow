@@ -1,5 +1,4 @@
 import { OnEventHandler, OnMutationHandler } from "@/app/interfaces";
-import { SaveSlot } from "@/app/store/db";
 import { SystemTimestamp } from "@/app/utils/timestamp";
 
 import { EntityAdmin, EntityWatcher } from "./entity";
@@ -16,11 +15,7 @@ export class Runner {
 
   readonly interactor: InteractorFacade;
 
-  constructor(
-    onMutation: OnMutationHandler,
-    onLogEvent: OnEventHandler,
-    saveSlot: SaveSlot,
-  ) {
+  constructor(onMutation: OnMutationHandler, onLogEvent: OnEventHandler) {
     this.onTickedHandler = onMutation;
     this.onLogEventHandler = onLogEvent;
 
@@ -35,8 +30,8 @@ export class Runner {
     );
 
     this.interactor = new InteractorFacade(controller, this.admin);
-    this.interactor.store.load(saveSlot);
 
+    // initialize systems
     this.systems = new GameSystems(this.admin);
     this.systems.init();
 

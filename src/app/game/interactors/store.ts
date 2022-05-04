@@ -1,5 +1,13 @@
 import { IStoreInteractor } from "@/app/interfaces";
-import { loadOrInitGeneral, saveSlot, SaveSlot } from "@/app/store/db";
+import {
+  loadOrInitGeneral,
+  loadSlot,
+  newSlot,
+  saveSlot,
+  SaveSlot,
+  setCurrentSlot,
+} from "@/app/store/db";
+
 import { EntityAdmin } from "../entity";
 
 export class StoreInteractor implements IStoreInteractor {
@@ -9,9 +17,16 @@ export class StoreInteractor implements IStoreInteractor {
     this.version = 0;
   }
 
-  load(slot: SaveSlot): void {
-    this.version = slot.version;
-    this.admin.loadState(slot.state);
+  async load(): Promise<void> {
+    const general = await loadOrInitGeneral();
+    if (!general.currentSlot) {
+      general.currentSlot = await newSlot();
+    }
+
+    const slotData = await loadSlot(general.currentSlot);
+    await setCurrentSlot(general.currentSlot);
+    this.version = slotData.version;
+    this.admin.loadState(slotData.state);
   }
 
   async save(): Promise<void> {

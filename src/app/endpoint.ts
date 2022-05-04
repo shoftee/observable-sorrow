@@ -22,7 +22,6 @@ import {
   SocietyPresenter,
   StateManager,
 } from "./presenters";
-import { loadOrInitGeneral } from "./store/db";
 
 export type Endpoint = {
   interactors: {
@@ -60,12 +59,8 @@ export async function Setup(): Promise<Endpoint> {
     stateManager.acceptEvents(logEvents);
   };
 
-  const general = await loadOrInitGeneral();
-  await root.initialize(
-    proxy(onTicked),
-    proxy(onLogEvent),
-    general.currentSlot,
-  );
+  await root.initialize(proxy(onTicked), proxy(onLogEvent));
+  await root.load();
 
   release = () => {
     root[releaseProxy]();
@@ -99,6 +94,7 @@ export async function Setup(): Promise<Endpoint> {
         send: root.send,
       },
       store: {
+        load: root.load,
         save: root.save,
       },
     },

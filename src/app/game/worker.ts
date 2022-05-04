@@ -9,31 +9,16 @@ import {
 
 import { Runner } from "./runner";
 
-import { loadSlot, newSlot, SaveSlot, setCurrentSlot } from "@/app/store/db";
-
-async function load(id: number | undefined): Promise<SaveSlot> {
-  if (!id) {
-    id = await newSlot();
-  }
-
-  const slot = await loadSlot(id);
-  await setCurrentSlot(id);
-
-  return slot;
-}
-
 let runner: Runner;
 const interactor: IRootInteractor = {
   async initialize(
     onMutation: OnMutationHandler,
     onEvent: OnEventHandler,
-    saveSlot: number | undefined,
   ): Promise<void> {
     if (runner !== undefined) {
       runner.interactor.controller.stop();
     }
-    const slot = await load(saveSlot);
-    runner = new Runner(onMutation, onEvent, slot);
+    runner = new Runner(onMutation, onEvent);
   },
   // game controls
   start() {
@@ -43,6 +28,9 @@ const interactor: IRootInteractor = {
     runner.interactor.controller.stop();
   },
   // store
+  async load() {
+    await runner.interactor.store.load();
+  },
   async save() {
     await runner.interactor.store.save();
   },
