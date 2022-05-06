@@ -37,7 +37,7 @@ const Main = defineAsyncComponent(async () => {
       </div>
     </header>
     <main unscrollable>
-      <suspense>
+      <Suspense>
         <template #default>
           <Main class="w-100 h-100" />
         </template>
@@ -48,7 +48,7 @@ const Main = defineAsyncComponent(async () => {
             </div>
           </div>
         </template>
-      </suspense>
+      </Suspense>
     </main>
     <footer>
       <div>
