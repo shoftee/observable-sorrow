@@ -1,16 +1,18 @@
 import { round } from "@/app/utils/mathx";
-import { App, Component, Plugin } from ".";
+
+import { App, EcsComponent, Plugin } from ".";
+
 import { Mut } from "./query";
 import { Query, Res, System } from "./system";
-import { Resource } from "./world";
+import { EcsResource } from "./world";
 
-export class GameTime extends Resource {
+export class GameTime extends EcsResource {
   last = 0;
   delta = 0;
   speed = 1;
 }
 
-export class Timer extends Component {
+export class Timer extends EcsComponent {
   ticks = 0;
   delta = 0;
   elapsed = 0;

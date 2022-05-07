@@ -1,4 +1,4 @@
-import { Entity, Archetype } from "../world";
+import { EcsEntity, Archetype } from "../world";
 import { WorldQuery } from "./types";
 
 class OptQuery<F> implements WorldQuery<F | undefined> {
@@ -8,7 +8,7 @@ class OptQuery<F> implements WorldQuery<F | undefined> {
     return true;
   }
 
-  fetch(entity: Entity, archetype: Archetype): F | undefined {
+  fetch(entity: EcsEntity, archetype: Archetype): F | undefined {
     // inner fetch being undefined is not reflected in the types, but it's possible.
     return this.inner.fetch(entity, archetype);
   }

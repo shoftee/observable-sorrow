@@ -6,57 +6,61 @@ import { TypeSet, Table } from "@/app/utils/collections";
 import { WorldQuery } from "./query";
 
 export const EntityType = Symbol.for("Entity");
-export class Entity {
+export class EcsEntity {
   [EntityType]: number;
 }
 
 export const ComponentType = Symbol.for("Component");
-export abstract class Component {
+export abstract class EcsComponent {
   protected [ComponentType]: true;
 }
 
 export const ResourceType = Symbol.for("Resource");
-export abstract class Resource {
+export abstract class EcsResource {
   protected [ResourceType]: true;
 }
 
 export const EventType = Symbol.for("Event");
-export abstract class Event {
+export abstract class EcsEvent {
   protected [EventType]: true;
 }
 
-export type ComponentCtor<C extends Component = Component> = Ctor<C>;
+export type ComponentCtor<C extends EcsComponent = EcsComponent> = Ctor<C>;
 
-export type Archetype<C extends Component = Component> = ReadonlyMap<
+export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
   ComponentCtor<C>,
   C
 >;
 
 export interface IQuery {
-  notify(entity: Entity, archetype: Archetype): void;
+  notify(entity: EcsEntity, archetype: Archetype): void;
 }
 
 export class World {
-  private readonly entities = new Set<Entity>();
-  private readonly components = new Table<Entity, ComponentCtor, Component>();
-  private readonly resources = new TypeSet<Resource>();
-  private readonly eventQueues = new Map<Ctor<Event>, Queue<Event>>();
+  private readonly entities = new Set<EcsEntity>();
+  private readonly components = new Table<
+    EcsEntity,
+    ComponentCtor,
+    EcsComponent
+  >();
+  private readonly resources = new TypeSet<EcsResource>();
+  private readonly eventQueues = new Map<Ctor<EcsEvent>, Queue<EcsEvent>>();
 
   private newEntityId = 1;
 
-  spawn(...components: Component[]): Entity {
+  spawn(...components: EcsComponent[]): EcsEntity {
     const entity = Object.freeze({ [EntityType]: this.newEntityId++ });
     this.entities.add(entity);
     this.insertComponents(entity, ...components);
     return entity;
   }
 
-  despawn(entity: Entity) {
+  despawn(entity: EcsEntity) {
     this.components.removeRow(entity);
     this.entities.delete(entity);
   }
 
-  insertComponents(entity: Entity, ...components: Component[]): void {
+  insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void {
     for (const component of components) {
       const ctor = getConstructorOf(component);
       this.components.add(entity, ctor, (exists) => {
@@ -68,36 +72,36 @@ export class World {
     }
   }
 
-  removeComponents(entity: Entity, ...ctors: ComponentCtor[]): void {
+  removeComponents(entity: EcsEntity, ...ctors: ComponentCtor[]): void {
     for (const ctor of ctors) {
       this.components.removeCell(entity, ctor);
     }
   }
 
-  archetype(entity: Entity): Archetype {
+  archetype(entity: EcsEntity): Archetype {
     return this.components.row(entity);
   }
 
-  *archetypes(): Iterable<[Entity, Archetype]> {
+  *archetypes(): Iterable<[EcsEntity, Archetype]> {
     yield* this.components.rows();
   }
 
-  insertResource<R extends Resource>(resource: R): void {
+  insertResource<R extends EcsResource>(resource: R): void {
     this.resources.add(resource);
   }
 
-  resource<R extends Resource>(ctor: Ctor<R>): R | undefined {
+  resource<R extends EcsResource>(ctor: Ctor<R>): R | undefined {
     return this.resources.get(ctor);
   }
 
-  registerEvent<E extends Event>(ctor: Ctor<E>) {
+  registerEvent<E extends EcsEvent>(ctor: Ctor<E>) {
     if (this.eventQueues.has(ctor)) {
       throw new Error("Event already registered");
     }
     this.eventQueues.set(ctor, new Queue<E>());
   }
 
-  events<E extends Event>(ctor: Ctor<E>): Queue<E> {
+  events<E extends EcsEvent>(ctor: Ctor<E>): Queue<E> {
     const queue = this.eventQueues.get(ctor);
     if (queue === undefined) {
       throw new Error("Event not registered");
@@ -117,7 +121,7 @@ export class WorldState {
 
   private readonly commands = new Queue<WorldCommand>();
 
-  spawn(...components: Component[]): Entity {
+  spawn(...components: EcsComponent[]): EcsEntity {
     const entity = this.world.spawn(...components);
 
     this.notifyChanged(entity);
@@ -125,19 +129,19 @@ export class WorldState {
     return entity;
   }
 
-  despawn(entity: Entity): void {
+  despawn(entity: EcsEntity): void {
     this.world.despawn(entity);
 
     this.notifyChanged(entity);
   }
 
-  insertComponents(entity: Entity, ...components: Component[]): void {
+  insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void {
     this.world.insertComponents(entity, ...components);
 
     this.notifyChanged(entity);
   }
 
-  private notifyChanged(entity: Entity) {
+  private notifyChanged(entity: EcsEntity) {
     const newGeneration = this.generation++;
     const row = this.world.archetype(entity);
     for (const [, fetch] of this.fetches) {
@@ -165,21 +169,21 @@ export class WorldState {
     return fetch.results() as Iterable<WorldQueryResult<Q>>;
   }
 
-  insertResource<R extends Resource>(resource: R) {
+  insertResource<R extends EcsResource>(resource: R) {
     this.world.insertResource(resource);
   }
 
-  registerEvent<E extends Event>(ctor: Ctor<E>) {
+  registerEvent<E extends EcsEvent>(ctor: Ctor<E>) {
     this.world.registerEvent(ctor);
   }
 
-  insertComponentsDeferred(entity: Entity, ...components: Component[]) {
+  insertComponentsDeferred(entity: EcsEntity, ...components: EcsComponent[]) {
     this.commands.enqueue((world) =>
       world.insertComponents(entity, ...components),
     );
   }
 
-  despawnDeferred(entity: Entity) {
+  despawnDeferred(entity: EcsEntity) {
     this.commands.enqueue((world) => {
       world.despawn(entity);
     });
@@ -194,11 +198,11 @@ export class WorldState {
 }
 
 class FetchCache<F = unknown> {
-  private readonly descriptors = new Map<Entity, CachedQueryResult>();
+  private readonly descriptors = new Map<EcsEntity, CachedQueryResult>();
 
   constructor(private readonly query: WorldQuery<F>) {}
 
-  notify(generation: number, entity: Entity, archetype: Archetype) {
+  notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.match(archetype)) {
       this.descriptors.delete(entity);
     } else {
@@ -226,7 +230,7 @@ class FetchCache<F = unknown> {
 
 class CachedQueryResult {
   constructor(
-    readonly entity: Entity,
+    readonly entity: EcsEntity,
     public archetype: Archetype,
     public generation: number,
   ) {}

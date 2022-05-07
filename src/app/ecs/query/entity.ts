@@ -1,12 +1,12 @@
 import { WorldQuery } from ".";
-import { Entity as Etty } from "../world";
+import { EcsEntity } from "../world";
 
-class EntityQuery implements WorldQuery<Readonly<Etty>> {
+class EntityQuery implements WorldQuery<Readonly<EcsEntity>> {
   match(): boolean {
     return true;
   }
 
-  fetch(entity: Etty): Readonly<Etty> {
+  fetch(entity: EcsEntity): Readonly<EcsEntity> {
     return entity;
   }
 }

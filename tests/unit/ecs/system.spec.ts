@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { Component, World, WorldState } from "@/app/ecs";
+import { EcsComponent, World, WorldState } from "@/app/ecs";
 import { Query, System } from "@/app/ecs/system";
 import { Read } from "@/app/ecs/query";
 
@@ -25,13 +25,13 @@ describe("ecs", () => {
   });
 });
 
-class Id extends Component {
+class Id extends EcsComponent {
   constructor(readonly value: string) {
     super();
   }
 }
 
-class Player extends Component {
+class Player extends EcsComponent {
   constructor(public level: number) {
     super();
   }

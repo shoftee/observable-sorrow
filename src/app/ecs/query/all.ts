@@ -2,7 +2,7 @@ import { all } from "@/app/utils/collections";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { WorldQuery, WorldQueryFilter } from ".";
-import { Archetype, Component, Entity } from "../world";
+import { Archetype, EcsComponent, EcsEntity } from "../world";
 
 export type AllParams = [...WorldQuery[]];
 export type AllResults<T> = T extends [infer Head, ...infer Tail]
@@ -21,7 +21,7 @@ class AllQuery<Q extends AllParams> extends WorldQuery<AllResults<Q>> {
     super();
   }
 
-  match(archetype: Archetype<Component>): boolean {
+  match(archetype: Archetype<EcsComponent>): boolean {
     for (const filter of this.iterateFilters()) {
       if (!filter.match(archetype)) {
         return false;
@@ -37,7 +37,7 @@ class AllQuery<Q extends AllParams> extends WorldQuery<AllResults<Q>> {
     }
   }
 
-  fetch(entity: Entity, archetype: Archetype<Component>): AllResults<Q> {
+  fetch(entity: EcsEntity, archetype: Archetype<EcsComponent>): AllResults<Q> {
     // TODO: Determine whether this array allocation is necessary.
     // Broken tests don't necessarily reflect real usage.
     return this.queries.map((q) => q.fetch(entity, archetype)) as AllResults<Q>;
@@ -55,7 +55,7 @@ export function All<Q extends AllParams>(...qs: Q): AllQuery<Q> {
 }
 
 // [Component1, Component2,...] => [Ctor<Component1>, Ctor<Component2>,...]
-type FilterTuple = [...Ctor<Component>[]];
+type FilterTuple = [...Ctor<EcsComponent>[]];
 
 class WithFilter<T extends FilterTuple> implements WorldQueryFilter {
   private readonly ctors: T;

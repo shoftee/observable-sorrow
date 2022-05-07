@@ -1,4 +1,4 @@
-import { App, Component, Plugin } from "@/app/ecs";
+import { App, EcsComponent, Plugin } from "@/app/ecs";
 import { Timer } from "@/app/ecs/time-plugin";
 import { Commands, Query, System } from "@/app/ecs/system";
 
@@ -17,7 +17,7 @@ export class DayTimer extends Timer {
   }
 }
 
-class Calendar extends Component {
+class Calendar extends EcsComponent {
   day = 0; // integer
   season: SeasonId = "spring";
   year = 0; // integer

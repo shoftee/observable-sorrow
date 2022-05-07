@@ -11,7 +11,7 @@ import {
   EventPool,
 } from "@/app/interfaces";
 import { getOrAdd } from "@/app/utils/collections";
-import { Resource } from "@/app/ecs";
+import { EcsResource } from "@/app/ecs";
 
 export interface Watcher {
   watch(id: EntityId, state: unknown): void;
@@ -22,7 +22,7 @@ export interface Buffer {
   push(state: unknown): void;
 }
 
-export class EntityWatcher extends Resource {
+export class EntityWatcher extends EcsResource {
   private readonly handles = new Map<EntityId, WatchStopHandle>();
   private readonly singletons = new WatchedPool("singletons");
   private readonly pools = new Map<PoolId, WatchedPool>();

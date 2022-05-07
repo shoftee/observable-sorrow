@@ -1,4 +1,4 @@
-import { Archetype, Entity } from "../world";
+import { Archetype, EcsEntity } from "../world";
 
 export interface WorldQueryFilter {
   match(archetype: Archetype): boolean;
@@ -26,5 +26,5 @@ export interface WorldQueryFilter {
  */
 export abstract class WorldQuery<Fetch = unknown> implements WorldQueryFilter {
   abstract match(archetype: Archetype): boolean;
-  abstract fetch(entity: Entity, archetype: Archetype): Fetch;
+  abstract fetch(entity: EcsEntity, archetype: Archetype): Fetch;
 }

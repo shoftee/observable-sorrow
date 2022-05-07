@@ -1,7 +1,7 @@
-import { Constructor } from "@/app/utils/types";
+import { Constructor as Ctor } from "@/app/utils/types";
 import { MultiMap, TypeSet } from "@/app/utils/collections";
 
-import { Event, Resource, World, WorldState } from "./world";
+import { EcsEvent, EcsResource, World, WorldState } from "./world";
 import { IntoSystem, SystemRunner } from "./system";
 
 export type SystemStage =
@@ -14,15 +14,15 @@ export type SystemStage =
 
 export class App {
   private readonly systemBuilders = new MultiMap<SystemStage, IntoSystem>();
-  private readonly resources = new TypeSet<Resource>();
-  private readonly events = new Set<Constructor<Event>>();
+  private readonly resources = new TypeSet<EcsResource>();
+  private readonly events = new Set<Ctor<EcsEvent>>();
 
-  registerEvent(ctor: Constructor<Event>): App {
+  registerEvent(ctor: Ctor<EcsEvent>): App {
     this.events.add(ctor);
     return this;
   }
 
-  insertResource<R extends Resource>(resource: R): App {
+  insertResource<R extends EcsResource>(resource: R): App {
     this.resources.add(resource);
     return this;
   }

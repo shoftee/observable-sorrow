@@ -1,5 +1,5 @@
-import { Component } from "@/app/ecs";
+import { EcsComponent } from "@/app/ecs";
 
 export default {
-  Environment: class extends Component {},
+  Environment: class extends EcsComponent {},
 };

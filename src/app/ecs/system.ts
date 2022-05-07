@@ -1,7 +1,13 @@
 import { Queue } from "queue-typescript";
 
 import { Constructor as Ctor } from "@/app/utils/types";
-import { Component, Entity, Event, Resource, WorldState } from "./world";
+import {
+  EcsComponent,
+  EcsEntity,
+  EcsEvent,
+  EcsResource,
+  WorldState,
+} from "./world";
 import { single } from "../utils/collections";
 import { All, AllResults, AllParams, Filters } from "./query";
 
@@ -15,7 +21,7 @@ type FetcherFactory<T = any> = {
   create(state: WorldState): Fetcher<T>;
 };
 
-export function Res<R extends Resource>(ctor: Ctor<R>): FetcherFactory<R> {
+export function Res<R extends EcsResource>(ctor: Ctor<R>): FetcherFactory<R> {
   return {
     create: (state) => {
       return {
@@ -31,7 +37,7 @@ export function Res<R extends Resource>(ctor: Ctor<R>): FetcherFactory<R> {
   };
 }
 
-class Receiver<E extends Event> {
+class Receiver<E extends EcsEvent> {
   constructor(private readonly queue: Queue<E>) {}
 
   *pull(): Iterable<E> {
@@ -42,7 +48,7 @@ class Receiver<E extends Event> {
   }
 }
 
-export function Receive<E extends Event>(
+export function Receive<E extends EcsEvent>(
   ctor: Ctor<E>,
 ): FetcherFactory<Receiver<E>> {
   return {
@@ -57,7 +63,7 @@ export function Receive<E extends Event>(
   };
 }
 
-class Dispatcher<E extends Event> {
+class Dispatcher<E extends EcsEvent> {
   constructor(private readonly queue: Queue<E>) {}
 
   dispatch(event: E): void {
@@ -65,7 +71,7 @@ class Dispatcher<E extends Event> {
   }
 }
 
-export function Dispatch<E extends Event>(
+export function Dispatch<E extends EcsEvent>(
   ctor: Ctor<E>,
 ): FetcherFactory<Dispatcher<E>> {
   return {
@@ -81,19 +87,19 @@ export function Dispatch<E extends Event>(
 }
 
 type Commands = {
-  spawn(...components: Component[]): Entity;
-  insertComponents(entity: Entity, ...components: Component[]): void;
+  spawn(...components: EcsComponent[]): EcsEntity;
+  insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void;
 };
 export function Commands(): FetcherFactory<Commands> {
   return {
     create(state) {
       const commands = {
-        spawn(...components: Component[]) {
+        spawn(...components: EcsComponent[]) {
           const entity = state.spawn();
           state.insertComponentsDeferred(entity, ...components);
           return entity;
         },
-        insertComponents(entity: Entity, ...components: Component[]) {
+        insertComponents(entity: EcsEntity, ...components: EcsComponent[]) {
           state.insertComponentsDeferred(entity, ...components);
         },
       };

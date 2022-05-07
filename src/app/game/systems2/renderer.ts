@@ -1,11 +1,11 @@
-import { App, Plugin, Resource } from "@/app/ecs";
+import { App, Plugin, EcsResource } from "@/app/ecs";
 import { Res, System } from "@/app/ecs/system";
 
 import { OnEventHandler, OnMutationHandler } from "@/app/interfaces";
 
 import { EntityWatcher } from "./_watcher";
 
-class Renderer extends Resource {
+class Renderer extends EcsResource {
   constructor(
     readonly onMutation: OnMutationHandler,
     readonly onLogEvent: OnEventHandler,

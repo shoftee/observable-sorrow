@@ -1,18 +1,19 @@
-import { App, Event, SystemStage } from "@/app/ecs";
-import { Receive, System, Dispatch } from "@/app/ecs/system";
+import { expect } from "chai";
+
 import { MultiMap } from "@/app/utils/collections";
 
-import { expect } from "chai";
+import { App, EcsEvent, SystemStage } from "@/app/ecs";
+import { Receive, System, Dispatch } from "@/app/ecs/system";
 
 describe("ecs app", () => {
   describe("events", () => {
-    class StringEvent extends Event {
+    class StringEvent extends EcsEvent {
       constructor(readonly stringValue: string) {
         super();
       }
     }
 
-    class NumberEvent extends Event {
+    class NumberEvent extends EcsEvent {
       constructor(readonly numberValue: number) {
         super();
       }
