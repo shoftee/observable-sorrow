@@ -1,8 +1,4 @@
-import { Archetype, EcsEntity } from "../world";
-
-export interface WorldQueryFilter {
-  match(archetype: Archetype): boolean;
-}
+import { Archetype, EcsEntity, WorldState } from "../world";
 
 /**
  * A generic interface for querying the world state for component data.
@@ -24,7 +20,19 @@ export interface WorldQueryFilter {
  * * With(C1, C2, C3...) - include results that have all of the specified components present. This behavior is similar to requesting them in an All query, but doesn't fetch the data for the components.
  * * Without(C1, C2, C3...) - exclude results that have the specified components present.
  */
-export abstract class WorldQuery<Fetch = unknown> implements WorldQueryFilter {
-  abstract match(archetype: Archetype): boolean;
-  abstract fetch(entity: EcsEntity, archetype: Archetype): Fetch;
+
+export interface InstantiatedFilter {
+  match(archetype: Archetype): boolean;
+}
+
+export interface InstantiatedQuery<F> extends InstantiatedFilter {
+  fetch(entity: EcsEntity, archetype: Archetype): F;
+}
+
+export abstract class FilterDescriptor {
+  abstract newFilter(state: WorldState): InstantiatedFilter;
+}
+
+export abstract class QueryDescriptor<Fetch = unknown> {
+  abstract newQuery(state: WorldState): InstantiatedQuery<Fetch>;
 }

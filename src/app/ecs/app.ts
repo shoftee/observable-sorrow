@@ -1,4 +1,4 @@
-import { Constructor as Ctor } from "@/app/utils/types";
+import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { MultiMap, TypeSet } from "@/app/utils/collections";
 
 import { EcsEvent, EcsResource, World, WorldState } from "./world";
@@ -36,7 +36,7 @@ export class App {
     return this;
   }
 
-  plugin(p: Plugin): App {
+  addPlugin(p: Plugin): App {
     p.add(this);
     return this;
   }
@@ -74,11 +74,11 @@ export class GameRunner {
   }
 
   private update(): void {
-    this.run("first");
     if (this.firstRun) {
       this.run("startup");
       this.firstRun = false;
     }
+    this.run("first");
     this.run("preUpdate");
     this.run("update");
     this.run("postUpdate");
@@ -90,6 +90,14 @@ export class GameRunner {
       system.run();
     }
     this.state.flushDeferred();
+  }
+
+  resource<R extends EcsResource>(ctor: Ctor<R>): R | undefined {
+    return this.state.world.resource(ctor);
+  }
+
+  dispatch<E extends EcsEvent>(event: E) {
+    this.state.world.events(getConstructorOf(event)).enqueue(event);
   }
 }
 

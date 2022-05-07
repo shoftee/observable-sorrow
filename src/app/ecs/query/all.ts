@@ -1,49 +1,46 @@
 import { all } from "@/app/utils/collections";
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { WorldQuery, WorldQueryFilter } from ".";
-import { Archetype, EcsComponent, EcsEntity } from "../world";
+import { QueryDescriptor, FilterDescriptor } from ".";
+import { Archetype, EcsComponent, EcsEntity, WorldState } from "../world";
+import { InstantiatedFilter, InstantiatedQuery } from "./types";
 
-export type AllParams = [...WorldQuery[]];
+export type AllParams = [...QueryDescriptor[]];
 export type AllResults<T> = T extends [infer Head, ...infer Tail]
   ? [...UnwrapResult<Head>, ...AllResults<Tail>]
   : [];
-type UnwrapResult<T> = T extends WorldQuery<infer Fetch>
+type UnwrapResult<T> = T extends QueryDescriptor<infer Fetch>
   ? [...UnwrapResult<Fetch>]
   : [T];
 
-export type Filters = [...WorldQueryFilter[]];
+export type Filters = [...FilterDescriptor[]];
 
-class AllQuery<Q extends AllParams> extends WorldQuery<AllResults<Q>> {
-  private filters: Filters | undefined;
+class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
+  private filters?: FilterDescriptor[];
 
   constructor(private readonly queries: Q) {
     super();
   }
 
-  match(archetype: Archetype<EcsComponent>): boolean {
-    for (const filter of this.iterateFilters()) {
-      if (!filter.match(archetype)) {
-        return false;
-      }
-    }
-    return true;
+  newQuery(state: WorldState): InstantiatedQuery<AllResults<Q>> {
+    const queries = this.queries.map((x) => x.newQuery(state));
+    const filters = this.filters?.map((x) => x.newFilter(state)) ?? [];
+    const filterIterator = function* () {
+      yield* queries;
+      yield* filters;
+    };
+
+    return {
+      match: (archetype: Archetype) => {
+        return all(filterIterator(), (f) => f.match(archetype));
+      },
+      fetch: (entity: EcsEntity, archetype: Archetype) => {
+        return queries.map((q) => q.fetch(entity, archetype)) as AllResults<Q>;
+      },
+    };
   }
 
-  private *iterateFilters(): Iterable<WorldQueryFilter> {
-    yield* this.queries;
-    if (this.filters) {
-      yield* this.filters;
-    }
-  }
-
-  fetch(entity: EcsEntity, archetype: Archetype<EcsComponent>): AllResults<Q> {
-    // TODO: Determine whether this array allocation is necessary.
-    // Broken tests don't necessarily reflect real usage.
-    return this.queries.map((q) => q.fetch(entity, archetype)) as AllResults<Q>;
-  }
-
-  filter<F extends Filters>(...filters: F): AllQuery<Q> {
+  filter(...filters: FilterDescriptor[]): AllQuery<Q> {
     this.filters = filters;
     return this;
   }
@@ -54,35 +51,30 @@ export function All<Q extends AllParams>(...qs: Q): AllQuery<Q> {
   return new AllQuery(qs);
 }
 
-// [Component1, Component2,...] => [Ctor<Component1>, Ctor<Component2>,...]
-type FilterTuple = [...Ctor<EcsComponent>[]];
+type With = FilterDescriptor;
 
-class WithFilter<T extends FilterTuple> implements WorldQueryFilter {
-  private readonly ctors: T;
-  constructor(...ctors: T) {
-    this.ctors = ctors;
-  }
-
-  match(archetype: Archetype): boolean {
-    return all(this.ctors, (ctor) => archetype.has(ctor));
-  }
+export function With(...ctors: Ctor<EcsComponent>[]): With {
+  return {
+    newFilter(): InstantiatedFilter {
+      return {
+        match: (archetype: Archetype) => {
+          return all(ctors, (ctor) => archetype.has(ctor));
+        },
+      };
+    },
+  };
 }
 
-export function With<T extends FilterTuple>(...ctors: T): WithFilter<T> {
-  return new WithFilter(...ctors);
-}
+type Without = FilterDescriptor;
 
-class WithoutFilter<T extends FilterTuple> implements WorldQueryFilter {
-  private readonly ctors: T;
-  constructor(...ctors: T) {
-    this.ctors = ctors;
-  }
-
-  match(archetype: Archetype): boolean {
-    return all(this.ctors, (ctor) => !archetype.has(ctor));
-  }
-}
-
-export function Without<T extends FilterTuple>(...ctors: T): WithoutFilter<T> {
-  return new WithoutFilter(...ctors);
+export function Without(...ctors: Ctor<EcsComponent>[]): Without {
+  return {
+    newFilter(): InstantiatedFilter {
+      return {
+        match: (archetype: Archetype) => {
+          return all(ctors, (ctor) => !archetype.has(ctor));
+        },
+      };
+    },
+  };
 }

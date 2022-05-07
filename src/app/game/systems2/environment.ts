@@ -1,34 +1,27 @@
-import { App, EcsComponent, Plugin } from "@/app/ecs";
-import { Timer } from "@/app/ecs/time-plugin";
-import { Commands, Query, System } from "@/app/ecs/system";
-
 import { SeasonId } from "@/app/interfaces";
-import { Mut, Read, With } from "@/app/ecs/query";
 import { TimeConstants } from "@/app/state";
 
-import Markers from "./_markers";
+import { App, Plugin } from "@/app/ecs";
+import { Commands, Query, Res, System } from "@/app/ecs/system";
+import { ChangeTrackers, Mut, Read, With } from "@/app/ecs/query";
 
-const Marker = Markers.Environment;
+import { Timer } from "@/app/ecs/plugins/time";
 
-// Timers
+import { DeltaBuffer } from "./types";
+import { Calendar, EnvironmentMarker } from "./types/environment";
+
 export class DayTimer extends Timer {
   constructor() {
     super(2000);
   }
 }
 
-class Calendar extends EcsComponent {
-  day = 0; // integer
-  season: SeasonId = "spring";
-  year = 0; // integer
-}
-
-const Startup = System(Commands())((cmds) => {
-  cmds.spawn(new Marker(), new DayTimer(), new Calendar());
+const startup = System(Commands())((cmds) => {
+  cmds.spawn(new EnvironmentMarker(), new DayTimer(), new Calendar());
 });
 
 const advanceDaysQuery = Query(Read(DayTimer), Mut(Calendar)).filter(
-  With(Marker),
+  With(EnvironmentMarker),
 );
 const AdvanceDays = System(advanceDaysQuery)((query) => {
   const [days, calendar] = query.single();
@@ -49,10 +42,24 @@ const AdvanceDays = System(advanceDaysQuery)((query) => {
     calendar.day = currentDay;
   }
 });
+const TrackChanges = System(
+  Res(DeltaBuffer),
+  Query(ChangeTrackers(Calendar)).filter(With(EnvironmentMarker)),
+)((buffer, query) => {
+  const [tracker] = query.single();
+  if (tracker.isAdded()) {
+    buffer.components.setAdded({ calendar: tracker.value() });
+  } else if (tracker.isChanged()) {
+    buffer.components.setChanged({ calendar: tracker.value() });
+  }
+});
 
 export class EnvironmentPlugin extends Plugin {
   add(app: App): void {
-    app.addStartupSystem(Startup).addSystem(AdvanceDays);
+    app
+      .addStartupSystem(startup)
+      .addSystem(AdvanceDays)
+      .addSystem(TrackChanges, "postUpdate");
   }
 }
 

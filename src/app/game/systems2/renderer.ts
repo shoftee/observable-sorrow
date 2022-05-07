@@ -1,43 +1,32 @@
+import { OnRenderHandler } from "@/app/interfaces";
+
 import { App, Plugin, EcsResource } from "@/app/ecs";
 import { Res, System } from "@/app/ecs/system";
 
-import { OnEventHandler, OnMutationHandler } from "@/app/interfaces";
-
-import { EntityWatcher } from "./_watcher";
+import { DeltaBuffer } from "./types";
 
 class Renderer extends EcsResource {
-  constructor(
-    readonly onMutation: OnMutationHandler,
-    readonly onLogEvent: OnEventHandler,
-  ) {
+  constructor(readonly onRender: OnRenderHandler) {
     super();
   }
 }
 
 const FlushChanges = System(
-  Res(EntityWatcher),
+  Res(DeltaBuffer),
   Res(Renderer),
-)((watcher, renderer) => {
-  watcher.flushMutations((changes) => {
-    renderer.onMutation(changes);
-  });
-  watcher.flushEvents((logEvents) => {
-    renderer.onLogEvent(logEvents);
-  });
+)((buffer, renderer) => {
+  renderer.onRender(buffer.components);
 });
 
 export class RendererPlugin extends Plugin {
-  constructor(
-    private readonly onMutation: OnMutationHandler,
-    private readonly onLogEvent: OnEventHandler,
-  ) {
+  constructor(readonly onRender: OnRenderHandler) {
     super();
   }
 
   add(app: App): void {
     app
-      .insertResource(new EntityWatcher())
-      .insertResource(new Renderer(this.onMutation, this.onLogEvent))
+      .insertResource(new DeltaBuffer())
+      .insertResource(new Renderer(this.onRender))
       .addSystem(FlushChanges, "last");
   }
 }

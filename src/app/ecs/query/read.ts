@@ -1,21 +1,22 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { Archetype, EcsComponent, EcsEntity } from "../world";
-import { WorldQuery } from "./types";
+import { InstantiatedQuery, QueryDescriptor } from "./types";
 
-class ReadQuery<C extends EcsComponent> implements WorldQuery<Readonly<C>> {
-  constructor(readonly ctor: Ctor<C>) {}
-
-  match(archetype: Archetype): boolean {
-    return archetype.has(this.ctor);
-  }
-
-  fetch(_: EcsEntity, archetype: Archetype<C>): Readonly<C> {
-    return archetype.get(this.ctor)!;
-  }
-}
+type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
 
 /** Include a read-only view of a component in the query results. */
-export function Read<C extends EcsComponent>(ctor: Ctor<C>): ReadQuery<C> {
-  return new ReadQuery<C>(ctor);
+export function Read<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
+  return {
+    newQuery(): InstantiatedQuery<Readonly<C>> {
+      return {
+        match: (archetype: Archetype) => {
+          return archetype.has(ctor);
+        },
+        fetch: (_: EcsEntity, archetype: Archetype<C>) => {
+          return archetype.get(ctor)!;
+        },
+      };
+    },
+  };
 }

@@ -115,11 +115,11 @@ describe("ecs app", () => {
       updater();
       updater();
 
-      const first = Array.from(counters.entriesForKey("first"));
-      expect(first).to.have.ordered.members([0, 6, 11]);
-
       const startup = Array.from(counters.entriesForKey("startup"));
-      expect(startup).to.have.ordered.members([1]);
+      expect(startup).to.have.ordered.members([0]);
+
+      const first = Array.from(counters.entriesForKey("first"));
+      expect(first).to.have.ordered.members([1, 6, 11]);
 
       const preUpdate = Array.from(counters.entriesForKey("preUpdate"));
       expect(preUpdate).to.have.ordered.members([2, 7, 12]);

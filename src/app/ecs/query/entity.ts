@@ -1,17 +1,20 @@
-import { WorldQuery } from ".";
-import { EcsEntity } from "../world";
+import { QueryDescriptor } from ".";
+import { EcsEntity as Etty } from "../world";
 
-class EntityQuery implements WorldQuery<Readonly<EcsEntity>> {
-  match(): boolean {
-    return true;
-  }
-
-  fetch(entity: EcsEntity): Readonly<EcsEntity> {
-    return entity;
-  }
-}
+type EntityQuery = QueryDescriptor<Readonly<Etty>>;
 
 /** Include the entity object in the query results. */
 export function Entity(): EntityQuery {
-  return new EntityQuery();
+  return {
+    newQuery() {
+      return {
+        match(): boolean {
+          return true;
+        },
+        fetch(entity: Etty): Readonly<Etty> {
+          return entity;
+        },
+      };
+    },
+  };
 }

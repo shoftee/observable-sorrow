@@ -1,6 +1,8 @@
 import { Queue } from "queue-typescript";
 
 import { Constructor as Ctor } from "@/app/utils/types";
+import { single } from "@/app/utils/collections";
+
 import {
   EcsComponent,
   EcsEntity,
@@ -8,8 +10,8 @@ import {
   EcsResource,
   WorldState,
 } from "./world";
-import { single } from "../utils/collections";
 import { All, AllResults, AllParams, Filters } from "./query";
+import { SystemTicks } from "./change-tracking";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Fetcher<T = any> = {
@@ -112,33 +114,49 @@ export function Commands(): FetcherFactory<Commands> {
   };
 }
 
+type World = {
+  ticks: SystemTicks;
+};
+
+export function World(): FetcherFactory<World> {
+  return {
+    create(state) {
+      return {
+        fetch() {
+          return { ticks: state.world.ticks };
+        },
+      };
+    },
+  };
+}
+
 type QueryFetcher<Q extends AllParams> = {
   all(): Iterable<AllResults<Q>>;
   single(): AllResults<Q>;
 };
 
 class QueryFactory<Q extends AllParams> {
-  private query;
+  private descriptor;
 
   constructor(...wq: Q) {
-    this.query = All(...wq);
+    this.descriptor = All(...wq);
   }
 
   filter<F extends Filters>(...f: F): QueryFactory<Q> {
-    this.query = this.query.filter(...f);
+    this.descriptor = this.descriptor.filter(...f);
     return this;
   }
 
   create(state: WorldState): Fetcher<QueryFetcher<Q>> {
-    const query = this.query;
-    state.addQuery(query);
+    const descriptor = this.descriptor;
+    state.addQuery(descriptor);
 
     const fetcher = {
       *all() {
-        yield* state.fetchQuery(query);
+        yield* state.fetchQuery(descriptor);
       },
       single() {
-        return single(state.fetchQuery(query));
+        return single(state.fetchQuery(descriptor));
       },
     };
     return {

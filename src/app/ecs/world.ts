@@ -3,16 +3,17 @@ import { Queue } from "queue-typescript";
 import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { TypeSet, Table } from "@/app/utils/collections";
 
-import { WorldQuery } from "./query";
+import { InstantiatedQuery, QueryDescriptor } from "./query";
+import { ComponentTicks, SystemTicks } from "./change-tracking";
 
 export const EntityType = Symbol.for("Entity");
 export class EcsEntity {
   [EntityType]: number;
 }
 
-export const ComponentType = Symbol.for("Component");
+export const ChangeTicks = Symbol.for("ChangeTicks");
 export abstract class EcsComponent {
-  protected [ComponentType]: true;
+  [ChangeTicks]: ComponentTicks;
 }
 
 export const ResourceType = Symbol.for("Resource");
@@ -46,6 +47,8 @@ export class World {
   private readonly resources = new TypeSet<EcsResource>();
   private readonly eventQueues = new Map<Ctor<EcsEvent>, Queue<EcsEvent>>();
 
+  readonly ticks = new SystemTicks();
+
   private newEntityId = 1;
 
   spawn(...components: EcsComponent[]): EcsEntity {
@@ -61,7 +64,9 @@ export class World {
   }
 
   insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void {
+    const added = this.ticks.advance();
     for (const component of components) {
+      component[ChangeTicks] = new ComponentTicks(added);
       const ctor = getConstructorOf(component);
       this.components.add(entity, ctor, (exists) => {
         if (exists) {
@@ -111,11 +116,13 @@ export class World {
 }
 
 type WorldCommand = (world: World) => void;
-type WorldQueryResult<T = unknown> = T extends WorldQuery<infer R> ? R : never;
+type WorldQueryResult<T = unknown> = T extends QueryDescriptor<infer R>
+  ? R
+  : never;
 
 export class WorldState {
   private generation = 0;
-  private readonly fetches = new Map<WorldQuery, FetchCache>();
+  private readonly fetches = new Map<QueryDescriptor, FetchCache>();
 
   constructor(readonly world: World) {}
 
@@ -149,19 +156,21 @@ export class WorldState {
     }
   }
 
-  addQuery(query: WorldQuery) {
-    if (this.fetches.has(query)) {
+  addQuery(descriptor: QueryDescriptor) {
+    if (this.fetches.has(descriptor)) {
       throw new Error("Query already registered.");
     }
 
-    const fetch = new FetchCache(query);
-    this.fetches.set(query, fetch);
+    const fetch = new FetchCache(descriptor.newQuery(this));
+    this.fetches.set(descriptor, fetch);
     for (const [entity, row] of this.world.archetypes()) {
       fetch.notify(this.generation, entity, row);
     }
   }
 
-  fetchQuery<Q extends WorldQuery>(query: Q): Iterable<WorldQueryResult<Q>> {
+  fetchQuery<Q extends QueryDescriptor>(
+    query: Q,
+  ): Iterable<WorldQueryResult<Q>> {
     const fetch = this.fetches.get(query);
     if (fetch === undefined) {
       throw new Error("Query is not registered.");
@@ -200,7 +209,7 @@ export class WorldState {
 class FetchCache<F = unknown> {
   private readonly descriptors = new Map<EcsEntity, CachedQueryResult>();
 
-  constructor(private readonly query: WorldQuery<F>) {}
+  constructor(private readonly query: InstantiatedQuery<F>) {}
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.match(archetype)) {

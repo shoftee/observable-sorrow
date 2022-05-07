@@ -39,6 +39,13 @@ import {
 } from "@/app/state";
 import { getOrAdd } from "@/app/utils/collections";
 import { Enumerable } from "@/app/utils/enumerable";
+import {
+  addState,
+  changeState,
+  removeState,
+  DeltaSchema,
+} from "@/app/game/systems2/core";
+import { ComponentDeltas } from "@/app/game/systems2/types";
 
 export interface IStateManager {
   buildings(): Enumerable<[BuildingId, BuildingState]>;
@@ -145,12 +152,20 @@ class EventPools extends Map<EventId, Channel> {
 }
 
 export class StateManager implements IPresenterChangeSink, IStateManager {
+  private readonly state: DeltaSchema;
   private readonly pools: MutationPools;
   private readonly events: EventPools;
 
   constructor() {
+    this.state = reactive({});
     this.pools = new MutationPools();
     this.events = new EventPools();
+  }
+
+  acceptRender(deltas: ComponentDeltas): void {
+    addState(this.state, deltas.added);
+    changeState(this.state, deltas.changed);
+    removeState(this.state, deltas.removed);
   }
 
   acceptMutations(mutations: MutationPool[]): void {

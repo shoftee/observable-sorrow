@@ -1,18 +1,15 @@
-import { OnMutationHandler, OnEventHandler } from "@/app/interfaces";
+import { OnRenderHandler } from "@/app/interfaces";
 
 import { GameRunner, App } from "@/app/ecs";
-import { TimePlugin } from "@/app/ecs/time-plugin";
+import { MinimalPlugins } from "@/app/ecs/plugins";
 
 import { RendererPlugin } from "./renderer";
 import { EnvironmentPlugin } from "./environment";
 
-export function build(
-  onMutation: OnMutationHandler,
-  onLogEvent: OnEventHandler,
-): GameRunner {
+export function build(onRender: OnRenderHandler): GameRunner {
   return new App()
-    .plugin(new TimePlugin())
-    .plugin(new EnvironmentPlugin())
-    .plugin(new RendererPlugin(onMutation, onLogEvent))
+    .addPlugin(new MinimalPlugins())
+    .addPlugin(new EnvironmentPlugin())
+    .addPlugin(new RendererPlugin(onRender))
     .buildRunner();
 }

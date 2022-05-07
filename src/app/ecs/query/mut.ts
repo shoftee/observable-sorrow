@@ -1,21 +1,38 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { Archetype, EcsComponent, EcsEntity } from "../world";
-import { WorldQuery } from "./types";
+import {
+  Archetype,
+  ChangeTicks,
+  EcsComponent,
+  EcsEntity,
+  WorldState,
+} from "../world";
+import { InstantiatedQuery, QueryDescriptor } from "./types";
 
-class MutQuery<C extends EcsComponent> implements WorldQuery<C> {
-  constructor(readonly ctor: Ctor<C>) {}
-
-  match(archetype: Archetype): boolean {
-    return archetype.has(this.ctor);
-  }
-
-  fetch(_: EcsEntity, archetype: Archetype<C>): C {
-    return archetype.get(this.ctor)!;
-  }
-}
+type Mut<C extends EcsComponent> = QueryDescriptor<C>;
 
 /** Include a mutable view of a component in the query results. */
-export function Mut<C extends EcsComponent>(ctor: Ctor<C>): MutQuery<C> {
-  return new MutQuery<C>(ctor);
+export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
+  return {
+    newQuery(state: WorldState): InstantiatedQuery<C> {
+      return {
+        match: (archetype: Archetype) => {
+          return archetype.has(ctor);
+        },
+        fetch: (_: EcsEntity, archetype: Archetype<C>) => {
+          const component = archetype.get(ctor)!;
+          return new Proxy(component, {
+            set(target, propertKey, receiver) {
+              const success = Reflect.set(target, propertKey, receiver);
+              if (success) {
+                // set changed tick to current tick from world state
+                component[ChangeTicks].changed = state.world.ticks.current;
+              }
+              return success;
+            },
+          });
+        },
+      };
+    },
+  };
 }

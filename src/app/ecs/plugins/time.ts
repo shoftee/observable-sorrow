@@ -1,10 +1,10 @@
 import { round } from "@/app/utils/mathx";
 
-import { App, EcsComponent, Plugin } from ".";
+import { EcsComponent, EcsResource } from "../world";
 
-import { Mut } from "./query";
-import { Query, Res, System } from "./system";
-import { EcsResource } from "./world";
+import { App } from "../app";
+import { Mut } from "../query";
+import { Query, Res, System } from "../system";
 
 export class GameTime extends EcsResource {
   last = 0;
