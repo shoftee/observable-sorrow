@@ -3,26 +3,33 @@ import { Calendar, Resource, HistoryEvent } from "../types";
 
 type RecordObj = Record<string, unknown>;
 
-type ComplexState<T> = T extends Record<string, unknown> ? T : never;
+const MarkerSymbol = Symbol();
+class ComponentMarker<C extends EcsComponent = EcsComponent> {
+  [MarkerSymbol]: C;
+}
 
-type ComponentsSchema = ComplexState<{
-  calendar: Calendar;
-  resources: ComplexState<{
-    catnip: Resource;
-  }>;
-}>;
+type Serializable<T> = {
+  [K in Extract<keyof T, string>]: T[K];
+};
+
+type ComponentsSchema = {
+  calendar: ComponentMarker<Calendar>;
+  resources: {
+    catnip: ComponentMarker<Resource>;
+  };
+};
 
 export type EventsSchema = {
   history?: HistoryEvent[];
 };
 
-type Present<T> = T extends ComplexState<infer S>
-  ? { [K in keyof S]?: Present<S[K]> }
-  : T;
+type Present<T> = T extends ComponentMarker<infer V>
+  ? Serializable<V>
+  : { [K in keyof T]?: Present<T[K]> };
 
-type Removed<T> = T extends ComplexState<infer S>
-  ? { [K in keyof S]?: Removed<S[K]> }
-  : true;
+type Removed<T> = T extends ComponentMarker
+  ? true
+  : { [K in keyof T]?: Removed<T[K]> };
 
 export type DeltaSchema = Present<ComponentsSchema>;
 export type RemovedDeltaSchema = Removed<ComponentsSchema>;
@@ -31,16 +38,18 @@ export function addState(dst: DeltaSchema, src: DeltaSchema) {
   return addStateDeep(dst, src);
 }
 
-function addStateDeep<T extends RecordObj>(destination: T, source: T) {
-  mergeWith(destination, source, (dstElement, srcElement, key) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function addStateDeep(destination: any, source: any) {
+  mergeWith(destination, source, (dstElement, srcElement) => {
     if (srcElement instanceof EcsComponent) {
-      return srcElement;
+      return mergeProperties({}, srcElement);
     }
 
     if (isObject(srcElement)) {
       if (dstElement === undefined) {
-        // property is missing, set it directly
-        return srcElement;
+        const newDstElement = {};
+        addStateDeep(newDstElement, srcElement);
+        return newDstElement;
       }
 
       if (isObject(dstElement)) {
@@ -50,7 +59,7 @@ function addStateDeep<T extends RecordObj>(destination: T, source: T) {
       }
 
       throw new Error(
-        `Expected property ${key} to be an object, but found ${dstElement} instead.`,
+        `Expected property to be an object, but found ${dstElement} instead.`,
       );
     }
   });
@@ -60,57 +69,58 @@ export function changeState(dst: DeltaSchema, src: DeltaSchema) {
   changeStateDeep(dst, src);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function changeStateDeep<T extends RecordObj>(destination: T, source: T) {
-  mergeWith(destination, source, (dstElement, srcElement, key) => {
-    if (dstElement === undefined) {
-      // property is missing, write source directly.
-      return srcElement;
+  mergeWith(destination, source, (dstElement, srcElement) => {
+    if (srcElement instanceof EcsComponent) {
+      if (dstElement !== undefined) {
+        return mergeProperties(dstElement, srcElement);
+      } else {
+        return mergeProperties({}, srcElement);
+      }
     }
-    if (
-      srcElement instanceof EcsComponent &&
-      dstElement instanceof EcsComponent
-    ) {
-      mergeProperties(dstElement, srcElement);
-      return dstElement;
-    }
-    if (isObject(srcElement) && isObject(dstElement)) {
-      changeState(srcElement, dstElement);
-      return dstElement;
+
+    if (isObject(srcElement)) {
+      if (dstElement !== undefined) {
+        if (isObject(dstElement)) {
+          changeStateDeep(dstElement, srcElement);
+          return dstElement;
+        }
+      } else {
+        const newDstElement = {};
+        changeStateDeep(newDstElement, srcElement);
+        return newDstElement;
+      }
     }
 
     throw new Error(
-      `Types of property ${key} in source and destination did not match.`,
+      `Types of property in source and destination did not match.`,
     );
   });
 }
 
-function mergeProperties<C extends EcsComponent>(dst: C, src: C) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mergeProperties(dst: any, src: any) {
   for (const key in src) {
     if (Object.prototype.hasOwnProperty.call(src, key)) {
       dst[key] = src[key];
     }
   }
+  return dst;
 }
-
-type RemovalSource<T> = T extends ComplexState<infer S>
-  ? { [K in keyof S]: RemovalSource<S[K]> }
-  : true;
 
 export function removeState(dst: DeltaSchema, src: RemovedDeltaSchema) {
   removeStateDeep(dst, src);
 }
 
-function removeStateDeep<T extends RecordObj>(
-  destination: T,
-  source: RemovalSource<T>,
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function removeStateDeep(destination: any, source: any) {
   mergeWith(destination, source, (dstElement, srcElement) => {
     if (srcElement === true) {
       return undefined;
     }
     if (isObject(dstElement)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      removeStateDeep(dstElement, srcElement as any);
+      removeStateDeep(dstElement, srcElement);
       return dstElement;
     }
   });
@@ -124,7 +134,7 @@ export function mergeRemovals(
 }
 
 function mergeRemovalsDeep<T extends RecordObj>(destination: T, source: T) {
-  mergeWith(destination, source, (dstElement, srcElement, key) => {
+  mergeWith(destination, source, (dstElement, srcElement) => {
     if (srcElement === true) {
       return true;
     }
@@ -138,11 +148,11 @@ function mergeRemovalsDeep<T extends RecordObj>(destination: T, source: T) {
       }
 
       throw new Error(
-        `Types of property ${key} in source and destination did not match.`,
+        `Types of property in source and destination did not match.`,
       );
     }
 
-    throw new Error(`Unexpected type for property ${key}: ${srcElement}.`);
+    throw new Error(`Unexpected type for property: ${srcElement}.`);
   });
 }
 

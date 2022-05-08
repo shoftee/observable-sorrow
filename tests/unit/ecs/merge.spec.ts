@@ -9,6 +9,7 @@ import {
   DeltaSchema,
   removeState,
 } from "@/app/game/systems2/core";
+import { ChangeTicks } from "@/app/ecs";
 
 describe("delta merge", () => {
   describe("addState", () => {
@@ -20,16 +21,19 @@ describe("delta merge", () => {
       addState(added, { calendar: newCalendar });
 
       expect(added).to.deep.equal({ calendar: newCalendar });
+      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
     });
     it("should overwrite existing objects", () => {
       const buffer = new DeltaBuffer();
       const added = buffer.components.added;
 
       const oldCalendar = new Calendar();
-      added.calendar = oldCalendar;
+      addState(added, { calendar: oldCalendar });
+      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       const newCalendar = calendar();
       addState(added, { calendar: newCalendar });
+      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       expect(added).to.deep.equal({ calendar: newCalendar });
     });
@@ -41,6 +45,7 @@ describe("delta merge", () => {
       addState(added, {
         resources: { catnip: newResource },
       });
+      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(added).to.deep.equal({
         resources: { catnip: newResource },
@@ -54,11 +59,13 @@ describe("delta merge", () => {
       addState(added, {
         resources: { catnip: oldResource },
       });
+      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       addState(added, {
         resources: { catnip: newResource },
       });
+      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(added).to.deep.equal({
         resources: { catnip: newResource },
@@ -72,16 +79,19 @@ describe("delta merge", () => {
       changeState(added, {
         calendar: newCalendar,
       });
+      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       changeState(added, {
         resources: { catnip: newResource },
       });
+      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(added).to.deep.equal({
         calendar: newCalendar,
         resources: { catnip: newResource },
       });
+      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
     });
   });
 
@@ -92,6 +102,7 @@ describe("delta merge", () => {
 
       const newCalendar = calendar();
       changeState(changed, { calendar: newCalendar });
+      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({ calendar: newCalendar });
     });
@@ -100,10 +111,12 @@ describe("delta merge", () => {
       const changed = buffer.components.changed;
 
       const oldCalendar = new Calendar();
-      changed.calendar = oldCalendar;
+      changeState(changed, { calendar: oldCalendar });
+      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       const newCalendar = calendar();
       changeState(changed, { calendar: newCalendar });
+      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({ calendar: newCalendar });
     });
@@ -115,6 +128,7 @@ describe("delta merge", () => {
       changeState(changed, {
         resources: { catnip: newResource },
       });
+      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({
         resources: { catnip: newResource },
@@ -128,11 +142,13 @@ describe("delta merge", () => {
       changeState(changed, {
         resources: { catnip: oldResource },
       });
+      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       changeState(changed, {
         resources: { catnip: newResource },
       });
+      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({
         resources: { catnip: newResource },
@@ -146,11 +162,13 @@ describe("delta merge", () => {
       changeState(changed, {
         calendar: newCalendar,
       });
+      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       changeState(changed, {
         resources: { catnip: newResource },
       });
+      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({
         calendar: newCalendar,
