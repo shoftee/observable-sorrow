@@ -27,30 +27,25 @@ export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
 
 export class ComponentTicks {
   readonly added: number;
-  changed: number;
+  changed: number | undefined;
 
   constructor(tick: number) {
-    this.added = this.changed = tick;
+    this.added = tick;
   }
 
   isAdded(last: number, current: number): boolean {
-    return compare(this.added, last, current);
+    const added = this.added;
+    return compare(added, last, current);
   }
 
   isChanged(last: number, current: number): boolean {
-    return compare(this.changed, last, current);
+    const changed = this.changed;
+    return changed !== undefined && compare(changed, last, current);
   }
 }
 
-function compare(
-  tick: number,
-  systemLast: number,
-  systemCurrent: number,
-): boolean {
-  const componentDelta = systemCurrent - tick;
-  const systemDelta = systemCurrent - systemLast;
-
-  return componentDelta < systemDelta;
+function compare(tick: number, last: number, current: number): boolean {
+  return current - tick < current - last;
 }
 
 export class SystemTicks {

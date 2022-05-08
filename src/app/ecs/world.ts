@@ -16,13 +16,11 @@ import {
   SystemTicks,
 } from "./types";
 
-export type ComponentCtor<C extends EcsComponent = EcsComponent> = Ctor<C>;
-
 export class World {
   private readonly entities = new Set<EcsEntity>();
   private readonly components = new Table<
     EcsEntity,
-    ComponentCtor,
+    Ctor<EcsComponent>,
     EcsComponent
   >();
   private readonly resources = new TypeSet<EcsResource>();
@@ -51,14 +49,14 @@ export class World {
       const ctor = getConstructorOf(component);
       this.components.add(entity, ctor, (exists) => {
         if (exists) {
-          throw new Error(`Entity already has compnent of type ${ctor}`);
+          throw new Error(`Entity already has component of type ${ctor}.`);
         }
         return component;
       });
     }
   }
 
-  removeComponents(entity: EcsEntity, ...ctors: ComponentCtor[]): void {
+  removeComponents(entity: EcsEntity, ...ctors: Ctor<EcsComponent>[]): void {
     for (const ctor of ctors) {
       this.components.removeCell(entity, ctor);
     }
@@ -81,16 +79,17 @@ export class World {
   }
 
   registerEvent<E extends EcsEvent>(ctor: Ctor<E>) {
-    if (this.eventQueues.has(ctor)) {
-      throw new Error("Event already registered");
+    const events = this.eventQueues;
+    if (events.has(ctor)) {
+      throw new Error("Event already registered.");
     }
-    this.eventQueues.set(ctor, new Queue<E>());
+    events.set(ctor, new Queue<E>());
   }
 
   events<E extends EcsEvent>(ctor: Ctor<E>): Queue<E> {
     const queue = this.eventQueues.get(ctor);
     if (queue === undefined) {
-      throw new Error("Event not registered");
+      throw new Error("Event not registered.");
     }
     return queue as Queue<E>;
   }
@@ -138,12 +137,12 @@ export class WorldState {
   }
 
   addQuery(descriptor: QueryDescriptor) {
-    if (this.fetches.has(descriptor)) {
+    const fetches = this.fetches;
+    if (fetches.has(descriptor)) {
       throw new Error("Query already registered.");
     }
-
     const fetch = new FetchCache(descriptor.newQuery(this));
-    this.fetches.set(descriptor, fetch);
+    fetches.set(descriptor, fetch);
     for (const [entity, row] of this.world.archetypes()) {
       fetch.notify(this.generation, entity, row);
     }
@@ -210,10 +209,10 @@ class FetchCache<F = unknown> {
   }
 
   *results(): Iterable<F> {
-    for (const [entity, result] of this.descriptors) {
-      const matches = this.query.matches?.(result.archetype) ?? true;
-      if (matches) {
-        yield this.query.fetch(entity, result.archetype);
+    const { fetch, matches } = this.query;
+    for (const [entity, { archetype }] of this.descriptors) {
+      if (matches?.(archetype) ?? true) {
+        yield fetch(entity, archetype);
       }
     }
   }
