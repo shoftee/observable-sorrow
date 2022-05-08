@@ -2,7 +2,7 @@ import { round } from "@/app/utils/mathx";
 
 import { EcsComponent, EcsResource } from "../world";
 
-import { App } from "../app";
+import { App, EcsPlugin } from "../app";
 import { Mut } from "../query";
 import { Query, Res, System } from "../system";
 
@@ -51,7 +51,7 @@ const AdvanceTimers = System(
   }
 });
 
-export class TimePlugin extends Plugin {
+export class TimePlugin extends EcsPlugin {
   add(app: App): void {
     app
       .insertResource(new GameTime())

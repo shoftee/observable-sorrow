@@ -36,7 +36,7 @@ export class App {
     return this;
   }
 
-  addPlugin(p: Plugin): App {
+  addPlugin(p: EcsPlugin): App {
     p.add(this);
     return this;
   }
@@ -101,6 +101,6 @@ export class GameRunner {
   }
 }
 
-export abstract class Plugin {
+export abstract class EcsPlugin {
   abstract add(app: App): void;
 }
