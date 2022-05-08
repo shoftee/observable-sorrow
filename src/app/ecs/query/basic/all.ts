@@ -1,9 +1,13 @@
 import { all } from "@/app/utils/collections";
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { QueryDescriptor, FilterDescriptor } from ".";
-import { Archetype, EcsComponent, EcsEntity, WorldState } from "../world";
-import { InstantiatedFilter, InstantiatedQuery } from "./types";
+import { Archetype, EcsComponent, EcsEntity, WorldState } from "@/app/ecs";
+import {
+  QueryDescriptor,
+  FilterDescriptor,
+  InstantiatedFilter,
+  InstantiatedQuery,
+} from "../types";
 
 export type AllParams = [...QueryDescriptor[]];
 export type AllResults<T> = T extends [infer Head, ...infer Tail]

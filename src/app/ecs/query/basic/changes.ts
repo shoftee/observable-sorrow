@@ -6,9 +6,8 @@ import {
   EcsComponent,
   EcsEntity,
   WorldState,
-} from "../world";
-
-import { FilterDescriptor, QueryDescriptor } from "./types";
+} from "@/app/ecs";
+import { FilterDescriptor, QueryDescriptor } from "../types";
 
 type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;

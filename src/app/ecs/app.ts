@@ -1,8 +1,9 @@
 import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { MultiMap, TypeSet } from "@/app/utils/collections";
 
-import { EcsEvent, EcsResource, World, WorldState } from "./world";
 import { IntoSystem, SystemRunner } from "./system";
+import { EcsResource, EcsEvent } from "./types";
+import { World, WorldState } from "./world";
 
 export type SystemStage =
   | "startup"

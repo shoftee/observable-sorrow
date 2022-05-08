@@ -1,8 +1,9 @@
 import { expect } from "chai";
 
 import { EcsComponent, World, WorldState } from "@/app/ecs";
-import { Query, System } from "@/app/ecs/system";
-import { Read } from "@/app/ecs/query";
+
+import { Query, Read } from "@/app/ecs/query";
+import { System } from "@/app/ecs/system";
 
 describe("ecs systems", () => {
   it("should compile", () => {

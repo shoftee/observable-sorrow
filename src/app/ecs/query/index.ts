@@ -1,9 +1,13 @@
-export * from "./types";
+export * from "./basic/all";
+export * from "./basic/entity";
+export * from "./basic/read";
+export * from "./basic/mut";
+export * from "./basic/opt";
+export * from "./basic/changes";
 
-export * from "./entity";
-export * from "./read";
-export * from "./mut";
-export * from "./opt";
-
-export * from "./changes";
-export * from "./all";
+export * from "./system/commands";
+export * from "./system/dispatch";
+export * from "./system/receiver";
+export * from "./system/res";
+export * from "./system/query";
+export * from "./system/world";

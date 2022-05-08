@@ -1,7 +1,7 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { Archetype, EcsComponent, EcsEntity } from "../world";
-import { InstantiatedQuery, QueryDescriptor } from "./types";
+import { Archetype, EcsComponent, EcsEntity } from "@/app/ecs";
+import { InstantiatedQuery, QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
 

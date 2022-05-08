@@ -6,8 +6,8 @@ import {
   EcsComponent,
   EcsEntity,
   WorldState,
-} from "../world";
-import { InstantiatedQuery, QueryDescriptor } from "./types";
+} from "@/app/ecs";
+import { InstantiatedQuery, QueryDescriptor } from "../types";
 
 type Mut<C extends EcsComponent> = QueryDescriptor<C>;
 

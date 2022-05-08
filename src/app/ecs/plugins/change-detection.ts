@@ -1,5 +1,6 @@
 import { App, EcsPlugin } from "../app";
-import { System, World } from "../system";
+import { World } from "../query";
+import { System } from "../system";
 
 const AdvanceSystemTicks = System(World())((world) => {
   world.ticks.updateLast();

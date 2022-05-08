@@ -1,5 +1,5 @@
-import { EcsEntity, Archetype, WorldState, EcsComponent } from "../world";
-import { QueryDescriptor } from "./types";
+import { EcsEntity, Archetype, WorldState, EcsComponent } from "@/app/ecs";
+import { QueryDescriptor } from "../types";
 
 type Opt<F> = QueryDescriptor<F | undefined>;
 

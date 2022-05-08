@@ -1,7 +1,7 @@
-import { QueryDescriptor } from ".";
-import { EcsEntity as Etty } from "../world";
+import { EcsEntity } from "@/app/ecs";
+import { QueryDescriptor } from "../types";
 
-type EntityQuery = QueryDescriptor<Readonly<Etty>>;
+type EntityQuery = QueryDescriptor<Readonly<EcsEntity>>;
 
 /** Include the entity object in the query results. */
 export function Entity(): EntityQuery {
@@ -11,7 +11,7 @@ export function Entity(): EntityQuery {
         includes(): boolean {
           return true;
         },
-        fetch(entity: Etty): Readonly<Etty> {
+        fetch(entity: EcsEntity): Readonly<EcsEntity> {
           return entity;
         },
       };

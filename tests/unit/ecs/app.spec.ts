@@ -3,8 +3,18 @@ import { expect } from "chai";
 import { MultiMap } from "@/app/utils/collections";
 
 import { App, EcsComponent, EcsEvent, SystemStage } from "@/app/ecs";
-import { Receive, System, Dispatch, Commands, Query } from "@/app/ecs/system";
-import { Mut, Read, Changed, Added, ChangeTrackers } from "@/app/ecs/query";
+import { System } from "@/app/ecs/system";
+import {
+  Dispatch,
+  Receive,
+  Query,
+  Mut,
+  Read,
+  Changed,
+  Commands,
+  Added,
+  ChangeTrackers,
+} from "@/app/ecs/query";
 import { MinimalPlugins } from "@/app/ecs/plugins";
 
 describe("ecs app", () => {

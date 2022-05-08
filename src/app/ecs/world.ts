@@ -3,39 +3,20 @@ import { Queue } from "queue-typescript";
 import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { TypeSet, Table } from "@/app/utils/collections";
 
-import { InstantiatedQuery, QueryDescriptor } from "./query";
-import { ComponentTicks, SystemTicks } from "./change-tracking";
-
-export const EntityType = Symbol.for("Entity");
-export class EcsEntity {
-  [EntityType]: number;
-}
-
-export const ChangeTicks = Symbol.for("ChangeTicks");
-export abstract class EcsComponent {
-  [ChangeTicks]: ComponentTicks;
-}
-
-export const ResourceType = Symbol.for("Resource");
-export abstract class EcsResource {
-  protected [ResourceType]: true;
-}
-
-export const EventType = Symbol.for("Event");
-export abstract class EcsEvent {
-  protected [EventType]: true;
-}
+import { InstantiatedQuery, QueryDescriptor } from "./query/types";
+import {
+  Archetype,
+  ChangeTicks,
+  ComponentTicks,
+  EcsComponent,
+  EcsEntity,
+  EcsEvent,
+  EcsResource,
+  EntityType,
+  SystemTicks,
+} from "./types";
 
 export type ComponentCtor<C extends EcsComponent = EcsComponent> = Ctor<C>;
-
-export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
-  ComponentCtor<C>,
-  C
->;
-
-export interface IQuery {
-  notify(entity: EcsEntity, archetype: Archetype): void;
-}
 
 export class World {
   private readonly entities = new Set<EcsEntity>();

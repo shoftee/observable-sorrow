@@ -1,4 +1,5 @@
-import { Archetype, EcsEntity, WorldState } from "../world";
+import { Archetype, EcsEntity } from "../types";
+import { WorldState } from "../world";
 
 /**
  * A generic interface for querying the world state for component data.
@@ -43,3 +44,13 @@ export abstract class FilterDescriptor {
 export abstract class QueryDescriptor<Fetch = unknown> {
   abstract newQuery(state: WorldState): InstantiatedQuery<Fetch>;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Fetcher<T = any> = {
+  fetch(): T;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FetcherFactory<T = any> = {
+  create(state: WorldState): Fetcher<T>;
+};
