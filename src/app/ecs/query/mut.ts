@@ -16,7 +16,7 @@ export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
     newQuery(state: WorldState): InstantiatedQuery<C> {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
           return archetype.has(ctor);
         },
         fetch: (_: EcsEntity, archetype: Archetype<C>) => {

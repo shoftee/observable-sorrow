@@ -1,7 +1,7 @@
 import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
-import { App, Plugin } from "@/app/ecs";
+import { App, EcsPlugin } from "@/app/ecs";
 import { Commands, Query, Res, System } from "@/app/ecs/system";
 import { ChangeTrackers, Mut, Read, With } from "@/app/ecs/query";
 
@@ -54,7 +54,7 @@ const TrackChanges = System(
   }
 });
 
-export class EnvironmentPlugin extends Plugin {
+export class EnvironmentPlugin extends EcsPlugin {
   add(app: App): void {
     app
       .addStartupSystem(startup)

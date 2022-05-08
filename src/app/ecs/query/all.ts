@@ -31,8 +31,11 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
     };
 
     return {
-      match: (archetype: Archetype) => {
-        return all(filterIterator(), (f) => f.match(archetype));
+      includes: (archetype: Archetype) => {
+        return all(filterIterator(), (f) => f.includes(archetype) ?? true);
+      },
+      matches: (archetype: Archetype) => {
+        return all(filterIterator(), (f) => f.matches?.(archetype) ?? true);
       },
       fetch: (entity: EcsEntity, archetype: Archetype) => {
         return queries.map((q) => q.fetch(entity, archetype)) as AllResults<Q>;
@@ -57,7 +60,7 @@ export function With(...ctors: Ctor<EcsComponent>[]): With {
   return {
     newFilter(): InstantiatedFilter {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
           return all(ctors, (ctor) => archetype.has(ctor));
         },
       };
@@ -71,7 +74,7 @@ export function Without(...ctors: Ctor<EcsComponent>[]): Without {
   return {
     newFilter(): InstantiatedFilter {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
           return all(ctors, (ctor) => !archetype.has(ctor));
         },
       };

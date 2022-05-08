@@ -10,7 +10,7 @@ export function Read<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
   return {
     newQuery(): InstantiatedQuery<Readonly<C>> {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
           return archetype.has(ctor);
         },
         fetch: (_: EcsEntity, archetype: Archetype<C>) => {

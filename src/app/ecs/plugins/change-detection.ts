@@ -2,7 +2,7 @@ import { App, EcsPlugin } from "../app";
 import { System, World } from "../system";
 
 const AdvanceSystemTicks = System(World())((world) => {
-  world.ticks.advance();
+  world.ticks.updateLast();
 });
 
 export class ChangeDetectionPlugin extends EcsPlugin {

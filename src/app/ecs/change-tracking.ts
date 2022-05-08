@@ -33,7 +33,7 @@ export class SystemTicks {
   }
 
   advance(): number {
-    return ++this._current;
+    return this._current++;
   }
 
   updateLast() {

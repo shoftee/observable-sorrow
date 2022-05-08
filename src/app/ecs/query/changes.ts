@@ -23,7 +23,7 @@ export function ChangeTrackers<C extends EcsComponent>(
   return {
     newQuery(state: WorldState) {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
           return archetype.has(ctor);
         },
         fetch: (_: EcsEntity, archetype: Archetype<C>) => {
@@ -51,7 +51,10 @@ export function Added<C extends EcsComponent>(ctor: Ctor<C>): AddedFilter {
   return {
     newFilter(state: WorldState) {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
+          return archetype.has(ctor);
+        },
+        matches: (archetype: Archetype) => {
           const component = archetype.get(ctor);
           if (component !== undefined) {
             const { last, current } = state.world.ticks;
@@ -70,7 +73,10 @@ export function Changed<C extends EcsComponent>(ctor: Ctor<C>): ChangedFilter {
   return {
     newFilter(state: WorldState) {
       return {
-        match: (archetype: Archetype) => {
+        includes: (archetype: Archetype) => {
+          return archetype.has(ctor);
+        },
+        matches: (archetype: Archetype) => {
           const component = archetype.get(ctor);
           if (component !== undefined) {
             const { last, current } = state.world.ticks;

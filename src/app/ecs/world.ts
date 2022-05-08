@@ -115,7 +115,7 @@ export class World {
   }
 }
 
-type WorldCommand = (world: World) => void;
+type WorldCommand = () => void;
 type WorldQueryResult<T = unknown> = T extends QueryDescriptor<infer R>
   ? R
   : never;
@@ -187,21 +187,19 @@ export class WorldState {
   }
 
   insertComponentsDeferred(entity: EcsEntity, ...components: EcsComponent[]) {
-    this.commands.enqueue((world) =>
-      world.insertComponents(entity, ...components),
-    );
+    this.commands.enqueue(() => this.insertComponents(entity, ...components));
   }
 
   despawnDeferred(entity: EcsEntity) {
-    this.commands.enqueue((world) => {
-      world.despawn(entity);
+    this.commands.enqueue(() => {
+      this.despawn(entity);
     });
   }
 
   flushDeferred() {
     let command;
     while ((command = this.commands.dequeue())) {
-      command(this.world);
+      command();
     }
   }
 }
@@ -212,7 +210,7 @@ class FetchCache<F = unknown> {
   constructor(private readonly query: InstantiatedQuery<F>) {}
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
-    if (archetype.size === 0 || !this.query.match(archetype)) {
+    if (archetype.size === 0 || !this.query.includes(archetype)) {
       this.descriptors.delete(entity);
     } else {
       const result = this.descriptors.get(entity);
@@ -232,7 +230,10 @@ class FetchCache<F = unknown> {
 
   *results(): Iterable<F> {
     for (const [entity, result] of this.descriptors) {
-      yield this.query.fetch(entity, result.archetype);
+      const matches = this.query.matches?.(result.archetype) ?? true;
+      if (matches) {
+        yield this.query.fetch(entity, result.archetype);
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 import { OnRenderHandler } from "@/app/interfaces";
 
-import { App, Plugin, EcsResource } from "@/app/ecs";
+import { App, EcsPlugin, EcsResource } from "@/app/ecs";
 import { Res, System } from "@/app/ecs/system";
 
 import { DeltaBuffer } from "./types";
@@ -18,7 +18,7 @@ const FlushChanges = System(
   renderer.onRender(buffer.components);
 });
 
-export class RendererPlugin extends Plugin {
+export class RendererPlugin extends EcsPlugin {
   constructor(readonly onRender: OnRenderHandler) {
     super();
   }

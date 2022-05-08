@@ -8,7 +8,7 @@ export function Entity(): EntityQuery {
   return {
     newQuery() {
       return {
-        match(): boolean {
+        includes(): boolean {
           return true;
         },
         fetch(entity: Etty): Readonly<Etty> {
