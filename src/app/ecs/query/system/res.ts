@@ -5,9 +5,9 @@ import { FetcherFactory } from "../types";
 
 export function Res<R extends EcsResource>(ctor: Ctor<R>): FetcherFactory<R> {
   return {
-    create: (state) => {
+    create(state) {
       return {
-        fetch: () => {
+        fetch() {
           const res = state.world.resource(ctor);
           if (res === undefined) {
             throw new Error("Resource not found.");

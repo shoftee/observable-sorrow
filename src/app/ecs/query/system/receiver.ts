@@ -23,7 +23,7 @@ export function Receive<E extends EcsEvent>(
     create(state) {
       const receiver = new Receiver(state.world.events(ctor));
       return {
-        fetch(): Receiver<E> {
+        fetch() {
           return receiver;
         },
       };
