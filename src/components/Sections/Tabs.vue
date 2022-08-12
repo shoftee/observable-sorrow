@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { SectionId } from "@/app/interfaces";
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useStateManager } from "@/composables/game-endpoint";
+
+import { filterArrayView, fromIds, newSectionView } from "@/app/presenters/views";
 
 const props = defineProps<{ active: SectionId }>();
 const emit = defineEmits<{
   (e: "changed", section: SectionId): void;
 }>();
 
-const { topLevelSections } = useEndpoint((ep) => {
-  return {
-    topLevelSections: Array.from(ep.presenters.section.topLevelSections),
-  };
-});
+const manager = useStateManager();
 
 const { t } = useI18n();
 const active = ref(props.active);
-const items = computed(() => topLevelSections.filter((s) => s.unlocked));
+const all = fromIds(manager, manager.sections().keys(), newSectionView);
+
+// the tabs consist of all sections that have no parents and are unlocked
+const items = filterArrayView(all, (s) => !s.parentId && s.unlocked);
 
 function onTabClick(id: SectionId) {
   active.value = id;
@@ -28,18 +29,14 @@ function onTabClick(id: SectionId) {
 <template>
   <ul class="nav nav-pills">
     <li class="nav-item" v-for="section in items" :key="section.id">
-      <button
-        class="btn nav-link"
-        :class="{
-          active: section.id === active,
-          disabled: items.length < 2,
-        }"
-        @click="onTabClick(section.id)"
-      >
+      <button class="btn nav-link" :class="{
+        active: section.id === active,
+        disabled: items.length < 2,
+      }" @click="onTabClick(section.id)">
         <slot>
           {{ t(section.label) }}
           <span v-if="section.alert" class="number-annotation bg-danger">{{
-            section.alert
+              section.alert
           }}</span>
         </slot>
       </button>

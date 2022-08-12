@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
 import BuildingButton from "@/components/Controls/Building/Button.vue";
 
-import { useEndpoint } from "@/composables/game-endpoint";
-const { bonfire } = useEndpoint((ep) => {
-  return {
-    bonfire: ep.presenters.bonfire,
-  };
-});
+import { useStateManager } from "@/composables/game-endpoint";
+import { filterArrayView, fromIds, newBonfireItemView } from "@/app/presenters/views";
 
-const items = computed(() => bonfire.all.filter((b) => b.unlocked));
+const manager = useStateManager();
+
+const all = fromIds(manager, ["gather-catnip"], newBonfireItemView)
+const items = filterArrayView(all, b => b.unlocked);
 </script>
 
 <template>

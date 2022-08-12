@@ -11,28 +11,21 @@ import {
   Res,
   With,
 } from "@/app/ecs/query";
-
-import { Timer } from "@/app/ecs/plugins/time";
-
-import { DeltaBuffer } from "./types";
-import { Calendar, EnvironmentMarker } from "./types/environment";
 import { System } from "@/app/ecs/system";
 
-export class DayTimer extends Timer {
-  constructor() {
-    super(2000);
-  }
-}
+import { DeltaBuffer, Timer, Calendar, DayTimer, Environment } from "./types";
 
-const startup = System(Commands())((cmds) => {
-  cmds.spawn(new EnvironmentMarker(), new DayTimer(), new Calendar());
+const Setup = System(Commands())((cmds) => {
+  cmds.spawn(new DayTimer(), new Timer(2000));
+  cmds.spawn(new Environment(), new Calendar());
 });
 
-const advanceDaysQuery = Query(Read(DayTimer), Mut(Calendar)).filter(
-  With(EnvironmentMarker),
-);
-const AdvanceDays = System(advanceDaysQuery)((query) => {
-  const [days, calendar] = query.single();
+const AdvanceCalendar = System(
+  Query(Read(Timer)).filter(With(DayTimer)),
+  Query(Mut(Calendar)).filter(With(Environment)),
+)((timerQuery, calendarQuery) => {
+  const [days] = timerQuery.single();
+  const [calendar] = calendarQuery.single();
   if (days.isNewTick) {
     let currentDay = calendar.day;
     currentDay += 1;
@@ -50,24 +43,25 @@ const AdvanceDays = System(advanceDaysQuery)((query) => {
     calendar.day = currentDay;
   }
 });
+
 const TrackChanges = System(
   Res(DeltaBuffer),
-  Query(ChangeTrackers(Calendar)).filter(With(EnvironmentMarker)),
+  Query(ChangeTrackers(Calendar)).filter(With(Environment)),
 )((buffer, query) => {
   const [tracker] = query.single();
   if (tracker.isAdded()) {
-    buffer.components.setAdded({ calendar: tracker.value() });
+    buffer.components.setAdded((root) => (root.calendar = tracker.value()));
   } else if (tracker.isChanged()) {
-    buffer.components.setChanged({ calendar: tracker.value() });
+    buffer.components.setChanged((root) => (root.calendar = tracker.value()));
   }
 });
 
 export class EnvironmentPlugin extends EcsPlugin {
   add(app: App): void {
     app
-      .addStartupSystem(startup)
-      .addSystem(AdvanceDays)
-      .addSystem(TrackChanges, "postUpdate");
+      .addStartupSystem(Setup)
+      .addSystem(AdvanceCalendar)
+      .addSystem(TrackChanges, { stage: "main-end" });
   }
 }
 

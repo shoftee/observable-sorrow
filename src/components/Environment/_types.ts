@@ -1,4 +1,5 @@
-import { Calendar } from "@/app/presenters";
+import { SeasonId } from "@/app/interfaces";
+import { Meta } from "@/app/state";
 
 export interface LogEpoch {
   id: number;
@@ -12,13 +13,15 @@ export interface LogEpoch {
   }[];
 }
 
-export function newLogEpoch(id: number, calendar: Calendar): LogEpoch {
-  // Use non-reactive copies, otherwise old epochs will change with current calendar.
-  const { year, seasonLabel } = calendar;
+export function newLogEpoch(
+  id: number,
+  year: number,
+  season: SeasonId,
+): LogEpoch {
   return {
     id: id,
     year: year,
-    seasonLabel: seasonLabel,
+    seasonLabel: Meta.season(season).label,
     events: [],
   };
 }

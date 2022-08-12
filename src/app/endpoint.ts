@@ -1,102 +1,58 @@
-import { proxy, releaseProxy, RemoteObject, wrap } from "comlink";
+import { proxy, releaseProxy, wrap } from "comlink";
 
-import {
-  IDispatcher,
-  IDevToolsInteractor,
-  IGameController,
-  IRootInteractor,
-  IStoreInteractor,
-  OnEventHandler,
-  OnMutationHandler,
-} from "@/app/interfaces";
+import { Intent, IRootInteractor, OnRenderHandler } from "@/app/interfaces";
 
 import {
   BonfirePresenter,
-  EnvironmentPresenter,
+  IStateManager,
   NumberFormatter,
   PlayerPresenter,
   PresenterFacade,
-  ResourcesPresenter,
   SciencePresenter,
-  SectionsPresenter,
   SocietyPresenter,
   StateManager,
 } from "./presenters";
+import { ComponentDeltas } from "./game/systems2/types";
 
 export type Endpoint = {
-  interactors: {
-    controller: RemoteObject<IGameController>;
-    devTools: RemoteObject<IDevToolsInteractor>;
-    dispatcher: RemoteObject<IDispatcher>;
-    store: RemoteObject<IStoreInteractor>;
-  };
+  send(intent: Intent): Promise<void>;
+  stateManager: IStateManager;
   presenters: {
     bonfire: BonfirePresenter;
     formatter: NumberFormatter;
-    environment: EnvironmentPresenter;
     player: PlayerPresenter;
-    resources: ResourcesPresenter;
     science: SciencePresenter;
-    section: SectionsPresenter;
     society: SocietyPresenter;
   };
 };
 
-let release: () => void;
+let release: () => Promise<void>;
 
 export async function Setup(): Promise<Endpoint> {
   // release old proxies if they're around
-  release?.();
+  await release?.();
 
   const worker = new Worker(new URL("./game/worker.ts", import.meta.url));
   const root = wrap<IRootInteractor>(worker);
 
   const stateManager = new StateManager();
-  const onTicked: OnMutationHandler = proxy(function (changes) {
-    stateManager.acceptMutations(changes);
+  const onRender: OnRenderHandler = proxy(function (deltas: ComponentDeltas) {
+    stateManager.acceptRender(deltas);
   });
-  const onLogEvent: OnEventHandler = function (logEvents) {
-    stateManager.acceptEvents(logEvents);
-  };
 
-  await root.initialize(proxy(onTicked), proxy(onLogEvent));
-  await root.load();
+  await root.initialize(proxy(onRender));
+  await root.start();
 
-  release = () => {
+  release = async () => {
+    await root.stop();
     root[releaseProxy]();
   };
 
-  const presenters = new PresenterFacade(stateManager);
-
   return {
-    presenters: {
-      bonfire: presenters.bonfire,
-      environment: presenters.environment,
-      formatter: presenters.formatter,
-      player: presenters.player,
-      resources: presenters.resources,
-      science: presenters.science,
-      section: presenters.sections,
-      society: presenters.society,
+    async send(intent: Intent): Promise<void> {
+      await root.send(intent);
     },
-    interactors: {
-      controller: {
-        start: root.start,
-        stop: root.stop,
-      },
-      devTools: {
-        turnDevToolsOn: root.turnDevToolsOn,
-        turnDevToolsOff: root.turnDevToolsOff,
-        setGatherCatnip: root.setGatherCatnip,
-        setTimeAcceleration: root.setTimeAcceleration,
-      },
-      dispatcher: {
-        send: root.send,
-      },
-      store: {
-        load: root.load,
-        save: root.save,
-      },
-    },
+    stateManager: stateManager,
+    presenters: new PresenterFacade(stateManager),
   };
 }

@@ -1,55 +1,25 @@
 import { expose } from "comlink";
 
-import {
-  Intent,
-  IRootInteractor,
-  OnEventHandler,
-  OnMutationHandler,
-} from "@/app/interfaces";
+import { Intent, IRootInteractor, OnRenderHandler } from "@/app/interfaces";
 
-import { Runner } from "./runner";
+import { Game } from "./game";
 
-let runner: Runner;
+let game: Game;
 const interactor: IRootInteractor = {
-  async initialize(
-    onMutation: OnMutationHandler,
-    onEvent: OnEventHandler,
-  ): Promise<void> {
-    if (runner !== undefined) {
-      runner.interactor.controller.stop();
+  initialize(onRender: OnRenderHandler) {
+    if (game !== undefined) {
+      game.stop();
     }
-    runner = new Runner(onMutation, onEvent);
+    game = new Game(onRender);
   },
-  // game controls
   start() {
-    runner.interactor.controller.start();
+    game.start();
   },
   stop() {
-    runner.interactor.controller.stop();
+    game.stop();
   },
-  // store
-  async load() {
-    await runner.interactor.store.load();
-  },
-  async save() {
-    await runner.interactor.store.save();
-  },
-  // command dispatch
-  async send(intent: Intent) {
-    await runner.interactor.dispatcher.send(intent);
-  },
-  // devtools
-  turnDevToolsOn() {
-    runner.interactor.devTools.turnDevToolsOn();
-  },
-  turnDevToolsOff() {
-    runner.interactor.devTools.turnDevToolsOff();
-  },
-  setGatherCatnip(amount: number) {
-    runner.interactor.devTools.setGatherCatnip(amount);
-  },
-  setTimeAcceleration(factor: number) {
-    runner.interactor.devTools.setTimeAcceleration(factor);
+  send(intent: Intent) {
+    game.dispatch(intent);
   },
 };
 

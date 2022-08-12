@@ -11,9 +11,9 @@ import { useLogItemEvent } from "@/composables/use-event-listener";
 
 import { LogEpoch, newLogEpoch, removeClippedEvents } from "./_types";
 
-const { environment, fmt } = useEndpoint((ep) => {
+const { calendar, fmt } = useEndpoint((ep) => {
   return {
-    environment: ep.presenters.environment,
+    calendar: ep.stateManager.state.calendar,
     fmt: ep.presenters.formatter,
   };
 });
@@ -25,7 +25,7 @@ const epochs: LogEpoch[] = reactive([]);
 const requireNewEpoch = ref(true);
 
 watch(
-  () => environment.calendar.season,
+  () => calendar.season,
   () => {
     requireNewEpoch.value = true;
   },
@@ -38,7 +38,7 @@ function clearLog() {
 
 function latestEpoch(): LogEpoch {
   if (requireNewEpoch.value) {
-    const newEpoch = newLogEpoch(epochId.value++, environment.calendar);
+    const newEpoch = newLogEpoch(epochId.value++, calendar.year, calendar.season);
     epochs.unshift(newEpoch);
     requireNewEpoch.value = false;
   }
@@ -67,37 +67,25 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
       <div>{{ t("game.blurb") }}</div>
       <div class="btn-group">
         <ObserveSky class="btn btn-outline-secondary" />
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          @click="clearLog"
-        >
+        <button type="button" class="btn btn-outline-secondary" @click="clearLog">
           {{ t("game.control.clear-log") }}
         </button>
         <Pawse class="btn btn-outline-secondary" />
       </div>
     </div>
     <div class="log-container small p-2">
-      <div
-        class="log-section mb-3"
-        v-for="epoch in epochs"
-        :key="epoch.id"
-        :ref="el => { if (el) epoch.ref = el as Element }"
-      >
+      <div class="log-section mb-3" v-for="epoch in epochs" :key="epoch.id"
+        :ref="el => { if (el) epoch.ref = el as Element }">
         <div class="border-bottom">
-          <i18n-t scope="global" :keypath="environment.calendar.epochLabel">
+          <i18n-t scope="global" :keypath="calendar.epochLabel">
             <template #year>
               <span class="number">{{ fmt.number(epoch.year) }}</span>
             </template>
             <template #season>{{ t(epoch.seasonLabel) }}</template>
           </i18n-t>
         </div>
-        <div
-          class="log-event"
-          v-for="event in epoch.events"
-          :key="event.id"
-          :ref="el => { if (el) event.ref = el as Element }"
-        >
+        <div class="log-event" v-for="event in epoch.events" :key="event.id"
+          :ref="el => { if (el) event.ref = el as Element }">
           {{ event.text }}
         </div>
       </div>

@@ -1,20 +1,23 @@
-import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
-import { MultiMap, TypeSet } from "@/app/utils/collections";
+import { Queue } from "queue-typescript";
 
-import { IntoSystem, SystemRunner } from "./system";
-import { EcsResource, EcsEvent } from "./types";
+import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
+import { any, MultiMap, TypeSet } from "@/app/utils/collections";
+
+import { SystemRunner, SystemSpecification as SystemSpec } from "./system";
+import { EcsResource, EcsEvent, EcsStage, EcsStageType } from "./types";
 import { World, WorldState } from "./world";
 
-export type SystemStage =
-  | "startup"
-  | "first"
-  | "preUpdate"
-  | "update"
-  | "postUpdate"
-  | "last";
+type SystemId = { id: string };
+type TopologySpecParam = {
+  after?: SystemId[];
+  stage?: EcsStage;
+};
+type TopologySpec = SystemId & { after?: SystemId[] };
 
 export class App {
-  private readonly systemBuilders = new MultiMap<SystemStage, IntoSystem>();
+  private readonly systems = new Map<string, SystemSpec>();
+  private readonly topology = new MultiMap<string, TopologySpec>();
+
   private readonly resources = new TypeSet<EcsResource>();
   private readonly events = new Set<Ctor<EcsEvent>>();
 
@@ -28,17 +31,21 @@ export class App {
     return this;
   }
 
-  addStartupSystem(system: IntoSystem): App {
-    return this.addSystem(system, "startup");
+  addStartupSystem(spec: SystemSpec): App {
+    return this.addSystem(spec, { stage: "startup" });
   }
 
-  addSystem(system: IntoSystem, stage: SystemStage = "update"): App {
-    this.systemBuilders.add(stage, system);
+  addSystem(spec: SystemSpec, topology?: Partial<TopologySpecParam>): App {
+    this.systems.set(spec.id, spec);
+    this.topology.add(topology?.stage ?? "main", {
+      id: spec.id,
+      after: topology?.after ?? [],
+    });
     return this;
   }
 
-  addPlugin(p: EcsPlugin): App {
-    p.add(this);
+  addPlugin(plugin: EcsPlugin): App {
+    plugin.add(this);
     return this;
   }
 
@@ -52,13 +59,60 @@ export class App {
     }
 
     const state = new WorldState(world);
-    const systems = new MultiMap<SystemStage, SystemRunner>();
-    for (const [stage, builders] of this.systemBuilders) {
-      for (const builder of builders) {
-        systems.add(stage, builder.intoSystem(state));
+    const systems = new MultiMap<string, SystemRunner>();
+    for (const [stage, topologySpec] of this.topology) {
+      for (const spec of this.orderByTopology(stage, topologySpec)) {
+        systems.add(stage, spec.build(state));
       }
     }
     return new GameRunner(state, systems);
+  }
+
+  private orderByTopology(
+    stage: string,
+    topologySpecs: Iterable<TopologySpec>,
+  ): SystemSpec[] {
+    const dependencies = new MultiMap<string, string>();
+    const remaining = new Map<string, SystemSpec>();
+    for (const dependency of topologySpecs) {
+      dependencies.addAll(
+        dependency.id,
+        (dependency.after ?? []).map((v) => v.id),
+      );
+      const systemSpec = this.systems.get(dependency.id)!;
+      remaining.set(dependency.id, systemSpec);
+    }
+
+    const searchQueue = new Queue<SystemSpec>();
+    const ordered = [];
+    while (remaining.size > 0) {
+      // find systems that don't have any 'run after' dependencies remaining
+      for (const [id, spec] of remaining) {
+        if (
+          !any(dependencies.entriesForKey(id), (dependencyId) =>
+            remaining.has(dependencyId),
+          )
+        ) {
+          // if we got here, it means the dependencies for system 'id' have all been processed already.
+          searchQueue.enqueue(spec);
+        }
+      }
+
+      let processed = false;
+      let next: SystemSpec;
+      while ((next = searchQueue.dequeue())) {
+        ordered.push(next);
+        remaining.delete(next.id);
+        processed = true;
+      }
+
+      if (!processed) {
+        throw new Error(
+          `Could not resolve system topology of stage '${stage}' because of a dependency cycle. Remaining systems: ${remaining}`,
+        );
+      }
+    }
+    return ordered;
   }
 }
 
@@ -67,7 +121,7 @@ export class GameRunner {
 
   constructor(
     private readonly state: WorldState,
-    private readonly stages: MultiMap<SystemStage, SystemRunner>,
+    private readonly stages: MultiMap<string, SystemRunner>,
   ) {}
 
   start(): () => void {
@@ -76,18 +130,22 @@ export class GameRunner {
 
   private update(): void {
     if (this.firstRun) {
-      this.run("startup");
+      this.runStageParts("startup");
       this.firstRun = false;
     }
-    this.run("first");
-    this.run("preUpdate");
-    this.run("update");
-    this.run("postUpdate");
-    this.run("last");
+    this.runStageParts("first");
+    this.runStageParts("main");
+    this.runStageParts("last");
   }
 
-  private run(stage: SystemStage) {
-    for (const system of this.stages.entriesForKey(stage)) {
+  private runStageParts(stageType: EcsStageType) {
+    this.run(`${stageType}-start`);
+    this.run(`${stageType}`);
+    this.run(`${stageType}-end`);
+  }
+
+  private run(id: string) {
+    for (const system of this.stages.entriesForKey(id)) {
       system.run();
     }
     this.state.flushDeferred();

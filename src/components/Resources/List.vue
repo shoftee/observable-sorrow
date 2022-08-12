@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useStateManager } from "@/composables/game-endpoint";
+import { filterArrayView, fromIds, newResourceView } from "@/app/presenters/views";
 
 const { t } = useI18n();
 
 const show = ref(true);
-const { resources } = useEndpoint((ep) => {
-  return {
-    resources: ep.presenters.resources,
-  };
-});
+const manager = useStateManager();
 
-const items = computed(() => resources.all.filter((r) => r.unlocked));
+const all = fromIds(manager, manager.resources().keys(), newResourceView);
+const items = filterArrayView(all, r => r.unlocked);
 </script>
 
 <template>

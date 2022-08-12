@@ -23,31 +23,12 @@ export interface IPresenterChangeSink {
   acceptEvents(events: EventPool[]): void;
 }
 
-export interface IRootInteractor
-  extends IDispatcher,
-    IDevToolsInteractor,
-    IGameController,
-    IStoreInteractor {
-  initialize(
-    onTicked: OnMutationHandler,
-    onLogEvent: OnEventHandler,
-  ): Promise<void>;
+export interface IRootInteractor extends IDispatcher, IGameController {
+  initialize(onRender: OnRenderHandler): void;
 }
 
 export interface IDispatcher {
-  send(intent: Intent): Promise<void>;
-}
-
-export interface IStoreInteractor {
-  load(): Promise<void>;
-  save(): Promise<void>;
-}
-
-export interface IDevToolsInteractor {
-  turnDevToolsOn(): void;
-  turnDevToolsOff(): void;
-  setGatherCatnip(amount: number): void;
-  setTimeAcceleration(factor: number): void;
+  send(intent: Intent): void;
 }
 
 export interface IGameController {

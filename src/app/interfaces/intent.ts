@@ -1,5 +1,13 @@
 import { BuildingId, JobId, RecipeId, TechId } from ".";
 
+export type MetaIntent = { kind: "meta" } & { id: "save-game" };
+
+export type TimeIntent = { kind: "time" } & (
+  | { id: "pawse" }
+  | { id: "unpawse" }
+  | { id: "set-power"; power: number }
+);
+
 export type BonfireIntent = { kind: "bonfire" } & (
   | { id: "gather-catnip" }
   | { id: "observe-sky" }
@@ -26,6 +34,8 @@ export type SocietyIntent = { kind: "society" } & (
 );
 
 export type Intent =
+  | MetaIntent
+  | TimeIntent
   | BonfireIntent
   | ConstructionIntent
   | ResearchIntent

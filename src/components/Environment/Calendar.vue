@@ -2,22 +2,23 @@
 import { useI18n } from "vue-i18n";
 
 import { useEndpoint } from "@/composables/game-endpoint";
+import { newCalendarView } from "@/app/presenters/views";
 
 const { t } = useI18n();
 
-const { environment, fmt } = useEndpoint((ep) => {
+const { manager, fmt } = useEndpoint((ep) => {
   return {
-    environment: ep.presenters.environment,
+    manager: ep.stateManager,
     fmt: ep.presenters.formatter,
   };
 });
 
-const state = environment.calendar;
+const state = newCalendarView(manager);
 </script>
 
 <template>
   <div class="calendar-container">
-    <i18n-t scope="global" :keypath="state.calendarLabel" tag="span">
+    <i18n-t scope="global" :keypath="state.dateLabel" tag="span">
       <template #year>
         <span class="number">{{ fmt.number(state.year) }}</span>
       </template>

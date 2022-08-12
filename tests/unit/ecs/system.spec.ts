@@ -19,7 +19,7 @@ describe("ecs systems", () => {
     state.spawn(new Id("shoftee"), new Player(20));
     state.spawn(new Id("shoftee"), new Player(20));
 
-    const system = PlayerSystem.intoSystem(state);
+    const system = PlayerSystem.build(state);
     system.run();
   });
 });

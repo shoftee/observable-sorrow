@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { MultiMap } from "@/app/utils/collections";
 
-import { App, EcsComponent, EcsEvent, SystemStage } from "@/app/ecs";
+import { App, EcsComponent, EcsEvent, EcsStage } from "@/app/ecs";
 import { System } from "@/app/ecs/system";
 import {
   Dispatch,
@@ -62,8 +62,8 @@ describe("ecs app", () => {
       const runner = new App()
         .registerEvent(StringEvent)
         .registerEvent(NumberEvent)
-        .addSystem(Dispatcher, "preUpdate")
-        .addSystem(Receiver, "update")
+        .addSystem(Dispatcher)
+        .addSystem(Receiver, { after: [Dispatcher] })
         .buildRunner();
 
       const updater = runner.start();
@@ -90,8 +90,8 @@ describe("ecs app", () => {
 
       const runner = new App()
         .registerEvent(NumberEvent)
-        .addSystem(Dispatcher, "preUpdate")
-        .addSystem(Receiver, "update")
+        .addSystem(Dispatcher)
+        .addSystem(Receiver)
         .buildRunner();
 
       const updater = runner.start();
@@ -106,20 +106,26 @@ describe("ecs app", () => {
   describe("system run order", () => {
     it("should run systems in the right order", () => {
       let counter = 0;
-      const counters = new MultiMap<SystemStage, number>();
-      function builder(stage: SystemStage) {
+      const counters = new MultiMap<EcsStage, number>();
+      function builder(stage: EcsStage) {
         return System()(() => {
           counters.add(stage, counter++);
         });
       }
 
       const runner = new App()
-        .addSystem(builder("first"), "first")
-        .addSystem(builder("startup"), "startup")
-        .addSystem(builder("preUpdate"), "preUpdate")
-        .addSystem(builder("update"), "update")
-        .addSystem(builder("postUpdate"), "postUpdate")
-        .addSystem(builder("last"), "last")
+        .addSystem(builder("first-start"), { stage: "first-start" })
+        .addSystem(builder("first"), { stage: "first" })
+        .addSystem(builder("first-end"), { stage: "first-end" })
+        .addSystem(builder("startup-start"), { stage: "startup-start" })
+        .addSystem(builder("startup"), { stage: "startup" })
+        .addSystem(builder("startup-end"), { stage: "startup-end" })
+        .addSystem(builder("main-start"), { stage: "main-start" })
+        .addSystem(builder("main"), { stage: "main" })
+        .addSystem(builder("main-end"), { stage: "main-end" })
+        .addSystem(builder("last-start"), { stage: "last-start" })
+        .addSystem(builder("last"), { stage: "last" })
+        .addSystem(builder("last-end"), { stage: "last-end" })
         .buildRunner();
 
       const updater = runner.start();
@@ -127,23 +133,23 @@ describe("ecs app", () => {
       updater();
       updater();
 
-      const startup = Array.from(counters.entriesForKey("startup"));
-      expect(startup).to.have.ordered.members([0]);
+      const getCounts = (s: EcsStage) => Array.from(counters.entriesForKey(s));
 
-      const first = Array.from(counters.entriesForKey("first"));
-      expect(first).to.have.ordered.members([1, 6, 11]);
+      expect(getCounts("startup-start")).to.have.ordered.members([0]);
+      expect(getCounts("startup")).to.have.ordered.members([1]);
+      expect(getCounts("startup-end")).to.have.ordered.members([2]);
 
-      const preUpdate = Array.from(counters.entriesForKey("preUpdate"));
-      expect(preUpdate).to.have.ordered.members([2, 7, 12]);
+      expect(getCounts("first-start")).to.have.ordered.members([3, 12, 21]);
+      expect(getCounts("first")).to.have.ordered.members([4, 13, 22]);
+      expect(getCounts("first-end")).to.have.ordered.members([5, 14, 23]);
 
-      const update = Array.from(counters.entriesForKey("update"));
-      expect(update).to.have.ordered.members([3, 8, 13]);
+      expect(getCounts("main-start")).to.have.ordered.members([6, 15, 24]);
+      expect(getCounts("main")).to.have.ordered.members([7, 16, 25]);
+      expect(getCounts("main-end")).to.have.ordered.members([8, 17, 26]);
 
-      const postUpdate = Array.from(counters.entriesForKey("postUpdate"));
-      expect(postUpdate).to.have.ordered.members([4, 9, 14]);
-
-      const last = Array.from(counters.entriesForKey("last"));
-      expect(last).to.have.ordered.members([5, 10, 15]);
+      expect(getCounts("last-start")).to.have.ordered.members([9, 18, 27]);
+      expect(getCounts("last")).to.have.ordered.members([10, 19, 28]);
+      expect(getCounts("last-end")).to.have.ordered.members([11, 20, 29]);
     });
   });
   describe("change detection", () => {
@@ -188,7 +194,7 @@ describe("ecs app", () => {
         .addPlugin(new MinimalPlugins())
         .addStartupSystem(SpawnSystem)
         .addSystem(LevelUpSystem)
-        .addSystem(ChangedCounter, "postUpdate")
+        .addSystem(ChangedCounter, { stage: "last" })
         .buildRunner();
 
       const updater = runner.start();
@@ -227,7 +233,7 @@ describe("ecs app", () => {
       const runner = new App()
         .addPlugin(new MinimalPlugins())
         .addSystem(SpawnSystem)
-        .addSystem(AddedCounter, "postUpdate")
+        .addSystem(AddedCounter, { stage: "last" })
         .buildRunner();
 
       const updater = runner.start();
@@ -282,10 +288,10 @@ describe("ecs app", () => {
 
       const runner = new App()
         .addPlugin(new MinimalPlugins())
-        .addSystem(SpawnSystem, "preUpdate")
+        .addSystem(SpawnSystem, { stage: "first" })
         .addSystem(LevelUpper)
-        .addSystem(AddedCounter, "postUpdate")
-        .addSystem(ChangedCounter, "postUpdate")
+        .addSystem(AddedCounter, { stage: "last" })
+        .addSystem(ChangedCounter, { stage: "last" })
         .buildRunner();
 
       const updater = runner.start();

@@ -2,23 +2,29 @@ import { Constructor } from "@/app/utils/types";
 
 export const EntityType = Symbol.for("Entity");
 export class EcsEntity {
-  [EntityType]: number;
+  [EntityType]!: number;
 }
 
 export const ChangeTicks = Symbol.for("ChangeTicks");
 export abstract class EcsComponent {
-  [ChangeTicks]: ComponentTicks;
+  [ChangeTicks]!: ComponentTicks;
 }
 
 export const ResourceType = Symbol.for("Resource");
 export abstract class EcsResource {
-  protected [ResourceType]: true;
+  protected [ResourceType]!: true;
 }
 
 export const EventType = Symbol.for("Event");
 export abstract class EcsEvent {
-  protected [EventType]: true;
+  protected [EventType]!: true;
 }
+
+export type EcsStageType = "startup" | "first" | "main" | "last";
+export type EcsStage =
+  | EcsStageType
+  | `${EcsStageType}-start`
+  | `${EcsStageType}-end`;
 
 export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
   Constructor<C>,

@@ -2,11 +2,9 @@ import { EcsResource } from "@/app/ecs";
 
 import {
   EventsSchema,
-  addState,
-  changeState,
   DeltaSchema,
   RemovedDeltaSchema,
-  mergeRemovals,
+  visitState,
 } from "../core";
 
 export class ComponentDeltas {
@@ -22,16 +20,16 @@ export class ComponentDeltas {
     this.events = {};
   }
 
-  setAdded(obj: DeltaSchema) {
-    addState(this.added, obj);
+  setAdded(fn: (root: DeltaSchema) => void) {
+    visitState(this.added, fn);
   }
 
-  setChanged(obj: DeltaSchema) {
-    changeState(this.changed, obj);
+  setChanged(fn: (root: DeltaSchema) => void) {
+    visitState(this.changed, fn);
   }
 
-  setRemoved(obj: RemovedDeltaSchema) {
-    mergeRemovals(this.removed, obj);
+  setRemoved(fn: (root: RemovedDeltaSchema) => void) {
+    visitState(this.removed, fn);
   }
 }
 

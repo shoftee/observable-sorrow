@@ -43,12 +43,14 @@ import {
   addState,
   changeState,
   removeState,
-  DeltaSchema,
+  StateSchema,
 } from "@/app/game/systems2/core";
 import { ComponentDeltas } from "@/app/game/systems2/types";
 
 export interface IStateManager {
-  buildings(): Enumerable<[BuildingId, BuildingState]>;
+  state: StateSchema;
+
+  buildings(): ReadonlyMap<BuildingId, BuildingState>;
   building(id: BuildingId): BuildingState;
 
   fulfillment(id: FulfillmentId): FulfillmentState;
@@ -62,9 +64,10 @@ export interface IStateManager {
 
   recipe(id: RecipeId): RecipeState;
 
+  resources(): ReadonlyMap<ResourceId, ResourceState>;
   resource(id: ResourceId): ResourceState;
 
-  sections(): Enumerable<[SectionId, SectionState]>;
+  sections(): ReadonlyMap<SectionId, SectionState>;
   section(id: SectionId): SectionState;
 
   stockpile(id: StockpileId): StockpileState;
@@ -152,20 +155,32 @@ class EventPools extends Map<EventId, Channel> {
 }
 
 export class StateManager implements IPresenterChangeSink, IStateManager {
-  private readonly state: DeltaSchema;
+  readonly state: StateSchema;
+
   private readonly pools: MutationPools;
   private readonly events: EventPools;
 
   constructor() {
-    this.state = reactive({});
+    this.state = reactive({} as StateSchema);
     this.pools = new MutationPools();
     this.events = new EventPools();
   }
 
   acceptRender(deltas: ComponentDeltas): void {
-    addState(this.state, deltas.added);
-    changeState(this.state, deltas.changed);
-    removeState(this.state, deltas.removed);
+    if (Object.entries(deltas.added).length > 0) {
+      console.log("Added", deltas.added);
+      addState(this.state, deltas.added);
+    }
+
+    if (Object.entries(deltas.changed).length > 0) {
+      console.log("Changed", deltas.changed);
+      changeState(this.state, deltas.changed);
+    }
+
+    if (Object.entries(deltas.removed).length > 0) {
+      console.log("Removed", deltas.removed);
+      removeState(this.state, deltas.removed);
+    }
   }
 
   acceptMutations(mutations: MutationPool[]): void {
@@ -196,8 +211,8 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     }
   }
 
-  buildings(): Enumerable<[BuildingId, BuildingState]> {
-    return new Enumerable(this.pools.buildings.entries());
+  buildings() {
+    return this.pools.buildings;
   }
 
   building(id: BuildingId): BuildingState {
@@ -228,12 +243,16 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.recipes.get(id) as RecipeState;
   }
 
+  resources() {
+    return this.pools.resources;
+  }
+
   resource(id: ResourceId): ResourceState {
     return this.pools.resources.get(id) as ResourceState;
   }
 
-  sections(): Enumerable<[SectionId, SectionState]> {
-    return new Enumerable(this.pools.sections.entries());
+  sections() {
+    return this.pools.sections;
   }
 
   section(id: SectionId): SectionState {

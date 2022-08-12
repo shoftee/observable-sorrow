@@ -1,9 +1,8 @@
-import { IDevToolsInteractor } from "@/app/interfaces";
 import { PlayerState } from "@/app/state";
 
 import { EntityAdmin } from "../entity";
 
-export class DevToolsInteractor implements IDevToolsInteractor {
+export class DevToolsInteractor {
   constructor(private readonly admin: EntityAdmin) {}
 
   private get player(): PlayerState {

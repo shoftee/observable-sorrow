@@ -1,5 +1,6 @@
 import { WorldState } from "./world";
 import { FetcherFactory } from "./query/types";
+import { v4 as uuidv4 } from "uuid";
 
 type FactoryTuple = [...FetcherFactory[]];
 
@@ -17,23 +18,28 @@ type RunnerFn<F extends FactoryTuple, Result> = (
   ...args: ResultTuple<F>
 ) => Result;
 
-export type IntoSystem<R = void> = {
-  intoSystem(state: WorldState): SystemRunner<R>;
+export type SystemSpecification<R = void> = {
+  id: string;
+  build(state: WorldState): SystemRunner<R>;
 };
 
 export type SystemRunner<Result = void> = {
+  id: string;
   run(): Result;
 };
 
 class SystemBuilder<F extends FactoryTuple, R> {
+  readonly id = uuidv4();
+
   constructor(
     private readonly factories: F,
     private readonly run: RunnerFn<F, R>,
   ) {}
 
-  intoSystem(state: WorldState): SystemRunner<R> {
+  build(state: WorldState): SystemRunner<R> {
     const fetchers = this.factories.map((f) => f.create(state));
     return {
+      id: this.id,
       run: () => {
         const args = fetchers.map((p) => p.fetch()) as ResultTuple<F>;
         return this.run(...args);

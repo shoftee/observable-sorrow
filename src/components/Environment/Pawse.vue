@@ -1,31 +1,25 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useSend, useStateManager } from "@/composables/game-endpoint";
+import { newTimeView } from "@/app/presenters/views";
 
-const { controller } = useEndpoint((ep) => {
-  return { controller: ep.interactors.controller };
-});
+const send = useSend();
+const manager = useStateManager();
 
 const { t } = useI18n();
 
-const paused = ref(false);
+const time = newTimeView(manager);
+
 async function pause() {
-  await controller.stop();
-  paused.value = true;
+  await send({ kind: "time", id: "pawse" })
 }
 async function unpause() {
-  await controller.start();
-  paused.value = false;
+  await send({ kind: "time", id: "unpawse" })
 }
 </script>
 <template>
-  <button
-    type="button"
-    :class="{ active: paused }"
-    @click="paused ? unpause() : pause()"
-  >
-    {{ t(paused ? "game.control.unpawse" : "game.control.pawse") }}
+  <button type="button" :class="{ active: time.paused }" @click="time.paused ? unpause() : pause()">
+    {{ t(time.paused ? "game.control.unpawse" : "game.control.pawse") }}
   </button>
 </template>

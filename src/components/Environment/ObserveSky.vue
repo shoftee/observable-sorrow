@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useSend, useStateManager } from "@/composables/game-endpoint";
 
-const { environment, dispatcher } = useEndpoint((ep) => {
-  return {
-    environment: ep.presenters.environment,
-    dispatcher: ep.interactors.dispatcher,
-  };
-});
+import { newAstronomyView } from "@/app/presenters/views";
+
+const send = useSend()
+const manager = useStateManager()
 
 const { t } = useI18n();
 
+const astronomy = newAstronomyView(manager);
+
 async function observeSky(): Promise<void> {
-  await dispatcher.send({ kind: "bonfire", id: "observe-sky" });
+  await send({ kind: "bonfire", id: "observe-sky" });
 }
+
 </script>
 <template>
-  <button
-    v-if="environment.calendar.showObserveSky"
-    type="button"
-    class="btn-observe-sky"
-    @click="observeSky"
-  >
+  <button v-if="astronomy.showObserveSky" type="button" class="btn-observe-sky" @click="observeSky">
     <i class="bi bi-stars"></i>
     {{ t("game.control.observe-sky") }}
   </button>

@@ -17,6 +17,7 @@ const FlushChanges = System(
   Res(Renderer),
 )((buffer, renderer) => {
   renderer.onRender(buffer.components);
+  buffer.components.clear();
 });
 
 export class RendererPlugin extends EcsPlugin {
@@ -28,6 +29,6 @@ export class RendererPlugin extends EcsPlugin {
     app
       .insertResource(new DeltaBuffer())
       .insertResource(new Renderer(this.onRender))
-      .addSystem(FlushChanges, "last");
+      .addSystem(FlushChanges, { stage: "last" });
   }
 }

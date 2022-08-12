@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import Calendar from "./Environment/Calendar.vue";
 import History from "./Environment/History.vue";
 import Resources from "./Resources/List.vue";
 
 import DevTools from "./DevTools.vue";
-import Happiness from "./Controls/Happiness.vue";
+// import Happiness from "./Controls/Happiness.vue";
 
 import SectionTabs from "./Sections/Tabs.vue";
 import SectionContent from "./Sections/Content.vue";
@@ -15,22 +15,14 @@ import { SectionId } from "@/app/interfaces";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 
-const { controller, store } = useEndpoint((ep) => {
-  return {
-    controller: ep.interactors.controller,
-    store: ep.interactors.store,
-  };
-});
-
-onMounted(async () => {
-  // Start the game
-  await controller.start();
+const { send } = useEndpoint((ep) => {
+  return ep;
 });
 
 const activeSection = ref<SectionId>("bonfire");
 
 async function save(): Promise<void> {
-  await store.save();
+  await send({ kind: "meta", id: "save-game" });
 }
 
 const devtools = window.__OS_DEVTOOLS__;
@@ -52,7 +44,7 @@ const devtools = window.__OS_DEVTOOLS__;
       </div>
     </div>
     <teleport to=".header-middle">
-      <Happiness />
+      <!-- <Happiness /> -->
     </teleport>
     <teleport to=".header-end">
       <button class="btn btn-link p-0 m-0" @click="save">Save</button>

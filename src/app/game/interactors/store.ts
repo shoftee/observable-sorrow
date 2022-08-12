@@ -1,4 +1,3 @@
-import { IStoreInteractor } from "@/app/interfaces";
 import {
   loadOrInitGeneral,
   loadSlot,
@@ -10,7 +9,7 @@ import {
 
 import { EntityAdmin } from "../entity";
 
-export class StoreInteractor implements IStoreInteractor {
+export class StoreInteractor {
   private version;
 
   constructor(private readonly admin: EntityAdmin) {
