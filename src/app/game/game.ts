@@ -3,7 +3,7 @@ import { Intent, OnRenderHandler } from "@/app/interfaces";
 import { EcsEvent, GameRunner } from "../ecs";
 
 import { build } from "./systems2/builder";
-import { TimeEvent } from "./systems2/types";
+import * as events from "./systems2/types";
 
 export class Game {
   readonly runner: GameRunner;
@@ -44,8 +44,7 @@ export class Game {
 function convertToEvent(intent: Intent): EcsEvent | undefined {
   switch (intent.kind) {
     case "time":
-      return new TimeEvent(intent);
-    default:
-      return undefined;
+      return new events.TimeEvent(intent);
   }
+  return undefined;
 }
