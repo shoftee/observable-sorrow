@@ -1,7 +1,7 @@
 import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
-import { App, EcsPlugin } from "@/app/ecs";
+import { PluginApp, EcsPlugin } from "@/app/ecs";
 import {
   ChangeTrackers,
   Commands,
@@ -57,7 +57,7 @@ const TrackChanges = System(
 });
 
 export class EnvironmentPlugin extends EcsPlugin {
-  add(app: App): void {
+  add(app: PluginApp): void {
     app
       .addStartupSystem(Setup)
       .addSystem(AdvanceCalendar)

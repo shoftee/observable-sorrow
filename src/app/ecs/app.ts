@@ -160,6 +160,14 @@ export class GameRunner {
   }
 }
 
+export type PluginApp = { 
+  registerEvent(ctr: Ctor<EcsEvent>): PluginApp;
+  insertResource<R extends EcsResource>(resource: R): PluginApp;
+  addStartupSystem(spec: SystemSpec): PluginApp;
+  addSystem(spec: SystemSpec, topology?: Partial<TopologySpecParam>): PluginApp;
+  addPlugin(plugin: EcsPlugin): PluginApp;
+ }
+
 export abstract class EcsPlugin {
-  abstract add(app: App): void;
+  abstract add(app: PluginApp): void;
 }

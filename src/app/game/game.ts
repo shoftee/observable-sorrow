@@ -45,6 +45,11 @@ function convertToEvent(intent: Intent): EcsEvent | undefined {
   switch (intent.kind) {
     case "time":
       return new events.TimeEvent(intent);
+    case "bonfire":
+      switch(intent.id) {
+        case "gather-catnip":
+          return new events.ResourceTransactionEvent([{type: "debit", resource: "catnip", amount: 1}])
+      }
   }
   return undefined;
 }

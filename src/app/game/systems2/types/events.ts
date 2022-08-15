@@ -6,3 +6,15 @@ export class TimeEvent extends EcsEvent {
     super();
   }
 }
+
+type TransactionItem = {
+  resource: string;
+  type: "debit" | "credit";
+  amount: number;
+}
+
+export class ResourceTransactionEvent extends EcsEvent {
+  constructor(readonly items: TransactionItem[]) {
+    super();
+  }
+}

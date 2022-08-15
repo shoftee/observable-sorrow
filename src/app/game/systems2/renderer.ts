@@ -1,6 +1,6 @@
 import { OnRenderHandler } from "@/app/interfaces";
 
-import { App, EcsPlugin, EcsResource } from "@/app/ecs";
+import { PluginApp, EcsPlugin, EcsResource } from "@/app/ecs";
 
 import { DeltaBuffer } from "./types";
 import { System } from "@/app/ecs/system";
@@ -25,7 +25,7 @@ export class RendererPlugin extends EcsPlugin {
     super();
   }
 
-  add(app: App): void {
+  add(app: PluginApp): void {
     app
       .insertResource(new DeltaBuffer())
       .insertResource(new Renderer(this.onRender))

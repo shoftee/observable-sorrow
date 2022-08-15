@@ -1,6 +1,6 @@
 import { round } from "@/app/utils/mathx";
 
-import { App, EcsComponent, EcsPlugin } from "@/app/ecs";
+import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
 import {
   Commands,
   Query,
@@ -100,7 +100,7 @@ const TrackChanges = System(
 });
 
 export class TimePlugin extends EcsPlugin {
-  add(app: App): void {
+  add(app: PluginApp): void {
     app
       .registerEvent(TimeEvent)
       .addStartupSystem(Setup)
