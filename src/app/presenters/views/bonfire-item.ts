@@ -11,6 +11,21 @@ import {
 } from "../common";
 import { IStateManager } from "../state-manager";
 
+export interface BonfireItemView {
+  id: BonfireItemId;
+  intent: Intent;
+
+  label: string;
+  description: string;
+  flavor?: string;
+
+  unlocked: boolean;
+  level?: number;
+
+  fulfillment: FulfillmentItem;
+  effects?: EffectItem[];
+}
+
 export function newBonfireItemView(
   id: BonfireItemId,
   manager: IStateManager,
@@ -92,19 +107,4 @@ function effects(buildingId: BuildingId, manager: IStateManager): EffectItem[] {
       totalAmount: computed(() => numberView(manager, meta.total)),
     }),
   );
-}
-
-export interface BonfireItemView {
-  id: BonfireItemId;
-  intent: Intent;
-
-  label: string;
-  description: string;
-  flavor?: string;
-
-  unlocked: boolean;
-  level?: number;
-
-  fulfillment: FulfillmentItem;
-  effects?: EffectItem[];
 }

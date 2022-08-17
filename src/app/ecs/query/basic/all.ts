@@ -13,9 +13,7 @@ export type AllParams = [...QueryDescriptor[]];
 export type AllResults<T> = T extends [infer Head, ...infer Tail]
   ? [...UnwrapResult<Head>, ...AllResults<Tail>]
   : [];
-type UnwrapResult<T> = T extends QueryDescriptor<infer Fetch>
-  ? [...UnwrapResult<Fetch>]
-  : [T];
+type UnwrapResult<T> = T extends QueryDescriptor<infer Fetch> ? [Fetch] : [T];
 
 export type Filters = [...FilterDescriptor[]];
 

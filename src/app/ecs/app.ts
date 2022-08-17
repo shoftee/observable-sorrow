@@ -44,6 +44,13 @@ export class App {
     return this;
   }
 
+  addSystems(specs: SystemSpec[], topology?: Partial<TopologySpecParam>): App {
+    for (const spec of specs) {
+      this.addSystem(spec, topology);
+    }
+    return this;
+  }
+
   addPlugin(plugin: EcsPlugin): App {
     plugin.add(this);
     return this;
@@ -160,13 +167,17 @@ export class GameRunner {
   }
 }
 
-export type PluginApp = { 
+export type PluginApp = {
   registerEvent(ctr: Ctor<EcsEvent>): PluginApp;
   insertResource<R extends EcsResource>(resource: R): PluginApp;
   addStartupSystem(spec: SystemSpec): PluginApp;
   addSystem(spec: SystemSpec, topology?: Partial<TopologySpecParam>): PluginApp;
+  addSystems(
+    specs: SystemSpec[],
+    topology?: Partial<TopologySpecParam>,
+  ): PluginApp;
   addPlugin(plugin: EcsPlugin): PluginApp;
- }
+};
 
 export abstract class EcsPlugin {
   abstract add(app: PluginApp): void;

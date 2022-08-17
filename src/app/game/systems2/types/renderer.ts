@@ -1,10 +1,14 @@
-import { EcsResource } from "@/app/ecs";
+import { EcsComponent, EcsResource } from "@/app/ecs";
+import { ChangeTrackers, Query, Read, Res } from "@/app/ecs/query";
+import { System } from "@/app/ecs/system";
+import { Constructor as Ctor } from "@/app/utils/types";
 
 import {
   EventsSchema,
   DeltaSchema,
   RemovedDeltaSchema,
   visitState,
+  StateSchema,
 } from "../core";
 
 export class ComponentDeltas {
@@ -20,12 +24,12 @@ export class ComponentDeltas {
     this.events = {};
   }
 
-  setAdded(fn: (root: DeltaSchema) => void) {
-    visitState(this.added, fn);
+  setAdded(fn: (root: StateSchema) => void) {
+    visitState(this.added as StateSchema, fn);
   }
 
-  setChanged(fn: (root: DeltaSchema) => void) {
-    visitState(this.changed, fn);
+  setChanged(fn: (root: StateSchema) => void) {
+    visitState(this.changed as StateSchema, fn);
   }
 
   setRemoved(fn: (root: RemovedDeltaSchema) => void) {
@@ -35,4 +39,30 @@ export class ComponentDeltas {
 
 export class DeltaBuffer extends EcsResource {
   readonly components: ComponentDeltas = new ComponentDeltas();
+}
+
+export function ChangeTrackingSystem<
+  Id extends EcsComponent,
+  State extends EcsComponent,
+>(
+  idCtor: Ctor<Id>,
+  stateCtor: Ctor<State>,
+  writerFn: (root: StateSchema, id: Id, state: State) => void,
+) {
+  return System(
+    Res(DeltaBuffer),
+    Query(Read(idCtor), ChangeTrackers(stateCtor)),
+  )((buffer, query) => {
+    for (const [id, tracker] of query.all()) {
+      if (tracker.isAdded()) {
+        buffer.components.setAdded((root) =>
+          writerFn(root, id, tracker.value()),
+        );
+      } else if (tracker.isChanged()) {
+        buffer.components.setChanged((root) =>
+          writerFn(root, id, tracker.value()),
+        );
+      }
+    }
+  });
 }

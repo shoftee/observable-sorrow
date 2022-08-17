@@ -2,6 +2,13 @@ import { ResourceId } from "@/app/interfaces";
 
 type ResourceQty = [ResourceId, number];
 
+export type ResourceQuantityType = {
+  readonly id: ResourceId;
+  readonly quantity: number;
+};
+
+export type ResourcesType = Readonly<Partial<Record<ResourceId, number>>>;
+
 function toIterable(resources: ResourcesType): Iterable<ResourceQty> {
   return Object.entries(resources) as Iterable<ResourceQty>;
 }
@@ -37,10 +44,3 @@ export function ingredientsFromObject(obj: ResourcesType): IngredientState[] {
     fulfilled: true,
   }));
 }
-
-export type ResourceQuantityType = {
-  readonly id: ResourceId;
-  readonly quantity: number;
-};
-
-export type ResourcesType = Readonly<Partial<Record<ResourceId, number>>>;

@@ -14,29 +14,27 @@ type UnwrapResultFromFactory<Factory> = Factory extends FetcherFactory<infer T>
   ? [T]
   : [];
 
-type RunnerFn<F extends FactoryTuple, Result> = (
-  ...args: ResultTuple<F>
-) => Result;
+type RunnerFn<F extends FactoryTuple> = (...args: ResultTuple<F>) => void;
 
-export type SystemSpecification<R = void> = {
+export type SystemSpecification = {
   id: string;
-  build(state: WorldState): SystemRunner<R>;
+  build(state: WorldState): SystemRunner;
 };
 
-export type SystemRunner<Result = void> = {
+export type SystemRunner = {
   id: string;
-  run(): Result;
+  run(): void;
 };
 
-class SystemBuilder<F extends FactoryTuple, R> {
+class SystemBuilder<F extends FactoryTuple> {
   readonly id = uuidv4();
 
   constructor(
     private readonly factories: F,
-    private readonly run: RunnerFn<F, R>,
+    private readonly run: RunnerFn<F>,
   ) {}
 
-  build(state: WorldState): SystemRunner<R> {
+  build(state: WorldState): SystemRunner {
     const fetchers = this.factories.map((f) => f.create(state));
     return {
       id: this.id,
@@ -49,13 +47,7 @@ class SystemBuilder<F extends FactoryTuple, R> {
 }
 
 export function System<F extends FactoryTuple>(...f: F) {
-  return (runner: RunnerFn<F, void>) => {
-    return new SystemBuilder(f, runner);
-  };
-}
-
-export function RunCondition<F extends FactoryTuple>(...f: F) {
-  return (runner: RunnerFn<F, boolean>) => {
+  return (runner: RunnerFn<F>) => {
     return new SystemBuilder(f, runner);
   };
 }

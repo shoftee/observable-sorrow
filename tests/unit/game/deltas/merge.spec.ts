@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { Calendar, DeltaBuffer, Resource } from "@/app/game/systems2/types";
+import { Calendar, DeltaBuffer } from "@/app/game/systems2/types";
 
 import {
   addState,
@@ -55,7 +55,10 @@ describe("delta merge", () => {
       const buffer = new DeltaBuffer();
       const added = buffer.components.added;
 
-      const oldResource = new Resource();
+      const oldResource = {
+        amount: 123,
+        unlocked: false,
+      };
       addState(added, {
         resources: { catnip: oldResource },
       });
@@ -138,7 +141,10 @@ describe("delta merge", () => {
       const buffer = new DeltaBuffer();
       const changed = buffer.components.changed;
 
-      const oldResource = new Resource();
+      const oldResource = {
+        amount: 123,
+        unlocked: false,
+      };
       changeState(changed, {
         resources: { catnip: oldResource },
       });
@@ -241,9 +247,7 @@ describe("delta merge", () => {
 });
 
 function resource() {
-  const r = new Resource();
-  r.amount = 123;
-  return r;
+  return { amount: 123, unlocked: true };
 }
 
 function calendar() {

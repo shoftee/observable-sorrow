@@ -1,19 +1,11 @@
 import { round } from "@/app/utils/mathx";
 
 import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
-import {
-  Commands,
-  Query,
-  Mut,
-  With,
-  Res,
-  Receive,
-  Read,
-  ChangeTrackers,
-} from "@/app/ecs/query";
+import { Commands, Query, Mut, With, Receive, Read } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaBuffer, TimeEvent, TimeOptions, Timer } from "./types";
+import { ChangeTrackingSystem, TimeOptions, Timer } from "./types";
+import * as events from "./types/events";
 
 const TimeMarker = class extends EcsComponent {};
 
@@ -26,10 +18,10 @@ const Setup = System(Commands())((cmds) => {
   cmds.spawn(new TimeMarker(), new DeltaTime(), new TimeOptions());
 });
 
-const EventHandler = System(
+const HandleOptionsChanged = System(
+  Receive(events.TimeOptionsChanged),
   Query(Mut(TimeOptions)).filter(With(TimeMarker)),
-  Receive(TimeEvent),
-)((optionsQuery, events) => {
+)((events, optionsQuery) => {
   const [options] = optionsQuery.single();
   for (const { intent } of events.pull()) {
     switch (intent.id) {
@@ -87,26 +79,21 @@ const AdvanceTimers = System(
   }
 });
 
-const TrackChanges = System(
-  Res(DeltaBuffer),
-  Query(ChangeTrackers(TimeOptions)).filter(With(TimeMarker)),
-)((deltas, query) => {
-  const [trackers] = query.single();
-  if (trackers.isAdded()) {
-    deltas.components.setAdded((root) => (root.time = trackers.value()));
-  } else if (trackers.isChanged()) {
-    deltas.components.setChanged((root) => (root.time = trackers.value()));
-  }
-});
+const TrackTime = ChangeTrackingSystem(
+  TimeMarker,
+  TimeOptions,
+  (root, _, options) => {
+    root.time = options;
+  },
+);
 
 export class TimePlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
-      .registerEvent(TimeEvent)
+      .registerEvent(events.TimeOptionsChanged)
       .addStartupSystem(Setup)
-      .addSystem(UpdateGameTime, { stage: "first" })
-      .addSystem(AdvanceTimers, { stage: "first" })
-      .addSystem(EventHandler, { stage: "main" })
-      .addSystem(TrackChanges, { stage: "last" });
+      .addSystems([UpdateGameTime, AdvanceTimers], { stage: "first" })
+      .addSystem(HandleOptionsChanged)
+      .addSystem(TrackTime, { stage: "last-start" });
   }
 }

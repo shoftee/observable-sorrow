@@ -2,18 +2,16 @@ import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
 import { PluginApp, EcsPlugin } from "@/app/ecs";
-import {
-  ChangeTrackers,
-  Commands,
-  Mut,
-  Query,
-  Read,
-  Res,
-  With,
-} from "@/app/ecs/query";
+import { Commands, Mut, Query, Read, With } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaBuffer, Timer, Calendar, DayTimer, Environment } from "./types";
+import {
+  Timer,
+  Calendar,
+  DayTimer,
+  Environment,
+  ChangeTrackingSystem,
+} from "./types";
 
 const Setup = System(Commands())((cmds) => {
   cmds.spawn(new DayTimer(), new Timer(2000));
@@ -44,24 +42,20 @@ const AdvanceCalendar = System(
   }
 });
 
-const TrackChanges = System(
-  Res(DeltaBuffer),
-  Query(ChangeTrackers(Calendar)).filter(With(Environment)),
-)((buffer, query) => {
-  const [tracker] = query.single();
-  if (tracker.isAdded()) {
-    buffer.components.setAdded((root) => (root.calendar = tracker.value()));
-  } else if (tracker.isChanged()) {
-    buffer.components.setChanged((root) => (root.calendar = tracker.value()));
-  }
-});
+const TrackCalendar = ChangeTrackingSystem(
+  Environment,
+  Calendar,
+  (root, _, calendar) => {
+    root.calendar = calendar;
+  },
+);
 
 export class EnvironmentPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addStartupSystem(Setup)
       .addSystem(AdvanceCalendar)
-      .addSystem(TrackChanges, { stage: "main-end" });
+      .addSystem(TrackCalendar, { stage: "last-start" });
   }
 }
 

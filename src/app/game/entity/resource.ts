@@ -1,16 +1,21 @@
 import { reactive } from "vue";
 
 import { ResourceId } from "@/app/interfaces";
-import { Meta, ResourceMetadataType, ResourceState } from "@/app/state";
+import {
+  Meta,
+  ResourceMetadataType,
+  ResourceState,
+  LedgerEntry,
+} from "@/app/state";
 import { SaveState } from "@/app/store";
 
-import { Entity, EntityPool, ResourceDelta, Watched, Watcher } from ".";
+import { Entity, EntityPool, Watched, Watcher } from ".";
 
 type ResourceStore = NonNullable<SaveState["resources"]>[ResourceId];
 
 export class ResourceEntity extends Entity<ResourceId> implements Watched {
   readonly state: ResourceState;
-  readonly delta: ResourceDelta = new ResourceDelta();
+  readonly stockpile: LedgerEntry = new LedgerEntry();
 
   constructor(readonly meta: ResourceMetadataType) {
     super(meta.id);

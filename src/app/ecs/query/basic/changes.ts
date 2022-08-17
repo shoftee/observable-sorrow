@@ -12,13 +12,15 @@ import { FilterDescriptor, QueryDescriptor } from "../types";
 type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;
   isChanged(): boolean;
+  isAddedOrChanged(): boolean;
   value(): C;
 };
 
-type ChangeTrackersQuery<C extends EcsComponent> = QueryDescriptor<Tracker<C>>;
+type ChangeTrackers<C extends EcsComponent> = QueryDescriptor<Tracker<C>>;
+
 export function ChangeTrackers<C extends EcsComponent>(
   ctor: Ctor<C>,
-): ChangeTrackersQuery<C> {
+): ChangeTrackers<C> {
   return {
     newQuery(state: WorldState) {
       return {
@@ -28,25 +30,36 @@ export function ChangeTrackers<C extends EcsComponent>(
         fetch: (_: EcsEntity, archetype: Archetype<C>) => {
           const component = archetype.get(ctor)!;
           const { last, current } = state.world.ticks;
-          return {
-            isAdded(): boolean {
-              return component[ChangeTicks].isAdded(last, current);
-            },
-            isChanged(): boolean {
-              return component[ChangeTicks].isChanged(last, current);
-            },
-            value(): C {
-              return component;
-            },
-          };
+          return createTracker(component, last, current);
         },
       };
     },
   };
 }
 
-type AddedFilter = FilterDescriptor;
-export function Added<C extends EcsComponent>(ctor: Ctor<C>): AddedFilter {
+function createTracker<C extends EcsComponent>(
+  component: C,
+  last: number,
+  current: number,
+): Tracker<C> {
+  return {
+    isAdded(): boolean {
+      return component[ChangeTicks].isAdded(last, current);
+    },
+    isChanged(): boolean {
+      return component[ChangeTicks].isChanged(last, current);
+    },
+    isAddedOrChanged(): boolean {
+      return this.isAdded() || this.isChanged();
+    },
+    value(): C {
+      return component;
+    },
+  };
+}
+
+type Added = FilterDescriptor;
+export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
   return {
     newFilter(state: WorldState) {
       return {
@@ -67,8 +80,8 @@ export function Added<C extends EcsComponent>(ctor: Ctor<C>): AddedFilter {
   };
 }
 
-type ChangedFilter = FilterDescriptor;
-export function Changed<C extends EcsComponent>(ctor: Ctor<C>): ChangedFilter {
+type Changed = FilterDescriptor;
+export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
   return {
     newFilter(state: WorldState) {
       return {

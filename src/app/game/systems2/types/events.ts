@@ -1,20 +1,15 @@
 import { EcsEvent } from "@/app/ecs";
 import { TimeIntent } from "@/app/interfaces";
+import { ResourceMap } from "@/app/state";
 
-export class TimeEvent extends EcsEvent {
+export class TimeOptionsChanged extends EcsEvent {
   constructor(readonly intent: TimeIntent) {
     super();
   }
 }
 
-type TransactionItem = {
-  resource: string;
-  type: "debit" | "credit";
-  amount: number;
-}
-
-export class ResourceTransactionEvent extends EcsEvent {
-  constructor(readonly items: TransactionItem[]) {
+export class ResourceOrder extends EcsEvent {
+  constructor(readonly debits?: ResourceMap, readonly credits?: ResourceMap) {
     super();
   }
 }

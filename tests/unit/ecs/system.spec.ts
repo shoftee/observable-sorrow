@@ -6,6 +6,18 @@ import { Query, Read } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 describe("ecs systems", () => {
+  class Id extends EcsComponent {
+    constructor(readonly value: string) {
+      super();
+    }
+  }
+
+  class Player extends EcsComponent {
+    constructor(public level: number) {
+      super();
+    }
+  }
+
   it("should compile", () => {
     const PlayerSystem = System(Query(Read(Id), Read(Player)))((players) => {
       for (const test of players.all()) {
@@ -23,15 +35,3 @@ describe("ecs systems", () => {
     system.run();
   });
 });
-
-class Id extends EcsComponent {
-  constructor(readonly value: string) {
-    super();
-  }
-}
-
-class Player extends EcsComponent {
-  constructor(public level: number) {
-    super();
-  }
-}

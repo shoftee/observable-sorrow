@@ -1,6 +1,8 @@
 import { Queue } from "queue-typescript";
 
-import { DeltaSet, EntityAdmin } from "@/app/game/entity";
+import { Ledger } from "@/app/state";
+
+import { EntityAdmin } from "@/app/game/entity";
 
 export type OrderResult =
   | { success: false; ErrorMessage: string }
@@ -8,7 +10,7 @@ export type OrderResult =
 
 export type OrderContext<T> = {
   admin: EntityAdmin;
-  transaction: DeltaSet;
+  transaction: Ledger;
   order: T;
 };
 
@@ -33,28 +35,28 @@ export class OrderHandler<T> {
   consume(admin: EntityAdmin): void {
     const { apply, success, failure } = this.handlers;
 
-    // Initialize the ambient deltas.
-    const ambient = new DeltaSet();
-    for (const { id, delta } of admin.resources()) {
-      ambient.addDelta(id, delta);
+    // Initialize the ambient ledger.
+    const ambient = new Ledger();
+    for (const { id, stockpile } of admin.resources()) {
+      ambient.add(id, stockpile);
     }
 
     for (const order of this.consumeOrders()) {
-      // Create delta layer for this order.
+      // Create ledger layer for this order.
       // If the order fails, we can safely discard the whole layer.
-      const transaction = new DeltaSet(ambient);
+      const transaction = new Ledger(ambient);
 
-      const context = { admin: admin, transaction, order };
+      const context = { admin, transaction, order };
       const result = this.applyOrder(context, apply);
 
       if (result.success) {
-        // Apply changes to base resource deltas.
-        for (const [id, delta] of transaction.deltas()) {
+        // Apply changes to base resource.
+        for (const [id, stockpile] of transaction.entries()) {
           const resource = admin.resource(id);
-          resource.delta.addDelta(delta);
+          resource.stockpile.add(stockpile);
         }
 
-        transaction.merge(true);
+        transaction.rebase();
 
         if (success) {
           success(context);

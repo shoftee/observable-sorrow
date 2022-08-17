@@ -22,7 +22,7 @@ export class ResourceAmountsSystem extends System {
 
   update(): void {
     const dt = this.admin.time().ticks.delta;
-    for (const { state, delta } of this.admin.resources()) {
+    for (const { state, stockpile: delta } of this.admin.resources()) {
       const change = dt * state.change;
       if (change > 0) {
         // change is positive, add value as debit

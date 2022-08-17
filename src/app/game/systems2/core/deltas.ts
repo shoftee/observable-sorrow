@@ -1,49 +1,66 @@
 import { EcsComponent } from "@/app/ecs";
-import {
-  Calendar,
-  Resource,
-  HistoryEvent,
-  Countdown,
-  TimeOptions,
-} from "../types";
+import { ResourceId, SeasonId, WeatherId } from "@/app/interfaces";
+import { HistoryEvent, Countdown } from "../types";
 
 type RecordObj = Record<string, unknown>;
 
-const MarkerSymbol = Symbol();
-class ComponentMarker<C extends EcsComponent = EcsComponent> {
-  [MarkerSymbol]: C;
+const ComponentMarkerSymbol = Symbol();
+class Component<C extends EcsComponent = EcsComponent> {
+  [ComponentMarkerSymbol]!: C;
+}
+
+const EntityMarkerSymbol = Symbol();
+class Entity<T = unknown> {
+  [EntityMarkerSymbol]!: T;
 }
 
 type Serializable<T> = {
-  [K in Extract<keyof T, string>]: T[K];
+  [K in keyof T as Exclude<K, (...args: unknown[]) => unknown>]: T[K];
 };
 
 type ComponentsSchema = {
-  time: ComponentMarker<TimeOptions>;
-  calendar: ComponentMarker<Calendar>;
-  resources: {
-    catnip: ComponentMarker<Resource>;
-  };
   countdowns: {
-    rareEvent?: ComponentMarker<Countdown>;
+    rareEvent: Entity<Component<Countdown>>;
   };
+  resources: {
+    [K in ResourceId]: Entity<{
+      amount: number;
+      delta?: number;
+      capacity?: number;
+      unlocked: boolean;
+    }>;
+  };
+  calendar: Entity<{
+    day: number;
+    season: SeasonId;
+    year: number;
+    weather: WeatherId;
+    dateLabel: string;
+    epochLabel: string;
+  }>;
+  time: Entity<{
+    paused: boolean;
+    power: number;
+  }>;
 };
 
 export type EventsSchema = {
   history?: HistoryEvent[];
 };
 
-type Present<T> = T extends ComponentMarker<infer V>
-  ? Serializable<V>
+type Present<T> = T extends Entity<infer E>
+  ? Present<E>
+  : T extends Component<infer C>
+  ? Serializable<C>
   : { [K in keyof T]?: Present<T[K]> };
 
-type State<T> = T extends ComponentMarker<infer V>
-  ? Serializable<V>
+type State<T> = T extends Entity<infer E>
+  ? State<E>
+  : T extends Component<infer C>
+  ? Serializable<C>
   : { [K in keyof T]: State<T[K]> };
 
-type Removed<T> = T extends ComponentMarker
-  ? true
-  : { [K in keyof T]?: Removed<T[K]> };
+type Removed<T> = T extends Entity ? true : { [K in keyof T]?: Removed<T[K]> };
 
 export type DeltaSchema = Present<ComponentsSchema>;
 export type StateSchema = State<ComponentsSchema>;

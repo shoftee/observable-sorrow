@@ -14,7 +14,6 @@ import {
   PopId,
   PropertyBag,
   RecipeId,
-  ResourceId,
   SectionId,
   TechId,
   StockpileId,
@@ -31,7 +30,6 @@ import {
   PlayerState,
   PopState,
   RecipeState,
-  ResourceState,
   SectionState,
   StockpileState,
   TechState,
@@ -63,9 +61,6 @@ export interface IStateManager {
   pops(): Enumerable<[PopId, PopState]>;
 
   recipe(id: RecipeId): RecipeState;
-
-  resources(): ReadonlyMap<ResourceId, ResourceState>;
-  resource(id: ResourceId): ResourceState;
 
   sections(): ReadonlyMap<SectionId, SectionState>;
   section(id: SectionId): SectionState;
@@ -115,13 +110,6 @@ class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
 
   get recipes(): Map<RecipeId, RecipeState> {
     return this.ensure("recipes") as unknown as Map<RecipeId, RecipeState>;
-  }
-
-  get resources(): Map<ResourceId, ResourceState> {
-    return this.ensure("resources") as unknown as Map<
-      ResourceId,
-      ResourceState
-    >;
   }
 
   get sections(): Map<SectionId, SectionState> {
@@ -241,14 +229,6 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
 
   recipe(id: RecipeId): RecipeState {
     return this.pools.recipes.get(id) as RecipeState;
-  }
-
-  resources() {
-    return this.pools.resources;
-  }
-
-  resource(id: ResourceId): ResourceState {
-    return this.pools.resources.get(id) as ResourceState;
   }
 
   sections() {

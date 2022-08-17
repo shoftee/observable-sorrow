@@ -1,9 +1,10 @@
 import { Intent, OnRenderHandler } from "@/app/interfaces";
 
 import { EcsEvent, GameRunner } from "../ecs";
+import { ResourceMap } from "../state";
 
 import { build } from "./systems2/builder";
-import * as events from "./systems2/types";
+import * as events from "./systems2/types/events";
 
 export class Game {
   readonly runner: GameRunner;
@@ -44,11 +45,13 @@ export class Game {
 function convertToEvent(intent: Intent): EcsEvent | undefined {
   switch (intent.kind) {
     case "time":
-      return new events.TimeEvent(intent);
+      return new events.TimeOptionsChanged(intent);
     case "bonfire":
-      switch(intent.id) {
+      switch (intent.id) {
         case "gather-catnip":
-          return new events.ResourceTransactionEvent([{type: "debit", resource: "catnip", amount: 1}])
+          return new events.ResourceOrder(
+            ResourceMap.fromObject({ catnip: 1 }),
+          );
       }
   }
   return undefined;

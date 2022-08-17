@@ -21,7 +21,7 @@ const FlushChanges = System(
 });
 
 export class RendererPlugin extends EcsPlugin {
-  constructor(readonly onRender: OnRenderHandler) {
+  constructor(private readonly onRender: OnRenderHandler) {
     super();
   }
 
