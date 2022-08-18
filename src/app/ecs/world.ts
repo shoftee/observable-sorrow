@@ -150,12 +150,12 @@ export class WorldState {
 
   fetchQuery<Q extends QueryDescriptor>(
     query: Q,
-  ): Iterable<WorldQueryResult<Q>> {
+  ): FetchCache<WorldQueryResult<Q>> {
     const fetch = this.fetches.get(query);
     if (fetch === undefined) {
       throw new Error("Query is not registered.");
     }
-    return fetch.results() as Iterable<WorldQueryResult<Q>>;
+    return fetch as FetchCache<WorldQueryResult<Q>>;
   }
 
   insertResource<R extends EcsResource>(resource: R) {
@@ -184,44 +184,49 @@ export class WorldState {
   }
 }
 
+type CachedResult = {
+  archetype: Archetype;
+  generation: number;
+};
+
 class FetchCache<F = unknown> {
-  private readonly descriptors = new Map<EcsEntity, CachedQueryResult>();
+  private readonly entries = new Map<EcsEntity, CachedResult>();
 
   constructor(private readonly query: InstantiatedQuery<F>) {}
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.includes(archetype)) {
-      this.descriptors.delete(entity);
+      this.entries.delete(entity);
     } else {
-      const result = this.descriptors.get(entity);
+      const result = this.entries.get(entity);
       if (result !== undefined) {
         if (result.generation !== generation) {
-          result.generation = generation;
           result.archetype = archetype;
+          result.generation = generation;
         }
       } else {
-        this.descriptors.set(
-          entity,
-          new CachedQueryResult(entity, archetype, generation),
-        );
+        this.entries.set(entity, { archetype, generation });
       }
     }
   }
 
   *results(): Iterable<F> {
     const { fetch, matches } = this.query;
-    for (const [entity, { archetype }] of this.descriptors) {
+    for (const [entity, { archetype }] of this.entries) {
       if (matches?.(archetype) ?? true) {
         yield fetch(entity, archetype);
       }
     }
   }
-}
 
-class CachedQueryResult {
-  constructor(
-    readonly entity: EcsEntity,
-    public archetype: Archetype,
-    public generation: number,
-  ) {}
+  get(entity: EcsEntity): F | undefined {
+    const { fetch, matches } = this.query;
+    const entry = this.entries.get(entity);
+    if (entry) {
+      if (!matches || matches(entry.archetype)) {
+        return fetch(entity, entry.archetype);
+      }
+    }
+    return undefined;
+  }
 }

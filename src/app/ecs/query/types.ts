@@ -35,24 +35,22 @@ export interface InstantiatedFilter {
   matches?(archetype: Archetype): boolean;
 }
 
-export interface InstantiatedQuery<F> extends InstantiatedFilter {
-  fetch(entity: EcsEntity, archetype: Archetype): F;
+export interface InstantiatedQuery<QueryResult> extends InstantiatedFilter {
+  fetch(entity: EcsEntity, archetype: Archetype): QueryResult;
 }
 
 export abstract class FilterDescriptor {
   abstract newFilter(state: WorldState): InstantiatedFilter;
 }
 
-export abstract class QueryDescriptor<Fetch = unknown> {
-  abstract newQuery(state: WorldState): InstantiatedQuery<Fetch>;
+export abstract class QueryDescriptor<QueryResult = unknown> {
+  abstract newQuery(state: WorldState): InstantiatedQuery<QueryResult>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Fetcher<T = any> = {
-  fetch(): T;
+export type Fetcher<FetchResult = unknown> = {
+  fetch(): FetchResult;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FetcherFactory<T = any> = {
-  create(state: WorldState): Fetcher<T>;
+export type FetcherFactory<FetchResult = unknown> = {
+  create(state: WorldState): Fetcher<FetchResult>;
 };

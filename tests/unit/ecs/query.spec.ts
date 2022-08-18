@@ -4,6 +4,7 @@ import { single } from "@/app/utils/collections";
 
 import { EcsComponent, ValueComponent, World, WorldState } from "@/app/ecs";
 import { All, Read, Mut, With, Without, Opt, Value } from "@/app/ecs/query";
+import { QueryDescriptor } from "@/app/ecs/query/types";
 
 describe("ecs query", () => {
   class Id extends ValueComponent<string> {
@@ -24,6 +25,10 @@ describe("ecs query", () => {
     }
   }
 
+  function results<Q extends QueryDescriptor>(state: WorldState, query: Q) {
+    return state.fetchQuery(query).results();
+  }
+
   let state: WorldState;
   beforeEach(() => {
     state = new WorldState(new World());
@@ -36,7 +41,7 @@ describe("ecs query", () => {
       const idQuery = All(Value(Id));
       state.addQuery(idQuery);
 
-      const ids = Array.from(state.fetchQuery(idQuery));
+      const ids = Array.from(results(state, idQuery));
 
       expect(ids[0]).to.deep.equal(["shoftee1"]);
       expect(ids[1]).to.deep.equal(["shoftee2"]);
@@ -48,12 +53,12 @@ describe("ecs query", () => {
       const query = All(Value(Id));
       state.addQuery(query);
 
-      for (const [id] of state.fetchQuery(query)) {
+      for (const [id] of results(state, query)) {
         expect(id).to.eq("shoftee1");
         break;
       }
 
-      for (const [id] of state.fetchQuery(query)) {
+      for (const [id] of results(state, query)) {
         expect(id).to.eq("shoftee1");
         break;
       }
@@ -67,8 +72,8 @@ describe("ecs query", () => {
       const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
-      const results = Array.from(state.fetchQuery(query));
-      expect(results).to.deep.equal([
+      const entries = Array.from(results(state, query));
+      expect(entries).to.deep.equal([
         ["shoftee", { level: 20, exp: 123 }],
         ["another shoftee", { level: 20, exp: 123 }],
       ]);
@@ -80,8 +85,8 @@ describe("ecs query", () => {
       const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
-      const results = Array.from(state.fetchQuery(query));
-      expect(results).to.deep.equal([["shoftee", { level: 20, exp: 123 }]]);
+      const entries = Array.from(results(state, query));
+      expect(entries).to.deep.equal([["shoftee", { level: 20, exp: 123 }]]);
     });
     it("changes query results when components are inserted", () => {
       const entity = state.spawn();
@@ -90,11 +95,11 @@ describe("ecs query", () => {
       const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
-      assert(Array.from(state.fetchQuery(query)).length === 0);
+      assert(Array.from(results(state, query)).length === 0);
 
       state.insertComponents(entity, new Player(20, 123));
 
-      for (const result of state.fetchQuery(query)) {
+      for (const result of results(state, query)) {
         expect(result).to.deep.equal(["shoftee", { level: 20, exp: 123 }]);
       }
     });
@@ -114,8 +119,8 @@ describe("ecs query", () => {
       const query = All(Value(Id), Opt(Value(Name)), Opt(Read(Player)));
       state.addQuery(query);
 
-      const results = Array.from(state.fetchQuery(query));
-      expect(results).to.deep.equal([
+      const entries = Array.from(results(state, query));
+      expect(entries).to.deep.equal([
         ["35709e7e-2e3e-4541-be9f-76f0a5593bf5", undefined, undefined],
         ["fb73e3d9-7f6f-424e-9af1-0d98e04287d9", "shoftee2", undefined],
         [
@@ -134,13 +139,13 @@ describe("ecs query", () => {
       const query = All(Value(Id), Mut(Player));
       state.addQuery(query);
 
-      for (const [, player] of state.fetchQuery(query)) {
+      for (const [, player] of results(state, query)) {
         player.level += 10;
         player.exp += 10000;
       }
 
-      const results = Array.from(state.fetchQuery(query));
-      expect(results).to.deep.equal([
+      const entries = Array.from(results(state, query));
+      expect(entries).to.deep.equal([
         ["shoftee1", { level: 30, exp: 10123 }],
         ["shoftee2", { level: 40, exp: 10345 }],
       ]);
@@ -161,22 +166,22 @@ describe("ecs query", () => {
 
       const bothQuery = All(Read(Player)).filter(With(Id, Name));
       state.addQuery(bothQuery);
-      const bothResults = Array.from(state.fetchQuery(bothQuery));
+      const bothEntries = Array.from(results(state, bothQuery));
 
-      expect(bothResults).to.deep.equal([[{ level: 20, exp: 123 }]]);
+      expect(bothEntries).to.deep.equal([[{ level: 20, exp: 123 }]]);
 
       const nameQuery = All(Read(Player)).filter(With(Name));
       state.addQuery(nameQuery);
-      const nameResults = Array.from(state.fetchQuery(nameQuery));
-      expect(nameResults).to.deep.equal([
+      const nameEntries = Array.from(results(state, nameQuery));
+      expect(nameEntries).to.deep.equal([
         [{ level: 20, exp: 123 }],
         [{ level: 30, exp: 345 }],
       ]);
 
       const idQuery = All(Read(Player)).filter(With(Id));
       state.addQuery(idQuery);
-      const idResults = Array.from(state.fetchQuery(idQuery));
-      expect(idResults).to.deep.equal([
+      const idEntries = Array.from(results(state, idQuery));
+      expect(idEntries).to.deep.equal([
         [{ level: 20, exp: 123 }],
         [{ level: 40, exp: 456 }],
       ]);
@@ -197,13 +202,13 @@ describe("ecs query", () => {
 
       const withoutName = All(Read(Player)).filter(Without(Name));
       state.addQuery(withoutName);
-      const withoutNameResults = single(state.fetchQuery(withoutName));
-      expect(withoutNameResults).to.deep.equal([{ level: 40, exp: 456 }]);
+      const withoutNameEntries = single(results(state, withoutName));
+      expect(withoutNameEntries).to.deep.equal([{ level: 40, exp: 456 }]);
 
       const withoutId = All(Read(Player)).filter(Without(Id));
       state.addQuery(withoutId);
-      const withoutIdResults = single(state.fetchQuery(withoutId));
-      expect(withoutIdResults).to.deep.equal([{ level: 30, exp: 345 }]);
+      const withoutIdEntries = single(results(state, withoutId));
+      expect(withoutIdEntries).to.deep.equal([{ level: 30, exp: 345 }]);
     });
   });
 });
