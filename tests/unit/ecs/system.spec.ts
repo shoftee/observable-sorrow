@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { EcsComponent, ValueComponent, World, WorldState } from "@/app/ecs";
 
-import { ChangeTrackers, Mut, Query, Read } from "@/app/ecs/query";
+import { ChangeTrackers, Commands, Mut, Query, Read } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 describe("ecs systems", () => {
@@ -23,7 +23,13 @@ describe("ecs systems", () => {
   }
 
   it("should compile", () => {
-    const PlayerSystem = System(Query(Read(Id), Read(Player)))((players) => {
+    const Setup = System(Commands())((cmds) => {
+      cmds.spawn(new Id("shoftee"), new Player(20));
+      cmds.spawn(new Id("shoftee"), new Player(20));
+      cmds.spawn(new Id("shoftee"), new Player(20));
+    });
+
+    const PlayerChecker = System(Query(Read(Id), Read(Player)))((players) => {
       for (const [id, player] of players.all()) {
         expect(id).to.deep.equal({ value: "shoftee" });
         expect(player).to.deep.equal({ level: 20 });
@@ -31,15 +37,22 @@ describe("ecs systems", () => {
     });
 
     const state = new WorldState(new World());
-    state.spawn(new Id("shoftee"), new Player(20));
-    state.spawn(new Id("shoftee"), new Player(20));
-    state.spawn(new Id("shoftee"), new Player(20));
+    const setupInstance = Setup.build(state);
+    const playerCheckerInstance = PlayerChecker.build(state);
 
-    const system = PlayerSystem.build(state);
-    system.run();
+    setupInstance.run();
+    state.flush();
+
+    playerCheckerInstance.run();
   });
 
   it("should mark mutable components as changed when calling member methods", () => {
+    const Setup = System(Commands())((cmds) => {
+      cmds.spawn(new Id("shoftee1"), new Player(20));
+      cmds.spawn(new Id("shoftee2"), new Player(20));
+      cmds.spawn(new Id("shoftee3"), new Player(20));
+    });
+
     const LevelUpper = System(Query(Mut(Player)))((players) => {
       for (const [player] of players.all()) {
         player.levelUp();
@@ -56,12 +69,14 @@ describe("ecs systems", () => {
     });
 
     const state = new WorldState(new World());
-    state.spawn(new Id("shoftee1"), new Player(20));
-    state.spawn(new Id("shoftee2"), new Player(20));
-    state.spawn(new Id("shoftee3"), new Player(20));
 
+    const setupInstance = Setup.build(state);
     const levelUpperInstance = LevelUpper.build(state);
     const changeTrackerInstance = ChangeTracker.build(state);
+
+    setupInstance.run();
+    state.flush();
+
     levelUpperInstance.run();
     changeTrackerInstance.run();
   });

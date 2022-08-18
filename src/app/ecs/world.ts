@@ -95,44 +95,26 @@ export class World {
   }
 }
 
-type WorldCommand = () => void;
 type WorldQueryResult<T = unknown> = T extends QueryDescriptor<infer R>
   ? R
   : never;
 
+type Command = (world: World) => Iterable<EcsEntity>;
+
 export class WorldState {
-  private generation = 0;
   private readonly fetches = new Map<QueryDescriptor, FetchCache>();
+  private readonly commands = new Queue<Command>();
+  private generation = 0;
 
   constructor(readonly world: World) {}
 
-  private readonly commands = new Queue<WorldCommand>();
-
-  spawn(...components: EcsComponent[]): EcsEntity {
-    const entity = this.world.spawn(...components);
-
-    this.notifyChanged(entity);
-
-    return entity;
-  }
-
-  despawn(entity: EcsEntity): void {
-    this.world.despawn(entity);
-
-    this.notifyChanged(entity);
-  }
-
-  insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void {
-    this.world.insertComponents(entity, ...components);
-
-    this.notifyChanged(entity);
-  }
-
-  private notifyChanged(entity: EcsEntity) {
-    const newGeneration = this.generation++;
-    const row = this.world.archetype(entity);
-    for (const [, fetch] of this.fetches) {
-      fetch.notify(newGeneration, entity, row);
+  notifyChanged(...entities: EcsEntity[]) {
+    const newGeneration = ++this.generation;
+    for (const entity of entities) {
+      const row = this.world.archetype(entity);
+      for (const [, fetch] of this.fetches) {
+        fetch.notify(newGeneration, entity, row);
+      }
     }
   }
 
@@ -166,21 +148,21 @@ export class WorldState {
     this.world.registerEvent(ctor);
   }
 
-  insertComponentsDeferred(entity: EcsEntity, ...components: EcsComponent[]) {
-    this.commands.enqueue(() => this.insertComponents(entity, ...components));
+  defer(command: Command) {
+    this.commands.enqueue(command);
   }
 
-  despawnDeferred(entity: EcsEntity) {
-    this.commands.enqueue(() => {
-      this.despawn(entity);
-    });
-  }
+  flush() {
+    const entities = new Set<EcsEntity>();
 
-  flushDeferred() {
     let command;
     while ((command = this.commands.dequeue())) {
-      command();
+      for (const entity of command(this.world)) {
+        entities.add(entity);
+      }
     }
+
+    this.notifyChanged(...entities);
   }
 }
 

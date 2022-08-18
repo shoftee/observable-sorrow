@@ -1,9 +1,12 @@
 import { EcsComponent, EcsEntity } from "@/app/ecs";
+import { Constructor as Ctor } from "@/app/utils/types";
 import { FetcherFactory } from "../types";
 
 type Commands = {
-  spawn(...components: EcsComponent[]): EcsEntity;
+  spawn(...components: EcsComponent[]): void;
+  despawn(entity: EcsEntity): void;
   insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void;
+  removeComponents(entity: EcsEntity, ...ctors: Ctor<EcsComponent>[]): void;
 };
 
 /** Used to spawn entities and populate them with components. */
@@ -12,12 +15,27 @@ export function Commands(): FetcherFactory<Commands> {
     create(state) {
       const commands = {
         spawn(...components: EcsComponent[]) {
-          const entity = state.spawn();
-          state.insertComponentsDeferred(entity, ...components);
-          return entity;
+          state.defer(function* (world) {
+            yield world.spawn(...components);
+          });
         },
         insertComponents(entity: EcsEntity, ...components: EcsComponent[]) {
-          state.insertComponentsDeferred(entity, ...components);
+          state.defer(function* (world) {
+            world.insertComponents(entity, ...components);
+            yield entity;
+          });
+        },
+        removeComponents(entity: EcsEntity, ...ctors: Ctor<EcsComponent>[]) {
+          state.defer(function* (world) {
+            world.removeComponents(entity, ...ctors);
+            yield entity;
+          });
+        },
+        despawn(entity: EcsEntity) {
+          state.defer(function* (world) {
+            world.despawn(entity);
+            yield entity;
+          });
         },
       };
       return {

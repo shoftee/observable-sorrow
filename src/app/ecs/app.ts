@@ -155,7 +155,7 @@ export class GameRunner {
     for (const system of this.stages.entriesForKey(id)) {
       system.run();
     }
-    this.state.flushDeferred();
+    this.state.flush();
   }
 
   resource<R extends EcsResource>(ctor: Ctor<R>): R | undefined {

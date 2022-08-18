@@ -35,8 +35,8 @@ describe("ecs query", () => {
   });
   describe("value components", () => {
     it("returns multiple entities", () => {
-      state.spawn(new Id("shoftee1"));
-      state.spawn(new Id("shoftee2"));
+      state.world.spawn(new Id("shoftee1"));
+      state.world.spawn(new Id("shoftee2"));
 
       const idQuery = All(Value(Id));
       state.addQuery(idQuery);
@@ -47,8 +47,8 @@ describe("ecs query", () => {
       expect(ids[1]).to.deep.equal(["shoftee2"]);
     });
     it("always starts from the first element", () => {
-      state.spawn(new Id("shoftee1"));
-      state.spawn(new Id("shoftee2"));
+      state.world.spawn(new Id("shoftee1"));
+      state.world.spawn(new Id("shoftee2"));
 
       const query = All(Value(Id));
       state.addQuery(query);
@@ -66,8 +66,8 @@ describe("ecs query", () => {
   });
   describe("general components", () => {
     it("returns with value and general components", () => {
-      state.spawn(new Id("shoftee"), new Player(20, 123));
-      state.spawn(new Id("another shoftee"), new Player(20, 123));
+      state.world.spawn(new Id("shoftee"), new Player(20, 123));
+      state.world.spawn(new Id("another shoftee"), new Player(20, 123));
 
       const query = All(Value(Id), Read(Player));
       state.addQuery(query);
@@ -79,8 +79,8 @@ describe("ecs query", () => {
       ]);
     });
     it("returns only relevant entities", () => {
-      state.spawn(new Id("shoftee"), new Player(20, 123));
-      state.spawn(new Id("another shoftee"));
+      state.world.spawn(new Id("shoftee"), new Player(20, 123));
+      state.world.spawn(new Id("another shoftee"));
 
       const query = All(Value(Id), Read(Player));
       state.addQuery(query);
@@ -89,15 +89,16 @@ describe("ecs query", () => {
       expect(entries).to.deep.equal([["shoftee", { level: 20, exp: 123 }]]);
     });
     it("changes query results when components are inserted", () => {
-      const entity = state.spawn();
-      state.insertComponents(entity, new Id("shoftee"));
+      const entity = state.world.spawn(new Id("shoftee"));
+      state.notifyChanged(entity);
 
       const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
       assert(Array.from(results(state, query)).length === 0);
 
-      state.insertComponents(entity, new Player(20, 123));
+      state.world.insertComponents(entity, new Player(20, 123));
+      state.notifyChanged(entity);
 
       for (const result of results(state, query)) {
         expect(result).to.deep.equal(["shoftee", { level: 20, exp: 123 }]);
@@ -106,12 +107,12 @@ describe("ecs query", () => {
   });
   describe("optional components", () => {
     it("returns entities correctly", () => {
-      state.spawn(new Id("35709e7e-2e3e-4541-be9f-76f0a5593bf5"));
-      state.spawn(
+      state.world.spawn(new Id("35709e7e-2e3e-4541-be9f-76f0a5593bf5"));
+      state.world.spawn(
         new Id("fb73e3d9-7f6f-424e-9af1-0d98e04287d9"),
         new Name("shoftee2"),
       );
-      state.spawn(
+      state.world.spawn(
         new Id("97117bf4-a76d-4e15-b179-f48b6e71a3ac"),
         new Name("shoftee3"),
         new Player(30, 345),
@@ -133,8 +134,8 @@ describe("ecs query", () => {
   });
   describe("mutable components", () => {
     it("allows mutations", () => {
-      state.spawn(new Id("shoftee1"), new Player(20, 123));
-      state.spawn(new Id("shoftee2"), new Player(30, 345));
+      state.world.spawn(new Id("shoftee1"), new Player(20, 123));
+      state.world.spawn(new Id("shoftee2"), new Player(30, 345));
 
       const query = All(Value(Id), Mut(Player));
       state.addQuery(query);
@@ -153,13 +154,13 @@ describe("ecs query", () => {
   });
   describe("with filters", () => {
     it("excludes entities correctly", () => {
-      state.spawn(
+      state.world.spawn(
         new Id("96a8c161-0100-4ec1-bbb1-049f32dab366"),
         new Name("shoftee"),
         new Player(20, 123),
       );
-      state.spawn(new Name("shoftee without an ID"), new Player(30, 345));
-      state.spawn(
+      state.world.spawn(new Name("shoftee without an ID"), new Player(30, 345));
+      state.world.spawn(
         new Id("a46f1400-a919-412e-b36c-dba73150adaf"),
         new Player(40, 456),
       );
@@ -189,13 +190,13 @@ describe("ecs query", () => {
   });
   describe("without filters", () => {
     it("excludes entities correctly", () => {
-      state.spawn(
+      state.world.spawn(
         new Id("96a8c161-0100-4ec1-bbb1-049f32dab366"),
         new Name("shoftee"),
         new Player(20, 123),
       );
-      state.spawn(new Name("shoftee without an ID"), new Player(30, 345));
-      state.spawn(
+      state.world.spawn(new Name("shoftee without an ID"), new Player(30, 345));
+      state.world.spawn(
         new Id("a46f1400-a919-412e-b36c-dba73150adaf"),
         new Player(40, 456),
       );
