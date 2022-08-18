@@ -11,12 +11,14 @@ import { WorldState } from "../world";
  *
  * There are four basic kinds of world queries:
  * * Entity - ask for the entity for a given WQ result.
+ * * Value(Component) - returns the value field of a ValueComponent<T>
  * * Ref(Component) - returns read-only view of a component.
  * * Mut(Component) - returns component view with change tracking.
  * * Opt(WorldQuery) - wrapper for making other world queries optional.
  *
  * Combine any of the above with this:
- * * All(WorldQuery_1, WorldQuery_2, WorldQuery_3,...)
+ * * All(WorldQuery_1, WorldQuery_2, WorldQuery_3,...) - returns an iterator over all component tuples that match the provided world queries
+ * * Map([ValueComponent query], [any WorldQuery]) - returns a map keyed by the provided value component and valued with the result from the provided world query. Can be combined with All().
  *
  * Filters:
  * * With(C1, C2, C3...) - include results that have all of the specified components present. This behavior is similar to requesting them in an All query, but doesn't fetch the data for the components.

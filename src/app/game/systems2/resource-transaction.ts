@@ -1,37 +1,34 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
-import { Mut, Opt, Query, Read, Receive } from "@/app/ecs/query";
+import { All, MapQuery, Mut, Opt, Receive, Value } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
-import { Ledger as Ledger, ResourceMap } from "@/app/state";
-import { Enumerable } from "@/app/utils/enumerable";
+
+import { Ledger, ResourceMap } from "@/app/state";
+import { cache } from "@/app/utils/collections";
 
 import * as R from "./types/resources";
 import * as events from "./types/events";
 
 const ProcessResourceOrders = System(
   Receive(events.ResourceOrder),
-  Query(Read(R.Id), Read(R.Amount), Opt(Read(R.Capacity)), Mut(R.LedgerEntry)),
-)((ordersReceiver, query) => {
-  const orders = Array.from(ordersReceiver.pull());
-  if (orders.length === 0) {
-    return;
-  }
+  MapQuery(
+    Value(R.Id),
+    All(Value(R.Amount), Opt(Value(R.Capacity)), Mut(R.LedgerEntry)),
+  ),
+)((orders, resourcesQuery) => {
+  const resourcesCache = cache(() => resourcesQuery.map());
+  const ambientCache = cache(() => {
+    // Initialize the ambient deltas.
+    const ambient = new Ledger();
+    for (const [id, values] of resourcesCache()) {
+      ambient.add(id, values[2]);
+    }
+    return ambient;
+  });
 
-  const resources = new Enumerable(query.all()).toMap(
-    (p) => p[0].id,
-    (p) => [p[1], p[2]] as const,
-  );
-  const ledgerEntries = new Enumerable(query.all()).toMap(
-    (p) => p[0].id,
-    (p) => p[3],
-  );
+  for (const order of orders.pull()) {
+    const resources = resourcesCache();
+    const ambient = ambientCache();
 
-  // Initialize the ambient deltas.
-  const ambient = new Ledger();
-  for (const [id, entry] of ledgerEntries) {
-    ambient.add(id, entry);
-  }
-
-  for (const order of orders) {
     // Create delta layer for this order.
     // If the order fails, we can safely discard the whole layer.
     const transaction = new Ledger(ambient);
@@ -42,7 +39,7 @@ const ProcessResourceOrders = System(
       transaction.addCredit(id, credit);
 
       const [amount] = resources.get(id)!;
-      if (amount.value < credit) {
+      if (amount < credit) {
         return undefined;
       }
     }
@@ -58,10 +55,10 @@ const ProcessResourceOrders = System(
       if (capacity) {
         const debit = transaction.getDebit(id);
         const credit = transaction.getCredit(id);
-        const total = amount.value + debit - credit;
+        const total = amount + debit - credit;
 
         // if total > capacity, record only the part until cap.
-        rewards.set(id, Math.min(capacity.value, total) - amount.value);
+        rewards.set(id, Math.min(capacity, total) - amount);
       } else {
         // resources that are uncapped are always fulfilled completely.
         rewards.set(id, quantity);
@@ -71,7 +68,7 @@ const ProcessResourceOrders = System(
     if (rewards) {
       // Apply changes to base resource deltas.
       for (const [id, change] of transaction.entries()) {
-        const entry = ledgerEntries.get(id)!;
+        const entry = resources.get(id)![2];
         entry.debit += change.debit;
         entry.credit += change.credit;
       }

@@ -2,17 +2,17 @@ import { assert, expect } from "chai";
 
 import { single } from "@/app/utils/collections";
 
-import { EcsComponent, World, WorldState } from "@/app/ecs";
-import { All, Read, Mut, With, Without, Opt } from "@/app/ecs/query";
+import { EcsComponent, ValueComponent, World, WorldState } from "@/app/ecs";
+import { All, Read, Mut, With, Without, Opt, Value } from "@/app/ecs/query";
 
 describe("ecs query", () => {
-  class Id extends EcsComponent {
+  class Id extends ValueComponent<string> {
     constructor(readonly value: string) {
       super();
     }
   }
 
-  class Name extends EcsComponent {
+  class Name extends ValueComponent<string> {
     constructor(readonly value: string) {
       super();
     }
@@ -33,28 +33,28 @@ describe("ecs query", () => {
       state.spawn(new Id("shoftee1"));
       state.spawn(new Id("shoftee2"));
 
-      const idQuery = All(Read(Id));
+      const idQuery = All(Value(Id));
       state.addQuery(idQuery);
 
       const ids = Array.from(state.fetchQuery(idQuery));
 
-      expect(ids[0]).to.deep.equal([{ value: "shoftee1" }]);
-      expect(ids[1]).to.deep.equal([{ value: "shoftee2" }]);
+      expect(ids[0]).to.deep.equal(["shoftee1"]);
+      expect(ids[1]).to.deep.equal(["shoftee2"]);
     });
     it("always starts from the first element", () => {
       state.spawn(new Id("shoftee1"));
       state.spawn(new Id("shoftee2"));
 
-      const query = All(Read(Id));
+      const query = All(Value(Id));
       state.addQuery(query);
 
       for (const [id] of state.fetchQuery(query)) {
-        expect(id.value).to.eq("shoftee1");
+        expect(id).to.eq("shoftee1");
         break;
       }
 
       for (const [id] of state.fetchQuery(query)) {
-        expect(id.value).to.eq("shoftee1");
+        expect(id).to.eq("shoftee1");
         break;
       }
     });
@@ -64,29 +64,30 @@ describe("ecs query", () => {
       state.spawn(new Id("shoftee"), new Player(20, 123));
       state.spawn(new Id("another shoftee"), new Player(20, 123));
 
-      const query = All(Read(Id), Read(Player));
+      const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
-      const entities = Array.from(state.fetchQuery(query));
-
-      expect(entities).to.have.lengthOf(2);
+      const results = Array.from(state.fetchQuery(query));
+      expect(results).to.deep.equal([
+        ["shoftee", { level: 20, exp: 123 }],
+        ["another shoftee", { level: 20, exp: 123 }],
+      ]);
     });
     it("returns only relevant entities", () => {
       state.spawn(new Id("shoftee"), new Player(20, 123));
       state.spawn(new Id("another shoftee"));
 
-      const query = All(Read(Id), Read(Player));
+      const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
-      for (const [id] of state.fetchQuery(query)) {
-        expect(id).to.deep.equal({ value: "shoftee" });
-      }
+      const results = Array.from(state.fetchQuery(query));
+      expect(results).to.deep.equal([["shoftee", { level: 20, exp: 123 }]]);
     });
     it("changes query results when components are inserted", () => {
       const entity = state.spawn();
       state.insertComponents(entity, new Id("shoftee"));
 
-      const query = All(Read(Id), Read(Player));
+      const query = All(Value(Id), Read(Player));
       state.addQuery(query);
 
       assert(Array.from(state.fetchQuery(query)).length === 0);
@@ -94,29 +95,8 @@ describe("ecs query", () => {
       state.insertComponents(entity, new Player(20, 123));
 
       for (const result of state.fetchQuery(query)) {
-        expect(result).to.deep.equal([
-          { value: "shoftee" },
-          { level: 20, exp: 123 },
-        ]);
+        expect(result).to.deep.equal(["shoftee", { level: 20, exp: 123 }]);
       }
-    });
-    it("allows mutations", () => {
-      state.spawn(new Id("shoftee1"), new Player(20, 123));
-      state.spawn(new Id("shoftee2"), new Player(30, 345));
-
-      const query = All(Read(Id), Mut(Player));
-      state.addQuery(query);
-
-      for (const [, player] of state.fetchQuery(query)) {
-        player.level += 10;
-        player.exp += 10000;
-      }
-
-      const results = Array.from(state.fetchQuery(query));
-      expect(results).to.deep.equal([
-        [{ value: "shoftee1" }, { level: 30, exp: 10123 }],
-        [{ value: "shoftee2" }, { level: 40, exp: 10345 }],
-      ]);
     });
   });
   describe("optional components", () => {
@@ -131,26 +111,38 @@ describe("ecs query", () => {
         new Name("shoftee3"),
         new Player(30, 345),
       );
-      const query = All(Read(Id), Opt(Read(Name)), Opt(Read(Player)));
+      const query = All(Value(Id), Opt(Value(Name)), Opt(Read(Player)));
       state.addQuery(query);
 
       const results = Array.from(state.fetchQuery(query));
       expect(results).to.deep.equal([
+        ["35709e7e-2e3e-4541-be9f-76f0a5593bf5", undefined, undefined],
+        ["fb73e3d9-7f6f-424e-9af1-0d98e04287d9", "shoftee2", undefined],
         [
-          { value: "35709e7e-2e3e-4541-be9f-76f0a5593bf5" },
-          undefined,
-          undefined,
-        ],
-        [
-          { value: "fb73e3d9-7f6f-424e-9af1-0d98e04287d9" },
-          { value: "shoftee2" },
-          undefined,
-        ],
-        [
-          { value: "97117bf4-a76d-4e15-b179-f48b6e71a3ac" },
-          { value: "shoftee3" },
+          "97117bf4-a76d-4e15-b179-f48b6e71a3ac",
+          "shoftee3",
           { level: 30, exp: 345 },
         ],
+      ]);
+    });
+  });
+  describe("mutable components", () => {
+    it("allows mutations", () => {
+      state.spawn(new Id("shoftee1"), new Player(20, 123));
+      state.spawn(new Id("shoftee2"), new Player(30, 345));
+
+      const query = All(Value(Id), Mut(Player));
+      state.addQuery(query);
+
+      for (const [, player] of state.fetchQuery(query)) {
+        player.level += 10;
+        player.exp += 10000;
+      }
+
+      const results = Array.from(state.fetchQuery(query));
+      expect(results).to.deep.equal([
+        ["shoftee1", { level: 30, exp: 10123 }],
+        ["shoftee2", { level: 40, exp: 10345 }],
       ]);
     });
   });

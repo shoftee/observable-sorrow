@@ -13,6 +13,7 @@ class Dispatcher<E extends EcsEvent> {
   }
 }
 
+/** Used to dispatch events of type E. */
 export function Dispatch<E extends EcsEvent>(
   ctor: Ctor<E>,
 ): FetcherFactory<Dispatcher<E>> {

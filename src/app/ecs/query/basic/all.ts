@@ -57,7 +57,6 @@ export function All<Q extends AllParams>(...qs: Q): AllQuery<Q> {
 }
 
 type With = FilterDescriptor;
-
 export function With(...ctors: Ctor<EcsComponent>[]): With {
   return {
     newFilter(): InstantiatedFilter {
@@ -71,7 +70,6 @@ export function With(...ctors: Ctor<EcsComponent>[]): With {
 }
 
 type Without = FilterDescriptor;
-
 export function Without(...ctors: Ctor<EcsComponent>[]): Without {
   return {
     newFilter(): InstantiatedFilter {

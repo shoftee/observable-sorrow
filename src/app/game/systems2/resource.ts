@@ -1,29 +1,37 @@
-import { EcsPlugin, PluginApp } from "@/app/ecs";
-import { Commands, Mut, Opt, Query, Read } from "@/app/ecs/query";
+import { EcsComponent, EcsPlugin, PluginApp } from "@/app/ecs";
+import { Commands, Mut, Opt, Query, Read, Value } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
-import { Meta } from "@/app/state";
+import { Meta, ResourceMetadataType, UnlockMode } from "@/app/state";
 
-import { ChangeTrackingSystem, Unlock } from "./types";
+import { ChangeTrackingSystem, Unlocked } from "./types";
 import * as R from "./types/resources";
+
+function* componentsFromMeta(
+  meta: ResourceMetadataType,
+): Iterable<EcsComponent> {
+  yield new R.Id(meta.id);
+  yield new R.Amount();
+  yield new R.LedgerEntry();
+  yield new Unlocked(false);
+  if (meta.unlockMode === UnlockMode.FirstCapacity) {
+    yield new R.UnlockOnFirstCapacity();
+  } else {
+    yield new R.UnlockOnFirstQuantity();
+  }
+}
 
 const SpawnResources = System(Commands())((cmds) => {
   for (const meta of Meta.resources()) {
-    cmds.spawn(
-      new R.Id(meta.id),
-      new R.Amount(),
-      new R.Delta(),
-      new R.LedgerEntry(),
-      new Unlock(false),
-    );
+    cmds.spawn(...componentsFromMeta(meta));
   }
 });
 
 const ProcessLedger = System(
-  Query(Mut(R.Amount), Opt(Read(R.Capacity)), Read(R.LedgerEntry)),
+  Query(Mut(R.Amount), Opt(Value(R.Capacity)), Read(R.LedgerEntry)),
 )((query) => {
   for (const [amount, capacity, { debit, credit }] of query.all()) {
     if (debit !== 0 || credit !== 0) {
-      const effectiveCapacity = capacity?.value ?? Number.POSITIVE_INFINITY;
+      const effectiveCapacity = capacity ?? Number.POSITIVE_INFINITY;
       const oldAmount = amount.value;
 
       // subtract losses first
@@ -56,17 +64,16 @@ const CleanupLedger = System(Query(Mut(R.LedgerEntry)))((query) => {
 const TrackAmount = ChangeTrackingSystem(
   R.Id,
   R.Amount,
-  (root, { id }, amount) => {
-    const resource = root.resources[id];
-    resource.amount = amount.value;
+  (root, { value: amount }, { value: id }) => {
+    root.resources[id].amount = amount;
   },
 );
 
 const TrackUnlocked = ChangeTrackingSystem(
   R.Id,
-  Unlock,
-  (root, { id }, unlocked) => {
-    root.resources[id].unlocked = unlocked.unlocked;
+  Unlocked,
+  (root, { value: unlocked }, { value: id }) => {
+    root.resources[id].unlocked = unlocked;
   },
 );
 

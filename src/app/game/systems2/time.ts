@@ -82,7 +82,7 @@ const AdvanceTimers = System(
 const TrackTime = ChangeTrackingSystem(
   TimeMarker,
   TimeOptions,
-  (root, _, options) => {
+  (root, options) => {
     root.time = options;
   },
 );

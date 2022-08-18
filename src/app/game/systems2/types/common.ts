@@ -1,7 +1,7 @@
-import { EcsComponent } from "@/app/ecs";
+import { ValueComponent } from "@/app/ecs";
 
-export class Unlock extends EcsComponent {
-  constructor(public unlocked: boolean) {
+export class Unlocked extends ValueComponent<boolean> {
+  constructor(public value: boolean) {
     super();
   }
 }

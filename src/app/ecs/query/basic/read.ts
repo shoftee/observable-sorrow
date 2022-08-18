@@ -1,6 +1,6 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { Archetype, EcsComponent, EcsEntity } from "@/app/ecs";
+import { Archetype, EcsComponent, EcsEntity, ValueComponent } from "@/app/ecs";
 import { InstantiatedQuery, QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
@@ -15,6 +15,28 @@ export function Read<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
         },
         fetch: (_: EcsEntity, archetype: Archetype<C>) => {
           return archetype.get(ctor)!;
+        },
+      };
+    },
+  };
+}
+
+type Value<C extends EcsComponent> = C extends ValueComponent<infer T>
+  ? Readonly<T>
+  : never;
+
+/** Include a single-valued component in the query results. */
+export function Value<C extends ValueComponent>(
+  ctor: Ctor<C>,
+): QueryDescriptor<Value<C>> {
+  return {
+    newQuery(): InstantiatedQuery<Value<C>> {
+      return {
+        includes: (archetype: Archetype) => {
+          return archetype.has(ctor);
+        },
+        fetch: (_: EcsEntity, archetype: Archetype<C>) => {
+          return archetype.get(ctor)!.value as Value<C>;
         },
       };
     },

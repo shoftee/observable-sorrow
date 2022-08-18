@@ -6,6 +6,7 @@ type Commands = {
   insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void;
 };
 
+/** Used to spawn entities and populate them with components. */
 export function Commands(): FetcherFactory<Commands> {
   return {
     create(state) {

@@ -96,3 +96,8 @@ export function single<T>(iterable: Iterable<T>): T {
   }
   return found;
 }
+
+export function cache<T>(getter: () => T): () => T {
+  let cached: T | undefined;
+  return () => cached ?? (cached = getter());
+}

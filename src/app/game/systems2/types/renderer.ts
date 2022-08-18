@@ -47,7 +47,7 @@ export function ChangeTrackingSystem<
 >(
   idCtor: Ctor<Id>,
   stateCtor: Ctor<State>,
-  writerFn: (root: StateSchema, id: Id, state: State) => void,
+  writerFn: (root: StateSchema, state: State, id: Id) => void,
 ) {
   return System(
     Res(DeltaBuffer),
@@ -56,11 +56,11 @@ export function ChangeTrackingSystem<
     for (const [id, tracker] of query.all()) {
       if (tracker.isAdded()) {
         buffer.components.setAdded((root) =>
-          writerFn(root, id, tracker.value()),
+          writerFn(root, tracker.value(), id),
         );
       } else if (tracker.isChanged()) {
         buffer.components.setChanged((root) =>
-          writerFn(root, id, tracker.value()),
+          writerFn(root, tracker.value(), id),
         );
       }
     }

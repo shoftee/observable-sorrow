@@ -10,6 +10,10 @@ export abstract class EcsComponent {
   [ChangeTicks]!: ComponentTicks;
 }
 
+export abstract class ValueComponent<T = unknown> extends EcsComponent {
+  abstract get value(): T;
+}
+
 export const ResourceType = Symbol.for("Resource");
 export abstract class EcsResource {
   protected [ResourceType]!: true;

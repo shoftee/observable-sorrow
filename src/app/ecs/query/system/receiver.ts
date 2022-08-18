@@ -16,6 +16,7 @@ class Receiver<E extends EcsEvent> {
   }
 }
 
+/** Used to receive events of type E using a synchronous pull mechanism. */
 export function Receive<E extends EcsEvent>(
   ctor: Ctor<E>,
 ): FetcherFactory<Receiver<E>> {

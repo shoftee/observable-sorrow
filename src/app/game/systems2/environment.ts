@@ -5,22 +5,17 @@ import { PluginApp, EcsPlugin } from "@/app/ecs";
 import { Commands, Mut, Query, Read, With } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import {
-  Timer,
-  Calendar,
-  DayTimer,
-  Environment,
-  ChangeTrackingSystem,
-} from "./types";
+import { Timer, ChangeTrackingSystem } from "./types";
+import * as E from "./types/environment";
 
 const Setup = System(Commands())((cmds) => {
-  cmds.spawn(new DayTimer(), new Timer(2000));
-  cmds.spawn(new Environment(), new Calendar());
+  cmds.spawn(new E.DayTimer(), new Timer(2000));
+  cmds.spawn(new E.Environment(), new E.Calendar());
 });
 
 const AdvanceCalendar = System(
-  Query(Read(Timer)).filter(With(DayTimer)),
-  Query(Mut(Calendar)).filter(With(Environment)),
+  Query(Read(Timer)).filter(With(E.DayTimer)),
+  Query(Mut(E.Calendar)).filter(With(E.Environment)),
 )((timerQuery, calendarQuery) => {
   const [days] = timerQuery.single();
   const [calendar] = calendarQuery.single();
@@ -43,9 +38,9 @@ const AdvanceCalendar = System(
 });
 
 const TrackCalendar = ChangeTrackingSystem(
-  Environment,
-  Calendar,
-  (root, _, calendar) => {
+  E.Environment,
+  E.Calendar,
+  (root, calendar) => {
     root.calendar = calendar;
   },
 );
