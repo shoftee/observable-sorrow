@@ -1,5 +1,10 @@
 import { EcsComponent } from "@/app/ecs";
-import { ResourceId, SeasonId, WeatherId } from "@/app/interfaces";
+import {
+  FulfillmentId,
+  ResourceId,
+  SeasonId,
+  WeatherId,
+} from "@/app/interfaces";
 import { HistoryEvent, Countdown } from "../types";
 
 type RecordObj = Record<string, unknown>;
@@ -38,6 +43,20 @@ type ComponentsSchema = {
     dateLabel: string;
     epochLabel: string;
   }>;
+  fulfillments: {
+    [K in FulfillmentId]: Entity<{
+      fulfilled: boolean;
+      capped: boolean;
+      ingredients: Partial<{
+        [K in ResourceId]: Entity<{
+          requirement: number;
+          fulfilled: boolean;
+          eta: number | undefined;
+          capped: boolean;
+        }>;
+      }>;
+    }>;
+  };
   time: Entity<{
     paused: boolean;
     power: number;

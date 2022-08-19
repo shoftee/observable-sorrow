@@ -5,7 +5,7 @@ import { PluginApp, EcsPlugin } from "@/app/ecs";
 import { Commands, Mut, Query, Read, With } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { Timer, ChangeTrackingSystem } from "./types";
+import { Timer, DeltaRecorder } from "./types";
 import * as E from "./types/environment";
 
 const Setup = System(Commands())((cmds) => {
@@ -37,13 +37,12 @@ const AdvanceCalendar = System(
   }
 });
 
-const TrackCalendar = ChangeTrackingSystem(
-  E.Environment,
+const TrackCalendar = DeltaRecorder(
   E.Calendar,
-  (root, calendar) => {
-    root.calendar = calendar;
-  },
-);
+  Read(E.Environment),
+)((root, calendar) => {
+  root.calendar = calendar;
+});
 
 export class EnvironmentPlugin extends EcsPlugin {
   add(app: PluginApp): void {

@@ -1,5 +1,12 @@
 import { EcsComponent, EcsResource } from "@/app/ecs";
-import { ChangeTrackers, Query, Read, Res } from "@/app/ecs/query";
+import {
+  All,
+  AllParams,
+  AllResults,
+  ChangeTrackers,
+  Query,
+  Res,
+} from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { Constructor as Ctor } from "@/app/utils/types";
 
@@ -41,28 +48,28 @@ export class DeltaBuffer extends EcsResource {
   readonly components: ComponentDeltas = new ComponentDeltas();
 }
 
-export function ChangeTrackingSystem<
-  Id extends EcsComponent,
-  State extends EcsComponent,
->(
-  idCtor: Ctor<Id>,
-  stateCtor: Ctor<State>,
-  writerFn: (root: StateSchema, state: State, id: Id) => void,
+export function DeltaRecorder<C extends EcsComponent, Q extends AllParams>(
+  tracked: Ctor<C>,
+  ...stateQuery: Q
 ) {
-  return System(
-    Res(DeltaBuffer),
-    Query(Read(idCtor), ChangeTrackers(stateCtor)),
-  )((buffer, query) => {
-    for (const [id, tracker] of query.all()) {
-      if (tracker.isAdded()) {
-        buffer.components.setAdded((root) =>
-          writerFn(root, tracker.value(), id),
-        );
-      } else if (tracker.isChanged()) {
-        buffer.components.setChanged((root) =>
-          writerFn(root, tracker.value(), id),
-        );
+  return (
+    mutator: (root: StateSchema, tracked: C, state: AllResults<Q>) => void,
+  ) => {
+    return System(
+      Res(DeltaBuffer),
+      Query(ChangeTrackers(tracked), All<Q>(...stateQuery)),
+    )((buffer, query) => {
+      for (const [tracker, state] of query.all()) {
+        if (tracker.isAdded()) {
+          buffer.components.setAdded((root) =>
+            mutator(root, tracker.value(), state),
+          );
+        } else if (tracker.isChanged()) {
+          buffer.components.setChanged((root) =>
+            mutator(root, tracker.value(), state),
+          );
+        }
       }
-    }
-  });
+    });
+  };
 }

@@ -4,7 +4,7 @@ import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
 import { Commands, Query, Mut, With, Receive, Read } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { ChangeTrackingSystem, TimeOptions, Timer } from "./types";
+import { DeltaRecorder, TimeOptions, Timer } from "./types";
 import * as events from "./types/events";
 
 const TimeMarker = class extends EcsComponent {};
@@ -79,13 +79,12 @@ const AdvanceTimers = System(
   }
 });
 
-const TrackTime = ChangeTrackingSystem(
-  TimeMarker,
+const TrackTime = DeltaRecorder(
   TimeOptions,
-  (root, options) => {
-    root.time = options;
-  },
-);
+  Read(TimeMarker),
+)((root, options) => {
+  root.time = options;
+});
 
 export class TimePlugin extends EcsPlugin {
   add(app: PluginApp): void {

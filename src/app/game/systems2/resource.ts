@@ -1,9 +1,9 @@
 import { EcsComponent, EcsPlugin, PluginApp } from "@/app/ecs";
-import { Commands, Mut, Opt, Query, Read, Value } from "@/app/ecs/query";
+import { Commands, DiffMut, Opt, Query, Read, Value } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { Meta, ResourceMetadataType, UnlockMode } from "@/app/state";
 
-import { ChangeTrackingSystem, Unlocked } from "./types";
+import { DeltaRecorder, Unlocked } from "./types";
 import * as R from "./types/resources";
 
 function* componentsFromMeta(
@@ -27,7 +27,7 @@ const SpawnResources = System(Commands())((cmds) => {
 });
 
 const ProcessLedger = System(
-  Query(Mut(R.Amount), Opt(Value(R.Capacity)), Read(R.LedgerEntry)),
+  Query(DiffMut(R.Amount), Opt(Value(R.Capacity)), Read(R.LedgerEntry)),
 )((query) => {
   for (const [amount, capacity, { debit, credit }] of query.all()) {
     if (debit !== 0 || credit !== 0) {
@@ -47,35 +47,31 @@ const ProcessLedger = System(
       // negative resource amount is nonsense (for now)
       newAmount = Math.max(newAmount, 0);
 
-      if (newAmount !== oldAmount) {
-        amount.value = newAmount;
-      }
+      amount.value = newAmount;
     }
   }
 });
 
-const CleanupLedger = System(Query(Mut(R.LedgerEntry)))((query) => {
+const CleanupLedger = System(Query(DiffMut(R.LedgerEntry)))((query) => {
   for (const [entry] of query.all()) {
     entry.debit = 0;
     entry.credit = 0;
   }
 });
 
-const TrackAmount = ChangeTrackingSystem(
-  R.Id,
+const TrackAmount = DeltaRecorder(
   R.Amount,
-  (root, { value: amount }, { value: id }) => {
-    root.resources[id].amount = amount;
-  },
-);
+  Value(R.Id),
+)((root, { value: amount }, [id]) => {
+  root.resources[id].amount = amount;
+});
 
-const TrackUnlocked = ChangeTrackingSystem(
-  R.Id,
+const TrackUnlocked = DeltaRecorder(
   Unlocked,
-  (root, { value: unlocked }, { value: id }) => {
-    root.resources[id].unlocked = unlocked;
-  },
-);
+  Value(R.Id),
+)((root, { value: unlocked }, [id]) => {
+  root.resources[id].unlocked = unlocked;
+});
 
 export class ResourceSetupPlugin extends EcsPlugin {
   add(app: PluginApp): void {
