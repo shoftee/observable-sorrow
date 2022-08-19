@@ -26,21 +26,26 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
 
   newQuery(state: WorldState): InstantiatedQuery<AllResults<Q>> {
     const queries = this.queries.map((x) => x.newQuery(state));
-    const filters = this.filters?.map((x) => x.newFilter(state)) ?? [];
+    const filters = this.filters?.map((x) => x.newFilter(state));
     const filterIterator = function* () {
       yield* queries;
-      yield* filters;
+      if (filters) {
+        yield* filters;
+      }
     };
 
     return {
-      includes: (archetype: Archetype) => {
-        return all(filterIterator(), (f) => f.includes(archetype) ?? true);
+      includes(archetype: Archetype) {
+        return all(filterIterator(), (f) => f.includes?.(archetype) ?? true);
       },
-      matches: (archetype: Archetype) => {
+      matches(archetype: Archetype) {
         return all(filterIterator(), (f) => f.matches?.(archetype) ?? true);
       },
-      fetch: (entity: EcsEntity, archetype: Archetype) => {
+      fetch(entity: EcsEntity, archetype: Archetype) {
         return queries.map((q) => q.fetch(entity, archetype)) as AllResults<Q>;
+      },
+      cleanup() {
+        return queries.forEach((q) => q.cleanup?.());
       },
     };
   }

@@ -99,11 +99,11 @@ type WorldQueryResult<T = unknown> = T extends QueryDescriptor<infer R>
   ? R
   : never;
 
-type Command = (world: World) => Iterable<EcsEntity>;
+type EcsCommand = (world: World) => Iterable<EcsEntity>;
 
 export class WorldState {
   private readonly fetches = new Map<QueryDescriptor, FetchCache>();
-  private readonly commands = new Queue<Command>();
+  private readonly commands = new Queue<EcsCommand>();
   private generation = 0;
 
   constructor(readonly world: World) {}
@@ -148,7 +148,7 @@ export class WorldState {
     this.world.registerEvent(ctor);
   }
 
-  defer(command: Command) {
+  defer(command: EcsCommand) {
     this.commands.enqueue(command);
   }
 
@@ -172,9 +172,17 @@ type CachedResult = {
 };
 
 class FetchCache<F = unknown> {
+  private readonly query;
   private readonly entries = new Map<EcsEntity, CachedResult>();
 
-  constructor(private readonly query: InstantiatedQuery<F>) {}
+  constructor(query: InstantiatedQuery<F>) {
+    this.query = {
+      fetch: query.fetch,
+      includes: query.includes ?? ((_: Archetype) => true),
+      matches: query.matches ?? ((_: Archetype) => true),
+      cleanup: query.cleanup ?? (() => undefined),
+    };
+  }
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.includes(archetype)) {
@@ -193,22 +201,30 @@ class FetchCache<F = unknown> {
   }
 
   *results(): Iterable<F> {
-    const { fetch, matches } = this.query;
     for (const [entity, { archetype }] of this.entries) {
-      if (matches?.(archetype) ?? true) {
-        yield fetch(entity, archetype);
+      if (this.query.matches(archetype)) {
+        yield this.query.fetch(entity, archetype);
       }
     }
   }
 
   get(entity: EcsEntity): F | undefined {
-    const { fetch, matches } = this.query;
     const entry = this.entries.get(entity);
-    if (entry) {
-      if (!matches || matches(entry.archetype)) {
-        return fetch(entity, entry.archetype);
-      }
+    if (entry && this.query.matches(entry.archetype)) {
+      return this.query.fetch(entity, entry.archetype);
     }
     return undefined;
+  }
+
+  has(entity: EcsEntity): boolean {
+    const entry = this.entries.get(entity);
+    if (entry && this.query.matches(entry.archetype)) {
+      return true;
+    }
+    return false;
+  }
+
+  cleanup() {
+    this.query.cleanup();
   }
 }

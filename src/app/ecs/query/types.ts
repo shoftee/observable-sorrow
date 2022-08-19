@@ -31,8 +31,9 @@ import { WorldState } from "../world";
  */
 
 export interface InstantiatedFilter {
-  includes(archetype: Archetype): boolean;
+  includes?(archetype: Archetype): boolean;
   matches?(archetype: Archetype): boolean;
+  cleanup?(): void;
 }
 
 export interface InstantiatedQuery<QueryResult> extends InstantiatedFilter {
@@ -49,6 +50,7 @@ export abstract class QueryDescriptor<QueryResult = unknown> {
 
 export type Fetcher<FetchResult = unknown> = {
   fetch(): FetchResult;
+  cleanup?(): void;
 };
 
 export type FetcherFactory<FetchResult = unknown> = {

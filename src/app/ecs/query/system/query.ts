@@ -43,6 +43,9 @@ class QueryFactory<Q extends AllParams> {
       fetch() {
         return fetcher;
       },
+      cleanup() {
+        cache.cleanup();
+      },
     };
   }
 }
@@ -64,16 +67,19 @@ export function MapQuery<K, V>(
     create(state: WorldState) {
       state.addQuery(descriptor);
 
-      const cache = state.fetchQuery(descriptor);
+      const fetchCache = state.fetchQuery(descriptor);
       const fetcher = {
         map() {
-          return new Map(cache.results());
+          return new Map(fetchCache.results());
         },
       };
 
       return {
         fetch() {
           return fetcher;
+        },
+        cleanup() {
+          fetchCache.cleanup();
         },
       };
     },

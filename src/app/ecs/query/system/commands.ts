@@ -1,41 +1,66 @@
-import { EcsComponent, EcsEntity } from "@/app/ecs";
+import {
+  EcsComponent,
+  EcsEntity,
+  EcsParent,
+  World,
+  WorldState,
+} from "@/app/ecs";
 import { Constructor as Ctor } from "@/app/utils/types";
-import { FetcherFactory } from "../types";
 
-type Commands = {
-  spawn(...components: EcsComponent[]): void;
-  despawn(entity: EcsEntity): void;
-  insertComponents(entity: EcsEntity, ...components: EcsComponent[]): void;
-  removeComponents(entity: EcsEntity, ...ctors: Ctor<EcsComponent>[]): void;
-};
+class EntityCommands {
+  constructor(private readonly state: WorldState, private entity?: EcsEntity) {}
+
+  private ensureSpawned(world: World): EcsEntity {
+    return this.entity ?? (this.entity = world.spawn());
+  }
+
+  insert(...components: EcsComponent[]): EntityCommands {
+    this.state.defer((world) => {
+      const entity = this.ensureSpawned(world);
+      world.insertComponents(entity, ...components);
+      return [entity];
+    });
+    return this;
+  }
+
+  remove(...ctors: Ctor<EcsComponent>[]): EntityCommands {
+    this.state.defer((world) => {
+      const entity = this.ensureSpawned(world);
+      world.removeComponents(entity, ...ctors);
+      return [entity];
+    });
+    return this;
+  }
+
+  asParent(fn: (parent: EcsEntity) => void): EntityCommands {
+    this.state.defer((world) => {
+      const entity = this.ensureSpawned(world);
+      fn(entity);
+      return [entity];
+    });
+    return this;
+  }
+}
 
 /** Used to spawn entities and populate them with components. */
-export function Commands(): FetcherFactory<Commands> {
+export function Commands() {
   return {
-    create(state) {
+    create(state: WorldState) {
       const commands = {
-        spawn(...components: EcsComponent[]) {
-          state.defer(function* (world) {
-            yield world.spawn(...components);
-          });
+        with(entity: EcsEntity): EntityCommands {
+          return new EntityCommands(state, entity);
         },
-        insertComponents(entity: EcsEntity, ...components: EcsComponent[]) {
-          state.defer(function* (world) {
-            world.insertComponents(entity, ...components);
-            yield entity;
-          });
+        spawn(...components: EcsComponent[]): EntityCommands {
+          return new EntityCommands(state).insert(...components);
         },
-        removeComponents(entity: EcsEntity, ...ctors: Ctor<EcsComponent>[]) {
-          state.defer(function* (world) {
-            world.removeComponents(entity, ...ctors);
-            yield entity;
-          });
-        },
-        despawn(entity: EcsEntity) {
-          state.defer(function* (world) {
-            world.despawn(entity);
-            yield entity;
-          });
+        spawnChild(
+          parent: EcsEntity,
+          ...components: EcsComponent[]
+        ): EntityCommands {
+          return new EntityCommands(state).insert(
+            new EcsParent(parent),
+            ...components,
+          );
         },
       };
       return {

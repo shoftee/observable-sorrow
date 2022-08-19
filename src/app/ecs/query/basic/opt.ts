@@ -14,11 +14,8 @@ export function Opt<F>(query: QueryDescriptor<F>): Opt<F> {
     newQuery(state: WorldState) {
       const inner = query.newQuery(state);
       return {
-        includes: () => {
-          return true;
-        },
         fetch: (entity: EcsEntity, archetype: Archetype<EcsComponent>) => {
-          if (inner.includes(archetype)) {
+          if (inner.includes?.(archetype) ?? true) {
             return inner.fetch(entity, archetype);
           } else {
             return undefined;

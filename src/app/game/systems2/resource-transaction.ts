@@ -19,15 +19,15 @@ const ProcessResourceOrders = System(
   const ambientCache = cache(() => {
     // Initialize the ambient deltas.
     const ambient = new Ledger();
-    for (const [id, values] of resourcesCache()) {
+    for (const [id, values] of resourcesCache.retrieve()) {
       ambient.add(id, values[2]);
     }
     return ambient;
   });
 
   for (const order of orders.pull()) {
-    const resources = resourcesCache();
-    const ambient = ambientCache();
+    const resources = resourcesCache.retrieve();
+    const ambient = ambientCache.retrieve();
 
     // Create delta layer for this order.
     // If the order fails, we can safely discard the whole layer.

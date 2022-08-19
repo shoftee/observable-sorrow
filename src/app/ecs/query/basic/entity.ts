@@ -8,9 +8,6 @@ export function Entity(): EntityQuery {
   return {
     newQuery() {
       return {
-        includes(): boolean {
-          return true;
-        },
         fetch(entity: EcsEntity): Readonly<EcsEntity> {
           return entity;
         },

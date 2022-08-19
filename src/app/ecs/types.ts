@@ -35,6 +35,12 @@ export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
   C
 >;
 
+export class EcsParent extends ValueComponent<EcsEntity> {
+  constructor(readonly value: EcsEntity) {
+    super();
+  }
+}
+
 export class ComponentTicks {
   readonly added: number;
   changed: number | undefined;

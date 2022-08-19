@@ -40,7 +40,8 @@ class SystemBuilder<F extends FactoryTuple> {
       id: this.id,
       run: () => {
         const args = fetchers.map((p) => p.fetch()) as ResultTuple<F>;
-        return this.run(...args);
+        this.run(...args);
+        fetchers.forEach((f) => f.cleanup?.());
       },
     };
   }
