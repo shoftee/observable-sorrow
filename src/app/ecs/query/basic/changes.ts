@@ -1,12 +1,6 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import {
-  Archetype,
-  ChangeTicks,
-  EcsComponent,
-  EcsEntity,
-  WorldState,
-} from "@/app/ecs";
+import { ChangeTicks, EcsComponent } from "@/app/ecs";
 import { FilterDescriptor, QueryDescriptor } from "../types";
 
 type Tracker<C extends EcsComponent> = {
@@ -17,20 +11,18 @@ type Tracker<C extends EcsComponent> = {
 };
 
 type ChangeTrackers<C extends EcsComponent> = QueryDescriptor<Tracker<C>>;
-
 export function ChangeTrackers<C extends EcsComponent>(
   ctor: Ctor<C>,
 ): ChangeTrackers<C> {
   return {
-    newQuery(state: WorldState) {
+    newQuery({ ticks }) {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return archetype.has(ctor);
         },
-        fetch: (_: EcsEntity, archetype: Archetype<C>) => {
+        fetch: ({ archetype }) => {
           const component = archetype.get(ctor)!;
-          const { last, current } = state.world.ticks;
-          return createTracker(component, last, current);
+          return createTracker(component as C, ticks.last, ticks.current);
         },
       };
     },
@@ -61,19 +53,14 @@ function createTracker<C extends EcsComponent>(
 type Added = FilterDescriptor;
 export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
   return {
-    newFilter(state: WorldState) {
+    newFilter({ ticks }) {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return archetype.has(ctor);
         },
-        matches: (archetype: Archetype) => {
-          const component = archetype.get(ctor);
-          if (component !== undefined) {
-            const { last, current } = state.world.ticks;
-            return component[ChangeTicks].isAdded(last, current);
-          } else {
-            return false;
-          }
+        matches: ({ archetype }) => {
+          const component = archetype.get(ctor)!;
+          return component[ChangeTicks].isAdded(ticks.last, ticks.current);
         },
       };
     },
@@ -83,19 +70,14 @@ export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
 type Changed = FilterDescriptor;
 export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
   return {
-    newFilter(state: WorldState) {
+    newFilter({ ticks }) {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return archetype.has(ctor);
         },
-        matches: (archetype: Archetype) => {
-          const component = archetype.get(ctor);
-          if (component !== undefined) {
-            const { last, current } = state.world.ticks;
-            return component[ChangeTicks].isChanged(last, current);
-          } else {
-            return false;
-          }
+        matches: ({ archetype }) => {
+          const component = archetype.get(ctor)!;
+          return component[ChangeTicks].isChanged(ticks.last, ticks.current);
         },
       };
     },

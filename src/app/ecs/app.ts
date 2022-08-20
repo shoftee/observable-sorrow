@@ -5,7 +5,7 @@ import { any, MultiMap, TypeSet } from "@/app/utils/collections";
 
 import { SystemRunner, SystemSpecification as SystemSpec } from "./system";
 import { EcsResource, EcsEvent, EcsStage, EcsStageType } from "./types";
-import { World, WorldState } from "./world";
+import { World } from "./world";
 
 type SystemId = { id: string };
 type TopologySpecParam = {
@@ -59,20 +59,20 @@ export class App {
   buildRunner(): GameRunner {
     const world = new World();
     for (const [, resource] of this.resources.entries()) {
-      world.insertResource(resource);
+      world.resources.register(resource);
     }
     for (const event of this.events) {
-      world.registerEvent(event);
+      world.events.register(event);
     }
 
-    const state = new WorldState(world);
     const systems = new MultiMap<string, SystemRunner>();
     for (const [stage, topologySpec] of this.topology) {
       for (const spec of this.orderByTopology(stage, topologySpec)) {
-        systems.add(stage, spec.build(state));
+        systems.add(stage, spec.build(world));
       }
     }
-    return new GameRunner(state, systems);
+
+    return new GameRunner(world, systems);
   }
 
   private orderByTopology(
@@ -127,7 +127,7 @@ export class GameRunner {
   private firstRun = true;
 
   constructor(
-    private readonly state: WorldState,
+    private readonly world: World,
     private readonly stages: MultiMap<string, SystemRunner>,
   ) {}
 
@@ -155,15 +155,15 @@ export class GameRunner {
     for (const system of this.stages.entriesForKey(id)) {
       system.run();
     }
-    this.state.flush();
+    this.world.flush();
   }
 
   resource<R extends EcsResource>(ctor: Ctor<R>): R | undefined {
-    return this.state.world.resource(ctor);
+    return this.world.resources.get(ctor);
   }
 
   dispatch<E extends EcsEvent>(event: E) {
-    this.state.world.events(getConstructorOf(event)).enqueue(event);
+    this.world.events.get(getConstructorOf(event)).enqueue(event);
   }
 }
 

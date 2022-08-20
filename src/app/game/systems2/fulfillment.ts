@@ -1,7 +1,7 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   All,
-  Children,
+  ChildrenIterable,
   Commands,
   MapQuery,
   DiffMut,
@@ -9,6 +9,7 @@ import {
   Read,
   Value,
   With,
+  Parent,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -47,7 +48,7 @@ const CalculateFulfillment = System(
   Query(
     DiffMut(F.Fulfillment),
     DiffMut(F.Capped),
-    Children(Read(F.Fulfillment), Value(F.Capped)),
+    ChildrenIterable(Read(F.Fulfillment), Value(F.Capped)),
   ).filter(With(F.Id)),
   MapQuery(Value(R.Id), All(Value(R.Amount), Value(R.Capacity))),
 )((ingredientsQuery, fulfillmentsQuery, resourceQuery) => {
@@ -102,6 +103,34 @@ const CalculateFulfillment = System(
   }
 });
 
+const TrackIngredientRequirement = DeltaRecorder(
+  F.Requirement,
+  Value(F.Ingredient),
+  Parent(Value(F.Id)),
+)((root, { value: requirement }, [resource, [id]]) => {
+  const target = root.fulfillments[id].ingredients[resource]!;
+  target.requirement = requirement;
+});
+
+const TrackIngredientFulfillment = DeltaRecorder(
+  F.Fulfillment,
+  Value(F.Ingredient),
+  Parent(Value(F.Id)),
+)((root, fulfillment, [resource, [id]]) => {
+  const target = root.fulfillments[id].ingredients[resource]!;
+  target.fulfilled = fulfillment.fulfilled;
+  target.eta = fulfillment.eta;
+});
+
+const TrackIngredientCapped = DeltaRecorder(
+  F.Capped,
+  Value(F.Ingredient),
+  Parent(Value(F.Id)),
+)((root, { value: capped }, [resource, [id]]) => {
+  const target = root.fulfillments[id].ingredients[resource]!;
+  target.capped = capped;
+});
+
 const TrackRecipeFulfillment = DeltaRecorder(
   F.Fulfillment,
   Value(F.Id),
@@ -121,8 +150,15 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
     app
       .addStartupSystem(SpawnFulfillments)
       .addSystem(CalculateFulfillment)
-      .addSystems([TrackRecipeFulfillment, TrackRecipeCapped], {
-        stage: "last-start",
-      });
+      .addSystems(
+        [
+          TrackIngredientRequirement,
+          TrackIngredientFulfillment,
+          TrackIngredientCapped,
+          TrackRecipeFulfillment,
+          TrackRecipeCapped,
+        ],
+        { stage: "last-start" },
+      );
   }
 }

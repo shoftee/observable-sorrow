@@ -1,6 +1,6 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { Archetype, EcsComponent, EcsEntity, ValueComponent } from "@/app/ecs";
+import { EcsComponent, ValueComponent } from "@/app/ecs";
 import { InstantiatedQuery, QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
@@ -10,11 +10,11 @@ export function Read<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
   return {
     newQuery(): InstantiatedQuery<Readonly<C>> {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return archetype.has(ctor);
         },
-        fetch: (_: EcsEntity, archetype: Archetype<C>) => {
-          return archetype.get(ctor)!;
+        fetch: ({ archetype }) => {
+          return archetype.get(ctor)! as C;
         },
       };
     },
@@ -32,11 +32,12 @@ export function Value<C extends ValueComponent>(
   return {
     newQuery(): InstantiatedQuery<Value<C>> {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return archetype.has(ctor);
         },
-        fetch: (_: EcsEntity, archetype: Archetype<C>) => {
-          return archetype.get(ctor)!.value as Value<C>;
+        fetch: ({ archetype }) => {
+          const entry = archetype.get(ctor)! as C;
+          return entry.value as Value<C>;
         },
       };
     },

@@ -18,8 +18,8 @@ export function Dispatch<E extends EcsEvent>(
   ctor: Ctor<E>,
 ): FetcherFactory<Dispatcher<E>> {
   return {
-    create(state) {
-      const dispatcher = new Dispatcher<E>(state.world.events(ctor));
+    create({ events }) {
+      const dispatcher = new Dispatcher<E>(events.get(ctor));
       return {
         fetch(): Dispatcher<E> {
           return dispatcher;

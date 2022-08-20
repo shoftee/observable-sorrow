@@ -1,7 +1,7 @@
 import { all } from "@/app/utils/collections";
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { Archetype, EcsComponent, EcsEntity, WorldState } from "@/app/ecs";
+import { EcsComponent, World } from "@/app/ecs";
 import {
   QueryDescriptor,
   FilterDescriptor,
@@ -24,9 +24,9 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
     super();
   }
 
-  newQuery(state: WorldState): InstantiatedQuery<AllResults<Q>> {
-    const queries = this.queries.map((x) => x.newQuery(state));
-    const filters = this.filters?.map((x) => x.newFilter(state));
+  newQuery(world: World): InstantiatedQuery<AllResults<Q>> {
+    const queries = this.queries.map((inner) => inner.newQuery(world));
+    const filters = this.filters?.map((inner) => inner.newFilter(world));
     const filterIterator = function* () {
       yield* queries;
       if (filters) {
@@ -35,22 +35,23 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
     };
 
     return {
-      includes(archetype: Archetype) {
-        return all(filterIterator(), (f) => f.includes?.(archetype) ?? true);
+      includes(ctx) {
+        return all(filterIterator(), (f) => f.includes?.(ctx) ?? true);
       },
-      matches(archetype: Archetype) {
-        return all(filterIterator(), (f) => f.matches?.(archetype) ?? true);
+      matches(ctx) {
+        return all(filterIterator(), (f) => f.matches?.(ctx) ?? true);
       },
-      fetch(entity: EcsEntity, archetype: Archetype) {
-        return queries.map((q) => q.fetch(entity, archetype)) as AllResults<Q>;
+      fetch(ctx) {
+        return queries.map((q) => q.fetch(ctx)) as AllResults<Q>;
       },
       cleanup() {
-        return queries.forEach((q) => q.cleanup?.());
+        queries.forEach((q) => q.cleanup?.());
+        filters?.forEach((f) => f.cleanup?.());
       },
     };
   }
 
-  filter(...filters: FilterDescriptor[]): AllQuery<Q> {
+  filter<F extends Filters>(...filters: F): AllQuery<Q> {
     this.filters = filters;
     return this;
   }
@@ -66,7 +67,7 @@ export function With(...ctors: Ctor<EcsComponent>[]): With {
   return {
     newFilter(): InstantiatedFilter {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return all(ctors, (ctor) => archetype.has(ctor));
         },
       };
@@ -79,7 +80,7 @@ export function Without(...ctors: Ctor<EcsComponent>[]): Without {
   return {
     newFilter(): InstantiatedFilter {
       return {
-        includes: (archetype: Archetype) => {
+        includes: ({ archetype }) => {
           return all(ctors, (ctor) => !archetype.has(ctor));
         },
       };

@@ -8,7 +8,7 @@ export function Entity(): EntityQuery {
   return {
     newQuery() {
       return {
-        fetch(entity: EcsEntity): Readonly<EcsEntity> {
+        fetch({ entity }) {
           return entity;
         },
       };

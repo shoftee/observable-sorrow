@@ -1,5 +1,5 @@
-import { Archetype, EcsEntity } from "../types";
-import { WorldState } from "../world";
+import { Archetype, EcsComponent, EcsEntity } from "../types";
+import { World } from "../world";
 
 /**
  * A generic interface for querying the world state for component data.
@@ -30,29 +30,34 @@ import { WorldState } from "../world";
  * * ChangeTrackers(C) - return the change tracking information for C, can be used to determine if C was added or changed since the last system execution. Cannot be used for removal detection.
  */
 
+export type FetchContext<C extends EcsComponent = EcsComponent> = {
+  entity: EcsEntity;
+  archetype: Archetype<C>;
+};
+
 export interface InstantiatedFilter {
-  includes?(archetype: Archetype): boolean;
-  matches?(archetype: Archetype): boolean;
+  includes?(ctx: FetchContext): boolean;
+  matches?(ctx: FetchContext): boolean;
   cleanup?(): void;
 }
 
 export interface InstantiatedQuery<QueryResult> extends InstantiatedFilter {
-  fetch(entity: EcsEntity, archetype: Archetype): QueryResult;
+  fetch(ctx: FetchContext): QueryResult;
 }
 
 export abstract class FilterDescriptor {
-  abstract newFilter(state: WorldState): InstantiatedFilter;
+  abstract newFilter(world: World): InstantiatedFilter;
 }
 
 export abstract class QueryDescriptor<QueryResult = unknown> {
-  abstract newQuery(state: WorldState): InstantiatedQuery<QueryResult>;
+  abstract newQuery(world: World): InstantiatedQuery<QueryResult>;
 }
 
-export type Fetcher<FetchResult = unknown> = {
+type Fetcher<FetchResult = unknown> = {
   fetch(): FetchResult;
   cleanup?(): void;
 };
 
 export type FetcherFactory<FetchResult = unknown> = {
-  create(state: WorldState): Fetcher<FetchResult>;
+  create(world: World): Fetcher<FetchResult>;
 };

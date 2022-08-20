@@ -1,5 +1,3 @@
-import { SetLike } from "../types";
-
 /** Map-reduce combination for generic iterables. */
 export function reduce<T, TResult>(
   iterable: Iterable<T>,
@@ -71,7 +69,7 @@ export function getOrAdd<K, V>(
 
 /** Returns whether first contains all elements from second. */
 export function containsAll<T>(
-  first: SetLike<T>,
+  first: ReadonlySet<T>,
   second: Iterable<T>,
 ): boolean {
   for (const item of second) {

@@ -1,9 +1,9 @@
-import { SystemTicks } from "@/app/ecs";
+import { WorldTicks } from "@/app/ecs";
 
 import { FetcherFactory } from "../types";
 
 type World = {
-  ticks: SystemTicks;
+  ticks: WorldTicks;
 };
 
 /** Used for magical queries that need direct access to world state.
@@ -12,10 +12,10 @@ type World = {
  */
 export function World(): FetcherFactory<World> {
   return {
-    create(state) {
+    create({ ticks }) {
       return {
         fetch() {
-          return { ticks: state.world.ticks };
+          return { ticks };
         },
       };
     },

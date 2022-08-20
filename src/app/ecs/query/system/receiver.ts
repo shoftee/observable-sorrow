@@ -21,8 +21,8 @@ export function Receive<E extends EcsEvent>(
   ctor: Ctor<E>,
 ): FetcherFactory<Receiver<E>> {
   return {
-    create(state) {
-      const receiver = new Receiver(state.world.events(ctor));
+    create({ events }) {
+      const receiver = new Receiver(events.get(ctor));
       return {
         fetch() {
           return receiver;

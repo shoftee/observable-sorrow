@@ -1,14 +1,8 @@
 import { single } from "@/app/utils/collections";
 
-import { EcsEntity, WorldState } from "@/app/ecs";
-import { Fetcher, FetcherFactory, QueryDescriptor } from "../types";
-import { All, AllParams, AllResults, Filters } from "../basic/all";
-
-type QueryFetcher<Q extends AllParams> = {
-  all(): Iterable<AllResults<Q>>;
-  single(): AllResults<Q>;
-  get(entity: EcsEntity): AllResults<Q> | undefined;
-};
+import { EcsEntity, World } from "@/app/ecs";
+import { FetcherFactory, QueryDescriptor } from "../types";
+import { All, AllParams, Filters } from "../basic/all";
 
 class QueryFactory<Q extends AllParams> {
   private descriptor;
@@ -22,11 +16,11 @@ class QueryFactory<Q extends AllParams> {
     return this;
   }
 
-  create(state: WorldState): Fetcher<QueryFetcher<Q>> {
+  create(world: World) {
     const descriptor = this.descriptor;
-    state.addQuery(descriptor);
+    world.queries.register(descriptor);
 
-    const cache = state.fetchQuery(descriptor);
+    const cache = world.queries.get(descriptor);
     const fetcher = {
       *all() {
         yield* cache.results();
@@ -36,6 +30,9 @@ class QueryFactory<Q extends AllParams> {
       },
       get(entity: EcsEntity) {
         return cache.get(entity);
+      },
+      has(entity: EcsEntity) {
+        return cache.has(entity);
       },
     };
 
@@ -64,10 +61,10 @@ export function MapQuery<K, V>(
 ): MapQueryFactory<K, V> {
   const descriptor = All(keys, values);
   return {
-    create(state: WorldState) {
-      state.addQuery(descriptor);
+    create({ queries }) {
+      queries.register(descriptor);
 
-      const fetchCache = state.fetchQuery(descriptor);
+      const fetchCache = queries.get(descriptor);
       const fetcher = {
         map() {
           return new Map(fetchCache.results());

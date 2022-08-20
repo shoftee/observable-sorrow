@@ -1,100 +1,123 @@
 import { Constructor as Ctor } from "@/app/utils/types";
-import { cache, MultiMap } from "@/app/utils/collections";
+import { cache } from "@/app/utils/collections";
 
-import {
-  Archetype,
-  EcsComponent,
-  EcsEntity,
-  EcsParent,
-  WorldState,
-} from "@/app/ecs";
+import { EcsComponent, EcsEntity, World } from "@/app/ecs";
 
+import { All, AllParams, AllResults, Entity, MapQuery, With } from "..";
 import { FilterDescriptor, QueryDescriptor } from "../types";
-import { All, AllParams, AllResults, Entity, Query, Value, With } from "..";
+import { Enumerable } from "@/app/utils/enumerable";
 
-type Parent = FilterDescriptor;
-export function Parent(...ctors: Ctor<EcsComponent>[]): Parent {
+type WithParent = FilterDescriptor;
+export function WithParent(...ctors: Ctor<EcsComponent>[]): WithParent {
   return {
-    newFilter(state) {
+    newFilter({ queries, hierarchy }) {
       const descriptor = All(Entity()).filter(With(...ctors));
-      state.addQuery(descriptor);
-
-      const parentsQuery = state.fetchQuery(descriptor);
+      queries.register(descriptor);
+      const parentsQuery = queries.get(descriptor);
 
       return {
-        includes(archetype: Archetype<EcsParent>) {
-          const parent = archetype.get(EcsParent);
-          return parent ? parentsQuery.has(parent.value) : false;
+        matches({ entity }) {
+          const parent = hierarchy.parentOf(entity);
+          return !!parent && parentsQuery.has(parent);
+        },
+        cleanup() {
+          parentsQuery.cleanup();
         },
       };
     },
   };
 }
 
-class ChildrenQueryDescriptor<Q extends AllParams> {
-  private readonly queries;
+export function ChildrenIterable<Q extends AllParams>(
+  ...qs: Q
+): QueryDescriptor<Iterable<AllResults<Q>>> {
+  const mapQuery = MapQuery(Entity(), All(...qs));
+  return {
+    newQuery(world) {
+      const fetcher = mapQuery.create(world);
+      const lookup = cache(() => {
+        return fetcher.fetch().map();
+      });
 
-  constructor(...qs: Q) {
-    this.queries = Query(Value(EcsParent), All(...qs));
-  }
-
-  private getChildrenCache(state: WorldState) {
-    const childrenQuery = this.queries.create(state);
-
-    const children = cache(() => {
-      const map = new MultiMap<EcsEntity, AllResults<Q>>();
-      for (const [parent, results] of childrenQuery.fetch().all()) {
-        map.add(parent, results);
-      }
-      return map;
-    });
-
-    return children;
-  }
-
-  newArrayFetcher(state: WorldState) {
-    const children = this.getChildrenCache(state);
-    return {
-      fetch(entity: EcsEntity) {
-        return Array.from(children.retrieve().entriesForKey(entity));
-      },
-      cleanup() {
-        children.invalidate();
-      },
-    };
-  }
-
-  newIterableFetcher(state: WorldState) {
-    const children = this.getChildrenCache(state);
-    return {
-      fetch(entity: EcsEntity) {
-        return children.retrieve().entriesForKey(entity);
-      },
-      cleanup() {
-        children.invalidate();
-      },
-    };
-  }
+      return {
+        fetch({ entity }) {
+          return iterateChildResults(world, entity, lookup.retrieve());
+        },
+        cleanup() {
+          lookup.invalidate();
+          fetcher.cleanup?.();
+        },
+      };
+    },
+  };
 }
 
 export function Children<Q extends AllParams>(
   ...qs: Q
-): QueryDescriptor<Iterable<AllResults<Q>>> {
-  const descriptor = new ChildrenQueryDescriptor(...qs);
+): QueryDescriptor<AllResults<Q>[]> {
+  const mapQuery = MapQuery(Entity(), All(...qs));
   return {
-    newQuery(state) {
-      return descriptor.newIterableFetcher(state);
+    newQuery(world) {
+      const fetcher = mapQuery.create(world);
+      const lookup = cache(() => {
+        return fetcher.fetch().map();
+      });
+
+      return {
+        fetch({ entity }) {
+          return Array.from(
+            iterateChildResults(world, entity, lookup.retrieve()),
+          );
+        },
+        cleanup() {
+          lookup.invalidate();
+          fetcher.cleanup?.();
+        },
+      };
     },
   };
 }
 
-export function ChildrenArray<Q extends AllParams>(
-  ...qs: Q
-): QueryDescriptor<AllResults<Q>[]> {
-  const descriptor = new ChildrenQueryDescriptor(...qs);
+type Parent<Q extends AllParams> = QueryDescriptor<AllResults<Q>>;
+export function Parent<Q extends AllParams>(...qs: Q): Parent<Q> {
+  const mapQuery = MapQuery(Entity(), All(...qs));
   return {
-    newQuery(state) {
-      return descriptor.newArrayFetcher(state);
+    newQuery(world) {
+      const fetcher = mapQuery.create(world);
+      const lookup = cache(() => {
+        return fetcher.fetch().map();
+      });
+
+      return {
+        includes({ entity }) {
+          return !!parentOf(world, entity);
+        },
+        matches({ entity }) {
+          const parent = parentOf(world, entity);
+          return !!parent && lookup.retrieve().has(parent);
+        },
+        fetch({ entity }) {
+          const parent = parentOf(world, entity)!;
+          return lookup.retrieve().get(parent)!;
+        },
+        cleanup() {
+          lookup.invalidate();
+          fetcher.cleanup?.();
+        },
+      };
     },
   };
+}
+
+function parentOf(world: World, child: EcsEntity) {
+  return world.hierarchy.parentOf(child);
+}
+
+function* iterateChildResults<Q extends AllParams>(
+  world: World,
+  parent: EcsEntity,
+  lookup: ReadonlyMap<EcsEntity, AllResults<Q>>,
+) {
+  const children = world.hierarchy.childrenOf(parent);
+  yield* new Enumerable(children).filterMap((child) => lookup.get(child));
 }

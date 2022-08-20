@@ -1,10 +1,10 @@
 import { expect } from "chai";
 
-import { EcsComponent, ValueComponent, World, WorldState } from "@/app/ecs";
+import { EcsComponent, ValueComponent, World } from "@/app/ecs";
 
 import {
   ChangeTrackers,
-  Children,
+  ChildrenIterable,
   Commands,
   Mut,
   Query,
@@ -38,7 +38,7 @@ describe("ecs systems", () => {
 
   describe("misc", () => {
     it("should mark mutable components as changed when calling member methods", () => {
-      const state = new WorldState(new World());
+      const world = new World();
 
       const Setup = System(Commands())((cmds) => {
         cmds.spawn(new Id("shoftee1"), new Player(20));
@@ -46,16 +46,16 @@ describe("ecs systems", () => {
         cmds.spawn(new Id("shoftee3"), new Player(20));
       });
 
-      const setupInstance = Setup.build(state);
+      const setupInstance = Setup.build(world);
       setupInstance.run();
-      state.flush();
+      world.flush();
 
       const LevelUpper = System(Query(Mut(Player)))((players) => {
         for (const [player] of players.all()) {
           player.levelUp();
         }
       });
-      const levelUpperInstance = LevelUpper.build(state);
+      const levelUpperInstance = LevelUpper.build(world);
 
       const ChangeTracker = System(Query(ChangeTrackers(Player)))((query) => {
         let changed = 0;
@@ -65,7 +65,7 @@ describe("ecs systems", () => {
         }
         expect(changed).to.eq(3);
       });
-      const changeTrackerInstance = ChangeTracker.build(state);
+      const changeTrackerInstance = ChangeTracker.build(world);
 
       levelUpperInstance.run();
       changeTrackerInstance.run();
@@ -74,16 +74,16 @@ describe("ecs systems", () => {
 
   describe("commands", () => {
     it("should spawn entities and insert components", () => {
-      const state = new WorldState(new World());
+      const world = new World();
 
       const Setup = System(Commands())((cmds) => {
         cmds.spawn(new Id("shoftee"), new Player(20));
         cmds.spawn(new Id("shoftee"), new Player(20));
         cmds.spawn(new Id("shoftee"), new Player(20));
       });
-      const setupInstance = Setup.build(state);
+      const setupInstance = Setup.build(world);
       setupInstance.run();
-      state.flush();
+      world.flush();
 
       const PlayerChecker = System(Query(Value(Id), Read(Player)))(
         (players) => {
@@ -93,11 +93,11 @@ describe("ecs systems", () => {
           }
         },
       );
-      const playerCheckerInstance = PlayerChecker.build(state);
+      const playerCheckerInstance = PlayerChecker.build(world);
       playerCheckerInstance.run();
     });
     it("should spawn entities with children and insert components", () => {
-      const state = new WorldState(new World());
+      const world = new World();
 
       const Setup = System(Commands())((cmds) => {
         cmds.spawn(new Id("mage"), new Player(20)).asParent((parent) => {
@@ -109,12 +109,12 @@ describe("ecs systems", () => {
           cmds.spawnChild(parent, new ItemStack("Mana Potion", 15));
         });
       });
-      const setupInstance = Setup.build(state);
+      const setupInstance = Setup.build(world);
       setupInstance.run();
-      state.flush();
+      world.flush();
 
       const HierarchyChecker = System(
-        Query(Value(Id), Read(Player), Children(Read(ItemStack))),
+        Query(Value(Id), Read(Player), ChildrenIterable(Read(ItemStack))),
       )((query) => {
         const results = Array.from(query.all(), ([id, player, children]) => {
           return [id, player, Array.from(children)];
@@ -138,7 +138,7 @@ describe("ecs systems", () => {
           ],
         ]);
       });
-      const hierarchyCheckerInstance = HierarchyChecker.build(state);
+      const hierarchyCheckerInstance = HierarchyChecker.build(world);
       hierarchyCheckerInstance.run();
     });
   });

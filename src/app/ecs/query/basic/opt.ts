@@ -1,8 +1,6 @@
-import { EcsEntity, Archetype, WorldState, EcsComponent } from "@/app/ecs";
 import { QueryDescriptor } from "../types";
 
 type Opt<F> = QueryDescriptor<F | undefined>;
-
 /**
  * Include potentially missing components in the query results.
  *
@@ -11,12 +9,12 @@ type Opt<F> = QueryDescriptor<F | undefined>;
  */
 export function Opt<F>(query: QueryDescriptor<F>): Opt<F> {
   return {
-    newQuery(state: WorldState) {
-      const inner = query.newQuery(state);
+    newQuery(world) {
+      const inner = query.newQuery(world);
       return {
-        fetch: (entity: EcsEntity, archetype: Archetype<EcsComponent>) => {
-          if (inner.includes?.(archetype) ?? true) {
-            return inner.fetch(entity, archetype);
+        fetch: (ctx) => {
+          if (inner.includes?.(ctx) ?? true) {
+            return inner.fetch(ctx);
           } else {
             return undefined;
           }

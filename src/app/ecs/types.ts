@@ -1,4 +1,4 @@
-import { Constructor } from "@/app/utils/types";
+import { Constructor as Ctor } from "@/app/utils/types";
 
 export const EntityType = Symbol.for("Entity");
 export class EcsEntity {
@@ -31,15 +31,9 @@ export type EcsStage =
   | `${EcsStageType}-end`;
 
 export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
-  Constructor<C>,
+  Ctor<C>,
   C
 >;
-
-export class EcsParent extends ValueComponent<EcsEntity> {
-  constructor(readonly value: EcsEntity) {
-    super();
-  }
-}
 
 export class ComponentTicks {
   readonly added: number;
@@ -64,7 +58,7 @@ function compare(tick: number, last: number, current: number): boolean {
   return current - tick < current - last;
 }
 
-export class SystemTicks {
+export class WorldTicks {
   private _last: number;
   private _current: number;
 

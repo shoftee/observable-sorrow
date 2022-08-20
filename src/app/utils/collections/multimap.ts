@@ -3,14 +3,14 @@ import { getOrAdd } from ".";
 export class MultiMap<K, V> {
   private readonly map = new Map<K, Set<V>>();
 
-  *entriesForKey(key: K): Iterable<V> {
-    const entries = this.map.get(key);
-    if (!entries) {
-      return;
+  constructor(items?: Iterable<[K, Iterable<V>]>) {
+    for (const [key, vals] of items ?? []) {
+      this.addAll(key, vals);
     }
-    for (const entry of entries) {
-      yield entry;
-    }
+  }
+
+  entriesForKey(key: K): ReadonlySet<V> {
+    return this.map.get(key) ?? new Set();
   }
 
   add(key: K, val: V) {
