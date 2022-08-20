@@ -1,13 +1,22 @@
 import { round } from "@/app/utils/mathx";
 
 import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
-import { Commands, Query, Mut, With, Receive, Read } from "@/app/ecs/query";
+import {
+  Commands,
+  Query,
+  Mut,
+  With,
+  Receive,
+  Read,
+  DiffMut,
+} from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaRecorder, TimeOptions, Timer } from "./types";
 import * as events from "./types/events";
 
-const TimeMarker = class extends EcsComponent {};
+const Marker = class extends EcsComponent {};
+const F_Marker = With(Marker);
 
 class DeltaTime extends EcsComponent {
   last?: number;
@@ -15,12 +24,12 @@ class DeltaTime extends EcsComponent {
 }
 
 const Setup = System(Commands())((cmds) => {
-  cmds.spawn(new TimeMarker(), new DeltaTime(), new TimeOptions());
+  cmds.spawn(new Marker(), new DeltaTime(), new TimeOptions());
 });
 
 const HandleOptionsChanged = System(
   Receive(events.TimeOptionsChanged),
-  Query(Mut(TimeOptions)).filter(With(TimeMarker)),
+  Query(DiffMut(TimeOptions)).filter(F_Marker),
 )((events, optionsQuery) => {
   const [options] = optionsQuery.single();
   for (const { intent } of events.pull()) {
@@ -39,7 +48,7 @@ const HandleOptionsChanged = System(
 });
 
 const UpdateGameTime = System(
-  Query(Mut(DeltaTime), Read(TimeOptions)).filter(With(TimeMarker)),
+  Query(Mut(DeltaTime), Read(TimeOptions)).filter(F_Marker),
 )((query) => {
   const [time, options] = query.single();
 
@@ -54,8 +63,8 @@ const UpdateGameTime = System(
 });
 
 const AdvanceTimers = System(
-  Query(Read(DeltaTime)).filter(With(TimeMarker)),
-  Query(Mut(Timer)),
+  Query(Read(DeltaTime)).filter(F_Marker),
+  Query(DiffMut(Timer)),
 )((timeQuery, timerQuery) => {
   const [{ delta }] = timeQuery.single();
   if (delta > 0) {
@@ -79,10 +88,7 @@ const AdvanceTimers = System(
   }
 });
 
-const TrackTime = DeltaRecorder(
-  TimeOptions,
-  Read(TimeMarker),
-)((root, options) => {
+const TrackTime = DeltaRecorder(TimeOptions)((root, options) => {
   root.time = options;
 });
 

@@ -20,12 +20,12 @@ export class World {
   readonly events = new EventState();
   readonly hierarchy = new HierarchyState();
   readonly resources = new ResourceState();
-  readonly queries = new QueryState(this.components, this);
+  readonly queries = new QueryState(this);
 
-  private newEntityId = 1;
+  private newEntityId = 0;
 
   spawn(...components: EcsComponent[]): EcsEntity {
-    const entity = Object.freeze({ [EntityType]: this.newEntityId++ });
+    const entity = Object.freeze({ [EntityType]: ++this.newEntityId });
     this.entities.add(entity);
     this.components.insert(entity, ...components);
     return entity;

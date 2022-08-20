@@ -91,7 +91,7 @@ export const SandcastleBuilderFormatter = (
 };
 
 export interface NumberView {
-  value: number | undefined;
+  value: number;
   style: EffectDisplayStyle;
   rounded?: boolean;
   showSign?: ShowSign;
@@ -106,11 +106,16 @@ export function numberView(
   id: NumberEffectId,
   showSign?: ShowSign,
   rounded?: boolean,
-): NumberView {
-  return {
-    value: manager.number(id).value,
-    style: EffectDisplayStyles[id],
-    showSign: showSign ?? "always",
-    rounded: rounded ?? false,
-  };
+): NumberView | undefined {
+  const value = manager.number(id).value;
+  if (value === undefined) {
+    return undefined;
+  } else {
+    return {
+      value: value,
+      style: EffectDisplayStyles[id],
+      showSign: showSign ?? "always",
+      rounded: rounded ?? false,
+    };
+  }
 }

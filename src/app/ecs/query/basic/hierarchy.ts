@@ -1,11 +1,11 @@
-import { Constructor as Ctor } from "@/app/utils/types";
 import { cache } from "@/app/utils/collections";
+import { Enumerable } from "@/app/utils/enumerable";
+import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, EcsEntity, World } from "@/app/ecs";
 
 import { All, AllParams, AllResults, Entity, MapQuery, With } from "..";
 import { FilterDescriptor, QueryDescriptor } from "../types";
-import { Enumerable } from "@/app/utils/enumerable";
 
 type WithParent = FilterDescriptor;
 export function WithParent(...ctors: Ctor<EcsComponent>[]): WithParent {
@@ -65,9 +65,11 @@ export function Children<Q extends AllParams>(
 
       return {
         fetch({ entity }) {
-          return Array.from(
-            iterateChildResults(world, entity, lookup.retrieve()),
-          );
+          return iterateChildResults(
+            world,
+            entity,
+            lookup.retrieve(),
+          ).toArray();
         },
         cleanup() {
           lookup.invalidate();
@@ -113,11 +115,11 @@ function parentOf(world: World, child: EcsEntity) {
   return world.hierarchy.parentOf(child);
 }
 
-function* iterateChildResults<Q extends AllParams>(
+function iterateChildResults<Q extends AllParams>(
   world: World,
   parent: EcsEntity,
   lookup: ReadonlyMap<EcsEntity, AllResults<Q>>,
 ) {
   const children = world.hierarchy.childrenOf(parent);
-  yield* new Enumerable(children).filterMap((child) => lookup.get(child));
+  return new Enumerable(children).filterMap((child) => lookup.get(child));
 }

@@ -1,7 +1,12 @@
-import { Intent, OnRenderHandler } from "@/app/interfaces";
+import {
+  BonfireIntent,
+  Intent,
+  OnRenderHandler,
+  WorkshopIntent,
+} from "@/app/interfaces";
 
 import { EcsEvent, GameRunner } from "../ecs";
-import { ResourceMap } from "../state";
+import { Meta, ResourceMap } from "../state";
 
 import { build } from "./systems2/builder";
 import * as events from "./systems2/types/events";
@@ -47,12 +52,24 @@ function convertToEvent(intent: Intent): EcsEvent | undefined {
     case "time":
       return new events.TimeOptionsChanged(intent);
     case "bonfire":
-      switch (intent.id) {
-        case "gather-catnip":
-          return new events.ResourceOrder(
-            ResourceMap.fromObject({ catnip: 1 }),
-          );
-      }
+      return convertBonfireIntent(intent);
+    case "workshop":
+      return convertWorkshopIntent(intent);
   }
-  return undefined;
+}
+
+function convertBonfireIntent(intent: BonfireIntent): EcsEvent | undefined {
+  if (intent.id === "gather-catnip") {
+    return new events.ResourceOrder(ResourceMap.fromObject({ catnip: 1 }));
+  }
+}
+
+function convertWorkshopIntent(intent: WorkshopIntent): EcsEvent | undefined {
+  if (intent.id === "craft-recipe") {
+    const { products, ingredients } = Meta.recipe(intent.recipe);
+    return new events.ResourceOrder(
+      ResourceMap.fromObject(products),
+      ResourceMap.fromObject(ingredients),
+    );
+  }
 }

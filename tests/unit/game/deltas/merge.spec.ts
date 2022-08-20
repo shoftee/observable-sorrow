@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { Calendar, DeltaBuffer } from "@/app/game/systems2/types";
+import { DeltaBuffer } from "@/app/game/systems2/types";
 
 import {
   addState,
@@ -9,33 +9,47 @@ import {
   DeltaSchema,
   removeState,
 } from "@/app/game/systems2/core";
-import { ChangeTicks } from "@/app/ecs";
+import { ChangeTicks, ComponentTicks } from "@/app/ecs";
 
 describe("delta merge", () => {
   describe("addState", () => {
+    it("should ignore symbols", () => {
+      const buffer = new DeltaBuffer();
+      const added = buffer.components.added;
+
+      const newTime = {
+        [ChangeTicks]: new ComponentTicks(123),
+        paused: false,
+        power: 1,
+      };
+      addState(added, { time: newTime });
+
+      expect(added).to.deep.equal({ time: { paused: false, power: 1 } });
+    });
     it("should add new objects", () => {
       const buffer = new DeltaBuffer();
       const added = buffer.components.added;
 
-      const newCalendar = calendar();
-      addState(added, { calendar: newCalendar });
+      const newTime = {
+        [ChangeTicks]: new ComponentTicks(123),
+        paused: false,
+        power: 1,
+      };
+      addState(added, { time: newTime });
 
-      expect(added).to.deep.equal({ calendar: newCalendar });
-      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
+      expect(added).to.deep.equal({ time: { paused: false, power: 1 } });
     });
     it("should overwrite existing objects", () => {
       const buffer = new DeltaBuffer();
       const added = buffer.components.added;
 
-      const oldCalendar = new Calendar();
-      addState(added, { calendar: oldCalendar });
-      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
+      const oldTime = { paused: true, power: 1 };
+      addState(added, { time: oldTime });
 
-      const newCalendar = calendar();
-      addState(added, { calendar: newCalendar });
-      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
+      const newTime = { paused: false };
+      addState(added, { time: newTime });
 
-      expect(added).to.deep.equal({ calendar: newCalendar });
+      expect(added).to.deep.equal({ time: { paused: false, power: 1 } });
     });
     it("should add objects deeply", () => {
       const buffer = new DeltaBuffer();
@@ -62,13 +76,11 @@ describe("delta merge", () => {
       addState(added, {
         resources: { catnip: oldResource },
       });
-      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       addState(added, {
         resources: { catnip: newResource },
       });
-      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(added).to.deep.equal({
         resources: { catnip: newResource },
@@ -78,50 +90,54 @@ describe("delta merge", () => {
       const buffer = new DeltaBuffer();
       const added = buffer.components.added;
 
-      const newCalendar = new Calendar();
+      const newTime = { paused: false };
       changeState(added, {
-        calendar: newCalendar,
+        time: newTime,
       });
-      expect(added.calendar).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       changeState(added, {
         resources: { catnip: newResource },
       });
-      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(added).to.deep.equal({
-        calendar: newCalendar,
+        time: newTime,
         resources: { catnip: newResource },
       });
-      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
     });
   });
 
   describe("changeState", () => {
+    it("should ignore symbols", () => {
+      const buffer = new DeltaBuffer();
+      const changed = buffer.components.changed;
+
+      changeState(changed, { time: { paused: false, power: 1 } });
+      const newTime = {
+        [ChangeTicks]: new ComponentTicks(123),
+        paused: false,
+        power: 1,
+      };
+      changeState(changed, { time: newTime });
+
+      expect(changed).to.deep.equal({ time: { paused: false, power: 1 } });
+    });
     it("should add new objects", () => {
       const buffer = new DeltaBuffer();
       const changed = buffer.components.changed;
 
-      const newCalendar = calendar();
-      changeState(changed, { calendar: newCalendar });
-      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
+      changeState(changed, { time: { paused: false } });
 
-      expect(changed).to.deep.equal({ calendar: newCalendar });
+      expect(changed).to.deep.equal({ time: { paused: false } });
     });
     it("should overwrite existing objects", () => {
       const buffer = new DeltaBuffer();
       const changed = buffer.components.changed;
 
-      const oldCalendar = new Calendar();
-      changeState(changed, { calendar: oldCalendar });
-      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
+      changeState(changed, { time: { paused: true, power: 1 } });
+      changeState(changed, { time: { paused: false } });
 
-      const newCalendar = calendar();
-      changeState(changed, { calendar: newCalendar });
-      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
-
-      expect(changed).to.deep.equal({ calendar: newCalendar });
+      expect(changed).to.deep.equal({ time: { paused: false, power: 1 } });
     });
     it("should add objects deeply", () => {
       const buffer = new DeltaBuffer();
@@ -131,7 +147,6 @@ describe("delta merge", () => {
       changeState(changed, {
         resources: { catnip: newResource },
       });
-      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({
         resources: { catnip: newResource },
@@ -148,13 +163,11 @@ describe("delta merge", () => {
       changeState(changed, {
         resources: { catnip: oldResource },
       });
-      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       const newResource = resource();
       changeState(changed, {
         resources: { catnip: newResource },
       });
-      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({
         resources: { catnip: newResource },
@@ -164,20 +177,15 @@ describe("delta merge", () => {
       const buffer = new DeltaBuffer();
       const changed = buffer.components.changed;
 
-      const newCalendar = new Calendar();
-      changeState(changed, {
-        calendar: newCalendar,
-      });
-      expect(changed.calendar).to.not.haveOwnProperty(ChangeTicks);
+      changeState(changed, { time: { paused: true, power: 1 } });
 
       const newResource = resource();
       changeState(changed, {
         resources: { catnip: newResource },
       });
-      expect(changed.resources?.catnip).to.not.haveOwnProperty(ChangeTicks);
 
       expect(changed).to.deep.equal({
-        calendar: newCalendar,
+        time: { paused: true, power: 1 },
         resources: { catnip: newResource },
       });
     });
@@ -186,18 +194,17 @@ describe("delta merge", () => {
   describe("removeState", () => {
     it("should remove present objects", () => {
       const newResource = resource();
-      const newCalendar = calendar();
       const deltas: DeltaSchema = {
-        calendar: newCalendar,
         resources: {
           catnip: newResource,
         },
+        time: { paused: false, power: 1 },
       };
 
-      removeState(deltas, { calendar: true });
+      removeState(deltas, { time: true });
 
       expect(deltas).to.deep.equal({
-        calendar: undefined,
+        time: undefined,
         resources: {
           catnip: newResource,
         },
@@ -210,9 +217,9 @@ describe("delta merge", () => {
       const buffer = new DeltaBuffer();
       const removed = buffer.components.removed;
 
-      mergeRemovals(removed, { calendar: true });
+      mergeRemovals(removed, { time: true });
 
-      expect(removed).to.deep.equal({ calendar: true });
+      expect(removed).to.deep.equal({ time: true });
     });
     it("should add objects deeply", () => {
       const buffer = new DeltaBuffer();
@@ -230,17 +237,12 @@ describe("delta merge", () => {
       const buffer = new DeltaBuffer();
       const removed = buffer.components.removed;
 
-      mergeRemovals(removed, {
-        resources: { catnip: true },
-      });
-
-      mergeRemovals(removed, {
-        calendar: true,
-      });
+      mergeRemovals(removed, { resources: { catnip: true } });
+      mergeRemovals(removed, { time: true });
 
       expect(removed).to.deep.equal({
-        calendar: true,
         resources: { catnip: true },
+        time: true,
       });
     });
   });
@@ -248,12 +250,4 @@ describe("delta merge", () => {
 
 function resource() {
   return { amount: 123, unlocked: true };
-}
-
-function calendar() {
-  const c = new Calendar();
-  c.day = 20;
-  c.season = "summer";
-  c.year = 123;
-  return c;
 }

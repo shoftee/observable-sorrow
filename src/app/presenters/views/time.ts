@@ -1,10 +1,11 @@
+import { StateSchema } from "@/app/game/systems2/core";
 import { computed, reactive } from "vue";
-import { IStateManager } from "../state-manager";
 
-export function newTimeView(manager: IStateManager): TimeView {
+export function newTimeView(state: StateSchema): TimeView {
+  const { time } = state;
   return reactive({
-    power: computed(() => manager.state.time.power),
-    paused: computed(() => manager.state.time.paused),
+    power: computed(() => time.power),
+    paused: computed(() => time.paused),
   });
 }
 

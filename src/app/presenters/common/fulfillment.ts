@@ -1,9 +1,9 @@
 import { reactive, computed } from "vue";
 
 import { FulfillmentId, ResourceId } from "@/app/interfaces";
-import { IngredientState, Meta, UnitKind } from "@/app/state";
+import { Meta, UnitKind } from "@/app/state";
+import { StateSchema } from "@/app/game/systems2/core";
 
-import { IStateManager } from "..";
 import { NumberView } from ".";
 
 export interface IngredientItem {
@@ -12,7 +12,7 @@ export interface IngredientItem {
   requirement: number;
   fulfillment: number;
   fulfilled: boolean;
-  fulfillmentTime?: NumberView | undefined;
+  eta: NumberView | undefined;
   capped: boolean;
 }
 
@@ -23,36 +23,51 @@ export interface FulfillmentItem {
 }
 
 export function fulfillment(
+  state: StateSchema,
   id: FulfillmentId,
-  manager: IStateManager,
 ): FulfillmentItem {
-  const fulfillment = manager.fulfillment(id);
+  const fulfillment = state.fulfillments[id];
   return reactive({
-    ingredients: Array.from(fulfillment.ingredients, (state) =>
-      reactive({
-        id: state.resourceId,
-        label: Meta.resource(state.resourceId).label,
-        requirement: computed(() => state.requirement),
-        fulfillment: computed(() => state.fulfillment),
-        fulfilled: computed(() => state.fulfilled),
-        fulfillmentTime: computed(() => fulfillmentTime(state)),
-        capped: computed(() => state.capped),
-      }),
+    ingredients: Array.from(
+      Object.entries(fulfillment.ingredients),
+      ([key, value]) => ingredient(state, key as ResourceId, value),
     ),
-    fulfilled: computed(() => fulfillment.fulfilled),
-    capped: computed(() => fulfillment.capped),
+    fulfilled: fulfillment.fulfilled,
+    capped: fulfillment.capped,
   });
 }
 
-function fulfillmentTime(ingredient: IngredientState): NumberView | undefined {
-  if (ingredient.fulfillmentTime === undefined) {
-    return undefined;
-  } else {
+function ingredient(
+  state: StateSchema,
+  key: ResourceId,
+  value: {
+    requirement: number;
+    fulfilled: boolean;
+    eta: number | undefined;
+    capped: boolean;
+  },
+) {
+  const id = key as ResourceId;
+  return reactive({
+    id: id,
+    label: Meta.resource(id).label,
+    requirement: computed(() => value.requirement),
+    fulfillment: computed(() => state.resources[id].amount),
+    fulfilled: computed(() => value.fulfilled),
+    eta: computed(() => etaView(value.eta)),
+    capped: computed(() => value.capped),
+  });
+}
+
+function etaView(eta: number | undefined): NumberView | undefined {
+  if (eta !== undefined) {
     return {
-      value: ingredient.fulfillmentTime,
+      value: eta,
       style: { unit: UnitKind.Tick },
       rounded: true,
       showSign: "negative",
     };
+  } else {
+    return undefined;
   }
 }

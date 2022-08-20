@@ -29,7 +29,7 @@ export interface JobItem {
 }
 
 export interface HappinessItem {
-  view: NumberView;
+  view: NumberView | undefined;
   effectTree: EffectTree;
 }
 

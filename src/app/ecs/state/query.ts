@@ -8,12 +8,12 @@ type QueryResult<T = unknown> = T extends QueryDescriptor<infer R> ? R : never;
 
 export class QueryState {
   private readonly fetches = new Map<QueryDescriptor, FetchCache>();
+  private readonly components: ComponentState;
   private generation = 0;
 
-  constructor(
-    private readonly components: ComponentState,
-    private readonly world: World,
-  ) {}
+  constructor(private readonly world: World) {
+    this.components = world.components;
+  }
 
   notifyChanged(...entities: EcsEntity[]) {
     const newGeneration = ++this.generation;
@@ -28,7 +28,8 @@ export class QueryState {
   register(descriptor: QueryDescriptor) {
     const fetches = this.fetches;
     if (fetches.has(descriptor)) {
-      throw new Error("Query already registered.");
+      // query descriptors can be reused
+      return;
     }
 
     const fetch = new FetchCache(descriptor.newQuery(this.world));

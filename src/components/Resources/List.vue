@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
@@ -13,7 +13,8 @@ const { t } = useI18n();
 const show = ref(true);
 const manager = useStateManager();
 
-const all = fromIds(manager, Object.keys(manager.state.resources) as ResourceId[], newResourceView);
+const newLocal = computed(() => Object.keys(manager.state.resources) as ResourceId[]);
+const all = fromIds(manager, newLocal, newResourceView);
 const items = filterArrayView(all, r => r.unlocked);
 </script>
 

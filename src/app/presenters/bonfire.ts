@@ -58,7 +58,7 @@ export class BonfirePresenter {
       flavor: "bonfire.refine-catnip.flavor",
 
       unlocked: true,
-      fulfillment: computed(() => fulfillment("refine-catnip", manager)),
+      fulfillment: computed(() => fulfillment(manager.state, "refine-catnip")),
     });
   }
 
@@ -81,7 +81,7 @@ export class BonfirePresenter {
 
       unlocked: computed(() => state.unlocked),
       level: computed(() => state.level),
-      fulfillment: computed(() => fulfillment(building.id, manager)),
+      fulfillment: computed(() => fulfillment(manager.state, building.id)),
       effects: computed(() => this.effects(building.id, manager)),
     });
   }

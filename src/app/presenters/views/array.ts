@@ -1,18 +1,18 @@
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, Ref, unref } from "vue";
 
 import { IStateManager } from "..";
 
 export function fromIds<Id, View>(
   manager: IStateManager,
-  ids: Iterable<Id>,
-  fn: (id: Id, mgr: IStateManager) => View,
+  ids: Ref<Iterable<Id>> | Iterable<Id>,
+  fn: (mgr: IStateManager, id: Id) => View,
 ): ComputedRef<View[]> {
-  return computed(() => Array.from(ids, (id) => fn(id, manager)));
+  return computed(() => Array.from(unref(ids), (id) => fn(manager, id)));
 }
 
 export function filterArrayView<T>(
-  array: ComputedRef<T[]>,
+  array: Ref<T[]>,
   predicate: (item: T, index: number, array: T[]) => unknown,
-): ComputedRef<T[]> {
-  return computed(() => array.value.filter(predicate));
+): Ref<T[]> {
+  return computed(() => unref(array).filter(predicate));
 }

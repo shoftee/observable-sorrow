@@ -28,7 +28,7 @@ export class SciencePresenter {
       unlocked: computed(() => state.unlocked),
       researched: computed(() => state.researched),
 
-      fulfillment: computed(() => fulfillment(meta.id, manager)),
+      fulfillment: computed(() => fulfillment(manager.state, meta.id)),
       effects: meta.effects,
     });
   }

@@ -30,10 +30,6 @@ export class NumberFormatter {
   }
 
   v(view: NumberView): string {
-    if (view.value === undefined) {
-      return "";
-    }
-
     const precision = view.rounded === true ? 0 : this.options.precision;
     const showSign = view.showSign ?? "negative";
     const value = view.style.invert === true ? -view.value : view.value;

@@ -6,7 +6,7 @@ import { filterArrayView, fromIds, newBonfireItemView } from "@/app/presenters/v
 
 const manager = useStateManager();
 
-const all = fromIds(manager, ["gather-catnip"], newBonfireItemView)
+const all = fromIds(manager, ["gather-catnip", "refine-catnip"], newBonfireItemView)
 const items = filterArrayView(all, b => b.unlocked);
 </script>
 

@@ -36,7 +36,7 @@ const { amount, capacity, change, modifier } = toRefs(item);
     <template v-else>
       <div class="col-3 no-capacity"></div>
     </template>
-    <template v-if="change.value">
+    <template v-if="change">
       <template v-if="item.deltaTree">
         <tippy class="col-3">
           <div class="number change" :class="{ 'text-danger': change.value < 0 }">

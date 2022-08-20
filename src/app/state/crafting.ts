@@ -12,7 +12,7 @@ export type RecipeMetadataType = Readonly<{
 export const RecipeMetadata: Record<RecipeId, RecipeMetadataType> = {
   "refine-catnip": {
     id: "refine-catnip",
-    ingredients: { catnip: 100 },
+    ingredients: { catnip: 10 },
     products: { wood: 1 },
   },
 };

@@ -1,18 +1,18 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
-import { All, MapQuery, Mut, Opt, Receive, Value } from "@/app/ecs/query";
+import { All, DiffMut, MapQuery, Opt, Receive, Value } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { Ledger, ResourceMap } from "@/app/state";
 import { cache } from "@/app/utils/collections";
 
-import * as R from "./types/resources";
-import * as events from "./types/events";
+import * as R from "../types/resources";
+import * as events from "../types/events";
 
 const ProcessResourceOrders = System(
   Receive(events.ResourceOrder),
   MapQuery(
     Value(R.Id),
-    All(Value(R.Amount), Opt(Value(R.Capacity)), Mut(R.LedgerEntry)),
+    All(Value(R.Amount), Opt(Value(R.Capacity)), DiffMut(R.LedgerEntry)),
   ),
 )((orders, resourcesQuery) => {
   const resourcesCache = cache(() => resourcesQuery.map());

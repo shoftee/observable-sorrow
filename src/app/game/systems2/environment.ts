@@ -2,7 +2,7 @@ import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
 import { PluginApp, EcsPlugin } from "@/app/ecs";
-import { Commands, Mut, Query, Read, With } from "@/app/ecs/query";
+import { Commands, DiffMut, Query, Read, With } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { Timer, DeltaRecorder } from "./types";
@@ -10,59 +10,64 @@ import * as E from "./types/environment";
 
 const Setup = System(Commands())((cmds) => {
   cmds.spawn(new E.DayTimer(), new Timer(2000));
-  cmds.spawn(new E.Environment(), new E.Calendar());
+  cmds.spawn(
+    new E.Day(),
+    new E.Season(),
+    new E.Year(),
+    new E.Weather(),
+    new E.Labels(),
+  );
 });
+
+const NextSeasonMap: Record<SeasonId, SeasonId> = {
+  spring: "summer",
+  summer: "autumn",
+  autumn: "winter",
+  winter: "spring",
+};
 
 const AdvanceCalendar = System(
   Query(Read(Timer)).filter(With(E.DayTimer)),
-  Query(Mut(E.Calendar)).filter(With(E.Environment)),
+  Query(DiffMut(E.Day), DiffMut(E.Season), DiffMut(E.Year)),
 )((timerQuery, calendarQuery) => {
   const [days] = timerQuery.single();
-  const [calendar] = calendarQuery.single();
+  const [day, season, year] = calendarQuery.single();
   if (days.isNewTick) {
-    let currentDay = calendar.day;
-    currentDay += 1;
-    if (currentDay >= TimeConstants.DaysPerSeason) {
-      currentDay = 0;
-      const nextSeason = calculateNextSeason(calendar.season);
-      calendar.season = nextSeason;
-      if (nextSeason === "spring") {
-        calendar.year++;
+    day.value += 1;
+    if (day.value >= TimeConstants.DaysPerSeason) {
+      day.value = 0;
+      season.value = NextSeasonMap[season.value];
+      if (season.value === "spring") {
+        year.value++;
       }
-
-      // TODO: weather
     }
-
-    calendar.day = currentDay;
   }
 });
 
-const TrackCalendar = DeltaRecorder(
-  E.Calendar,
-  Read(E.Environment),
-)((root, calendar) => {
-  root.calendar = calendar;
-});
+const DeltaRecorders = [
+  DeltaRecorder(E.Day)((root, { value: day }) => {
+    root.calendar.day = day;
+  }),
+  DeltaRecorder(E.Season)((root, { value: season }) => {
+    root.calendar.season = season;
+  }),
+  DeltaRecorder(E.Year)((root, { value: year }) => {
+    root.calendar.year = year;
+  }),
+  DeltaRecorder(E.Weather)((root, { value: weather }) => {
+    root.calendar.weather = weather;
+  }),
+  DeltaRecorder(E.Labels)((root, { dateLabel, epochLabel }) => {
+    root.calendar.dateLabel = dateLabel;
+    root.calendar.epochLabel = epochLabel;
+  }),
+];
 
 export class EnvironmentPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addStartupSystem(Setup)
       .addSystem(AdvanceCalendar)
-      .addSystem(TrackCalendar, { stage: "last-start" });
-  }
-}
-
-// utility functions
-function calculateNextSeason(current: SeasonId): SeasonId {
-  switch (current) {
-    case "spring":
-      return "summer";
-    case "summer":
-      return "autumn";
-    case "autumn":
-      return "winter";
-    case "winter":
-      return "spring";
+      .addSystems(DeltaRecorders, { stage: "last-start" });
   }
 }

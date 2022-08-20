@@ -2,6 +2,7 @@ import {
   BuildingId,
   JobId,
   NumberEffectId,
+  RecipeId,
   ResourceId,
   SeasonId,
   SectionId,
@@ -55,6 +56,10 @@ export const Meta = {
 
   job(id: JobId): JobMetadataType {
     return JobMetadata[id];
+  },
+
+  recipe(id: RecipeId): RecipeMetadataType {
+    return RecipeMetadata[id];
   },
 
   recipes(): Enumerable<RecipeMetadataType> {
