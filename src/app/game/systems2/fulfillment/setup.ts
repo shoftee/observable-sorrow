@@ -1,26 +1,27 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import { Commands } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
-
 import { ResourceId } from "@/app/interfaces";
-import { BuildingMetadataType, Meta } from "@/app/state";
+
+import { BuildingMetadataType, Meta, resourceQtyIterable } from "@/app/state";
 import { PriceRatio, Unlocked, UnlockOnEffect } from "../types";
 
 import * as F from "./types";
+
+function* ingredientComponents(id: ResourceId, requirement: number) {
+  yield new F.Resource(id);
+  yield new F.Requirement(requirement);
+  yield new F.Fulfillment();
+  yield new F.Capped(false);
+}
 
 const SpawnFulfillments = System(Commands())((cmds) => {
   for (const meta of Meta.recipes()) {
     cmds
       .spawn(new F.Recipe(meta.id), new F.Fulfillment(), new F.Capped(false))
-      .entity((parent) => {
-        for (const [id, requirement] of Object.entries(meta.ingredients)) {
-          cmds.spawnChild(
-            parent,
-            new F.Resource(id as ResourceId),
-            new F.Fulfillment(),
-            new F.Capped(false),
-            new F.Requirement(requirement),
-          );
+      .entity((e) => {
+        for (const [id, requirement] of resourceQtyIterable(meta.ingredients)) {
+          cmds.spawnChild(e, ...ingredientComponents(id, requirement));
         }
       });
   }
@@ -28,6 +29,9 @@ const SpawnFulfillments = System(Commands())((cmds) => {
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new F.Building(meta.id);
+  yield new F.Fulfillment();
+  yield new F.Capped(false);
+
   if (meta.unlock) {
     yield new Unlocked(false);
     if (meta.unlock.priceRatio) {
@@ -43,18 +47,13 @@ function* buildingComponents(meta: BuildingMetadataType) {
 
 const SpawnBuildings = System(Commands())((cmds) => {
   for (const meta of Meta.buildings()) {
-    cmds.spawn(...buildingComponents(meta)).entity((parent) => {
-      for (const [id, requirement] of Object.entries(meta.prices.base)) {
-        cmds.spawnChild(
-          parent,
-          new F.Resource(id as ResourceId),
-          new F.Fulfillment(),
-          new F.Capped(false),
-          new F.Requirement(requirement),
-          new PriceRatio(meta.prices.ratio),
-        );
-      }
-    });
+    cmds
+      .spawn(...buildingComponents(meta), new PriceRatio(meta.prices.ratio))
+      .entity((e) => {
+        for (const [id, requirement] of resourceQtyIterable(meta.prices.base)) {
+          cmds.spawnChild(e, ...ingredientComponents(id, requirement));
+        }
+      });
   }
 });
 

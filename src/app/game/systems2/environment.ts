@@ -2,7 +2,7 @@ import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
 import { PluginApp, EcsPlugin } from "@/app/ecs";
-import { Commands, DiffMut, Query, Read, With } from "@/app/ecs/query";
+import { Commands, DiffMut, Query, Read, Every } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { Timer, DeltaRecorder } from "./types";
@@ -20,14 +20,14 @@ const Setup = System(Commands())((cmds) => {
 });
 
 const NextSeasonMap: Record<SeasonId, SeasonId> = {
-  spring: "summer",
-  summer: "autumn",
-  autumn: "winter",
-  winter: "spring",
+  ["spring"]: "summer",
+  ["summer"]: "autumn",
+  ["autumn"]: "winter",
+  ["winter"]: "spring",
 };
 
 const AdvanceCalendar = System(
-  Query(Read(Timer)).filter(With(E.DayTimer)),
+  Query(Read(Timer)).filter(Every(E.DayTimer)),
   Query(DiffMut(E.Day), DiffMut(E.Season), DiffMut(E.Year)),
 )((timerQuery, calendarQuery) => {
   const [days] = timerQuery.single();

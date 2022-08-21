@@ -1,9 +1,16 @@
 import { cache } from "@/app/utils/collections";
-import { Constructor as Ctor } from "@/app/utils/types";
 
-import { EcsComponent, EcsEntity } from "@/app/ecs";
+import { EcsEntity } from "@/app/ecs";
 
-import { All, AllParams, AllResults, Entity, MapQuery, With } from "..";
+import {
+  All,
+  AllParams,
+  AllResults,
+  Entity,
+  MapQuery,
+  OneOrMoreCtors,
+  Every,
+} from "..";
 import {
   defaultFilter,
   defaultQuery,
@@ -12,10 +19,10 @@ import {
 } from "../types";
 
 type WithParent = FilterDescriptor;
-export function WithParent(...ctors: Ctor<EcsComponent>[]): WithParent {
+export function WithParent(...ctors: OneOrMoreCtors): WithParent {
   return {
     newFilter({ queries, hierarchy }) {
-      const descriptor = All(Entity()).filter(With(...ctors));
+      const descriptor = All(Entity()).filter(Every(...ctors));
       queries.register(descriptor);
       const parentsQuery = queries.get(descriptor);
 

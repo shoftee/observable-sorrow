@@ -5,7 +5,7 @@ import {
   Commands,
   Query,
   Mut,
-  With,
+  Every,
   Receive,
   Read,
   DiffMut,
@@ -16,7 +16,7 @@ import { DeltaRecorder, TimeOptions, Timer } from "./types";
 import * as events from "./types/events";
 
 const Marker = class extends EcsComponent {};
-const F_Marker = With(Marker);
+const F_Marker = Every(Marker);
 
 class DeltaTime extends EcsComponent {
   last?: number;

@@ -1,11 +1,10 @@
-import { all } from "@/app/utils/collections";
+import { all, any } from "@/app/utils/collections";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, World } from "@/app/ecs";
 import {
   QueryDescriptor,
   FilterDescriptor,
-  InstantiatedFilter,
   InstantiatedQuery,
   defaultFilter,
 } from "../types";
@@ -63,10 +62,12 @@ export function All<Q extends AllParams>(...qs: Q): AllQuery<Q> {
   return new AllQuery(qs);
 }
 
-type With = FilterDescriptor;
-export function With(...ctors: Ctor<EcsComponent>[]): With {
+export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
+
+type Every = FilterDescriptor;
+export function Every(...ctors: OneOrMoreCtors): Every {
   return {
-    newFilter(): InstantiatedFilter {
+    newFilter() {
       return defaultFilter({
         includes({ archetype }) {
           return all(ctors, (ctor) => archetype.has(ctor));
@@ -76,10 +77,23 @@ export function With(...ctors: Ctor<EcsComponent>[]): With {
   };
 }
 
-type Without = FilterDescriptor;
-export function Without(...ctors: Ctor<EcsComponent>[]): Without {
+type Any = FilterDescriptor;
+export function Any(...ctors: OneOrMoreCtors): Any {
   return {
-    newFilter(): InstantiatedFilter {
+    newFilter() {
+      return defaultFilter({
+        includes({ archetype }) {
+          return any(ctors, (ctor) => archetype.has(ctor));
+        },
+      });
+    },
+  };
+}
+
+type None = FilterDescriptor;
+export function None(...ctors: OneOrMoreCtors): None {
+  return {
+    newFilter() {
       return defaultFilter({
         includes({ archetype }) {
           return all(ctors, (ctor) => !archetype.has(ctor));

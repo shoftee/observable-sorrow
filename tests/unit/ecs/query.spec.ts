@@ -7,8 +7,8 @@ import {
   All,
   Read,
   Mut,
-  With,
-  Without,
+  Every,
+  None,
   Opt,
   Value,
   ParentQuery,
@@ -164,7 +164,7 @@ describe("ecs query", () => {
     });
   });
   describe("filters", () => {
-    describe("with", () => {
+    describe("Every", () => {
       it("excludes entities correctly", () => {
         world.spawn(
           new Id("96a8c161-0100-4ec1-bbb1-049f32dab366"),
@@ -177,13 +177,13 @@ describe("ecs query", () => {
           new Player(40, 456),
         );
 
-        const bothQuery = All(Read(Player)).filter(With(Id, Name));
+        const bothQuery = All(Read(Player)).filter(Every(Id, Name));
         world.queries.register(bothQuery);
         const bothEntries = Array.from(results(world, bothQuery));
 
         expect(bothEntries).to.deep.equal([[{ level: 20, exp: 123 }]]);
 
-        const nameQuery = All(Read(Player)).filter(With(Name));
+        const nameQuery = All(Read(Player)).filter(Every(Name));
         world.queries.register(nameQuery);
         const nameEntries = Array.from(results(world, nameQuery));
         expect(nameEntries).to.deep.equal([
@@ -191,7 +191,7 @@ describe("ecs query", () => {
           [{ level: 30, exp: 345 }],
         ]);
 
-        const idQuery = All(Read(Player)).filter(With(Id));
+        const idQuery = All(Read(Player)).filter(Every(Id));
         world.queries.register(idQuery);
         const idEntries = Array.from(results(world, idQuery));
         expect(idEntries).to.deep.equal([
@@ -200,7 +200,7 @@ describe("ecs query", () => {
         ]);
       });
     });
-    describe("without", () => {
+    describe("None", () => {
       it("excludes entities correctly", () => {
         world.spawn(
           new Id("96a8c161-0100-4ec1-bbb1-049f32dab366"),
@@ -213,12 +213,12 @@ describe("ecs query", () => {
           new Player(40, 456),
         );
 
-        const withoutName = All(Read(Player)).filter(Without(Name));
+        const withoutName = All(Read(Player)).filter(None(Name));
         world.queries.register(withoutName);
         const withoutNameEntries = single(results(world, withoutName));
         expect(withoutNameEntries).to.deep.equal([{ level: 40, exp: 456 }]);
 
-        const withoutId = All(Read(Player)).filter(Without(Id));
+        const withoutId = All(Read(Player)).filter(None(Id));
         world.queries.register(withoutId);
         const withoutIdEntries = single(results(world, withoutId));
         expect(withoutIdEntries).to.deep.equal([{ level: 30, exp: 345 }]);

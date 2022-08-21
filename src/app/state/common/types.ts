@@ -1,6 +1,6 @@
 import { ResourceId } from "@/app/interfaces";
 
-type ResourceQty = [ResourceId, number];
+type ResourceQuantityTuple = [ResourceId, number];
 
 export type ResourceQuantityType = {
   readonly id: ResourceId;
@@ -9,13 +9,15 @@ export type ResourceQuantityType = {
 
 export type ResourcesType = Readonly<Partial<Record<ResourceId, number>>>;
 
-function toIterable(resources: ResourcesType): Iterable<ResourceQty> {
-  return Object.entries(resources) as Iterable<ResourceQty>;
+export function resourceQtyIterable(
+  resources: ResourcesType,
+): Iterable<ResourceQuantityTuple> {
+  return Object.entries(resources) as Iterable<ResourceQuantityTuple>;
 }
 
 export class ResourceMap extends Map<ResourceId, number> {
   static fromObject(obj: ResourcesType): ResourceMap {
-    return new ResourceMap(toIterable(obj));
+    return new ResourceMap(resourceQtyIterable(obj));
   }
 }
 
@@ -35,7 +37,7 @@ export interface FulfillmentState {
 }
 
 export function ingredientsFromObject(obj: ResourcesType): IngredientState[] {
-  return Array.from(toIterable(obj), ([id, amount]) => ({
+  return Array.from(resourceQtyIterable(obj), ([id, amount]) => ({
     resourceId: id,
     requirement: amount,
     fulfillmentTime: undefined,

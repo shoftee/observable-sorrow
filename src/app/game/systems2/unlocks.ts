@@ -1,5 +1,5 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
-import { ChangeTrackers, Mut, Query, With } from "@/app/ecs/query";
+import { ChangeTrackers, Mut, Query, Every } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { Unlocked } from "./types";
@@ -7,10 +7,10 @@ import * as R from "./resource/types";
 
 const UnlockResources = System(
   Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(
-    With(R.UnlockOnFirstQuantity),
+    Every(R.UnlockOnFirstQuantity),
   ),
   Query(ChangeTrackers(R.Capacity), Mut(Unlocked)).filter(
-    With(R.UnlockOnFirstCapacity),
+    Every(R.UnlockOnFirstCapacity),
   ),
 )((quantityQuery, capacityQuery) => {
   for (const [trackers, unlock] of quantityQuery.all()) {
