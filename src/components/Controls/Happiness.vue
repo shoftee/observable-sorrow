@@ -12,7 +12,7 @@ const { society, fmt } = useEndpoint((ep) => {
 });
 
 const icon = computed(() => {
-  const happiness = society.happiness.view.value;
+  const happiness = society.happiness.view;
   if (happiness !== undefined) {
     const thresholds = [
       { threshold: 10, class: "bi-emoji-sunglasses" },
@@ -26,7 +26,7 @@ const icon = computed(() => {
     ];
 
     for (const item of thresholds) {
-      if (happiness > item.threshold) {
+      if (happiness.value > item.threshold) {
         return item.class;
       }
     }
@@ -40,7 +40,7 @@ const { happiness } = society;
 
 <template>
   <div class="text-center">
-    <div v-if="happiness.view.value !== undefined">
+    <div v-if="happiness.view !== undefined">
       <tippy>
         <div class="d-flex align-items-baseline">
           <span class="bi" :class="{ [icon]: true }"></span>

@@ -9,7 +9,7 @@ import { newTimeView } from "@/app/presenters/views";
 const manager = useStateManager()
 const send = useSend();
 
-const time = newTimeView(manager)
+const time = newTimeView(manager.state)
 
 const acceleration = computed({
   get: () => {

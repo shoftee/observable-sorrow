@@ -13,8 +13,8 @@ const { t } = useI18n();
 const show = ref(true);
 const manager = useStateManager();
 
-const newLocal = computed(() => Object.keys(manager.state.resources) as ResourceId[]);
-const all = fromIds(manager, newLocal, newResourceView);
+const ids = computed(() => Object.keys(manager.state.resources) as ResourceId[]);
+const all = fromIds(manager, ids, newResourceView);
 const items = filterArrayView(all, r => r.unlocked);
 </script>
 

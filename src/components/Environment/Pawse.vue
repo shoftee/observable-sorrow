@@ -9,7 +9,7 @@ const manager = useStateManager();
 
 const { t } = useI18n();
 
-const time = newTimeView(manager);
+const time = newTimeView(manager.state);
 
 async function pause() {
   await send({ kind: "time", id: "pawse" })

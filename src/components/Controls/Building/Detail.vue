@@ -5,10 +5,11 @@ import { useI18n } from "vue-i18n";
 import Ingredients from "../Ingredients.vue";
 import Effects from "../Effects.vue";
 
-import { BonfireItem } from "@/app/presenters";
+import { BonfireItemView } from "@/app/presenters/views";
+
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
-const { item } = defineProps<{ item: BonfireItem }>();
+const { item } = defineProps<{ item: BonfireItemView }>();
 const { t } = useI18n();
 const events = inject(KeyboardEventsKey);
 
@@ -24,11 +25,11 @@ const effects = computed(() => item.effects ?? []);
     <Ingredients v-if="ingredients.length > 0" :items="ingredients" />
     <Effects v-if="effects.length > 0" :items="effects">
       <template #title>{{
-        t(
-          events?.shift
-            ? "effects.buildings.total"
-            : "effects.buildings.per-level",
-        )
+          t(
+            events?.shift
+              ? "effects.buildings.total"
+              : "effects.buildings.per-level",
+          )
       }}</template>
     </Effects>
   </div>

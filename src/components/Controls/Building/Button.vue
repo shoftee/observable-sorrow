@@ -4,16 +4,16 @@ import { useI18n } from "vue-i18n";
 
 import Detail from "./Detail.vue";
 
-import { BonfireItem } from "@/app/presenters";
+import { BonfireItemView } from "@/app/presenters/views";
+
 import { useSend } from "@/composables/game-endpoint";
 import { Intent } from "@/app/interfaces";
 
-const { item } = defineProps<{ item: BonfireItem }>();
+const { item } = defineProps<{ item: BonfireItemView }>();
 const { t } = useI18n();
+const send = useSend();
 
 const level = computed(() => item.level ?? 0);
-
-const send = useSend();
 
 async function dispatch(intent: Intent): Promise<void> {
   await send(toRaw(intent));

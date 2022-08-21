@@ -6,27 +6,24 @@ import Effects from "../Effects.vue";
 
 import { JobId } from "@/app/interfaces";
 import { JobItem } from "@/app/presenters";
-import { useEndpoint } from "@/composables/game-endpoint";
+
+import { useSend } from "@/composables/game-endpoint";
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
 
 const { item } = defineProps<{ item: JobItem; noIdle: boolean }>();
+
+const send = useSend();
 const { t } = useI18n();
 const events = inject(KeyboardEventsKey);
 
 const effects = computed(() => item.effects ?? []);
 
-const { dispatcher } = useEndpoint((ep) => {
-  return {
-    dispatcher: ep.interactors.dispatcher,
-  };
-});
-
 async function assignJob(id: JobId): Promise<void> {
-  await dispatcher.send({ kind: "society", id: "assign-job", job: id });
+  await send({ kind: "society", id: "assign-job", job: id });
 }
 
 async function unassignJob(id: JobId): Promise<void> {
-  await dispatcher.send({ kind: "society", id: "unassign-job", job: id });
+  await send({ kind: "society", id: "unassign-job", job: id });
 }
 </script>
 
@@ -34,29 +31,15 @@ async function unassignJob(id: JobId): Promise<void> {
   <tippy>
     <!-- We need a container div because tippy listens to hover events to trigger and buttons don't fire events when disabled.-->
     <div class="col-12 btn-group">
-      <button
-        type="button"
-        class="btn btn-secondary w-100 shadow-none"
-        :disabled="item.capped || noIdle"
-        @click="assignJob(item.id)"
-      >
+      <button type="button" class="btn btn-secondary w-100 shadow-none" :disabled="item.capped || noIdle"
+        @click="assignJob(item.id)">
         {{ t(item.label) }}
         <span class="number-annotation border">{{ item.pops }}</span>
       </button>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        :disabled="item.capped || noIdle"
-        @click="assignJob(item.id)"
-      >
+      <button type="button" class="btn btn-secondary" :disabled="item.capped || noIdle" @click="assignJob(item.id)">
         <span class="bi-plus"></span>
       </button>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        :disabled="item.pops === 0"
-        @click="unassignJob(item.id)"
-      >
+      <button type="button" class="btn btn-secondary" :disabled="item.pops === 0" @click="unassignJob(item.id)">
         <span class="bi-dash"></span>
       </button>
     </div>
@@ -68,7 +51,7 @@ async function unassignJob(id: JobId): Promise<void> {
         </div>
         <Effects v-if="effects.length > 0" :items="effects">
           <template #title>{{
-            t(events?.shift ? "effects.jobs.total" : "effects.jobs.per-worker")
+              t(events?.shift ? "effects.jobs.total" : "effects.jobs.per-worker")
           }}</template>
         </Effects>
       </div>
