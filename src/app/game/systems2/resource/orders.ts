@@ -7,11 +7,12 @@ import { cache } from "@/app/utils/collections";
 
 import * as R from "./types";
 import * as events from "../types/events";
+import { Resource } from "../types";
 
 const ProcessResourceOrders = System(
   Receive(events.ResourceOrder),
   MapQuery(
-    Value(R.Id),
+    Value(Resource),
     All(Value(R.Amount), Opt(Value(R.Capacity)), DiffMut(R.LedgerEntry)),
   ),
 )((orders, resourcesQuery) => {

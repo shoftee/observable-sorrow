@@ -1,6 +1,5 @@
 export * from "./_facade";
 
-export * from "./bonfire";
 export * from "./formatter";
 export * from "./log";
 export * from "./player";

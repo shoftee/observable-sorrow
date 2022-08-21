@@ -1,5 +1,4 @@
 import {
-  BonfirePresenter,
   LogPresenter,
   NumberFormatter,
   PlayerPresenter,
@@ -9,7 +8,6 @@ import {
 } from ".";
 
 export class PresenterFacade {
-  readonly bonfire: BonfirePresenter;
   readonly formatter: NumberFormatter;
   readonly log: LogPresenter;
   readonly player: PlayerPresenter;
@@ -17,7 +15,6 @@ export class PresenterFacade {
   readonly society: SocietyPresenter;
 
   constructor(stateManager: StateManager) {
-    this.bonfire = new BonfirePresenter(stateManager);
     this.log = new LogPresenter(stateManager);
     this.player = new PlayerPresenter(stateManager);
     this.science = new SciencePresenter(stateManager);

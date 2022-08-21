@@ -4,7 +4,7 @@ import { ResearchIntent, TechId } from "@/app/interfaces";
 import { Meta, TechMetadataType } from "@/app/state";
 
 import { IStateManager } from ".";
-import { fulfillment, FulfillmentItem } from "./common";
+import { fulfillmentView, FulfillmentItemView } from "./common";
 
 export class SciencePresenter {
   readonly items: ComputedRef<TechItem[]>;
@@ -20,15 +20,16 @@ export class SciencePresenter {
 
   private newTechItem(id: TechId, manager: IStateManager): TechItem {
     const meta = Meta.tech(id);
-    const state = manager.tech(id);
+    const fulfillment = manager.state.fulfillments[id];
+    const tech = manager.state.techs[id];
     return reactive({
       ...this.staticData(meta),
       intent: { kind: "research", id: "research-tech", tech: meta.id },
 
-      unlocked: computed(() => state.unlocked),
-      researched: computed(() => state.researched),
+      unlocked: computed(() => fulfillment.unlocked),
+      researched: computed(() => tech.researched),
 
-      fulfillment: computed(() => fulfillment(manager.state, meta.id)),
+      fulfillment: computed(() => fulfillmentView(manager.state, fulfillment)),
       effects: meta.effects,
     });
   }
@@ -52,7 +53,7 @@ export interface TechItem {
   unlocked: boolean;
   researched: boolean;
   effects: TechEffectItem[];
-  fulfillment: FulfillmentItem;
+  fulfillment: FulfillmentItemView;
 }
 
 export interface TechEffectItem {

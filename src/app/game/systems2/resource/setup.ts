@@ -3,13 +3,13 @@ import { Commands } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { ResourceMetadataType, UnlockMode, Meta } from "@/app/state";
 
-import { Unlocked } from "../types";
+import { Resource, Unlocked } from "../types";
 import * as R from "./types";
 
 function* componentsFromMeta(
   meta: ResourceMetadataType,
 ): Iterable<EcsComponent> {
-  yield new R.Id(meta.id);
+  yield new Resource(meta.id);
   yield new R.Amount();
   yield new R.LedgerEntry();
   yield new Unlocked(false);

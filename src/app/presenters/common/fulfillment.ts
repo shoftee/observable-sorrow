@@ -1,12 +1,26 @@
 import { reactive, computed } from "vue";
 
-import { FulfillmentId, ResourceId } from "@/app/interfaces";
+import { ResourceId } from "@/app/interfaces";
 import { Meta, UnitKind } from "@/app/state";
 import { StateSchema } from "@/app/game/systems2/core";
 
 import { NumberView } from ".";
 
-export interface IngredientItem {
+export interface FulfillmentItemView {
+  ingredients: IngredientItemView[];
+  fulfilled: boolean;
+  capped: boolean;
+}
+
+type FulfillmentSchema = {
+  ingredients: Partial<{
+    [K in ResourceId]: IngredientSchema;
+  }>;
+  fulfilled: boolean;
+  capped: boolean;
+};
+
+export interface IngredientItemView {
   readonly id: ResourceId;
   label: string;
   requirement: number;
@@ -16,17 +30,17 @@ export interface IngredientItem {
   capped: boolean;
 }
 
-export interface FulfillmentItem {
-  ingredients: IngredientItem[];
+interface IngredientSchema {
+  requirement: number;
   fulfilled: boolean;
+  eta: number | undefined;
   capped: boolean;
 }
 
-export function fulfillment(
+export function fulfillmentView(
   state: StateSchema,
-  id: FulfillmentId,
-): FulfillmentItem {
-  const fulfillment = state.fulfillments[id];
+  fulfillment: FulfillmentSchema,
+): FulfillmentItemView {
   return reactive({
     ingredients: Array.from(
       Object.entries(fulfillment.ingredients),
@@ -39,15 +53,9 @@ export function fulfillment(
 
 function ingredient(
   state: StateSchema,
-  key: ResourceId,
-  value: {
-    requirement: number;
-    fulfilled: boolean;
-    eta: number | undefined;
-    capped: boolean;
-  },
+  id: ResourceId,
+  value: IngredientSchema,
 ) {
-  const id = key as ResourceId;
   return reactive({
     id: id,
     label: Meta.resource(id).label,

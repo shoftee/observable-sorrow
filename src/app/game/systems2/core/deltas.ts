@@ -1,8 +1,10 @@
 import { EcsComponent } from "@/app/ecs";
 import {
+  BuildingId,
   FulfillmentId,
   ResourceId,
   SeasonId,
+  TechId,
   WeatherId,
 } from "@/app/interfaces";
 import { HistoryEvent, Countdown } from "../types";
@@ -21,6 +23,25 @@ class Entity<T = unknown> {
 
 type Serializable<T> = {
   [K in keyof T as Exclude<K, (...args: unknown[]) => unknown>]: T[K];
+};
+
+type IngredientSchema = Entity<{
+  requirement: number;
+  fulfilled: boolean;
+  eta: number | undefined;
+  capped: boolean;
+  ingredients: IngredientsSchema;
+}>;
+
+type IngredientsSchema = Partial<{
+  [K in ResourceId]: IngredientSchema;
+}>;
+
+type FulfillmentSchema = {
+  fulfilled: boolean;
+  capped: boolean;
+  unlocked: boolean;
+  ingredients: IngredientsSchema;
 };
 
 type ComponentsSchema = {
@@ -44,18 +65,13 @@ type ComponentsSchema = {
     epochLabel: string;
   }>;
   fulfillments: {
-    [K in FulfillmentId]: Entity<{
-      fulfilled: boolean;
-      capped: boolean;
-      ingredients: Partial<{
-        [K in ResourceId]: Entity<{
-          requirement: number;
-          fulfilled: boolean;
-          eta: number | undefined;
-          capped: boolean;
-        }>;
-      }>;
-    }>;
+    [K in FulfillmentId]: Entity<FulfillmentSchema>;
+  };
+  buildings: {
+    [K in BuildingId]: Entity<{ level: number }>;
+  };
+  techs: {
+    [K in TechId]: Entity<{ researched: boolean }>;
   };
   time: Entity<{
     paused: boolean;

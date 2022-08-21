@@ -4,9 +4,9 @@ import { BuildingId, Intent } from "@/app/interfaces";
 import { BonfireBuildingId, BonfireItemId, Meta } from "@/app/state";
 
 import {
-  FulfillmentItem,
+  FulfillmentItemView,
   EffectItem,
-  fulfillment,
+  fulfillmentView,
   numberView,
 } from "../common";
 import { IStateManager } from "../state-manager";
@@ -23,7 +23,7 @@ export interface BonfireItemView {
   unlocked: boolean;
   level?: number;
 
-  fulfillment: FulfillmentItem;
+  fulfillment: FulfillmentItemView;
   effects?: EffectItem[];
 }
 
@@ -70,7 +70,9 @@ function refineCatnip(state: StateSchema): BonfireItemView {
     flavor: "bonfire.refine-catnip.flavor",
 
     unlocked: true,
-    fulfillment: computed(() => fulfillment(state, "refine-catnip")),
+    fulfillment: computed(() =>
+      fulfillmentView(state, state.fulfillments["refine-catnip"]),
+    ),
   });
 }
 
@@ -78,27 +80,34 @@ function buyBuilding(
   manager: IStateManager,
   id: BonfireBuildingId,
 ): BonfireItemView {
-  const building = Meta.building(id);
-  const state = manager.building(building.id);
+  const meta = Meta.building(id);
+  const fulfillment = manager.state.fulfillments[id];
+  const building = manager.state.buildings[id];
   return reactive({
     id: id,
     intent: {
       kind: "construction",
       id: "buy-building",
-      building: building.id,
+      building: meta.id,
     },
-    label: building.label,
-    description: building.description,
-    flavor: building.flavor,
+    label: meta.label,
+    description: meta.description,
+    flavor: meta.flavor,
 
-    unlocked: computed(() => state.unlocked),
-    level: computed(() => state.level),
-    fulfillment: computed(() => fulfillment(manager.state, building.id)),
-    effects: computed(() => effects(manager, building.id)),
+    unlocked: computed(() => fulfillment.unlocked),
+    level: computed(() => building.level),
+    fulfillment: computed(() => fulfillmentView(manager.state, fulfillment)),
+    effects: computed(() => effectViews(manager, meta.id)),
   });
 }
 
-function effects(manager: IStateManager, buildingId: BuildingId): EffectItem[] {
+function effectViews(
+  manager: IStateManager,
+  buildingId: BuildingId,
+): EffectItem[] {
+  // TODO: Fix effects.
+  return [];
+
   const effects = Meta.building(buildingId).effects;
   return Array.from(effects, (meta) =>
     reactive({

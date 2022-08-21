@@ -3,7 +3,6 @@ import { proxy, releaseProxy, wrap } from "comlink";
 import { Intent, IRootInteractor, OnRenderHandler } from "@/app/interfaces";
 
 import {
-  BonfirePresenter,
   IStateManager,
   NumberFormatter,
   PlayerPresenter,
@@ -18,7 +17,6 @@ export type Endpoint = {
   send(intent: Intent): Promise<void>;
   stateManager: IStateManager;
   presenters: {
-    bonfire: BonfirePresenter;
     formatter: NumberFormatter;
     player: PlayerPresenter;
     science: SciencePresenter;
