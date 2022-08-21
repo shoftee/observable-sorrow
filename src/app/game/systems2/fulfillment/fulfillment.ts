@@ -1,26 +1,27 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   All,
-  ChildrenIterable,
+  ChildrenQuery,
   MapQuery,
   DiffMut,
   Query,
   Read,
   Value,
   With,
-  Parent,
+  ParentQuery,
   Opt,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaRecorder } from "../types";
 
-import * as F from "../types/fulfillments";
-import * as R from "../types/resources";
+import * as F from "./types";
+import * as R from "../resource/types";
+import { cache } from "@/app/utils/collections";
 
-const Q_Id = Value(F.Id);
-const Q_ParentId = Parent(Q_Id);
-const Q_IngredientId = Value(F.Ingredient);
+const Q_Recipe = Value(F.Recipe);
+const Q_ParentRecipe = ParentQuery(Q_Recipe);
+const Q_Resource = Value(F.Resource);
 const Q_FulfillmentMut = DiffMut(F.Fulfillment);
 const Q_CappedMut = DiffMut(F.Capped);
 
@@ -41,23 +42,18 @@ function calculateEta(
   return undefined;
 }
 
-const CalculateFulfillment = System(
-  Query(Q_IngredientId, Value(F.Requirement), Q_FulfillmentMut, Q_CappedMut),
-  Query(
-    Q_FulfillmentMut,
-    Q_CappedMut,
-    ChildrenIterable(Read(F.Fulfillment), Value(F.Capped)),
-  ).filter(With(F.Id)),
+const CalculateIngredientFulfillment = System(
+  Query(Q_Resource, Value(F.Requirement), Q_FulfillmentMut, Q_CappedMut),
   MapQuery(Value(R.Id), All(Value(R.Amount), Opt(Value(R.Capacity)))),
-)((ingredientsQuery, fulfillmentsQuery, resourceQuery) => {
-  const map = resourceQuery.map();
+)((ingredientsQuery, resourcesQuery) => {
+  const resources = cache(() => resourcesQuery.map());
   for (const [
     resource,
     requirement,
     fulfillment,
     capped,
   ] of ingredientsQuery.all()) {
-    const [amount, capacity] = map.get(resource)!;
+    const [amount, capacity] = resources.retrieve().get(resource)!;
     const change = 0; // TODO: need to add this to resources
 
     fulfillment.fulfilled = amount >= requirement;
@@ -70,12 +66,16 @@ const CalculateFulfillment = System(
       capacity !== undefined &&
       requirement > capacity;
   }
+});
 
-  for (const [
-    mainFulfillment,
-    mainCapped,
-    ingredients,
-  ] of fulfillmentsQuery.all()) {
+const CalculateRecipeFulfillment = System(
+  Query(
+    Q_FulfillmentMut,
+    Q_CappedMut,
+    ChildrenQuery(Read(F.Fulfillment), Value(F.Capped)),
+  ).filter(With(F.Recipe)),
+)((query) => {
+  for (const [mainFulfillment, mainCapped, ingredients] of query.all()) {
     let allFulfilled = true;
     let anyCapped = false;
 
@@ -95,16 +95,16 @@ const CalculateFulfillment = System(
 const DeltaRecorders = [
   DeltaRecorder(
     F.Requirement,
-    Q_IngredientId,
-    Q_ParentId,
+    Q_Resource,
+    Q_ParentRecipe,
   )((root, { value: requirement }, [resource, [id]]) => {
     const target = root.fulfillments[id].ingredients[resource]!;
     target.requirement = requirement;
   }),
   DeltaRecorder(
     F.Fulfillment,
-    Q_IngredientId,
-    Q_ParentId,
+    Q_Resource,
+    Q_ParentRecipe,
   )((root, { fulfilled, eta }, [resource, [id]]) => {
     const target = root.fulfillments[id].ingredients[resource]!;
     target.fulfilled = fulfilled;
@@ -112,21 +112,21 @@ const DeltaRecorders = [
   }),
   DeltaRecorder(
     F.Capped,
-    Q_IngredientId,
-    Q_ParentId,
+    Q_Resource,
+    Q_ParentRecipe,
   )((root, { value: capped }, [resource, [id]]) => {
     const target = root.fulfillments[id].ingredients[resource]!;
     target.capped = capped;
   }),
   DeltaRecorder(
     F.Fulfillment,
-    Q_Id,
+    Q_Recipe,
   )((root, { fulfilled }, [id]) => {
     root.fulfillments[id].fulfilled = fulfilled;
   }),
   DeltaRecorder(
     F.Capped,
-    Q_Id,
+    Q_Recipe,
   )((root, { value: capped }, [id]) => {
     root.fulfillments[id].capped = capped;
   }),
@@ -135,7 +135,7 @@ const DeltaRecorders = [
 export class FulfillmentResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
-      .addSystem(CalculateFulfillment)
+      .addSystems([CalculateIngredientFulfillment, CalculateRecipeFulfillment])
       .addSystems(DeltaRecorders, { stage: "last-start" });
   }
 }

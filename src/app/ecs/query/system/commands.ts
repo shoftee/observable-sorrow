@@ -43,7 +43,7 @@ class EntityCommands {
     return this;
   }
 
-  asParent(fn: (parent: EcsEntity) => void): EntityCommands {
+  entity(fn: (entity: EcsEntity) => void): EntityCommands {
     this.world.defer((world) => {
       const entity = this.ensureSpawned(world);
       fn(entity);

@@ -11,8 +11,9 @@ import {
   Without,
   Opt,
   Value,
-  Parent,
-  Children,
+  ParentQuery,
+  ChildrenQuery,
+  Eager,
 } from "@/app/ecs/query";
 import { QueryDescriptor } from "@/app/ecs/query/types";
 
@@ -231,27 +232,33 @@ describe("ecs query", () => {
       }
     }
 
-    describe("query parents", () => {
-      it("returns parent if present", () => {
+    describe("ParentQuery", () => {
+      it("returns parent", () => {
         world.hierarchy.link(
           world.spawn(new Id("shoftee"), new Player(20, 123)),
           [world.spawn(new Item("potion", 10))],
         );
 
-        const query = All(Read(Item), Parent(Value(Id), Read(Player)));
+        const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
-        const entries = Array.from(results(world, query));
-        expect(entries).to.deep.equal([
-          [
-            { itemId: "potion", count: 10 },
-            ["shoftee", { level: 20, exp: 123 }],
-          ],
+        expect(single(results(world, query))).to.deep.equal([
+          { itemId: "potion", count: 10 },
+          ["shoftee", { level: 20, exp: 123 }],
         ]);
       });
+      it("excludes entities without parents", () => {
+        world.spawn(new Item("potion", 10));
+
+        const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
+        world.queries.register(query);
+
+        expect(results(world, query)).to.be.empty;
+      });
     });
-    describe("query children", () => {
-      it("returns children or empty", () => {
+
+    describe("ChildrenQuery", () => {
+      it("returns children", () => {
         world.hierarchy.link(
           world.spawn(new Id("shoftee"), new Player(20, 123)),
           [
@@ -260,19 +267,36 @@ describe("ecs query", () => {
           ],
         );
 
-        const query = All(Value(Id), Read(Player), Children(Read(Item)));
+        const query = All(
+          Value(Id),
+          Read(Player),
+          Eager(ChildrenQuery(Read(Item))),
+        );
         world.queries.register(query);
 
-        const entries = Array.from(results(world, query));
-        expect(entries).to.deep.equal([
+        expect(single(results(world, query))).to.deep.equal([
+          "shoftee",
+          { level: 20, exp: 123 },
           [
-            "shoftee",
-            { level: 20, exp: 123 },
-            [
-              [{ itemId: "potion", count: 10 }],
-              [{ itemId: "random junk", count: 9999 }],
-            ],
+            [{ itemId: "potion", count: 10 }],
+            [{ itemId: "random junk", count: 9999 }],
           ],
+        ]);
+      });
+      it("returns empty list", () => {
+        world.spawn(new Id("shoftee"), new Player(20, 123));
+
+        const query = All(
+          Value(Id),
+          Read(Player),
+          Eager(ChildrenQuery(Read(Item))),
+        );
+        world.queries.register(query);
+
+        expect(single(results(world, query))).to.deep.equal([
+          "shoftee",
+          { level: 20, exp: 123 },
+          [],
         ]);
       });
     });

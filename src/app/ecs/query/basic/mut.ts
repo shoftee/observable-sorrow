@@ -1,7 +1,7 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { ChangeTicks, EcsComponent } from "@/app/ecs";
-import { InstantiatedQuery, QueryDescriptor } from "../types";
+import { defaultQuery, InstantiatedQuery, QueryDescriptor } from "../types";
 
 type Mut<C extends EcsComponent> = QueryDescriptor<C>;
 
@@ -9,11 +9,11 @@ type Mut<C extends EcsComponent> = QueryDescriptor<C>;
 export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
     newQuery({ ticks }): InstantiatedQuery<C> {
-      return {
-        includes: ({ archetype }) => {
+      return defaultQuery({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        fetch: ({ archetype }) => {
+        fetch({ archetype }) {
           const component = archetype.get(ctor)!;
           return new Proxy(component as C, {
             set(target, propertKey, receiver) {
@@ -26,7 +26,7 @@ export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
             },
           });
         },
-      };
+      });
     },
   };
 }
@@ -35,11 +35,11 @@ export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
 export function DiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
     newQuery({ ticks }): InstantiatedQuery<C> {
-      return {
-        includes: ({ archetype }) => {
+      return defaultQuery({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        fetch: ({ archetype }) => {
+        fetch({ archetype }) {
           const component = archetype.get(ctor)!;
           return new Proxy(component as C, {
             set(target, key, value, receiver) {
@@ -57,7 +57,7 @@ export function DiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
             },
           });
         },
-      };
+      });
     },
   };
 }

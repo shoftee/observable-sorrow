@@ -1,11 +1,11 @@
 import { expect } from "chai";
 
 import { EcsComponent, ValueComponent, World } from "@/app/ecs";
-
 import {
   ChangeTrackers,
-  ChildrenIterable,
+  ChildrenQuery,
   Commands,
+  Eager,
   Mut,
   Query,
   Read,
@@ -100,13 +100,13 @@ describe("ecs systems", () => {
       const world = new World();
 
       const Setup = System(Commands())((cmds) => {
-        cmds.spawn(new Id("mage"), new Player(20)).asParent((parent) => {
-          cmds.spawnChild(parent, new ItemStack("Health Potion", 5));
-          cmds.spawnChild(parent, new ItemStack("Mana Potion", 20));
+        cmds.spawn(new Id("mage"), new Player(20)).entity((e) => {
+          cmds.spawnChild(e, new ItemStack("Health Potion", 5));
+          cmds.spawnChild(e, new ItemStack("Mana Potion", 20));
         });
-        cmds.spawn(new Id("brawler"), new Player(10)).asParent((parent) => {
-          cmds.spawnChild(parent, new ItemStack("Health Potion", 10));
-          cmds.spawnChild(parent, new ItemStack("Mana Potion", 15));
+        cmds.spawn(new Id("brawler"), new Player(10)).entity((e) => {
+          cmds.spawnChild(e, new ItemStack("Health Potion", 10));
+          cmds.spawnChild(e, new ItemStack("Mana Potion", 15));
         });
       });
       const setupInstance = Setup.build(world);
@@ -114,12 +114,9 @@ describe("ecs systems", () => {
       world.flush();
 
       const HierarchyChecker = System(
-        Query(Value(Id), Read(Player), ChildrenIterable(Read(ItemStack))),
+        Query(Value(Id), Read(Player), Eager(ChildrenQuery(Read(ItemStack)))),
       )((query) => {
-        const results = Array.from(query.all(), ([id, player, children]) => {
-          return [id, player, Array.from(children)];
-        });
-        expect(results).to.deep.equal([
+        expect(Array.from(query.all())).to.deep.equal([
           [
             "mage",
             { level: 20 },

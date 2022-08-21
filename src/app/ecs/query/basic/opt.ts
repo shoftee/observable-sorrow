@@ -1,4 +1,4 @@
-import { QueryDescriptor } from "../types";
+import { defaultQuery, QueryDescriptor } from "../types";
 
 type Opt<F> = QueryDescriptor<F | undefined>;
 /**
@@ -11,15 +11,14 @@ export function Opt<F>(query: QueryDescriptor<F>): Opt<F> {
   return {
     newQuery(world) {
       const inner = query.newQuery(world);
-      return {
-        fetch: (ctx) => {
-          if (inner.includes?.(ctx) ?? true) {
-            return inner.fetch(ctx);
-          } else {
-            return undefined;
-          }
+      return defaultQuery({
+        fetch(ctx) {
+          return inner.includes(ctx) ? inner.fetch(ctx) : undefined;
         },
-      };
+        cleanup() {
+          inner.cleanup();
+        },
+      });
     },
   };
 }

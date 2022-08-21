@@ -1,11 +1,15 @@
 import { cache } from "@/app/utils/collections";
-import { Enumerable } from "@/app/utils/enumerable";
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { EcsComponent, EcsEntity, World } from "@/app/ecs";
+import { EcsComponent, EcsEntity } from "@/app/ecs";
 
 import { All, AllParams, AllResults, Entity, MapQuery, With } from "..";
-import { FilterDescriptor, QueryDescriptor } from "../types";
+import {
+  defaultFilter,
+  defaultQuery,
+  FilterDescriptor,
+  QueryDescriptor,
+} from "../types";
 
 type WithParent = FilterDescriptor;
 export function WithParent(...ctors: Ctor<EcsComponent>[]): WithParent {
@@ -15,7 +19,7 @@ export function WithParent(...ctors: Ctor<EcsComponent>[]): WithParent {
       queries.register(descriptor);
       const parentsQuery = queries.get(descriptor);
 
-      return {
+      return defaultFilter({
         matches({ entity }) {
           const parent = hierarchy.parentOf(entity);
           return !!parent && parentsQuery.has(parent);
@@ -23,103 +27,99 @@ export function WithParent(...ctors: Ctor<EcsComponent>[]): WithParent {
         cleanup() {
           parentsQuery.cleanup();
         },
-      };
+      });
     },
   };
 }
 
-export function ChildrenIterable<Q extends AllParams>(
-  ...qs: Q
-): QueryDescriptor<Iterable<AllResults<Q>>> {
-  const mapQuery = MapQuery(Entity(), All(...qs));
+type Parent = QueryDescriptor<EcsEntity>;
+export function Parent(): Parent {
   return {
-    newQuery(world) {
-      const fetcher = mapQuery.create(world);
-      const lookup = cache(() => {
-        return fetcher.fetch().map();
-      });
-
-      return {
-        fetch({ entity }) {
-          return iterateChildResults(world, entity, lookup.retrieve());
-        },
-        cleanup() {
-          lookup.invalidate();
-          fetcher.cleanup?.();
-        },
-      };
-    },
-  };
-}
-
-export function Children<Q extends AllParams>(
-  ...qs: Q
-): QueryDescriptor<AllResults<Q>[]> {
-  const mapQuery = MapQuery(Entity(), All(...qs));
-  return {
-    newQuery(world) {
-      const fetcher = mapQuery.create(world);
-      const lookup = cache(() => {
-        return fetcher.fetch().map();
-      });
-
-      return {
-        fetch({ entity }) {
-          return iterateChildResults(
-            world,
-            entity,
-            lookup.retrieve(),
-          ).toArray();
-        },
-        cleanup() {
-          lookup.invalidate();
-          fetcher.cleanup?.();
-        },
-      };
-    },
-  };
-}
-
-type Parent<Q extends AllParams> = QueryDescriptor<AllResults<Q>>;
-export function Parent<Q extends AllParams>(...qs: Q): Parent<Q> {
-  const mapQuery = MapQuery(Entity(), All(...qs));
-  return {
-    newQuery(world) {
-      const fetcher = mapQuery.create(world);
-      const lookup = cache(() => {
-        return fetcher.fetch().map();
-      });
-
-      return {
+    newQuery({ hierarchy }) {
+      return defaultQuery({
         includes({ entity }) {
-          return !!parentOf(world, entity);
+          return hierarchy.hasParent(entity);
+        },
+        fetch({ entity }) {
+          return hierarchy.parentOf(entity)!;
+        },
+      });
+    },
+  };
+}
+
+type ParentQuery<Q extends AllParams> = QueryDescriptor<AllResults<Q>>;
+export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
+  const mapQuery = MapQuery(Entity(), All(...qs));
+  return {
+    newQuery(world) {
+      const { hierarchy } = world;
+      const fetcher = mapQuery.create(world);
+      const lookup = cache(() => {
+        return fetcher.fetch().map();
+      });
+
+      return defaultQuery({
+        includes({ entity }) {
+          return hierarchy.hasParent(entity);
         },
         matches({ entity }) {
-          const parent = parentOf(world, entity);
-          return !!parent && lookup.retrieve().has(parent);
+          const parent = hierarchy.parentOf(entity)!;
+          return lookup.retrieve().has(parent);
         },
         fetch({ entity }) {
-          const parent = parentOf(world, entity)!;
+          const parent = hierarchy.parentOf(entity)!;
           return lookup.retrieve().get(parent)!;
         },
         cleanup() {
           lookup.invalidate();
           fetcher.cleanup?.();
         },
-      };
+      });
     },
   };
 }
 
-function parentOf(world: World, child: EcsEntity) {
-  return world.hierarchy.parentOf(child);
+type Children = QueryDescriptor<Iterable<EcsEntity>>;
+export function Children(): Children {
+  return {
+    newQuery({ hierarchy }) {
+      return defaultQuery({
+        fetch({ entity }) {
+          return hierarchy.childrenOf(entity);
+        },
+      });
+    },
+  };
 }
 
-function iterateChildResults<Q extends AllParams>(
-  world: World,
-  parent: EcsEntity,
-  lookup: ReadonlyMap<EcsEntity, AllResults<Q>>,
-) {
-  const children = world.hierarchy.childrenOf(parent);
-  return new Enumerable(children).filterMap((child) => lookup.get(child));
+type ChildrenQuery<Q extends AllParams> = QueryDescriptor<
+  Iterable<AllResults<Q>>
+>;
+export function ChildrenQuery<Q extends AllParams>(...qs: Q): ChildrenQuery<Q> {
+  const mapQuery = MapQuery(Entity(), All(...qs));
+  return {
+    newQuery(world) {
+      const fetcher = mapQuery.create(world);
+      const lookupCache = cache(() => {
+        return fetcher.fetch().map();
+      });
+
+      return defaultQuery({
+        *fetch({ entity }) {
+          const lookup = lookupCache.retrieve();
+          for (const child of world.hierarchy.childrenOf(entity)) {
+            const results = lookup.get(child);
+            if (results) {
+              yield results;
+            }
+          }
+        },
+        cleanup() {
+          lookupCache.invalidate();
+          fetcher.cleanup?.();
+        },
+      });
+    },
+  };
 }

@@ -1,5 +1,5 @@
 import { EcsEntity } from "@/app/ecs";
-import { QueryDescriptor } from "../types";
+import { defaultQuery, QueryDescriptor } from "../types";
 
 type EntityQuery = QueryDescriptor<Readonly<EcsEntity>>;
 
@@ -7,11 +7,11 @@ type EntityQuery = QueryDescriptor<Readonly<EcsEntity>>;
 export function Entity(): EntityQuery {
   return {
     newQuery() {
-      return {
+      return defaultQuery({
         fetch({ entity }) {
           return entity;
         },
-      };
+      });
     },
   };
 }

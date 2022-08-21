@@ -7,6 +7,7 @@ import {
   FilterDescriptor,
   InstantiatedFilter,
   InstantiatedQuery,
+  defaultFilter,
 } from "../types";
 
 export type AllParams = [...QueryDescriptor[]];
@@ -36,17 +37,17 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
 
     return {
       includes(ctx) {
-        return all(filterIterator(), (f) => f.includes?.(ctx) ?? true);
+        return all(filterIterator(), (f) => f.includes(ctx));
       },
       matches(ctx) {
-        return all(filterIterator(), (f) => f.matches?.(ctx) ?? true);
+        return all(filterIterator(), (f) => f.matches(ctx));
       },
       fetch(ctx) {
         return queries.map((q) => q.fetch(ctx)) as AllResults<Q>;
       },
       cleanup() {
-        queries.forEach((q) => q.cleanup?.());
-        filters?.forEach((f) => f.cleanup?.());
+        queries.forEach((q) => q.cleanup());
+        filters?.forEach((f) => f.cleanup());
       },
     };
   }
@@ -66,11 +67,11 @@ type With = FilterDescriptor;
 export function With(...ctors: Ctor<EcsComponent>[]): With {
   return {
     newFilter(): InstantiatedFilter {
-      return {
-        includes: ({ archetype }) => {
+      return defaultFilter({
+        includes({ archetype }) {
           return all(ctors, (ctor) => archetype.has(ctor));
         },
-      };
+      });
     },
   };
 }
@@ -79,11 +80,11 @@ type Without = FilterDescriptor;
 export function Without(...ctors: Ctor<EcsComponent>[]): Without {
   return {
     newFilter(): InstantiatedFilter {
-      return {
-        includes: ({ archetype }) => {
+      return defaultFilter({
+        includes({ archetype }) {
           return all(ctors, (ctor) => !archetype.has(ctor));
         },
-      };
+      });
     },
   };
 }

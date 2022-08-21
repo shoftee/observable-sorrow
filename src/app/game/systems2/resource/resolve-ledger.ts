@@ -3,7 +3,7 @@ import { DiffMut, Opt, Query, Read, Value } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaRecorder, Unlocked } from "../types";
-import * as R from "../types/resources";
+import * as R from "./types";
 
 const ProcessLedger = System(
   Query(DiffMut(R.Amount), Opt(Value(R.Capacity)), Read(R.LedgerEntry)),

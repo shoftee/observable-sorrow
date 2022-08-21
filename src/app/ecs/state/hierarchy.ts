@@ -41,6 +41,10 @@ export class HierarchyState {
     return this.parentsLookup.get(child);
   }
 
+  hasParent(child: EcsEntity): boolean {
+    return this.parentsLookup.has(child);
+  }
+
   childrenOf(parent: EcsEntity): ReadonlySet<EcsEntity> {
     return this.childrenLookup.entriesForKey(parent);
   }

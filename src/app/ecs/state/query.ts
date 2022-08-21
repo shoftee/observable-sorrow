@@ -54,17 +54,9 @@ type CachedResult = {
 };
 
 class FetchCache<F = unknown> {
-  private readonly query;
   private readonly entries = new Map<EcsEntity, CachedResult>();
 
-  constructor(query: InstantiatedQuery<F>) {
-    this.query = {
-      fetch: query.fetch,
-      includes: query.includes ?? (() => true),
-      matches: query.matches ?? (() => true),
-      cleanup: query.cleanup ?? (() => undefined),
-    };
-  }
+  constructor(private readonly query: InstantiatedQuery<F>) {}
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.includes({ entity, archetype })) {

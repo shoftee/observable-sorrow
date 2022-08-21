@@ -36,13 +36,43 @@ export type FetchContext<C extends EcsComponent = EcsComponent> = {
 };
 
 export interface InstantiatedFilter {
-  includes?(ctx: FetchContext): boolean;
-  matches?(ctx: FetchContext): boolean;
-  cleanup?(): void;
+  includes(ctx: FetchContext): boolean;
+  matches(ctx: FetchContext): boolean;
+  cleanup(): void;
 }
 
-export interface InstantiatedQuery<QueryResult> extends InstantiatedFilter {
+interface Fetch<QueryResult> {
   fetch(ctx: FetchContext): QueryResult;
+}
+
+export interface InstantiatedQuery<QueryResult>
+  extends InstantiatedFilter,
+    Fetch<QueryResult> {}
+
+function alwaysTrue() {
+  return true;
+}
+function noOp() {
+  return;
+}
+
+type SimpleFilter = Partial<InstantiatedFilter>;
+export function defaultFilter(
+  inner: Partial<SimpleFilter>,
+): InstantiatedFilter {
+  inner.includes ?? (inner.includes = alwaysTrue);
+  inner.matches ?? (inner.matches = alwaysTrue);
+  inner.cleanup ?? (inner.cleanup = noOp);
+  return inner as InstantiatedFilter;
+}
+
+type SimpleQuery<QueryResult> = Partial<InstantiatedFilter> &
+  Fetch<QueryResult>;
+export function defaultQuery<QueryResult>(
+  inner: SimpleQuery<QueryResult>,
+): InstantiatedQuery<QueryResult> {
+  defaultFilter(inner);
+  return inner as InstantiatedQuery<QueryResult>;
 }
 
 export abstract class FilterDescriptor {

@@ -3,7 +3,7 @@ import { ChangeTrackers, Mut, Query, With } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { Unlocked } from "./types";
-import * as R from "./types/resources";
+import * as R from "./resource/types";
 
 const UnlockResources = System(
   Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(

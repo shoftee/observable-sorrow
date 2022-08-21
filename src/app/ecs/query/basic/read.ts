@@ -1,22 +1,22 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, ValueComponent } from "@/app/ecs";
-import { InstantiatedQuery, QueryDescriptor } from "../types";
+import { defaultQuery, InstantiatedQuery, QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
 
 /** Include a read-only view of a component in the query results. */
 export function Read<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
   return {
-    newQuery(): InstantiatedQuery<Readonly<C>> {
-      return {
-        includes: ({ archetype }) => {
+    newQuery() {
+      return defaultQuery({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        fetch: ({ archetype }) => {
+        fetch({ archetype }) {
           return archetype.get(ctor)! as C;
         },
-      };
+      });
     },
   };
 }
@@ -31,15 +31,15 @@ export function Value<C extends ValueComponent>(
 ): QueryDescriptor<Value<C>> {
   return {
     newQuery(): InstantiatedQuery<Value<C>> {
-      return {
-        includes: ({ archetype }) => {
+      return defaultQuery({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        fetch: ({ archetype }) => {
+        fetch({ archetype }) {
           const entry = archetype.get(ctor)! as C;
           return entry.value as Value<C>;
         },
-      };
+      });
     },
   };
 }

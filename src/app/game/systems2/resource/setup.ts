@@ -4,7 +4,7 @@ import { System } from "@/app/ecs/system";
 import { ResourceMetadataType, UnlockMode, Meta } from "@/app/state";
 
 import { Unlocked } from "../types";
-import * as R from "../types/resources";
+import * as R from "./types";
 
 function* componentsFromMeta(
   meta: ResourceMetadataType,

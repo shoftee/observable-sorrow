@@ -5,7 +5,7 @@ import { System } from "@/app/ecs/system";
 import { Ledger, ResourceMap } from "@/app/state";
 import { cache } from "@/app/utils/collections";
 
-import * as R from "../types/resources";
+import * as R from "./types";
 import * as events from "../types/events";
 
 const ProcessResourceOrders = System(

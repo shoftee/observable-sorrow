@@ -1,7 +1,12 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { ChangeTicks, EcsComponent } from "@/app/ecs";
-import { FilterDescriptor, QueryDescriptor } from "../types";
+import {
+  defaultFilter,
+  defaultQuery,
+  FilterDescriptor,
+  QueryDescriptor,
+} from "../types";
 
 type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;
@@ -16,15 +21,15 @@ export function ChangeTrackers<C extends EcsComponent>(
 ): ChangeTrackers<C> {
   return {
     newQuery({ ticks }) {
-      return {
-        includes: ({ archetype }) => {
+      return defaultQuery({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        fetch: ({ archetype }) => {
+        fetch({ archetype }) {
           const component = archetype.get(ctor)!;
           return createTracker(component as C, ticks.last, ticks.current);
         },
-      };
+      });
     },
   };
 }
@@ -54,15 +59,15 @@ type Added = FilterDescriptor;
 export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
   return {
     newFilter({ ticks }) {
-      return {
-        includes: ({ archetype }) => {
+      return defaultFilter({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        matches: ({ archetype }) => {
+        matches({ archetype }) {
           const component = archetype.get(ctor)!;
           return component[ChangeTicks].isAdded(ticks.last, ticks.current);
         },
-      };
+      });
     },
   };
 }
@@ -71,15 +76,15 @@ type Changed = FilterDescriptor;
 export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
   return {
     newFilter({ ticks }) {
-      return {
-        includes: ({ archetype }) => {
+      return defaultFilter({
+        includes({ archetype }) {
           return archetype.has(ctor);
         },
-        matches: ({ archetype }) => {
+        matches({ archetype }) {
           const component = archetype.get(ctor)!;
           return component[ChangeTicks].isChanged(ticks.last, ticks.current);
         },
-      };
+      });
     },
   };
 }
