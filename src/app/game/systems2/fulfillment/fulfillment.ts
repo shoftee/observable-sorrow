@@ -11,7 +11,6 @@ import {
   Value,
   ParentQuery,
   Opt,
-  Any,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -65,9 +64,16 @@ const CalculateRecipeFulfillment = System(
     Q_FulfillmentMut,
     Q_CappedMut,
     ChildrenQuery(Read(F.Fulfillment), Value(F.Capped)),
-  ).filter(Any(F.Recipe, F.Building)),
+  ),
 )((query) => {
-  for (const [mainFulfillment, mainCapped, ingredients] of query.all()) {
+  for (const [mainFulfillment, mainCapped, ingredientsQuery] of query.all()) {
+    // this logic only applies to 'composite' fulfillments
+    // skip it when they have no ingredients
+    const ingredients = Array.from(ingredientsQuery);
+    if (ingredients.length === 0) {
+      continue;
+    }
+
     let allFulfilled = true;
     let anyCapped = false;
 
@@ -77,7 +83,6 @@ const CalculateRecipeFulfillment = System(
     }
 
     mainFulfillment.fulfilled = allFulfilled;
-
     // if the whole thing is fulfilled, it's automatically non-capped
     // this is done to handle overcapped resources correctly
     mainCapped.value = !allFulfilled && anyCapped;
