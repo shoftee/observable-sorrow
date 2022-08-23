@@ -14,10 +14,13 @@ import {
 } from "./resource";
 import {
   BuildingSetupPlugin,
+  BuildingOrderPlugin,
   BuildingResolutionPlugin,
   FulfillmentSetupPlugin,
   FulfillmentResolutionPlugin,
 } from "./fulfillment";
+
+import { AggregateBuildingUnlocks } from "./core/unlock";
 
 export function build(onRender: OnRenderHandler): GameRunner {
   return new App()
@@ -26,12 +29,14 @@ export function build(onRender: OnRenderHandler): GameRunner {
     .addPlugin(new BuildingSetupPlugin())
     .addPlugin(new FulfillmentSetupPlugin())
     .addPlugin(new TimePlugin())
-    .addPlugin(new ResourceOrderPlugin())
     .addPlugin(new EnvironmentPlugin())
     .addPlugin(new AstronomyPlugin())
+    .addPlugin(new ResourceOrderPlugin())
+    .addPlugin(new BuildingOrderPlugin())
     .addPlugin(new ResourceResolutionPlugin())
     .addPlugin(new BuildingResolutionPlugin())
     .addPlugin(new FulfillmentResolutionPlugin())
+    .addSystem(AggregateBuildingUnlocks)
     .addPlugin(new RendererPlugin(onRender))
     .buildRunner();
 }

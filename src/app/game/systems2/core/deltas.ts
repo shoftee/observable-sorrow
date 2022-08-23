@@ -37,16 +37,9 @@ type IngredientsSchema = Partial<{
   [K in ResourceId]: IngredientSchema;
 }>;
 
-type FulfillmentSchema = {
-  fulfilled: boolean;
-  capped: boolean;
-  unlocked: boolean;
-  ingredients: IngredientsSchema;
-};
-
 type ComponentsSchema = {
   countdowns: {
-    rareEvent: Entity<Component<Countdown>>;
+    rareEvent?: Entity<Component<Countdown>>;
   };
   resources: {
     [K in ResourceId]: Entity<{
@@ -65,13 +58,22 @@ type ComponentsSchema = {
     epochLabel: string;
   }>;
   fulfillments: {
-    [K in FulfillmentId]: Entity<FulfillmentSchema>;
+    [K in FulfillmentId]: Entity<{
+      fulfilled: boolean;
+      capped: boolean;
+      unlocked: boolean;
+      ingredients: IngredientsSchema;
+    }>;
   };
   buildings: {
-    [K in BuildingId]: Entity<{ level: number }>;
+    [K in BuildingId]: Entity<{
+      level: number;
+    }>;
   };
   techs: {
-    [K in TechId]: Entity<{ researched: boolean }>;
+    [K in TechId]: Entity<{
+      researched: boolean;
+    }>;
   };
   time: Entity<{
     paused: boolean;

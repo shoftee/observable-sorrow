@@ -43,7 +43,7 @@ import {
   removeState,
   StateSchema,
 } from "@/app/game/systems2/core";
-import { ComponentDeltas } from "@/app/game/systems2/types";
+import { ComponentDeltas } from "@/app/game/systems2/core/renderer";
 
 export interface IStateManager {
   state: StateSchema;

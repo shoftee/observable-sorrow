@@ -2,10 +2,12 @@ import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
 import { PluginApp, EcsPlugin } from "@/app/ecs";
-import { Commands, DiffMut, Query, Read, Every } from "@/app/ecs/query";
+import { Commands, Query, Read, Every, Mut } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { Timer, DeltaRecorder } from "./types";
+import { DeltaExtractor } from "./core/renderer";
+
+import { Timer } from "./types";
 import * as E from "./types/environment";
 
 const Setup = System(Commands())((cmds) => {
@@ -28,38 +30,47 @@ const NextSeasonMap: Record<SeasonId, SeasonId> = {
 
 const AdvanceCalendar = System(
   Query(Read(Timer)).filter(Every(E.DayTimer)),
-  Query(DiffMut(E.Day), DiffMut(E.Season), DiffMut(E.Year)),
+  Query(Mut(E.Day), Mut(E.Season), Mut(E.Year)),
 )((timerQuery, calendarQuery) => {
   const [days] = timerQuery.single();
   const [day, season, year] = calendarQuery.single();
   if (days.isNewTick) {
-    day.value += 1;
-    if (day.value >= TimeConstants.DaysPerSeason) {
+    const newDay = day.value + 1;
+    if (newDay < TimeConstants.DaysPerSeason) {
+      // new day
+      day.value = newDay;
+    } else {
+      // new season
       day.value = 0;
-      season.value = NextSeasonMap[season.value];
-      if (season.value === "spring") {
+      const newSeason = NextSeasonMap[season.value];
+      season.value = newSeason;
+
+      if (newSeason === "spring") {
+        // new year
         year.value++;
       }
     }
   }
 });
 
+const CalendarRecorder = DeltaExtractor()((schema) => schema.calendar);
+
 const DeltaRecorders = [
-  DeltaRecorder(E.Day)((root, { value: day }) => {
-    root.calendar.day = day;
+  CalendarRecorder(E.Day, (calendar, { value: day }) => {
+    calendar.day = day;
   }),
-  DeltaRecorder(E.Season)((root, { value: season }) => {
-    root.calendar.season = season;
+  CalendarRecorder(E.Season, (calendar, { value: season }) => {
+    calendar.season = season;
   }),
-  DeltaRecorder(E.Year)((root, { value: year }) => {
-    root.calendar.year = year;
+  CalendarRecorder(E.Year, (calendar, { value: year }) => {
+    calendar.year = year;
   }),
-  DeltaRecorder(E.Weather)((root, { value: weather }) => {
-    root.calendar.weather = weather;
+  CalendarRecorder(E.Weather, (calendar, { value: weather }) => {
+    calendar.weather = weather;
   }),
-  DeltaRecorder(E.Labels)((root, { dateLabel, epochLabel }) => {
-    root.calendar.dateLabel = dateLabel;
-    root.calendar.epochLabel = epochLabel;
+  CalendarRecorder(E.Labels, (calendar, { dateLabel, epochLabel }) => {
+    calendar.dateLabel = dateLabel;
+    calendar.epochLabel = epochLabel;
   }),
 ];
 

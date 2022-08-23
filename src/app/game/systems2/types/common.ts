@@ -21,7 +21,7 @@ export class PriceRatio extends ValueComponent<number> {
   }
 }
 
-export class UnlockOnEffect extends ValueComponent<BooleanEffectId> {
+export class BooleanEffect extends ValueComponent<BooleanEffectId> {
   constructor(readonly value: BooleanEffectId) {
     super();
   }

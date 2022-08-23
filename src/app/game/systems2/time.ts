@@ -1,22 +1,12 @@
 import { round } from "@/app/utils/mathx";
 
 import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
-import {
-  Commands,
-  Query,
-  Mut,
-  Every,
-  Receive,
-  Read,
-  DiffMut,
-} from "@/app/ecs/query";
+import { Commands, Query, Mut, Receive, Read, DiffMut } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaRecorder, TimeOptions, Timer } from "./types";
+import { DeltaExtractor } from "./core/renderer";
+import { TimeOptions, Timer } from "./types";
 import * as events from "./types/events";
-
-const Marker = class extends EcsComponent {};
-const F_Marker = Every(Marker);
 
 class DeltaTime extends EcsComponent {
   last?: number;
@@ -24,12 +14,12 @@ class DeltaTime extends EcsComponent {
 }
 
 const Setup = System(Commands())((cmds) => {
-  cmds.spawn(new Marker(), new DeltaTime(), new TimeOptions());
+  cmds.spawn(new DeltaTime(), new TimeOptions());
 });
 
 const HandleOptionsChanged = System(
   Receive(events.TimeOptionsChanged),
-  Query(DiffMut(TimeOptions)).filter(F_Marker),
+  Query(DiffMut(TimeOptions)),
 )((events, optionsQuery) => {
   const [options] = optionsQuery.single();
   for (const { intent } of events.pull()) {
@@ -47,23 +37,23 @@ const HandleOptionsChanged = System(
   }
 });
 
-const UpdateGameTime = System(
-  Query(Mut(DeltaTime), Read(TimeOptions)).filter(F_Marker),
-)((query) => {
-  const [time, options] = query.single();
+const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeOptions)))(
+  (query) => {
+    const [time, options] = query.single();
 
-  const now = Date.now();
+    const now = Date.now();
 
-  // game paused <=> delta is 0
-  const speed = options.paused ? 0 : Math.pow(10, options.power);
-  // calculate system time delta
-  time.delta = (now - (time.last ?? now)) * speed;
+    // game paused <=> delta is 0
+    const speed = options.paused ? 0 : Math.pow(10, options.power);
+    // calculate system time delta
+    time.delta = (now - (time.last ?? now)) * speed;
 
-  time.last = now;
-});
+    time.last = now;
+  },
+);
 
 const AdvanceTimers = System(
-  Query(Read(DeltaTime)).filter(F_Marker),
+  Query(Read(DeltaTime)),
   Query(DiffMut(Timer)),
 )((timeQuery, timerQuery) => {
   const [{ delta }] = timeQuery.single();
@@ -88,8 +78,11 @@ const AdvanceTimers = System(
   }
 });
 
-const TrackTime = DeltaRecorder(TimeOptions)((root, options) => {
-  root.time = options;
+const TimeRecorder = DeltaExtractor()((schema) => schema.time);
+
+const TrackTime = TimeRecorder(TimeOptions, (time, options) => {
+  time.paused = options.paused;
+  time.power = options.power;
 });
 
 export class TimePlugin extends EcsPlugin {

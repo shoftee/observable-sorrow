@@ -1,4 +1,4 @@
-import { ComponentDeltas } from "@/app/game/systems2/types";
+import { ComponentDeltas } from "@/app/game/systems2/core/renderer";
 
 import { EventId, Intent, PoolId } from ".";
 

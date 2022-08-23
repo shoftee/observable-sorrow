@@ -1,7 +1,7 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, ValueComponent } from "@/app/ecs";
-import { defaultQuery, InstantiatedQuery, QueryDescriptor } from "../types";
+import { defaultQuery, QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
 
@@ -30,7 +30,7 @@ export function Value<C extends ValueComponent>(
   ctor: Ctor<C>,
 ): QueryDescriptor<Value<C>> {
   return {
-    newQuery(): InstantiatedQuery<Value<C>> {
+    newQuery() {
       return defaultQuery({
         includes({ archetype }) {
           return archetype.has(ctor);

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { DeltaBuffer } from "@/app/game/systems2/types";
+import { ChangeTicks, ComponentTicks } from "@/app/ecs";
 
 import {
   addState,
@@ -9,7 +9,7 @@ import {
   DeltaSchema,
   removeState,
 } from "@/app/game/systems2/core";
-import { ChangeTicks, ComponentTicks } from "@/app/ecs";
+import { DeltaBuffer } from "@/app/game/systems2/core/renderer";
 
 describe("delta merge", () => {
   describe("addState", () => {

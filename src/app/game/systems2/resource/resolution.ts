@@ -11,7 +11,9 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaRecorder, Resource, Unlocked } from "../types";
+import { DeltaExtractor } from "../core/renderer";
+import { Resource, Unlocked } from "../types/common";
+
 import * as R from "./types";
 
 const ProcessLedger = System(
@@ -68,18 +70,16 @@ const UnlockResources = System(
   }
 });
 
-const DeltaRecorders = [
-  DeltaRecorder(
-    R.Amount,
-    Value(Resource),
-  )((root, { value: amount }, [id]) => {
-    root.resources[id].amount = amount;
+const ResourceExtractor = DeltaExtractor(Value(Resource))(
+  (schema, [id]) => schema.resources[id],
+);
+
+const DeltaExtractors = [
+  ResourceExtractor(R.Amount, (resource, { value: amount }) => {
+    resource.amount = amount;
   }),
-  DeltaRecorder(
-    Unlocked,
-    Value(Resource),
-  )((root, { value: unlocked }, [id]) => {
-    root.resources[id].unlocked = unlocked;
+  ResourceExtractor(Unlocked, (resource, { value: unlocked }) => {
+    resource.unlocked = unlocked;
   }),
 ];
 
@@ -95,7 +95,7 @@ export class ResourceResolutionPlugin extends EcsPlugin {
     app
       .addSystem(ProcessLedger)
       .addSystem(UnlockResources)
-      .addSystems(DeltaRecorders, { stage: "last-start" })
+      .addSystems(DeltaExtractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });
   }
 }

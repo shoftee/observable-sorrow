@@ -11,7 +11,7 @@ import {
   SocietyPresenter,
   StateManager,
 } from "./presenters";
-import { ComponentDeltas } from "./game/systems2/types";
+import { ComponentDeltas } from "./game/systems2/core/renderer";
 
 export type Endpoint = {
   send(intent: Intent): Promise<void>;

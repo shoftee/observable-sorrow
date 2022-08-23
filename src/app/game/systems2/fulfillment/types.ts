@@ -1,7 +1,8 @@
 import { EcsComponent, ValueComponent } from "@/app/ecs";
 
 import { FulfillmentId, ResourceId } from "@/app/interfaces";
-import { Fulfillment, Resource } from "../types";
+
+import { Fulfillment, Resource } from "../types/common";
 
 export class Progress extends EcsComponent {
   fulfilled = false;
@@ -20,8 +21,8 @@ export class Requirement extends ValueComponent<number> {
   }
 }
 
-export class UnlockOnPriceRatio extends ValueComponent<number> {
-  constructor(readonly value: number) {
+export class BaseRequirement extends ValueComponent<number> {
+  constructor(public value: number) {
     super();
   }
 }

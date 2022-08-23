@@ -16,10 +16,13 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaRecorder, Fulfillment, Resource, Unlocked } from "../types";
+import { Meta, resourceQtyIterable } from "@/app/state";
+
+import { DeltaExtractor } from "../core/renderer";
+import { Fulfillment, Resource, Unlocked } from "../types/common";
+
 import * as F from "./types";
 import * as R from "../resource/types";
-import { Meta, resourceQtyIterable } from "@/app/state";
 
 const Q_Fulfillment = Value(Fulfillment);
 const Q_Resource = Value(Resource);
@@ -42,6 +45,14 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
     app.addStartupSystem(SpawnFulfillments);
   }
 }
+
+// TODO: support for multi-level recipes
+// const CalculateRecipeRequirements = System(
+//   MapQuery(
+//     Entity(),
+//     All(ChangeTrackers(F.Requirement), DiffMut(F.Requirement), Children()),
+//   ),
+// )((query) => { });
 
 const CalculateIngredientFulfillment = System(
   Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
@@ -83,7 +94,11 @@ const CalculateRecipeFulfillment = System(
     Eager(ChildrenQuery(Read(F.Progress), Value(F.Capped))),
   ),
 )((query) => {
-  for (const [mainProgress, mainCapped, ingredients] of query.all()) {
+  for (const [
+    fulfillmentProgress,
+    fulfillmentCapped,
+    ingredients,
+  ] of query.all()) {
     // this logic only applies to 'composite' fulfillments
     // skip it when they have no ingredients
     if (ingredients.length === 0) {
@@ -98,56 +113,44 @@ const CalculateRecipeFulfillment = System(
       anyCapped ||= capped;
     }
 
-    mainProgress.fulfilled = allFulfilled;
+    fulfillmentProgress.fulfilled = allFulfilled;
     // if the whole thing is fulfilled, it's automatically non-capped
     // this is done to handle overcapped resources correctly
-    mainCapped.value = !allFulfilled && anyCapped;
+    fulfillmentCapped.value = !allFulfilled && anyCapped;
   }
 });
 
-const DeltaRecorders = [
-  DeltaRecorder(
-    F.Requirement,
-    Q_Resource,
-    Q_ParentFulfillment,
-  )((root, { value: requirement }, [resource, [id]]) => {
-    const target = root.fulfillments[id].ingredients[resource]!;
-    target.requirement = requirement;
+const IngredientExtractor = DeltaExtractor(
+  Q_ParentFulfillment,
+  Q_Resource,
+)(
+  (schema, [[fulfillment], resource]) =>
+    schema.fulfillments[fulfillment].ingredients[resource]!,
+);
+
+const FulfillmentExtractor = DeltaExtractor(Value(Fulfillment))(
+  (schema, [id]) => schema.fulfillments[id],
+);
+
+const DeltaExtractors = [
+  IngredientExtractor(F.Requirement, (ingredient, { value: requirement }) => {
+    ingredient.requirement = requirement;
   }),
-  DeltaRecorder(
-    F.Progress,
-    Q_Resource,
-    Q_ParentFulfillment,
-  )((root, { fulfilled, eta }, [resource, [id]]) => {
-    const target = root.fulfillments[id].ingredients[resource]!;
-    target.fulfilled = fulfilled;
-    target.eta = eta;
+  IngredientExtractor(F.Progress, (ingredient, { fulfilled, eta }) => {
+    ingredient.fulfilled = fulfilled;
+    ingredient.eta = eta;
   }),
-  DeltaRecorder(
-    F.Capped,
-    Q_Resource,
-    Q_ParentFulfillment,
-  )((root, { value: capped }, [resource, [id]]) => {
-    const target = root.fulfillments[id].ingredients[resource]!;
-    target.capped = capped;
+  IngredientExtractor(F.Capped, (ingredient, { value: capped }) => {
+    ingredient.capped = capped;
   }),
-  DeltaRecorder(
-    F.Progress,
-    Q_Fulfillment,
-  )((root, { fulfilled }, [id]) => {
-    root.fulfillments[id].fulfilled = fulfilled;
+  FulfillmentExtractor(F.Progress, (fulfillment, { fulfilled }) => {
+    fulfillment.fulfilled = fulfilled;
   }),
-  DeltaRecorder(
-    F.Capped,
-    Q_Fulfillment,
-  )((root, { value: capped }, [id]) => {
-    root.fulfillments[id].capped = capped;
+  FulfillmentExtractor(F.Capped, (fulfillment, { value: capped }) => {
+    fulfillment.capped = capped;
   }),
-  DeltaRecorder(
-    Unlocked,
-    Q_Fulfillment,
-  )((root, { value: unlocked }, [id]) => {
-    root.fulfillments[id].unlocked = unlocked;
+  FulfillmentExtractor(Unlocked, (fulfillment, { value: unlocked }) => {
+    fulfillment.unlocked = unlocked;
   }),
 ];
 
@@ -155,6 +158,6 @@ export class FulfillmentResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addSystems([CalculateIngredientFulfillment, CalculateRecipeFulfillment])
-      .addSystems(DeltaRecorders, { stage: "last-start" });
+      .addSystems(DeltaExtractors, { stage: "last-start" });
   }
 }

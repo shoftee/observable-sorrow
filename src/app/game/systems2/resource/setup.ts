@@ -3,7 +3,8 @@ import { Commands } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { ResourceMetadataType, UnlockMode, Meta } from "@/app/state";
 
-import { Resource, Unlocked } from "../types";
+import { Resource, Unlocked } from "../types/common";
+
 import * as R from "./types";
 
 function* componentsFromMeta(

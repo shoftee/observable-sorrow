@@ -1,5 +1,6 @@
 import {
   BonfireIntent,
+  ConstructionIntent,
   Intent,
   OnRenderHandler,
   WorkshopIntent,
@@ -53,6 +54,8 @@ function convertToEvent(intent: Intent): EcsEvent | undefined {
       return new events.TimeOptionsChanged(intent);
     case "bonfire":
       return convertBonfireIntent(intent);
+    case "construction":
+      return convertConstructionIntent(intent);
     case "workshop":
       return convertWorkshopIntent(intent);
   }
@@ -61,6 +64,14 @@ function convertToEvent(intent: Intent): EcsEvent | undefined {
 function convertBonfireIntent(intent: BonfireIntent): EcsEvent | undefined {
   if (intent.id === "gather-catnip") {
     return new events.ResourceOrder(ResourceMap.fromObject({ catnip: 1 }));
+  }
+}
+
+function convertConstructionIntent(
+  intent: ConstructionIntent,
+): EcsEvent | undefined {
+  if (intent.id === "buy-building") {
+    return new events.ConstructBuildingOrder(intent.building);
   }
 }
 

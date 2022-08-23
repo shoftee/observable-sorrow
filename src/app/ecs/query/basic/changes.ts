@@ -12,7 +12,7 @@ type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;
   isChanged(): boolean;
   isAddedOrChanged(): boolean;
-  value(): C;
+  value(): Readonly<C>;
 };
 
 type ChangeTrackers<C extends EcsComponent> = QueryDescriptor<Tracker<C>>;
