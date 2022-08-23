@@ -1,3 +1,5 @@
+import { LimitEffectId } from "@/app/interfaces";
+
 import { EcsComponent, ValueComponent } from "@/app/ecs";
 
 export class Amount extends ValueComponent<number> {
@@ -6,6 +8,9 @@ export class Amount extends ValueComponent<number> {
 
 export class Capacity extends ValueComponent<number> {
   value = 0;
+  constructor(readonly effect: LimitEffectId) {
+    super();
+  }
 }
 
 export class LedgerEntry extends EcsComponent {

@@ -11,19 +11,17 @@ import { ResourceMapQuery, applyOrder } from "../core/orders";
 const ProcessResourceOrders = System(
   Receive(events.ResourceOrder),
   ResourceMapQuery,
-)((orders, resourcesQuery) => {
-  const resourcesCache = cache(() => resourcesQuery.map());
+)((orders, resources) => {
   const ambientCache = cache(() => {
     // Initialize the ambient deltas.
     const ambient = new Ledger();
-    for (const [id, [, , entry]] of resourcesCache.retrieve()) {
+    for (const [id, [, , entry]] of resources) {
       ambient.add(id, entry);
     }
     return ambient;
   });
 
   for (const order of orders.pull()) {
-    const resources = resourcesCache.retrieve();
     const ambient = ambientCache.retrieve();
     applyOrder(order, ambient, resources);
   }

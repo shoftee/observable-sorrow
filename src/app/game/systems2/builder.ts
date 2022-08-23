@@ -21,10 +21,12 @@ import {
 } from "./fulfillment";
 
 import { AggregateBuildingUnlocks } from "./core/unlock";
+import { EffectsSetupPlugin } from "./effects/setup";
 
 export function build(onRender: OnRenderHandler): GameRunner {
   return new App()
     .addPlugin(new MinimalPlugins())
+    .addPlugin(new EffectsSetupPlugin())
     .addPlugin(new ResourceSetupPlugin())
     .addPlugin(new BuildingSetupPlugin())
     .addPlugin(new FulfillmentSetupPlugin())

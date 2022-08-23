@@ -1,5 +1,3 @@
-import { cache } from "@/app/utils/collections";
-
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   All,
@@ -57,15 +55,14 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
 const CalculateIngredientFulfillment = System(
   Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
   MapQuery(Q_Resource, All(Value(R.Amount), Opt(Value(R.Capacity)))),
-)((ingredientsQuery, resourcesQuery) => {
-  const resources = cache(() => resourcesQuery.map());
+)((ingredientsQuery, resources) => {
   for (const [
     resource,
     requirement,
     progress,
     capped,
   ] of ingredientsQuery.all()) {
-    const [amount, capacity] = resources.retrieve().get(resource)!;
+    const [amount, capacity] = resources.get(resource)!;
     const change = 0; // TODO: need to add this to resources
 
     progress.fulfilled = amount >= requirement;

@@ -84,22 +84,18 @@ const ProcessConstructBuildingOrders = System(
     All(DiffMut(Level), ChildrenQuery(Value(Resource), Value(F.Requirement))),
   ),
   ResourceMapQuery,
-)((orders, buildingsQuery, resourcesQuery) => {
-  const resourcesCache = cache(() => resourcesQuery.map());
-  const buildingsCache = cache(() => buildingsQuery.map());
+)((orders, buildings, resources) => {
   const ambientCache = cache(() => {
     // Initialize the ambient deltas.
     const ambient = new Ledger();
-    for (const [id, [, , entry]] of resourcesCache.retrieve()) {
+    for (const [id, [, , entry]] of resources) {
       ambient.add(id, entry);
     }
     return ambient;
   });
 
   for (const order of orders.pull()) {
-    const resources = resourcesCache.retrieve();
     const ambient = ambientCache.retrieve();
-    const buildings = buildingsCache.retrieve();
 
     const [level, requirements] = buildings.get(order.building)!;
     applyOrder(
@@ -153,12 +149,10 @@ const ProcessRatioUnlocks = System(
     ChildrenQuery(DiffMut(Unlocked), Value(PriceRatio)),
   ).filter(Every(Building)),
   MapQuery(Q_Resource, Value(R.Amount)),
-)((buildingsQuery, amountsQuery) => {
-  const amountsCache = cache(() => amountsQuery.map());
+)((buildingsQuery, amounts) => {
   for (const [ingredients, unlocks] of buildingsQuery.all()) {
     for (const [unlocked, ratio] of unlocks) {
       if (!unlocked.value) {
-        const amounts = amountsCache.retrieve();
         unlocked.value = any(ingredients, ([id, requirement]) => {
           const amount = amounts.get(id)!;
           return amount >= requirement * ratio;

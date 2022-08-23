@@ -1,5 +1,3 @@
-import { cache } from "@/app/utils/collections";
-
 import { EcsEntity } from "@/app/ecs";
 
 import {
@@ -62,9 +60,6 @@ export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
     newQuery(world) {
       const { hierarchy } = world;
       const fetcher = mapQuery.create(world);
-      const lookup = cache(() => {
-        return fetcher.fetch().map();
-      });
 
       return defaultQuery({
         includes({ entity }) {
@@ -72,14 +67,13 @@ export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
         },
         matches({ entity }) {
           const parent = hierarchy.parentOf(entity)!;
-          return lookup.retrieve().has(parent);
+          return fetcher.fetch().has(parent);
         },
         fetch({ entity }) {
           const parent = hierarchy.parentOf(entity)!;
-          return lookup.retrieve().get(parent)!;
+          return fetcher.fetch().get(parent)!;
         },
         cleanup() {
-          lookup.invalidate();
           fetcher.cleanup?.();
         },
       });
@@ -108,13 +102,10 @@ export function ChildrenQuery<Q extends AllParams>(...qs: Q): ChildrenQuery<Q> {
   return {
     newQuery(world) {
       const fetcher = mapQuery.create(world);
-      const lookupCache = cache(() => {
-        return fetcher.fetch().map();
-      });
 
       return defaultQuery({
         *fetch({ entity }) {
-          const lookup = lookupCache.retrieve();
+          const lookup = fetcher.fetch();
           for (const child of world.hierarchy.childrenOf(entity)) {
             const results = lookup.get(child);
             if (results) {
@@ -123,7 +114,6 @@ export function ChildrenQuery<Q extends AllParams>(...qs: Q): ChildrenQuery<Q> {
           }
         },
         cleanup() {
-          lookupCache.invalidate();
           fetcher.cleanup?.();
         },
       });

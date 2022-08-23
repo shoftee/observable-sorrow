@@ -7,13 +7,18 @@ import { Resource, Unlocked } from "../types/common";
 
 import * as R from "./types";
 
-function* componentsFromMeta(
+function* resourceComponents(
   meta: ResourceMetadataType,
 ): Iterable<EcsComponent> {
   yield new Resource(meta.id);
   yield new R.Amount();
   yield new R.LedgerEntry();
   yield new Unlocked(false);
+  if (meta.effects) {
+    if (meta.effects.limit) {
+      yield new R.Capacity(meta.effects.limit);
+    }
+  }
   if (meta.unlockMode === UnlockMode.FirstCapacity) {
     yield new R.UnlockOnFirstCapacity();
   } else {
@@ -23,7 +28,7 @@ function* componentsFromMeta(
 
 const SpawnResources = System(Commands())((cmds) => {
   for (const meta of Meta.resources()) {
-    cmds.spawn(...componentsFromMeta(meta));
+    cmds.spawn(...resourceComponents(meta));
   }
 });
 
