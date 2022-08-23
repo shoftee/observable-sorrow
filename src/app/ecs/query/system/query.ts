@@ -4,21 +4,21 @@ import { EcsEntity, World } from "@/app/ecs";
 import { FetcherFactory, QueryDescriptor } from "../types";
 import { All, AllParams, AllResults, Filters } from "../basic/all";
 
-type QueryResult<Result> = {
+export type IterableQueryResult<Result> = {
   [Symbol.iterator](): IterableIterator<Result>;
   single(): Result;
   get(entity: EcsEntity): Result | undefined;
   has(entity: EcsEntity): boolean;
 };
 
-class QueryFactory<Q extends AllParams> {
+class IterableQueryFactory<Q extends AllParams> {
   private descriptor;
 
   constructor(...wq: Q) {
     this.descriptor = All(...wq);
   }
 
-  filter<F extends Filters>(...f: F): QueryFactory<Q> {
+  filter<F extends Filters>(...f: F): IterableQueryFactory<Q> {
     this.descriptor = this.descriptor.filter(...f);
     return this;
   }
@@ -29,7 +29,7 @@ class QueryFactory<Q extends AllParams> {
 
     const fetchCache = world.queries.get(descriptor);
     const map = cache(() => new Map(fetchCache.results()));
-    const fetcher: QueryResult<AllResults<Q>> = {
+    const fetcher: IterableQueryResult<AllResults<Q>> = {
       [Symbol.iterator]() {
         return map.retrieve().values();
       },
@@ -56,11 +56,11 @@ class QueryFactory<Q extends AllParams> {
   }
 }
 
-export function Query<Q extends AllParams>(...wq: Q): QueryFactory<Q> {
-  return new QueryFactory<Q>(...wq);
+export function Query<Q extends AllParams>(...wq: Q): IterableQueryFactory<Q> {
+  return new IterableQueryFactory<Q>(...wq);
 }
 
-type MapQueryResult<K, V> = {
+export type MapQueryResult<K, V> = {
   [Symbol.iterator](): IterableIterator<[Readonly<K>, V]>;
   get(key: Readonly<K>): V | undefined;
   has(key: Readonly<K>): boolean;

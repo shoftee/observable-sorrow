@@ -5,6 +5,7 @@ import { NumberEffect } from "./types";
 
 const Setup = System(Commands())((cmds) => {
   cmds.spawn(new NumberEffect("catnip.limit", 5000));
+  cmds.spawn(new NumberEffect("wood.limit", 200));
 });
 
 export class EffectsSetupPlugin extends EcsPlugin {

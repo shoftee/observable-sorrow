@@ -12,9 +12,25 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core/renderer";
+import { NumberTrackersQuery } from "../effects/types";
 import { Resource, Unlocked } from "../types/common";
 
 import * as R from "./types";
+
+const UpdateCapacity = System(
+  Query(DiffMut(R.Capacity)).filter(Every(Resource)),
+  NumberTrackersQuery,
+)((capacities, numbers) => {
+  for (const [capacity] of capacities) {
+    const tracker = numbers.get(capacity.effect);
+    if (tracker && tracker.isAddedOrChanged()) {
+      const effectValue = tracker.value().value;
+      if (effectValue) {
+        capacity.value = effectValue;
+      }
+    }
+  }
+});
 
 const ProcessLedger = System(
   Query(Read(R.LedgerEntry), Opt(Value(R.Capacity)), DiffMut(R.Amount)),
@@ -87,6 +103,9 @@ const DeltaExtractors = [
   ResourceExtractor(R.Amount, (resource, { value: amount }) => {
     resource.amount = amount;
   }),
+  ResourceExtractor(R.Capacity, (resource, { value: capacity }) => {
+    resource.capacity = capacity;
+  }),
   ResourceExtractor(Unlocked, (resource, { value: unlocked }) => {
     resource.unlocked = unlocked;
   }),
@@ -102,8 +121,7 @@ const CleanupLedger = System(Query(DiffMut(R.LedgerEntry)))((entries) => {
 export class ResourceResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
-      .addSystem(ProcessLedger)
-      .addSystem(UnlockResources)
+      .addSystems([UpdateCapacity, ProcessLedger, UnlockResources])
       .addSystems(DeltaExtractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });
   }

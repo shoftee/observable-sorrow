@@ -4,7 +4,7 @@ import { QueryDescriptor, InstantiatedQuery } from "../query/types";
 import { ComponentState } from "./components";
 import { World } from "../world";
 
-type QueryResult<T = unknown> = T extends QueryDescriptor<infer R> ? R : never;
+type Result<T = unknown> = T extends QueryDescriptor<infer R> ? R : never;
 
 export class QueryState {
   private readonly fetches = new Map<QueryDescriptor, FetchCache>();
@@ -39,22 +39,22 @@ export class QueryState {
     }
   }
 
-  get<Q extends QueryDescriptor>(descriptor: Q): FetchCache<QueryResult<Q>> {
+  get<Q extends QueryDescriptor>(descriptor: Q): FetchCache<Result<Q>> {
     const fetch = this.fetches.get(descriptor);
     if (fetch === undefined) {
       throw new Error("Query is not registered.");
     }
-    return fetch as FetchCache<QueryResult<Q>>;
+    return fetch as FetchCache<Result<Q>>;
   }
 }
 
-type CachedResult = {
+type FetchCacheEntry = {
   archetype: Archetype;
   generation: number;
 };
 
 class FetchCache<F = unknown> {
-  private readonly entries = new Map<EcsEntity, CachedResult>();
+  private readonly entries = new Map<EcsEntity, FetchCacheEntry>();
 
   constructor(private readonly query: InstantiatedQuery<F>) {}
 
