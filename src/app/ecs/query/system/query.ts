@@ -2,7 +2,14 @@ import { cache, single } from "@/app/utils/collections";
 
 import { EcsEntity, World } from "@/app/ecs";
 import { FetcherFactory, QueryDescriptor } from "../types";
-import { All, AllParams, Filters } from "../basic/all";
+import { All, AllParams, AllResults, Filters } from "../basic/all";
+
+type QueryResult<Result> = {
+  [Symbol.iterator](): IterableIterator<Result>;
+  single(): Result;
+  get(entity: EcsEntity): Result | undefined;
+  has(entity: EcsEntity): boolean;
+};
 
 class QueryFactory<Q extends AllParams> {
   private descriptor;
@@ -20,19 +27,20 @@ class QueryFactory<Q extends AllParams> {
     const descriptor = this.descriptor;
     world.queries.register(descriptor);
 
-    const cache = world.queries.get(descriptor);
-    const fetcher = {
-      *all() {
-        yield* cache.results();
+    const fetchCache = world.queries.get(descriptor);
+    const map = cache(() => new Map(fetchCache.results()));
+    const fetcher: QueryResult<AllResults<Q>> = {
+      [Symbol.iterator]() {
+        return map.retrieve().values();
       },
       single() {
-        return single(this.all());
+        return single(this);
       },
       get(entity: EcsEntity) {
-        return cache.get(entity);
+        return map.retrieve().get(entity);
       },
       has(entity: EcsEntity) {
-        return cache.has(entity);
+        return map.retrieve().has(entity);
       },
     };
 
@@ -41,7 +49,8 @@ class QueryFactory<Q extends AllParams> {
         return fetcher;
       },
       cleanup() {
-        cache.cleanup();
+        map.invalidate();
+        fetchCache.cleanup();
       },
     };
   }
@@ -51,38 +60,13 @@ export function Query<Q extends AllParams>(...wq: Q): QueryFactory<Q> {
   return new QueryFactory<Q>(...wq);
 }
 
-type MapQueryFactory<K, V> = FetcherFactory<ReadonlyMap<Readonly<K>, V>>;
+type MapQueryResult<K, V> = {
+  [Symbol.iterator](): IterableIterator<[Readonly<K>, V]>;
+  get(key: Readonly<K>): V | undefined;
+  has(key: Readonly<K>): boolean;
+};
 
-function proxyMap<K, V>(
-  getter: () => ReadonlyMap<Readonly<K>, V>,
-): ReadonlyMap<Readonly<K>, V> {
-  return {
-    forEach(callbackfn, thisArg?) {
-      getter().forEach(callbackfn, thisArg);
-    },
-    [Symbol.iterator]() {
-      return getter()[Symbol.iterator]();
-    },
-    entries() {
-      return getter().entries();
-    },
-    get(key) {
-      return getter().get(key);
-    },
-    has(key) {
-      return getter().has(key);
-    },
-    keys() {
-      return getter().keys();
-    },
-    values() {
-      return getter().values();
-    },
-    get size() {
-      return getter().size;
-    },
-  };
-}
+type MapQueryFactory<K, V> = FetcherFactory<MapQueryResult<K, V>>;
 
 export function MapQuery<K, V>(
   keys: QueryDescriptor<Readonly<K>>,
@@ -94,8 +78,18 @@ export function MapQuery<K, V>(
       queries.register(descriptor);
 
       const fetchCache = queries.get(descriptor);
-      const map = cache(() => new Map(fetchCache.results()));
-      const fetcher = proxyMap(() => map.retrieve());
+      const map = cache(() => new Map(fetchCache.resultValues()));
+      const fetcher: MapQueryResult<K, V> = {
+        [Symbol.iterator]() {
+          return map.retrieve()[Symbol.iterator]();
+        },
+        get(key) {
+          return map.retrieve().get(key);
+        },
+        has(key) {
+          return map.retrieve().has(key);
+        },
+      };
 
       return {
         fetch() {

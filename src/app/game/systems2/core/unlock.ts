@@ -9,7 +9,7 @@ export const AggregateBuildingUnlocks = System(
     Every(Building),
   ),
 )((query) => {
-  for (const [unlocked, parts] of query.all()) {
+  for (const [unlocked, parts] of query) {
     if (!unlocked.value) {
       unlocked.value = all(parts, ([value]) => value);
     }

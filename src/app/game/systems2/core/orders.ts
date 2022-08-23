@@ -28,10 +28,14 @@ type OrderHandlers = Partial<{
   failure(): void;
 }>;
 
+type ResourceTupleMap = {
+  get(id: ResourceId): ResourceTuple | undefined;
+};
+
 export function applyOrder(
   order: Order,
   ambient: Ledger,
-  resources: ReadonlyMap<ResourceId, ResourceTuple>,
+  resources: ResourceTupleMap,
   handlers?: OrderHandlers,
 ) {
   // Create delta layer for this order.

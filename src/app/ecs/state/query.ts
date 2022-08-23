@@ -74,12 +74,18 @@ class FetchCache<F = unknown> {
     }
   }
 
-  *results(): Iterable<F> {
+  *results(): IterableIterator<[EcsEntity, F]> {
     for (const [entity, { archetype }] of this.entries) {
       const ctx = { entity, archetype };
       if (this.query.matches(ctx)) {
-        yield this.query.fetch(ctx);
+        yield [entity, this.query.fetch(ctx)];
       }
+    }
+  }
+
+  *resultValues(): IterableIterator<F> {
+    for (const [, value] of this.results()) {
+      yield value;
     }
   }
 

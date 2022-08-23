@@ -98,8 +98,8 @@ export function DeltaExtractor<Q extends AllParams>(...stateQuery: Q) {
           ChangeTrackers(tracked),
           SchemaExtratorQuery(...stateQuery)(schemaExtractor),
         ),
-      )(({ components }, query) => {
-        for (const [tracker, extractor] of query.all()) {
+      )(({ components }, trackers) => {
+        for (const [tracker, extractor] of trackers) {
           if (tracker.isAdded()) {
             components.setAdded((root) =>
               mutator(extractor(root), tracker.value()),

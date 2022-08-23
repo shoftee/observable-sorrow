@@ -55,10 +55,10 @@ const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeOptions)))(
 const AdvanceTimers = System(
   Query(Read(DeltaTime)),
   Query(DiffMut(Timer)),
-)((timeQuery, timerQuery) => {
+)((timeQuery, timers) => {
   const [{ delta }] = timeQuery.single();
   if (delta > 0) {
-    for (const [timer] of timerQuery.all()) {
+    for (const [timer] of timers) {
       const last = timer.ticks;
 
       // calculate delta for the ticker
@@ -72,7 +72,7 @@ const AdvanceTimers = System(
     }
   } else {
     // no time has elapsed
-    for (const [timer] of timerQuery.all()) {
+    for (const [timer] of timers) {
       timer.delta = timer.elapsed = 0;
     }
   }

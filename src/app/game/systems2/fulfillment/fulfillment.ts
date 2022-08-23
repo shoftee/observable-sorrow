@@ -55,13 +55,8 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
 const CalculateIngredientFulfillment = System(
   Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
   MapQuery(Q_Resource, All(Value(R.Amount), Opt(Value(R.Capacity)))),
-)((ingredientsQuery, resources) => {
-  for (const [
-    resource,
-    requirement,
-    progress,
-    capped,
-  ] of ingredientsQuery.all()) {
+)((ingredients, resources) => {
+  for (const [resource, requirement, progress, capped] of ingredients) {
     const [amount, capacity] = resources.get(resource)!;
     const change = 0; // TODO: need to add this to resources
 
@@ -90,12 +85,12 @@ const CalculateRecipeFulfillment = System(
     Q_CappedMut,
     Eager(ChildrenQuery(Read(F.Progress), Value(F.Capped))),
   ),
-)((query) => {
+)((fulfillments) => {
   for (const [
     fulfillmentProgress,
     fulfillmentCapped,
     ingredients,
-  ] of query.all()) {
+  ] of fulfillments) {
     // this logic only applies to 'composite' fulfillments
     // skip it when they have no ingredients
     if (ingredients.length === 0) {

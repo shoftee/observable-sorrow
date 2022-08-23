@@ -37,7 +37,7 @@ describe("ecs query", () => {
   }
 
   function results<Q extends QueryDescriptor>(world: World, query: Q) {
-    return world.queries.get(query).results();
+    return world.queries.get(query).resultValues();
   }
 
   let world: World;

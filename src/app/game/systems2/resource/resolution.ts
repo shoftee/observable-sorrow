@@ -19,28 +19,37 @@ import * as R from "./types";
 const ProcessLedger = System(
   Query(Read(R.LedgerEntry), Opt(Value(R.Capacity)), DiffMut(R.Amount)),
 )((query) => {
-  for (const [{ debit, credit }, capacity, amount] of query.all()) {
+  for (const [{ debit, credit }, capacity, amount] of query) {
     if (debit !== 0 || credit !== 0) {
-      const effectiveCapacity = capacity ?? Number.POSITIVE_INFINITY;
-      const oldAmount = amount.value;
-
-      // subtract losses first
-      let newAmount = oldAmount - credit;
-      if (newAmount < effectiveCapacity) {
-        // new resources are gained only when under capacity
-        newAmount = newAmount + debit;
-
-        // but they only go up to capacity at most
-        newAmount = Math.min(newAmount, effectiveCapacity);
-      }
-
-      // negative resource amount is nonsense (for now)
-      newAmount = Math.max(newAmount, 0);
-
-      amount.value = newAmount;
+      amount.value = calculateAmount(amount.value, debit, credit, capacity);
     }
   }
 });
+
+function calculateAmount(
+  currentAmount: number,
+  debit: number,
+  credit: number,
+  capacity: number | undefined,
+): number {
+  const effectiveCapacity = capacity ?? Number.POSITIVE_INFINITY;
+
+  // subtract losses first
+  let newAmount = currentAmount - credit;
+
+  if (newAmount < effectiveCapacity) {
+    // new resources are gained only when under capacity
+    newAmount += debit;
+
+    // but they only go up to capacity at most
+    newAmount = Math.min(newAmount, effectiveCapacity);
+  }
+
+  // negative resource amount is nonsense (for now)
+  newAmount = Math.max(newAmount, 0);
+
+  return newAmount;
+}
 
 const UnlockResources = System(
   Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(
@@ -49,8 +58,8 @@ const UnlockResources = System(
   Query(ChangeTrackers(R.Capacity), Mut(Unlocked)).filter(
     Every(R.UnlockOnFirstCapacity),
   ),
-)((quantityQuery, capacityQuery) => {
-  for (const [trackers, unlocked] of quantityQuery.all()) {
+)((amounts, capacities) => {
+  for (const [trackers, unlocked] of amounts) {
     if (
       !unlocked.value &&
       trackers.isAddedOrChanged() &&
@@ -59,7 +68,7 @@ const UnlockResources = System(
       unlocked.value = true;
     }
   }
-  for (const [trackers, unlock] of capacityQuery.all()) {
+  for (const [trackers, unlock] of capacities) {
     if (
       !unlock.value &&
       trackers.isAddedOrChanged() &&
@@ -83,8 +92,8 @@ const DeltaExtractors = [
   }),
 ];
 
-const CleanupLedger = System(Query(DiffMut(R.LedgerEntry)))((query) => {
-  for (const [entry] of query.all()) {
+const CleanupLedger = System(Query(DiffMut(R.LedgerEntry)))((entries) => {
+  for (const [entry] of entries) {
     entry.debit = 0;
     entry.credit = 0;
   }

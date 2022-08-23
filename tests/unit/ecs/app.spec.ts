@@ -168,7 +168,7 @@ describe("ecs app", () => {
     it("should filter changed components correctly", () => {
       let levelUps = 0;
       const LevelUpSystem = System(Query(Mut(Player)))((players) => {
-        for (const [player] of players.all()) {
+        for (const [player] of players) {
           player.level++;
         }
         levelUps++;
@@ -178,8 +178,8 @@ describe("ecs app", () => {
       const ChangedCounter = System(
         Query(Read(Player)).filter(Changed(Player)),
       )((players) => {
-        for (const [player] of players.all()) {
-          expect(player.level).to.eq(20 + levelUps);
+        for (const [{ level }] of players) {
+          expect(level).to.eq(20 + levelUps);
           detected++;
         }
       });
@@ -223,8 +223,8 @@ describe("ecs app", () => {
       let detected = 0;
       const AddedCounter = System(Query(Read(Player)).filter(Added(Player)))(
         (players) => {
-          for (const [player] of players.all()) {
-            expect(player.level).to.eq(20);
+          for (const [{ level }] of players) {
+            expect(level).to.eq(20);
             detected++;
           }
         },
@@ -262,7 +262,7 @@ describe("ecs app", () => {
 
       const LevelUpper = System(Query(Mut(Player)).filter(Added(Player)))(
         (players) => {
-          for (const [player] of players.all()) {
+          for (const [player] of players) {
             player.level++;
           }
         },
@@ -270,7 +270,7 @@ describe("ecs app", () => {
 
       let detectedAdditions = 0;
       const AddedCounter = System(Query(ChangeTrackers(Player)))((query) => {
-        for (const [trackers] of query.all()) {
+        for (const [trackers] of query) {
           if (trackers.isAdded()) {
             detectedAdditions++;
           }
@@ -279,7 +279,7 @@ describe("ecs app", () => {
 
       let detectedChanges = 0;
       const ChangedCounter = System(Query(ChangeTrackers(Player)))((query) => {
-        for (const [trackers] of query.all()) {
+        for (const [trackers] of query) {
           if (trackers.isChanged()) {
             detectedChanges++;
           }

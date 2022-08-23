@@ -51,7 +51,7 @@ describe("ecs systems", () => {
       world.flush();
 
       const LevelUpper = System(Query(Mut(Player)))((players) => {
-        for (const [player] of players.all()) {
+        for (const [player] of players) {
           player.levelUp();
         }
       });
@@ -59,7 +59,7 @@ describe("ecs systems", () => {
 
       const ChangeTracker = System(Query(ChangeTrackers(Player)))((query) => {
         let changed = 0;
-        for (const [trackers] of query.all()) {
+        for (const [trackers] of query) {
           expect(trackers.isChanged()).to.be.true;
           changed++;
         }
@@ -87,7 +87,7 @@ describe("ecs systems", () => {
 
       const PlayerChecker = System(Query(Value(Id), Read(Player)))(
         (players) => {
-          for (const [id, player] of players.all()) {
+          for (const [id, player] of players) {
             expect(id).to.deep.equal("shoftee");
             expect(player).to.deep.equal({ level: 20 });
           }
@@ -116,7 +116,7 @@ describe("ecs systems", () => {
       const HierarchyChecker = System(
         Query(Value(Id), Read(Player), Eager(ChildrenQuery(Read(ItemStack)))),
       )((query) => {
-        expect(Array.from(query.all())).to.deep.equal([
+        expect(Array.from(query)).to.deep.equal([
           [
             "mage",
             { level: 20 },

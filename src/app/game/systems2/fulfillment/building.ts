@@ -120,7 +120,7 @@ const CalculateBuildingRequirements = System(
     ChildrenQuery(Value(F.BaseRequirement), DiffMut(F.Requirement)),
   ),
 )((query) => {
-  for (const [trackers, ratio, ingredients] of query.all()) {
+  for (const [trackers, ratio, ingredients] of query) {
     if (trackers.isAddedOrChanged()) {
       const { value: level } = trackers.value();
       for (const [base, requirement] of ingredients) {
@@ -149,8 +149,8 @@ const ProcessRatioUnlocks = System(
     ChildrenQuery(DiffMut(Unlocked), Value(PriceRatio)),
   ).filter(Every(Building)),
   MapQuery(Q_Resource, Value(R.Amount)),
-)((buildingsQuery, amounts) => {
-  for (const [ingredients, unlocks] of buildingsQuery.all()) {
+)((buildings, amounts) => {
+  for (const [ingredients, unlocks] of buildings) {
     for (const [unlocked, ratio] of unlocks) {
       if (!unlocked.value) {
         unlocked.value = any(ingredients, ([id, requirement]) => {
