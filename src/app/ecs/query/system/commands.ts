@@ -1,12 +1,25 @@
 import { EcsComponent, EcsEntity, World } from "@/app/ecs";
 import { Constructor as Ctor } from "@/app/utils/types";
+import { FetcherFactory } from "../types";
+
+export type WorldCmds = {
+  with(entity: EcsEntity): EntityCmds;
+  spawn(...components: EcsComponent[]): EntityCmds;
+  spawnChild(parent: EcsEntity, ...components: EcsComponent[]): EntityCmds;
+};
+
+export type EntityCmds = {
+  insert(...components: EcsComponent[]): EntityCmds;
+  remove(...ctors: Ctor<EcsComponent>[]): EntityCmds;
+  entity(fn: (entity: EcsEntity) => void): EntityCmds;
+};
 
 type CommandParams = {
   self?: EcsEntity;
   parent?: EcsEntity;
 };
 
-class EntityCommands {
+class EntityCommandsImpl {
   private readonly parent?: EcsEntity;
   private self?: EcsEntity;
 
@@ -25,7 +38,7 @@ class EntityCommands {
     return this.self;
   }
 
-  insert(...components: EcsComponent[]): EntityCommands {
+  insert(...components: EcsComponent[]): EntityCommandsImpl {
     this.world.defer((world) => {
       const entity = this.ensureSpawned(world);
       world.components.insert(entity, ...components);
@@ -34,7 +47,7 @@ class EntityCommands {
     return this;
   }
 
-  remove(...ctors: Ctor<EcsComponent>[]): EntityCommands {
+  remove(...ctors: Ctor<EcsComponent>[]): EntityCommandsImpl {
     this.world.defer((world) => {
       const entity = this.ensureSpawned(world);
       world.components.remove(entity, ...ctors);
@@ -43,7 +56,7 @@ class EntityCommands {
     return this;
   }
 
-  entity(fn: (entity: EcsEntity) => void): EntityCommands {
+  entity(fn: (entity: EcsEntity) => void): EntityCommandsImpl {
     this.world.defer((world) => {
       const entity = this.ensureSpawned(world);
       fn(entity);
@@ -53,22 +66,23 @@ class EntityCommands {
   }
 }
 
+type CommandsFactory = FetcherFactory<WorldCmds>;
+
 /** Used to spawn entities and populate them with components. */
-export function Commands() {
+export function Commands(): CommandsFactory {
   return {
     create(world: World) {
-      const commands = {
-        with(entity: EcsEntity): EntityCommands {
-          return new EntityCommands(world, { self: entity });
+      const commands: WorldCmds = {
+        with(entity) {
+          return new EntityCommandsImpl(world, { self: entity });
         },
-        spawn(...components: EcsComponent[]): EntityCommands {
-          return new EntityCommands(world).insert(...components);
+        spawn(...components) {
+          return new EntityCommandsImpl(world).insert(...components);
         },
-        spawnChild(
-          parent: EcsEntity,
-          ...components: EcsComponent[]
-        ): EntityCommands {
-          return new EntityCommands(world, { parent }).insert(...components);
+        spawnChild(parent, ...components) {
+          return new EntityCommandsImpl(world, { parent }).insert(
+            ...components,
+          );
         },
       };
       return {

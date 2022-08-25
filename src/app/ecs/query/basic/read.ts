@@ -21,25 +21,6 @@ export function Read<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
   };
 }
 
-export function Extract<C extends EcsComponent, V>(
-  ctor: Ctor<C>,
-  extractor: (component: C) => V,
-): QueryDescriptor<V> {
-  return {
-    newQuery() {
-      return defaultQuery({
-        includes({ archetype }) {
-          return archetype.has(ctor);
-        },
-        fetch({ archetype }) {
-          const entry = archetype.get(ctor)! as C;
-          return extractor(entry);
-        },
-      });
-    },
-  };
-}
-
 type Value<C extends EcsComponent> = C extends ValueComponent<infer T>
   ? Readonly<T>
   : never;
@@ -48,5 +29,17 @@ type Value<C extends EcsComponent> = C extends ValueComponent<infer T>
 export function Value<C extends ValueComponent>(
   ctor: Ctor<C>,
 ): QueryDescriptor<Value<C>> {
-  return Extract<C, Value<C>>(ctor, (c) => c.value as Value<C>);
+  return {
+    newQuery() {
+      return defaultQuery({
+        includes({ archetype }) {
+          return archetype.has(ctor);
+        },
+        fetch({ archetype }) {
+          const entry = archetype.get(ctor)! as C;
+          return entry.value as Value<C>;
+        },
+      });
+    },
+  };
 }

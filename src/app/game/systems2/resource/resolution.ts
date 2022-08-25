@@ -10,25 +10,38 @@ import {
   Value,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
+import { NumberEffectId } from "@/app/interfaces";
 
 import { DeltaExtractor } from "../core/renderer";
+import { RecalculateEffects } from "../effects/calculation";
 import { NumberTrackersQuery } from "../effects/types";
 import { Resource, Unlocked } from "../types/common";
 
 import * as R from "./types";
 
-const UpdateCapacity = System(
-  Query(DiffMut(R.Capacity)).filter(Every(Resource)),
+const UpdateLimitEffects = RecalculateEffects(Value(R.LimitEffect));
+const UpdateDeltaEffects = RecalculateEffects(Value(R.DeltaEffect));
+
+const UpdateEffectTargets = System(
+  Query(DiffMut(R.Capacity), Value(R.LimitEffect)).filter(Every(Resource)),
+  Query(DiffMut(R.Delta), Value(R.DeltaEffect)).filter(Every(Resource)),
   NumberTrackersQuery,
-)((capacities, numbers) => {
-  for (const [capacity] of capacities) {
-    const tracker = numbers.get(capacity.effect);
+)((capacities, deltas, numbers) => {
+  function update(effect: NumberEffectId, component: { set value(v: number) }) {
+    const tracker = numbers.get(effect);
     if (tracker && tracker.isAddedOrChanged()) {
       const effectValue = tracker.value().value;
       if (effectValue) {
-        capacity.value = effectValue;
+        component.value = effectValue;
       }
     }
+  }
+
+  for (const [capacity, effect] of capacities) {
+    update(effect, capacity);
+  }
+  for (const [delta, effect] of deltas) {
+    update(effect, delta);
   }
 });
 
@@ -121,7 +134,13 @@ const CleanupLedger = System(Query(DiffMut(R.LedgerEntry)))((entries) => {
 export class ResourceResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
-      .addSystems([UpdateCapacity, ProcessLedger, UnlockResources])
+      .addSystems([
+        UpdateLimitEffects,
+        UpdateDeltaEffects,
+        UpdateEffectTargets,
+        ProcessLedger,
+        UnlockResources,
+      ])
       .addSystems(DeltaExtractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });
   }

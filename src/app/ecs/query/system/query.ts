@@ -7,6 +7,8 @@ import { All, AllParams, AllResults, Filters } from "../basic/all";
 export type IterableQueryResult<Result> = {
   [Symbol.iterator](): IterableIterator<Result>;
   single(): Result;
+  map(): ReadonlyMap<EcsEntity, Result>;
+  keys(): IterableIterator<EcsEntity>;
   get(entity: EcsEntity): Result | undefined;
   has(entity: EcsEntity): boolean;
 };
@@ -36,6 +38,12 @@ class IterableQueryFactory<Q extends AllParams> {
       single() {
         return single(this);
       },
+      map() {
+        return map.retrieve();
+      },
+      keys() {
+        return map.retrieve().keys();
+      },
       get(entity: EcsEntity) {
         return map.retrieve().get(entity);
       },
@@ -62,12 +70,18 @@ export function Query<Q extends AllParams>(...wq: Q): IterableQueryFactory<Q> {
 
 export type MapQueryResult<K, V> = {
   [Symbol.iterator](): IterableIterator<[Readonly<K>, V]>;
+  entries(): IterableIterator<[Readonly<K>, V]>;
+  keys(): IterableIterator<Readonly<K>>;
+  values(): IterableIterator<V>;
   get(key: Readonly<K>): V | undefined;
   has(key: Readonly<K>): boolean;
 };
 
 type MapQueryFactory<K, V> = FetcherFactory<MapQueryResult<K, V>>;
 
+/** Used to create maps out of components.
+ *
+ * If you want the key to be the entity, use `.map()` from a `Query()` instead. */
 export function MapQuery<K, V>(
   keys: QueryDescriptor<Readonly<K>>,
   values: QueryDescriptor<V>,
@@ -82,6 +96,15 @@ export function MapQuery<K, V>(
       const fetcher: MapQueryResult<K, V> = {
         [Symbol.iterator]() {
           return map.retrieve()[Symbol.iterator]();
+        },
+        entries() {
+          return map.retrieve().entries();
+        },
+        keys() {
+          return map.retrieve().keys();
+        },
+        values() {
+          return map.retrieve().values();
         },
         get(key) {
           return map.retrieve().get(key);

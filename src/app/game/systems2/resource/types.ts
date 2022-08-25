@@ -1,4 +1,4 @@
-import { LimitEffectId } from "@/app/interfaces";
+import { DeltaEffectId, LimitEffectId } from "@/app/interfaces";
 
 import { EcsComponent, ValueComponent } from "@/app/ecs";
 
@@ -8,7 +8,20 @@ export class Amount extends ValueComponent<number> {
 
 export class Capacity extends ValueComponent<number> {
   value = 0;
-  constructor(readonly effect: LimitEffectId) {
+}
+
+export class LimitEffect extends ValueComponent<LimitEffectId> {
+  constructor(readonly value: LimitEffectId) {
+    super();
+  }
+}
+
+export class Delta extends ValueComponent<number> {
+  value = 0;
+}
+
+export class DeltaEffect extends ValueComponent<DeltaEffectId> {
+  constructor(readonly value: DeltaEffectId) {
     super();
   }
 }

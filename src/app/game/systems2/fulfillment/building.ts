@@ -5,7 +5,6 @@ import {
   All,
   ChangeTrackers,
   ChildrenQuery,
-  Commands,
   DiffMut,
   Eager,
   Every,
@@ -13,6 +12,7 @@ import {
   Query,
   Receive,
   Value,
+  Commands,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 

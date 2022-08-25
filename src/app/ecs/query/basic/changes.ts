@@ -8,7 +8,7 @@ import {
   QueryDescriptor,
 } from "../types";
 
-export type Tracker<C extends EcsComponent> = {
+type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;
   isChanged(): boolean;
   isAddedOrChanged(): boolean;

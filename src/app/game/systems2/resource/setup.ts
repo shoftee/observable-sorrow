@@ -16,7 +16,12 @@ function* resourceComponents(
   yield new Unlocked(false);
   if (meta.effects) {
     if (meta.effects.limit) {
-      yield new R.Capacity(meta.effects.limit);
+      yield new R.Capacity();
+      yield new R.LimitEffect(meta.effects.limit);
+    }
+    if (meta.effects.delta) {
+      yield new R.Delta();
+      yield new R.DeltaEffect(meta.effects.delta);
     }
   }
   if (meta.unlockMode === UnlockMode.FirstCapacity) {
