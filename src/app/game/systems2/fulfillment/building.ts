@@ -1,4 +1,5 @@
-import { any, cache } from "@/app/utils/collections";
+import { cache } from "@/app/utils/cache";
+import { any } from "@/app/utils/collections";
 
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {

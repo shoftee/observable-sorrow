@@ -1,4 +1,4 @@
-import { getOrAddWeak } from "@/app/utils/collections";
+import { firstOrDefault, getOrAddWeak } from "@/app/utils/collections";
 
 import { EcsEntity } from "../types";
 
@@ -48,8 +48,8 @@ export class HierarchyState {
 
   unlinkFromChildren(parent: EcsEntity) {
     const node = this.node(parent);
-    for (const childNode of node.children) {
-      childNode.parent = undefined;
+    for (const child of node.children) {
+      child.parent = undefined;
     }
     node.children.clear();
   }
@@ -63,11 +63,7 @@ export class HierarchyState {
   }
 
   parentOf(entity: EcsEntity): EcsEntity | undefined {
-    return this.node(entity).parent?.entity;
-  }
-
-  hasParent(entity: EcsEntity): boolean {
-    return this.node(entity).parent !== undefined;
+    return firstOrDefault(this.parentsOf(entity));
   }
 
   *childrenOf(entity: EcsEntity): Iterable<EcsEntity> {

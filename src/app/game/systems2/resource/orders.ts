@@ -3,7 +3,7 @@ import { Receive } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { Ledger } from "@/app/state";
-import { cache } from "@/app/utils/collections";
+import { cache } from "@/app/utils/cache";
 
 import * as events from "../types/events";
 import { ResourceMapQuery, applyOrder } from "../core/orders";

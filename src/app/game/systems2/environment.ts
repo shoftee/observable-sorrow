@@ -1,3 +1,5 @@
+import { single } from "@/app/utils/collections";
+
 import { SeasonId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
 
@@ -32,8 +34,8 @@ const AdvanceCalendar = System(
   Query(Read(Timer)).filter(Every(E.DayTimer)),
   Query(Mut(E.Day), Mut(E.Season), Mut(E.Year)),
 )((timerQuery, calendarQuery) => {
-  const [days] = timerQuery.single();
-  const [day, season, year] = calendarQuery.single();
+  const [days] = single(timerQuery);
+  const [day, season, year] = single(calendarQuery);
   if (days.isNewTick) {
     const newDay = day.value + 1;
     if (newDay < TimeConstants.DaysPerSeason) {

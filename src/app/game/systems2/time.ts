@@ -1,3 +1,4 @@
+import { single } from "@/app/utils/collections";
 import { round } from "@/app/utils/mathx";
 
 import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
@@ -21,7 +22,7 @@ const HandleOptionsChanged = System(
   Receive(events.TimeOptionsChanged),
   Query(DiffMut(TimeOptions)),
 )((events, optionsQuery) => {
-  const [options] = optionsQuery.single();
+  const [options] = single(optionsQuery);
   for (const { intent } of events.pull()) {
     switch (intent.id) {
       case "pawse":
@@ -39,7 +40,7 @@ const HandleOptionsChanged = System(
 
 const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeOptions)))(
   (query) => {
-    const [time, options] = query.single();
+    const [time, options] = single(query);
 
     const now = Date.now();
 
@@ -56,7 +57,7 @@ const AdvanceTimers = System(
   Query(Read(DeltaTime)),
   Query(DiffMut(Timer)),
 )((timeQuery, timers) => {
-  const [{ delta }] = timeQuery.single();
+  const [{ delta }] = single(timeQuery);
   if (delta > 0) {
     for (const [timer] of timers) {
       const last = timer.ticks;
