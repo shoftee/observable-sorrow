@@ -31,7 +31,7 @@ export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   };
 }
 
-/** Like Mut, but checks current value against new value and only sets the new value if they're different. */
+/** Like Mut, but only sets new value if it's strictly different from old value. */
 export function DiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
     newQuery({ ticks }): InstantiatedQuery<C> {
