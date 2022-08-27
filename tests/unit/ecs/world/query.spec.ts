@@ -17,7 +17,7 @@ import {
 } from "@/app/ecs/query";
 import { QueryDescriptor } from "@/app/ecs/query/types";
 
-describe("ecs query", () => {
+describe("ecs world query", () => {
   class Id extends ValueComponent<string> {
     constructor(readonly value: string) {
       super();
@@ -247,13 +247,29 @@ describe("ecs query", () => {
           ["shoftee", { level: 20, exp: 123 }],
         ]);
       });
-      it("excludes entities without parents", () => {
+      it("returns undefined result when parent does not match query", () => {
+        world.hierarchy.link(world.spawn(new Id("shoftee")), [
+          world.spawn(new Item("potion", 10)),
+        ]);
+
+        const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
+        world.queries.register(query);
+
+        expect(single(results(world, query))).to.deep.equal([
+          { itemId: "potion", count: 10 },
+          undefined,
+        ]);
+      });
+      it("returns undefined result when no parent", () => {
         world.spawn(new Item("potion", 10));
 
         const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
-        expect(results(world, query)).to.be.empty;
+        expect(single(results(world, query))).to.deep.equal([
+          { itemId: "potion", count: 10 },
+          undefined,
+        ]);
       });
     });
 

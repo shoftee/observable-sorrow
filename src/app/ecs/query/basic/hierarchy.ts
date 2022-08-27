@@ -37,14 +37,11 @@ export function WithParent(...ctors: OneOrMoreCtors): WithParent {
   };
 }
 
-type Parent = QueryDescriptor<EcsEntity>;
+type Parent = QueryDescriptor<EcsEntity | undefined>;
 export function Parent(): Parent {
   return {
     newQuery({ hierarchy }) {
       return defaultQuery({
-        includes({ entity }) {
-          return hierarchy.hasParent(entity);
-        },
         fetch({ entity }) {
           return hierarchy.parentOf(entity)!;
         },
@@ -53,7 +50,22 @@ export function Parent(): Parent {
   };
 }
 
-type ParentQuery<Q extends AllParams> = QueryDescriptor<AllResults<Q>>;
+type Parents = QueryDescriptor<Iterable<EcsEntity>>;
+export function Parents(): Parents {
+  return {
+    newQuery({ hierarchy }) {
+      return defaultQuery({
+        fetch({ entity }) {
+          return hierarchy.parentsOf(entity);
+        },
+      });
+    },
+  };
+}
+
+type ParentQuery<Q extends AllParams> = QueryDescriptor<
+  AllResults<Q> | undefined
+>;
 export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
   const mapQuery = MapQuery(Entity(), All(...qs));
   return {
@@ -62,16 +74,13 @@ export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
       const fetcher = mapQuery.create(world);
 
       return defaultQuery({
-        includes({ entity }) {
-          return hierarchy.hasParent(entity);
-        },
-        matches({ entity }) {
-          const parent = hierarchy.parentOf(entity)!;
-          return fetcher.fetch().has(parent);
-        },
         fetch({ entity }) {
-          const parent = hierarchy.parentOf(entity)!;
-          return fetcher.fetch().get(parent)!;
+          const parent = hierarchy.parentOf(entity);
+          if (parent) {
+            return fetcher.fetch().get(parent)!;
+          } else {
+            return undefined;
+          }
         },
         cleanup() {
           fetcher.cleanup?.();

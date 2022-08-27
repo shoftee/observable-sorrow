@@ -9,6 +9,10 @@ export class MultiMap<K, V> {
     }
   }
 
+  *[Symbol.iterator]() {
+    yield* this.map;
+  }
+
   entriesForKey(key: K): ReadonlySet<V> {
     return this.map.get(key) ?? new Set();
   }
@@ -37,9 +41,5 @@ export class MultiMap<K, V> {
 
   removeAll(key: K) {
     this.map.delete(key);
-  }
-
-  *[Symbol.iterator]() {
-    yield* this.map;
   }
 }

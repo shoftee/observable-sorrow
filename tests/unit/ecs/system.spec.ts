@@ -138,5 +138,57 @@ describe("ecs systems", () => {
       const hierarchyCheckerInstance = HierarchyChecker.build(world);
       hierarchyCheckerInstance.run();
     });
+    it("should spawn multiple levels of children correctly", () => {
+      const world = new World();
+
+      const Setup = System(Commands())((cmds) => {
+        cmds.spawn(new Id("name 1")).entity((level1) => {
+          cmds.spawnChild(level1, new Id("name 3")).entity((level2) => {
+            cmds.spawnChild(level2, new Id("name 7"));
+            cmds.spawnChild(level2, new Id("name 8"));
+          });
+          cmds.spawnChild(level1, new Id("name 4")).entity((level2) => {
+            cmds.spawnChild(level2, new Id("name 9"));
+            cmds.spawnChild(level2, new Id("name 10"));
+          });
+        });
+        cmds.spawn(new Id("name 2")).entity((level1) => {
+          cmds.spawnChild(level1, new Id("name 5")).entity((level2) => {
+            cmds.spawnChild(level2, new Id("name 11"));
+            cmds.spawnChild(level2, new Id("name 12"));
+          });
+          cmds.spawnChild(level1, new Id("name 6")).entity((level2) => {
+            cmds.spawnChild(level2, new Id("name 13"));
+            cmds.spawnChild(level2, new Id("name 14"));
+          });
+        });
+      });
+      const setupInstance = Setup.build(world);
+      setupInstance.run();
+      world.flush();
+
+      const HierarchyChecker = System(
+        Query(Value(Id), Eager(ChildrenQuery(Value(Id)))),
+      )((query) => {
+        expect(Array.from(query)).to.deep.equal([
+          ["name 1", [["name 3"], ["name 4"]]],
+          ["name 2", [["name 5"], ["name 6"]]],
+          ["name 3", [["name 7"], ["name 8"]]],
+          ["name 4", [["name 9"], ["name 10"]]],
+          ["name 5", [["name 11"], ["name 12"]]],
+          ["name 6", [["name 13"], ["name 14"]]],
+          ["name 7", []],
+          ["name 8", []],
+          ["name 9", []],
+          ["name 10", []],
+          ["name 11", []],
+          ["name 12", []],
+          ["name 13", []],
+          ["name 14", []],
+        ]);
+      });
+      const hierarchyCheckerInstance = HierarchyChecker.build(world);
+      hierarchyCheckerInstance.run();
+    });
   });
 });

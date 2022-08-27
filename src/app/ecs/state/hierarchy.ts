@@ -1,51 +1,87 @@
-import { MultiMap } from "@/app/utils/collections";
+import { getOrAddWeak } from "@/app/utils/collections";
+
 import { EcsEntity } from "../types";
 
+type Node = {
+  readonly entity: EcsEntity;
+  parent: Node | undefined;
+  children: Set<Node>;
+};
+
 export class HierarchyState {
-  // find children by parent
-  private readonly childrenLookup = new MultiMap<EcsEntity, EcsEntity>();
-  // find parents by children
-  private readonly parentsLookup = new Map<EcsEntity, EcsEntity>();
+  private readonly nodes = new WeakMap<EcsEntity, Node>();
 
   link(parent: EcsEntity, children: Iterable<EcsEntity>) {
+    const parentNode = this.node(parent);
     for (const child of children) {
-      this.linkOne(parent, child);
+      const childNode = this.node(child);
+      this.linkNodes(parentNode, childNode);
     }
   }
 
   linkOne(parent: EcsEntity, child: EcsEntity) {
-    if (this.parentsLookup.has(child)) {
-      throw new Error(`Entity ${child} already has a parent.`);
+    this.linkNodes(this.node(parent), this.node(child));
+  }
+
+  private linkNodes(parent: Node, child: Node) {
+    if (child.parent !== undefined) {
+      throw new Error(
+        `Entity ${child.entity} already has a parent entity ${child.parent.entity}`,
+      );
     }
-    this.parentsLookup.set(child, parent);
-    this.childrenLookup.add(parent, child);
+
+    child.parent = parent;
+    parent.children.add(child);
   }
 
   unlinkFromParent(child: EcsEntity) {
-    const parent = this.parentOf(child);
-    if (parent) {
-      this.childrenLookup.remove(parent, child, true);
-      this.parentsLookup.delete(child);
+    const node = this.node(child);
+    if (node.parent === undefined) {
+      throw new Error(
+        `Entity ${node.entity} does not have a parent to unlink.`,
+      );
     }
+
+    node.parent.children.delete(node);
+    node.parent = undefined;
   }
 
   unlinkFromChildren(parent: EcsEntity) {
-    const children = this.childrenOf(parent);
-    for (const child of children) {
-      this.parentsLookup.delete(child);
+    const node = this.node(parent);
+    for (const childNode of node.children) {
+      childNode.parent = undefined;
     }
-    this.childrenLookup.removeAll(parent);
+    node.children.clear();
   }
 
-  parentOf(child: EcsEntity): EcsEntity | undefined {
-    return this.parentsLookup.get(child);
+  *parentsOf(entity: EcsEntity): Iterable<EcsEntity> {
+    let current = this.node(entity);
+    while (current.parent) {
+      yield current.parent.entity;
+      current = current.parent;
+    }
   }
 
-  hasParent(child: EcsEntity): boolean {
-    return this.parentsLookup.has(child);
+  parentOf(entity: EcsEntity): EcsEntity | undefined {
+    return this.node(entity).parent?.entity;
   }
 
-  childrenOf(parent: EcsEntity): ReadonlySet<EcsEntity> {
-    return this.childrenLookup.entriesForKey(parent);
+  hasParent(entity: EcsEntity): boolean {
+    return this.node(entity).parent !== undefined;
+  }
+
+  *childrenOf(entity: EcsEntity): Iterable<EcsEntity> {
+    const children = this.node(entity).children;
+    for (const child of children) {
+      yield child.entity;
+    }
+  }
+
+  private node(entity: EcsEntity): Node {
+    return getOrAddWeak(this.nodes, entity, (entity) => ({
+      entity,
+      parent: undefined,
+      children: new Set<Node>(),
+    }));
   }
 }
