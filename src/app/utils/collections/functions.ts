@@ -1,3 +1,5 @@
+import { Queue } from "queue-typescript";
+
 /** Map-reduce combination for generic iterables. */
 export function reduce<T, TResult>(
   iterable: Iterable<T>,
@@ -37,6 +39,15 @@ export function any<T>(
     }
   }
   return false;
+}
+
+export function* map<T, V>(
+  iterable: Iterable<T>,
+  proj: (item: T) => V,
+): Iterable<V> {
+  for (const item of iterable) {
+    yield proj(item);
+  }
 }
 
 export function firstOrDefault<T>(
@@ -116,4 +127,17 @@ export function single<T>(iterable: Iterable<T>): T {
     throw new Error("Iterable produced no items.");
   }
   return found;
+}
+
+export function addRange<T>(set: Set<T>, iterable: Iterable<T>) {
+  for (const item of iterable) {
+    set.add(item);
+  }
+}
+
+export function* consume<T>(queue: Queue<T>): Iterable<T> {
+  let next;
+  while ((next = queue.dequeue())) {
+    yield next;
+  }
 }
