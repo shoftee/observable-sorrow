@@ -12,12 +12,12 @@ const { t } = useI18n();
 const astronomy = newAstronomyView(manager);
 
 async function observeSky(): Promise<void> {
-  await send({ kind: "bonfire", id: "observe-sky" });
+  await send({ kind: "astronomy", id: "observe-sky" });
 }
 
 </script>
 <template>
-  <button v-if="astronomy.showObserveSky" type="button" class="btn-observe-sky" @click="observeSky">
+  <button v-if="astronomy.hasRareEvent" type="button" class="btn-observe-sky" @click="observeSky">
     <i class="bi bi-stars"></i>
     {{ t("game.control.observe-sky") }}
   </button>

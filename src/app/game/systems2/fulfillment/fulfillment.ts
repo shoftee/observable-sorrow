@@ -126,7 +126,7 @@ const FulfillmentExtractor = DeltaExtractor(Value(Fulfillment))(
   (schema, [id]) => schema.fulfillments[id],
 );
 
-const DeltaExtractors = [
+const Extractors = [
   IngredientExtractor(F.Requirement, (ingredient, { value: requirement }) => {
     ingredient.requirement = requirement;
   }),
@@ -152,6 +152,6 @@ export class FulfillmentResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addSystems([CalculateIngredientFulfillment, CalculateRecipeFulfillment])
-      .addSystems(DeltaExtractors, { stage: "last-start" });
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }

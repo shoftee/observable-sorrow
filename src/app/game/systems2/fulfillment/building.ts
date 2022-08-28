@@ -177,7 +177,7 @@ const BuildingExtractor = DeltaExtractor(Value(Building))(
   (schema, [id]) => schema.buildings[id],
 );
 
-const DeltaExtractors = [
+const Extractors = [
   BuildingExtractor(Level, (building, { value: level }) => {
     building.level = level;
   }),
@@ -187,6 +187,6 @@ export class BuildingResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addSystems([ProcessRatioUnlocks])
-      .addSystems(DeltaExtractors, { stage: "last-start" });
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }

@@ -12,15 +12,15 @@ import { CalendarSchema } from "../environment/schema";
 import { BuildingSchema, FulfillmentSchema } from "../fulfillment/schema";
 import { ResourceSchema } from "../resource/schema";
 
-import { HistoryEvent, Countdown } from "../types";
+import { HistoryEvent } from "../types";
 import { NumberEffectSchema } from "../effects/schema";
 
 type RecordObj = Record<string, unknown>;
 
 type ComponentsSchema = {
-  countdowns: {
-    rareEvent?: SchemaEntity<SchemaComponent<Countdown>>;
-  };
+  astronomy: SchemaEntity<{
+    hasRareEvent: boolean;
+  }>;
   resources: {
     [K in ResourceId]: SchemaEntity<ResourceSchema>;
   };

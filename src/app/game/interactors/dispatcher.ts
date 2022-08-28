@@ -1,4 +1,5 @@
 import {
+  AstronomyIntent,
   BonfireIntent,
   ConstructionIntent,
   IDispatcher,
@@ -16,6 +17,9 @@ export class Dispatcher implements IDispatcher {
 
   async send(intent: Intent): Promise<void> {
     switch (intent.kind) {
+      case "astronomy":
+        return this.handleAstronomy(intent);
+
       case "bonfire":
         return this.handleBonfire(intent);
 
@@ -36,6 +40,16 @@ export class Dispatcher implements IDispatcher {
     }
   }
 
+  private handleAstronomy(intent: AstronomyIntent): void {
+    switch (intent.id) {
+      case "observe-sky":
+        if (this.admin.stockpile("observe-sky").state.amount > 0) {
+          this.admin.environment().observedSky = true;
+        }
+        break;
+    }
+  }
+
   private handleBonfire(intent: BonfireIntent): void {
     switch (intent.id) {
       case "gather-catnip":
@@ -46,13 +60,6 @@ export class Dispatcher implements IDispatcher {
           onFulfilled: () => ({}),
         });
         break;
-
-      case "observe-sky": {
-        if (this.admin.stockpile("observe-sky").state.amount > 0) {
-          this.admin.environment().observedSky = true;
-        }
-        break;
-      }
     }
   }
 

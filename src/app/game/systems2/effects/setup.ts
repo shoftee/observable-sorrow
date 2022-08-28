@@ -107,7 +107,7 @@ const EffectTreeExtractor = DeltaExtractor(
   All(Value(NumberEffect)).filter(Added(EffectTree)),
 )((schema, [[id]]) => schema.numbers[id]);
 
-const DeltaExtractors = [
+const Extractors = [
   NumberExtractor(NumberValue, (effect, { value }) => {
     effect.value = value;
   }),
@@ -121,6 +121,6 @@ export class EffectsSetupPlugin extends EcsPlugin {
     app
       .addStartupSystem(Setup)
       .addSystem(CollectEffectTrees, { stage: "startup-end" })
-      .addSystems(DeltaExtractors, { stage: "last-start" });
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }

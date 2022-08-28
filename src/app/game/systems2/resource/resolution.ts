@@ -138,7 +138,7 @@ const ResourceExtractor = DeltaExtractor(Value(Resource))(
   (schema, [id]) => schema.resources[id],
 );
 
-const DeltaExtractors = [
+const Extractors = [
   ResourceExtractor(R.Amount, (resource, { value: amount }) => {
     resource.amount = amount;
   }),
@@ -165,7 +165,7 @@ export class ResourceResolutionPlugin extends EcsPlugin {
         UnlockByQuantity,
         UnlockByCapacity,
       ])
-      .addSystems(DeltaExtractors, { stage: "last-start" })
+      .addSystems(Extractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });
   }
 }

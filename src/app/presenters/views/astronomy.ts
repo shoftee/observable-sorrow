@@ -3,12 +3,10 @@ import { IStateManager } from "../state-manager";
 
 export function newAstronomyView(manager: IStateManager): AstronomyView {
   return reactive({
-    showObserveSky: computed(
-      () => (manager.state.countdowns?.rareEvent?.remaining ?? 0) > 0,
-    ),
+    hasRareEvent: computed(() => manager.state.astronomy.hasRareEvent),
   });
 }
 
 interface AstronomyView {
-  showObserveSky: boolean;
+  hasRareEvent: boolean;
 }

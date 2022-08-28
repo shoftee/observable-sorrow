@@ -8,10 +8,9 @@ export type TimeIntent = { kind: "time" } & (
   | { id: "set-power"; power: number }
 );
 
-export type BonfireIntent = { kind: "bonfire" } & (
-  | { id: "gather-catnip" }
-  | { id: "observe-sky" }
-);
+export type AstronomyIntent = { kind: "astronomy" } & { id: "observe-sky" };
+
+export type BonfireIntent = { kind: "bonfire" } & { id: "gather-catnip" };
 
 export type ConstructionIntent = { kind: "construction" } & {
   id: "buy-building";
@@ -36,6 +35,7 @@ export type SocietyIntent = { kind: "society" } & (
 export type Intent =
   | MetaIntent
   | TimeIntent
+  | AstronomyIntent
   | BonfireIntent
   | ConstructionIntent
   | ResearchIntent

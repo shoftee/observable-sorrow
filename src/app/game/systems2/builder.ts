@@ -5,7 +5,7 @@ import { MinimalPlugins } from "@/app/ecs/plugins";
 
 import { RendererPlugin } from "./renderer";
 import { EnvironmentPlugin } from "./environment/plugin";
-import { AstronomyPlugin } from "./astronomy";
+import { AstronomyPlugin } from "./astronomy/plugin";
 import { TimePlugin } from "./time";
 import {
   ResourceSetupPlugin,

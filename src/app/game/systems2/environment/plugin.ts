@@ -104,22 +104,22 @@ const UpdateEffectTargets = RecalculateByList(
   "weather.severity-ratio",
 );
 
-const CalendarRecorder = DeltaExtractor()((schema) => schema.calendar);
+const CalendarExtractor = DeltaExtractor()((schema) => schema.calendar);
 
-const DeltaRecorders = [
-  CalendarRecorder(E.Day, (calendar, { value: day }) => {
+const Extractors = [
+  CalendarExtractor(E.Day, (calendar, { value: day }) => {
     calendar.day = day;
   }),
-  CalendarRecorder(E.Season, (calendar, { value: season }) => {
+  CalendarExtractor(E.Season, (calendar, { value: season }) => {
     calendar.season = season;
   }),
-  CalendarRecorder(E.Year, (calendar, { value: year }) => {
+  CalendarExtractor(E.Year, (calendar, { value: year }) => {
     calendar.year = year;
   }),
-  CalendarRecorder(E.Weather, (calendar, { value: weather }) => {
+  CalendarExtractor(E.Weather, (calendar, { value: weather }) => {
     calendar.weather = weather;
   }),
-  CalendarRecorder(E.Labels, (calendar, { date, epoch }) => {
+  CalendarExtractor(E.Labels, (calendar, { date, epoch }) => {
     calendar.labels.date = date;
     calendar.labels.epoch = epoch;
   }),
@@ -135,6 +135,6 @@ export class EnvironmentPlugin extends EcsPlugin {
         HandleWeatherChanged,
         UpdateEffectTargets,
       ])
-      .addSystems(DeltaRecorders, { stage: "last-start" });
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }
