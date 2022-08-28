@@ -2,7 +2,7 @@ import { watchSyncEffect } from "vue";
 
 import { SeasonId, WeatherId } from "@/app/interfaces";
 import { TimeConstants } from "@/app/state";
-import { choose } from "@/app/utils/probability";
+import { ChoiceSpecification, choose } from "@/app/utils/probability";
 
 import { System } from ".";
 
@@ -77,22 +77,17 @@ export class EnvironmentSystem extends System {
   }
 
   private chooseWeather(): WeatherId {
-    return choose(
-      [
-        {
-          frequency: 175,
-          result: "cold",
-        },
-        {
-          frequency: 175,
-          result: "warm",
-        },
-        {
-          result: "neutral",
-        },
-      ],
-      1000,
-      () => this.admin.prng().environment(),
+    return choose(WeatherChoiceSpecification, () =>
+      this.admin.prng().environment(),
     );
   }
 }
+
+const WeatherChoiceSpecification: ChoiceSpecification<WeatherId> = {
+  options: [
+    { frequency: 175, result: "cold" },
+    { frequency: 175, result: "warm" },
+    { result: "neutral" },
+  ],
+  total: 1000,
+};

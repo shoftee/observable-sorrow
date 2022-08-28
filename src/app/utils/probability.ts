@@ -1,15 +1,15 @@
-type ChoiceType<TResult> = {
-  frequency?: number;
-  result: TResult;
+export type ChoiceSpecification<TResult> = {
+  options: { frequency?: number; result: TResult }[];
+  total: number;
 };
 
 type RandomFunc = () => number;
 
 export function choose<TResult>(
-  options: ChoiceType<TResult>[],
-  total: number,
+  specification: ChoiceSpecification<TResult>,
   randomFunc: RandomFunc,
 ): TResult {
+  const { options, total } = specification;
   let providedTotal = 0;
   let unspecifiedCount = 0;
   for (const option of options) {
