@@ -1,6 +1,7 @@
-import { EcsEvent } from "@/app/ecs";
 import { BuildingId, TimeIntent } from "@/app/interfaces";
 import { ResourceMap } from "@/app/state";
+
+import { EcsEvent } from "@/app/ecs";
 
 export class TimeOptionsChanged extends EcsEvent {
   constructor(readonly intent: TimeIntent) {

@@ -7,7 +7,7 @@ export class LogPresenter {
   private eventId = 0;
 
   constructor(manager: IStateManager) {
-    manager.history().subscribe((events) => {
+    manager.events.history.subscribe((events) => {
       for (const event of events) {
         if (event.disposition !== "ignore") {
           document.dispatchEvent(

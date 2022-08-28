@@ -6,7 +6,7 @@ import {
   TechId,
 } from "@/app/interfaces";
 
-import { SchemaEntity, SchemaComponent } from "./schema";
+import { SchemaEntity, SchemaComponent, SchemaEvent } from "./schema";
 
 import { CalendarSchema } from "../environment/schema";
 import { BuildingSchema, FulfillmentSchema } from "../fulfillment/schema";
@@ -46,8 +46,8 @@ type ComponentsSchema = {
   }>;
 };
 
-export type EventsSchema = {
-  history?: HistoryEvent[];
+type EventsSchema = {
+  history: SchemaEvent<HistoryEvent>;
 };
 
 type Serializable<T> = {
@@ -69,6 +69,14 @@ type State<T> = T extends SchemaEntity<infer E>
 type Removed<T> = T extends SchemaEntity
   ? true
   : { [K in keyof T]?: Removed<T[K]> };
+
+export type EventSourceId = keyof EventsSchema;
+
+export type EventSources = {
+  [K in keyof EventsSchema]?: EventsSchema[K] extends SchemaEvent<infer E>
+    ? Serializable<E>[]
+    : never;
+};
 
 export type DeltaSchema = Present<ComponentsSchema>;
 export type StateSchema = State<ComponentsSchema>;
@@ -212,4 +220,20 @@ function mergeWith<T1 extends RecordObj, T2 extends RecordObj>(
 
 function isObject<T>(obj: T): obj is T & RecordObj {
   return obj === Object(obj);
+}
+
+type EventSinkPusher = {
+  [K in keyof EventSources]-?: (...items: NonNullable<EventSources[K]>) => void;
+};
+
+export function getEventSinkPusher(events: EventSources): EventSinkPusher {
+  return new Proxy({} as EventSinkPusher, {
+    get(_, propertyKey: keyof EventSources) {
+      const array = events[propertyKey] ?? (events[propertyKey] = []);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (...items: any[]) => {
+        array.push(...items);
+      };
+    },
+  });
 }

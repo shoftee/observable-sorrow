@@ -1,4 +1,4 @@
-import { ComponentDeltas } from "@/app/game/systems2/core/renderer";
+import { ComponentDeltas } from "@/app/game/systems2/core";
 
 import { EventId, Intent, PoolId } from ".";
 
@@ -19,8 +19,6 @@ export type OnEventHandler = (events: EventPool[]) => void;
 
 export interface IPresenterChangeSink {
   acceptRender(deltas: ComponentDeltas): void;
-  acceptMutations(changes: MutationPool[]): void;
-  acceptEvents(events: EventPool[]): void;
 }
 
 export interface IRootInteractor extends IDispatcher, IGameController {

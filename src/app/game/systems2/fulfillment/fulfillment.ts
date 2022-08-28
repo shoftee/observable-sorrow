@@ -1,3 +1,5 @@
+import { Meta, resourceQtyIterable } from "@/app/state";
+
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   All,
@@ -14,9 +16,7 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { Meta, resourceQtyIterable } from "@/app/state";
-
-import { DeltaExtractor } from "../core/renderer";
+import { DeltaExtractor } from "../core";
 import { Fulfillment, Resource, Unlocked } from "../types/common";
 
 import * as F from "./types";

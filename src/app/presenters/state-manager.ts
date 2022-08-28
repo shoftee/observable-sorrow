@@ -1,15 +1,11 @@
-import { mergeWith } from "lodash";
 import { reactive } from "vue";
 
+import { getOrAdd } from "@/app/utils/collections";
+import { Enumerable } from "@/app/utils/enumerable";
+
 import {
-  BuildingId,
-  EventId,
-  EventPool,
-  FulfillmentId,
   IPresenterChangeSink,
   JobId,
-  MutationPool,
-  NumberEffectId,
   PoolId,
   PopId,
   PropertyBag,
@@ -20,11 +16,6 @@ import {
 } from "@/app/interfaces";
 import { Channel } from "@/app/presenters/common/channel";
 import {
-  BuildingState,
-  EffectState,
-  EffectTreeState,
-  EnvironmentState,
-  FulfillmentState,
   HistoryEvent,
   JobState,
   PlayerState,
@@ -33,27 +24,19 @@ import {
   SectionState,
   StockpileState,
   TechState,
-  TimeState,
 } from "@/app/state";
-import { getOrAdd } from "@/app/utils/collections";
-import { Enumerable } from "@/app/utils/enumerable";
 import {
   addState,
   changeState,
   removeState,
+  ComponentDeltas,
   StateSchema,
+  EventSourceId,
 } from "@/app/game/systems2/core";
-import { ComponentDeltas } from "@/app/game/systems2/core/renderer";
 
 export interface IStateManager {
   state: StateSchema;
-
-  buildings(): ReadonlyMap<BuildingId, BuildingState>;
-  building(id: BuildingId): BuildingState;
-
-  fulfillment(id: FulfillmentId): FulfillmentState;
-
-  number(id: NumberEffectId): EffectState<number>;
+  events: IEventPools;
 
   jobs(): Enumerable<[JobId, JobState]>;
   job(id: JobId): JobState;
@@ -70,38 +53,12 @@ export interface IStateManager {
   techs(): Enumerable<TechId>;
   tech(id: TechId): TechState;
 
-  effectTree(): EffectTreeState;
-  environment(): EnvironmentState;
   player(): PlayerState;
-  time(): TimeState;
-
-  history(): Channel<HistoryEvent>;
 }
 
 class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
-  get buildings(): Map<BuildingId, BuildingState> {
-    return this.ensure("buildings") as unknown as Map<
-      BuildingId,
-      BuildingState
-    >;
-  }
-
-  get fulfillments(): Map<FulfillmentId, FulfillmentState> {
-    return this.ensure("fulfillments") as unknown as Map<
-      FulfillmentId,
-      FulfillmentState
-    >;
-  }
-
   get jobs(): Map<JobId, JobState> {
     return this.ensure("jobs") as unknown as Map<JobId, JobState>;
-  }
-
-  get numbers(): Map<NumberEffectId, EffectState<number>> {
-    return this.ensure("numbers") as unknown as Map<
-      NumberEffectId,
-      EffectState<number>
-    >;
   }
 
   get pops(): Map<PopId, PopState> {
@@ -132,21 +89,25 @@ class MutationPools extends Map<PoolId, Map<string, PropertyBag>> {
   }
 }
 
-class EventPools extends Map<EventId, Channel> {
+interface IEventPools {
+  get history(): Channel<HistoryEvent>;
+}
+
+class EventPools extends Map<EventSourceId, Channel> implements IEventPools {
   get history(): Channel<HistoryEvent> {
     return this.ensure("history") as Channel<HistoryEvent>;
   }
 
-  ensure(id: EventId): Channel {
+  ensure(id: EventSourceId): Channel {
     return getOrAdd(this, id, () => new Channel());
   }
 }
 
 export class StateManager implements IPresenterChangeSink, IStateManager {
   readonly state: StateSchema;
+  readonly events: EventPools;
 
   private readonly pools: MutationPools;
-  private readonly events: EventPools;
 
   constructor() {
     this.state = reactive({} as StateSchema);
@@ -169,46 +130,14 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
       console.log("Removed", deltas.removed);
       removeState(this.state, deltas.removed);
     }
-  }
 
-  acceptMutations(mutations: MutationPool[]): void {
-    for (const pool of mutations) {
-      const values = this.pools.ensure(pool.poolId);
-      if (pool.added) {
-        for (const [id, state] of pool.added) {
-          values.set(id, reactive(state));
-        }
-      }
-      if (pool.updated) {
-        for (const [id, state] of pool.updated) {
-          updateObject(state, values.get(id));
-        }
-      }
-      if (pool.removed) {
-        for (const id of pool.removed) {
-          values.delete(id);
-        }
+    const sinks = Object.entries(deltas.events);
+    if (sinks.length > 0) {
+      console.log("Events", sinks);
+      for (const [id, events] of sinks) {
+        this.events.ensure(id as EventSourceId).push(events);
       }
     }
-  }
-
-  acceptEvents(events: EventPool[]): void {
-    for (const pool of events) {
-      const channel = this.events.ensure(pool.id);
-      channel.push(pool.events);
-    }
-  }
-
-  buildings() {
-    return this.pools.buildings;
-  }
-
-  building(id: BuildingId): BuildingState {
-    return this.pools.buildings.get(id) as BuildingState;
-  }
-
-  fulfillment(id: FulfillmentId): FulfillmentState {
-    return this.pools.fulfillments.get(id) as FulfillmentState;
   }
 
   jobs(): Enumerable<[JobId, JobState]> {
@@ -217,10 +146,6 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
 
   job(id: JobId): JobState {
     return this.pools.jobs.get(id) as JobState;
-  }
-
-  number(id: NumberEffectId): EffectState<number> {
-    return this.pools.numbers.get(id) as EffectState<number>;
   }
 
   pops(): Enumerable<[PopId, PopState]> {
@@ -251,41 +176,8 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
     return this.pools.techs.get(id) as TechState;
   }
 
-  effectTree(): EffectTreeState {
-    const pool = this.pools.ensure("singletons");
-    return pool.get("effect-tree") as unknown as EffectTreeState;
-  }
-
-  environment(): EnvironmentState {
-    const pool = this.pools.ensure("singletons");
-    return pool.get("environment") as unknown as EnvironmentState;
-  }
-
   player(): PlayerState {
     const pool = this.pools.ensure("singletons");
     return pool.get("player") as unknown as PlayerState;
   }
-
-  time(): TimeState {
-    const pool = this.pools.ensure("singletons");
-    return pool.get("time") as unknown as TimeState;
-  }
-
-  history(): Channel<HistoryEvent> {
-    return this.events.history;
-  }
-}
-
-function updateObject(src: PropertyBag, dst?: PropertyBag): PropertyBag {
-  dst = dst ?? reactive({});
-  mergeWith(dst, src, (dstValue, srcValue, key, dstObj) => {
-    if (srcValue === undefined && dstValue !== undefined) {
-      // undefined is a valid value
-      dstObj[key] = undefined;
-    } else {
-      // leave it up to the calling method
-      return undefined;
-    }
-  });
-  return dst;
 }

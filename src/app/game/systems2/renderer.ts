@@ -1,11 +1,10 @@
 import { OnRenderHandler } from "@/app/interfaces";
 
 import { PluginApp, EcsPlugin, EcsResource } from "@/app/ecs";
-
 import { System } from "@/app/ecs/system";
 import { Res } from "@/app/ecs/query";
 
-import { DeltaBuffer } from "./core/renderer";
+import { DeltaBuffer } from "./core";
 
 class Renderer extends EcsResource {
   constructor(readonly onRender: OnRenderHandler) {

@@ -1,5 +1,11 @@
+import { Queue } from "queue-typescript";
+
+import { cache } from "@/app/utils/cache";
+import { consume, map, MultiMap } from "@/app/utils/collections";
+
 import { NumberEffectId } from "@/app/interfaces";
 
+import { EcsEntity } from "@/app/ecs";
 import {
   ChangeTrackers,
   ChildrenQuery,
@@ -28,10 +34,6 @@ import {
   Constant,
   Precalculated,
 } from "./types";
-import { EcsEntity } from "@/app/ecs";
-import { consume, map, MultiMap } from "@/app/utils/collections";
-import { Queue } from "queue-typescript";
-import { cache } from "@/app/utils/cache";
 
 export const NumberTrackersQuery = MapQuery(
   Value(NumberEffect),

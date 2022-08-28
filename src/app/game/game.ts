@@ -5,9 +5,9 @@ import {
   OnRenderHandler,
   WorkshopIntent,
 } from "@/app/interfaces";
+import { Meta, ResourceMap, TimeConstants } from "@/app/state";
 
-import { EcsEvent, GameRunner } from "../ecs";
-import { Meta, ResourceMap, TimeConstants } from "../state";
+import { EcsEvent, GameRunner } from "@/app/ecs";
 
 import { build } from "./systems2/builder";
 import * as events from "./systems2/types/events";

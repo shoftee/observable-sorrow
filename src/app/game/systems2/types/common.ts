@@ -1,10 +1,11 @@
-import { EcsComponent, ValueComponent } from "@/app/ecs";
 import {
   BooleanEffectId,
   BuildingId,
   FulfillmentId,
   ResourceId,
 } from "@/app/interfaces";
+
+import { EcsComponent, ValueComponent } from "@/app/ecs";
 
 export class Level extends ValueComponent<number> {
   value = 0;

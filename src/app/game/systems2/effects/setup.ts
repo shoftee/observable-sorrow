@@ -18,7 +18,9 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { NumberEffectId } from "@/app/interfaces";
-import { DeltaExtractor } from "../core/renderer";
+
+import { DeltaExtractor } from "../core";
+
 import {
   NumberValue,
   NumberEffect,

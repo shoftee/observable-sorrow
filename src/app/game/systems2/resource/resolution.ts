@@ -1,3 +1,7 @@
+import { single } from "@/app/utils/collections";
+
+import { NumberEffectId } from "@/app/interfaces";
+
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   ChangeTrackers,
@@ -10,10 +14,8 @@ import {
   Value,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
-import { NumberEffectId } from "@/app/interfaces";
-import { single } from "@/app/utils/collections";
 
-import { DeltaExtractor } from "../core/renderer";
+import { DeltaExtractor } from "../core";
 import {
   NumberTrackersQuery,
   RecalculateByQuery,

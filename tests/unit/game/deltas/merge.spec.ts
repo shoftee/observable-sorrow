@@ -7,9 +7,9 @@ import {
   changeState,
   mergeRemovals,
   DeltaSchema,
+  DeltaBuffer,
   removeState,
 } from "@/app/game/systems2/core";
-import { DeltaBuffer } from "@/app/game/systems2/core/renderer";
 
 import { ResourceSchema } from "@/app/game/systems2/resource/schema";
 import { NumberEffectSchema } from "@/app/game/systems2/effects/schema";

@@ -7,7 +7,7 @@ import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
 import { Commands, Query, Mut, Receive, Read, DiffMut } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaExtractor } from "./core/renderer";
+import { DeltaExtractor } from "./core";
 import { TimeControls, Timer } from "./types";
 import * as events from "./types/events";
 

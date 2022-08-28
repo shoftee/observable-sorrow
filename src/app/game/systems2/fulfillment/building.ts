@@ -26,7 +26,7 @@ import {
   resourceQtyIterable,
 } from "@/app/state";
 
-import { DeltaExtractor } from "../core/renderer";
+import { DeltaExtractor } from "../core";
 import { applyOrder, ResourceMapQuery } from "../core/orders";
 import {
   Building,
@@ -36,11 +36,12 @@ import {
   BooleanEffect,
   Resource,
 } from "../types/common";
-
 import * as events from "../types/events";
-import * as F from "./types";
+
 import * as R from "../resource/types";
 import { BuildingEffect, Effect, NumberValue } from "../effects/types";
+
+import * as F from "./types";
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new Building(meta.id);

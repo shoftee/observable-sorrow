@@ -14,12 +14,11 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaExtractor } from "../core/renderer";
-
+import { DeltaExtractor } from "../core";
 import { RecalculateByList } from "../effects/calculation";
 import { NumberValue, SeasonEffect, WeatherEffect } from "../effects/types";
-import { Timer } from "../types";
 import { Prng } from "../types/common";
+import { Timer } from "../types";
 
 import {
   getWeatherSeasonRatio,

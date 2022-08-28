@@ -1,12 +1,13 @@
+import { cache } from "@/app/utils/cache";
+
+import { Ledger } from "@/app/state";
+
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import { Receive } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { Ledger } from "@/app/state";
-import { cache } from "@/app/utils/cache";
-
-import * as events from "../types/events";
 import { ResourceMapQuery, applyOrder } from "../core/orders";
+import * as events from "../types/events";
 
 const ProcessResourceOrders = System(
   Receive(events.ResourceOrder),

@@ -15,16 +15,17 @@ import { System } from "@/app/ecs/system";
 import {
   DeltaSchema,
   RemovedDeltaSchema,
-  EventsSchema,
+  EventSources,
   StateSchema,
   visitState,
+  getEventSinkPusher,
 } from "./deltas";
 
 export class ComponentDeltas {
   added: DeltaSchema = {};
   changed: DeltaSchema = {};
   removed: RemovedDeltaSchema = {};
-  events: EventsSchema = {};
+  events: EventSources = {};
 
   clear() {
     this.added = {};
@@ -43,6 +44,10 @@ export class ComponentDeltas {
 
   setRemoved(fn: (root: RemovedDeltaSchema) => void) {
     visitState(this.removed, fn);
+  }
+
+  pushEvents() {
+    return getEventSinkPusher(this.events);
   }
 }
 

@@ -1,5 +1,6 @@
-import { EcsComponent } from "@/app/ecs";
 import { TimeConstants } from "@/app/state";
+
+import { EcsComponent } from "@/app/ecs";
 
 export class Timer extends EcsComponent {
   /** Absolute time, adjusted to the timer's period. */

@@ -9,3 +9,8 @@ const EntitySym = Symbol();
 export class SchemaEntity<T = unknown> {
   [EntitySym]!: T;
 }
+
+const EventSym = Symbol();
+export class SchemaEvent<T = unknown> {
+  [EventSym]!: T;
+}

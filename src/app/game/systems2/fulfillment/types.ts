@@ -1,6 +1,6 @@
-import { EcsComponent, ValueComponent } from "@/app/ecs";
-
 import { FulfillmentId, ResourceId } from "@/app/interfaces";
+
+import { EcsComponent, ValueComponent } from "@/app/ecs";
 
 import { Fulfillment, Resource } from "../types/common";
 

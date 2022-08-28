@@ -1,6 +1,6 @@
-import { EcsComponent, ValueComponent } from "@/app/ecs";
-
 import { SeasonId, WeatherId } from "@/app/interfaces";
+
+import { EcsComponent, ValueComponent } from "@/app/ecs";
 
 export const DayTimer = class extends EcsComponent {};
 
