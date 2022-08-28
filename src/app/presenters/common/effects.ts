@@ -2,8 +2,8 @@ import { computed, reactive } from "vue";
 
 import { NumberEffectId } from "@/app/interfaces";
 import { Meta } from "@/app/state";
+import { StateSchema } from "@/app/game/systems2/core";
 
-import { IStateManager } from "..";
 import { NumberView, numberView } from ".";
 
 export interface EffectItem {
@@ -24,21 +24,18 @@ export interface EffectTreeNode {
   nodes: EffectTreeNode[];
 }
 
-export function effectTree(
-  id: NumberEffectId,
-  manager: IStateManager,
-): EffectTree {
+export function effectTree(id: NumberEffectId, state: StateSchema): EffectTree {
   return reactive({
-    nodes: computed(() => Array.from(collectEffectNodes(id, manager))),
+    nodes: computed(() => Array.from(collectEffectNodes(id, state))),
   });
 }
 
 function* collectEffectNodes(
   id: NumberEffectId,
-  manager: IStateManager,
+  state: StateSchema,
 ): Iterable<EffectTreeNode> {
-  const children = manager.effectTree().get(id) ?? [];
-  for (const child of children) {
+  const children = state.numbers[id]?.references;
+  for (const child of children ?? []) {
     const style = Meta.effectDisplay(child);
     switch (style.disposition) {
       case "hide":
@@ -46,19 +43,19 @@ function* collectEffectNodes(
         continue;
       case "inline":
         // treat children-of-child as direct children
-        yield* collectEffectNodes(child, manager);
+        yield* collectEffectNodes(child, state);
         continue;
 
       default:
         yield reactive({
           id: child,
           label: style.label,
-          value: computed(() => numberView(manager.state, child)),
+          value: computed(() => numberView(state, child)),
           // Don't collect children of collapsed nodes
           nodes:
             style.disposition === "collapse"
               ? []
-              : Array.from(collectEffectNodes(child, manager)),
+              : Array.from(collectEffectNodes(child, state)),
         });
     }
   }

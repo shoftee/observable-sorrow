@@ -5,15 +5,13 @@ import { useI18n } from "vue-i18n";
 import EffectTree from "@/components/Controls/EffectTree.vue";
 
 import { ResourceView } from "@/app/presenters/views";
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useFormatter } from "@/composables/game-endpoint";
 
 const { item } = defineProps<{ item: ResourceView }>();
 
 const { t } = useI18n();
 
-const { fmt } = useEndpoint((ep) => {
-  return { fmt: ep.presenters.formatter };
-});
+const fmt = useFormatter();
 
 const { amount, capacity, change, modifier } = toRefs(item);
 </script>

@@ -11,6 +11,9 @@ import {
 } from "@/app/game/systems2/core";
 import { DeltaBuffer } from "@/app/game/systems2/core/renderer";
 
+import { ResourceSchema } from "@/app/game/systems2/resource/schema";
+import { NumberEffectSchema } from "@/app/game/systems2/effects/schema";
+
 describe("delta merge", () => {
   describe("addState", () => {
     it("should ignore symbols", () => {
@@ -91,18 +94,41 @@ describe("delta merge", () => {
       const added = buffer.components.added;
 
       const newTime = { paused: false };
-      changeState(added, {
+      addState(added, {
         time: newTime,
       });
 
       const newResource = resource();
-      changeState(added, {
+      addState(added, {
         resources: { catnip: newResource },
       });
 
       expect(added).to.deep.equal({
         time: newTime,
         resources: { catnip: newResource },
+      });
+    });
+    it("should add arrays", () => {
+      const buffer = new DeltaBuffer();
+      const added = buffer.components.added;
+
+      const newCatnipProduction: NumberEffectSchema = {
+        value: 0.125,
+        references: ["catnip.delta"],
+      };
+      addState(added, {
+        numbers: {
+          "catnip.production": newCatnipProduction,
+        },
+      });
+
+      expect(added).to.deep.equal({
+        numbers: {
+          "catnip.production": {
+            value: 0.125,
+            references: ["catnip.delta"],
+          },
+        },
       });
     });
   });
@@ -189,6 +215,37 @@ describe("delta merge", () => {
         resources: { catnip: newResource },
       });
     });
+    it("should overwrite arrays", () => {
+      const buffer = new DeltaBuffer();
+      const changed = buffer.components.changed;
+
+      changeState(changed, {
+        numbers: {
+          "catnip-field.catnip": {
+            value: 0.125,
+            references: ["weather.ratio"],
+          },
+        },
+      });
+
+      changeState(changed, {
+        numbers: {
+          "catnip-field.catnip": {
+            value: 0.125,
+            references: ["catnip-field.catnip.base", "weather.ratio"],
+          },
+        },
+      });
+
+      expect(changed).to.deep.equal({
+        numbers: {
+          "catnip-field.catnip": {
+            value: 0.125,
+            references: ["catnip-field.catnip.base", "weather.ratio"],
+          },
+        },
+      });
+    });
   });
 
   describe("removeState", () => {
@@ -248,6 +305,6 @@ describe("delta merge", () => {
   });
 });
 
-function resource() {
+function resource(): ResourceSchema {
   return { amount: 123, unlocked: true };
 }

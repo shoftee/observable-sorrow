@@ -76,9 +76,28 @@ type UpdateContext = {
   gathered: Set<EcsEntity>;
 };
 
-// TODO: parent effect propagation. When an effect is updated, all effects that reference it must also be updated.
+export const RecalculateByList = function (...ids: NumberEffectId[]) {
+  return System(
+    EntityByIdQuery,
+    EffectsTupleQuery,
+    OperationsTupleQuery,
+  )((idsLookup, effectsQuery, operationsQuery) => {
+    const entities = Array.from(ids, (id) => idsLookup.get(id)!);
 
-export const RecalculateIds = function (
+    const ctx: UpdateContext = {
+      effect: (entity) => effectsQuery.get(entity),
+      operation: (entity) => operationsQuery.get(entity),
+      entity: (id) => idsLookup.get(id),
+      gathered: new Set(),
+    };
+
+    for (const entity of entities) {
+      gather(ctx, entity);
+    }
+  });
+};
+
+export const RecalculateByQuery = function (
   selectionQuery: QueryDescriptor<NumberEffectId>,
 ) {
   return System(

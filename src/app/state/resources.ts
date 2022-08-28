@@ -1,4 +1,9 @@
-import { ResourceId, DeltaEffectId, LimitEffectId } from "@/app/interfaces";
+import {
+  ResourceId,
+  DeltaEffectId,
+  LimitEffectId,
+  ModifierEffectId,
+} from "@/app/interfaces";
 
 export enum UnlockMode {
   FirstQuantity = 0,
@@ -8,6 +13,7 @@ export enum UnlockMode {
 type ResourceEffectsType = Readonly<{
   delta?: DeltaEffectId;
   limit?: LimitEffectId;
+  modifier?: ModifierEffectId;
 }>;
 
 export type ResourceMetadataType = Readonly<{
@@ -24,6 +30,7 @@ export const ResourceMetadata: Record<ResourceId, ResourceMetadataType> = {
     effects: {
       delta: "catnip.delta",
       limit: "catnip.limit",
+      modifier: "weather.ratio",
     },
   },
   wood: {

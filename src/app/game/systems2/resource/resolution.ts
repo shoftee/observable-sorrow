@@ -14,15 +14,18 @@ import { NumberEffectId } from "@/app/interfaces";
 import { single } from "@/app/utils/collections";
 
 import { DeltaExtractor } from "../core/renderer";
-import { NumberTrackersQuery, RecalculateIds } from "../effects/calculation";
+import {
+  NumberTrackersQuery,
+  RecalculateByQuery,
+} from "../effects/calculation";
 import { TickTimer } from "../time";
 import { Timer } from "../types";
 import { Resource, Unlocked } from "../types/common";
 
 import * as R from "./types";
 
-const UpdateLimitEffects = RecalculateIds(Value(R.LimitEffect));
-const UpdateDeltaEffects = RecalculateIds(Value(R.DeltaEffect));
+const UpdateLimitEffects = RecalculateByQuery(Value(R.LimitEffect));
+const UpdateDeltaEffects = RecalculateByQuery(Value(R.DeltaEffect));
 
 const UpdateEffectTargets = System(
   Query(DiffMut(R.Capacity), Value(R.LimitEffect)).filter(Every(Resource)),

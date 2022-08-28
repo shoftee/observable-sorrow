@@ -21,7 +21,7 @@ const { happiness } = society;
     <div class="card-body">
       <div class="row">
         <div class="col-xl-6 col-12">
-          <div v-if="happiness.view.value !== undefined" class="text-center p-2">
+          <div v-if="happiness.view?.value !== undefined" class="text-center p-2">
             <tippy>
               <i18n-t keypath="management.happiness.label" scope="global">
                 <template #amount>

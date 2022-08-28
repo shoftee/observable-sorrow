@@ -1,10 +1,13 @@
-import { BuildingId, NumberEffectId } from "@/app/interfaces";
+import {
+  BuildingId,
+  NumberEffectId,
+  SeasonId,
+  WeatherId,
+} from "@/app/interfaces";
 
 import { EcsComponent, ValueComponent } from "@/app/ecs";
 
-export const Markers = {
-  Effect: class extends EcsComponent {},
-};
+export class Effect extends EcsComponent {}
 
 export class NumberEffect extends ValueComponent<NumberEffectId> {
   constructor(readonly value: NumberEffectId) {
@@ -54,12 +57,24 @@ export class Reference extends ValueComponent<NumberEffectId> {
   }
 }
 
+export class EffectTree extends EcsComponent {
+  readonly references = new Set<NumberEffectId>();
+}
+
 export class Precalculated extends EcsComponent {}
 
 export class BuildingEffect extends ValueComponent<BuildingId> {
   constructor(readonly value: BuildingId) {
     super();
   }
+}
+
+export class WeatherEffect extends ValueComponent<WeatherId> {
+  value: WeatherId = "neutral";
+}
+
+export class SeasonEffect extends ValueComponent<SeasonId> {
+  value: SeasonId = "spring";
 }
 
 export type EffectCompositeItem = EcsComponent | Expr;
@@ -171,8 +186,16 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
     reference("weather.season-ratio"),
     reference("weather.severity-ratio"),
   ),
-  "weather.season-ratio": constant(0), // TODO environment effects
-  "weather.severity-ratio": constant(0), // TODO environment effects
+  "weather.season-ratio": function* () {
+    yield new Default(0);
+    yield new Precalculated();
+    yield new SeasonEffect();
+  },
+  "weather.severity-ratio": function* () {
+    yield new Default(0);
+    yield new Precalculated();
+    yield new WeatherEffect();
+  },
 
   "wood.delta": reference("wood.production"),
   "wood.production": constant(0), // TODO jobs

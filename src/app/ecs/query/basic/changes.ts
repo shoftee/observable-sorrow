@@ -88,3 +88,25 @@ export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
     },
   };
 }
+
+type AddedOrChanged = FilterDescriptor;
+export function AddedOrChanged<C extends EcsComponent>(
+  ctor: Ctor<C>,
+): AddedOrChanged {
+  return {
+    newFilter({ ticks }) {
+      return defaultFilter({
+        includes({ archetype }) {
+          return archetype.has(ctor);
+        },
+        matches({ archetype }) {
+          const component = archetype.get(ctor)!;
+          return (
+            component[ChangeTicks].isAdded(ticks.last, ticks.current) ||
+            component[ChangeTicks].isChanged(ticks.last, ticks.current)
+          );
+        },
+      });
+    },
+  };
+}

@@ -4,14 +4,12 @@ import { inject } from "vue";
 import { EffectItem } from "@/app/presenters/common/effects";
 
 import { KeyboardEventsKey } from "@/composables/keyboard-events";
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useFormatter } from "@/composables/game-endpoint";
 
 const { items } = defineProps<{ items: EffectItem[] }>();
 const events = inject(KeyboardEventsKey);
 
-const { fmt } = useEndpoint((ep) => {
-  return { fmt: ep.presenters.formatter };
-});
+const fmt = useFormatter()
 </script>
 
 <template>

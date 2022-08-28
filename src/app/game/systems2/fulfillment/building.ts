@@ -40,7 +40,7 @@ import {
 import * as events from "../types/events";
 import * as F from "./types";
 import * as R from "../resource/types";
-import { BuildingEffect, Markers, NumberValue } from "../effects/types";
+import { BuildingEffect, Effect, NumberValue } from "../effects/types";
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new Building(meta.id);
@@ -122,9 +122,7 @@ const HandleLevelChanged = System(
     Value(PriceRatio),
     ChildrenQuery(Value(F.BaseRequirement), DiffMut(F.Requirement)),
   ),
-  MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(
-    Every(Markers.Effect),
-  ),
+  MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(Every(Effect)),
 )((trackersQuery, requirementsQuery, effectsQuery) => {
   for (const [buildingEntity, [id, trackers]] of trackersQuery) {
     if (trackers.isAddedOrChanged()) {

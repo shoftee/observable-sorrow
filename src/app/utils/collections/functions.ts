@@ -129,6 +129,17 @@ export function single<T>(iterable: Iterable<T>): T {
   return found;
 }
 
+export function* take<T>(iterable: Iterable<T>, count: number): Iterable<T> {
+  let taken = 0;
+  for (const item of iterable) {
+    if (taken >= count) {
+      break;
+    }
+    yield item;
+    taken++;
+  }
+}
+
 export function addRange<T>(set: Set<T>, iterable: Iterable<T>) {
   for (const item of iterable) {
     set.add(item);

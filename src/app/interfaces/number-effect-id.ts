@@ -34,8 +34,9 @@ export type LimitEffectId =
   | "catpower.limit.base"
   | "kittens.limit";
 
+export type ModifierEffectId = "weather.ratio";
+
 export type CatnipFieldEffectId =
-  | "weather.ratio"
   | "catnip-field.catnip"
   | "catnip-field.catnip.base";
 
@@ -87,6 +88,7 @@ export type NumberEffectId =
   | DeltaEffectId
   | RatioEffectId
   | LimitEffectId
+  | ModifierEffectId
   | AstronomyEffectId
   | CatnipFieldEffectId
   | HutEffectId

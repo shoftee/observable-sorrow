@@ -3,13 +3,11 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { EffectTreeNode } from "@/app/presenters/common";
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useFormatter } from "@/composables/game-endpoint";
 
 const { nodes } = defineProps<{ nodes: EffectTreeNode[] }>();
 
-const { fmt } = useEndpoint((ep) => {
-  return { fmt: ep.presenters.formatter };
-});
+const fmt = useFormatter()
 
 const { t } = useI18n();
 

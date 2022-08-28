@@ -5,8 +5,8 @@ import { useI18n } from "vue-i18n";
 import ObserveSky from "./ObserveSky.vue";
 import Pawse from "./Pawse.vue";
 
-import { useEndpoint } from "@/composables/game-endpoint";
 import { LogItem } from "@/app/presenters";
+import { useEndpoint } from "@/composables/game-endpoint";
 import { useLogItemEvent } from "@/composables/use-event-listener";
 
 import { LogEpoch, newLogEpoch, removeClippedEvents } from "./_types";
@@ -26,9 +26,7 @@ const requireNewEpoch = ref(true);
 
 watch(
   () => calendar.season,
-  () => {
-    requireNewEpoch.value = true;
-  },
+  () => { requireNewEpoch.value = true; },
 );
 
 function clearLog() {

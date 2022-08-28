@@ -15,8 +15,6 @@ type Order = Partial<{
   readonly credits: ResourceMap;
 }>;
 
-type Value<T> = T extends { value: infer V } ? V : never;
-
 type ResourceTuple = [
   Readonly<number>,
   Readonly<number> | undefined,

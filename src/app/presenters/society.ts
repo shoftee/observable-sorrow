@@ -59,7 +59,7 @@ export class SocietyPresenter {
       view: computed(() =>
         numberView(manager.state, "population.happiness.total", "negative"),
       ),
-      effectTree: effectTree("population.happiness.total", manager),
+      effectTree: effectTree("population.happiness.total", manager.state),
     });
 
     this.allowSendHunters = computed(() => manager.tech("archery").researched);

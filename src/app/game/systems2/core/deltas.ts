@@ -1,85 +1,45 @@
-import { EcsComponent } from "@/app/ecs";
 import {
   BuildingId,
   FulfillmentId,
   NumberEffectId,
   ResourceId,
-  SeasonId,
   TechId,
-  WeatherId,
 } from "@/app/interfaces";
+
+import { SchemaEntity, SchemaComponent } from "./schema";
+
+import { CalendarSchema } from "../environment/schema";
+import { BuildingSchema, FulfillmentSchema } from "../fulfillment/schema";
+import { ResourceSchema } from "../resource/schema";
+
 import { HistoryEvent, Countdown } from "../types";
+import { NumberEffectSchema } from "../effects/schema";
 
 type RecordObj = Record<string, unknown>;
 
-const ComponentMarkerSymbol = Symbol();
-class Component<C extends EcsComponent = EcsComponent> {
-  [ComponentMarkerSymbol]!: C;
-}
-
-const EntityMarkerSymbol = Symbol();
-class Entity<T = unknown> {
-  [EntityMarkerSymbol]!: T;
-}
-
-type Serializable<T> = {
-  [K in keyof T as Exclude<K, (...args: unknown[]) => unknown>]: T[K];
-};
-
-type IngredientSchema = Entity<{
-  requirement: number;
-  fulfilled: boolean;
-  eta: number | undefined;
-  capped: boolean;
-  ingredients: IngredientsSchema;
-}>;
-
-type IngredientsSchema = Partial<{
-  [K in ResourceId]: IngredientSchema;
-}>;
-
 type ComponentsSchema = {
   countdowns: {
-    rareEvent?: Entity<Component<Countdown>>;
+    rareEvent?: SchemaEntity<SchemaComponent<Countdown>>;
   };
   resources: {
-    [K in ResourceId]: Entity<{
-      amount: number;
-      unlocked: boolean;
-    }>;
+    [K in ResourceId]: SchemaEntity<ResourceSchema>;
   };
-  calendar: Entity<{
-    day: number;
-    season: SeasonId;
-    year: number;
-    weather: WeatherId;
-    dateLabel: string;
-    epochLabel: string;
-  }>;
+  calendar: SchemaEntity<CalendarSchema>;
   numbers: {
-    [K in NumberEffectId]: Entity<{
-      value: number | undefined;
-    }>;
+    [K in NumberEffectId]: SchemaEntity<NumberEffectSchema>;
   };
   fulfillments: {
-    [K in FulfillmentId]: Entity<{
-      fulfilled: boolean;
-      capped: boolean;
-      unlocked: boolean;
-      ingredients: IngredientsSchema;
-    }>;
+    [K in FulfillmentId]: SchemaEntity<FulfillmentSchema>;
   };
   buildings: {
-    [K in BuildingId]: Entity<{
-      level: number;
-    }>;
+    [K in BuildingId]: SchemaEntity<BuildingSchema>;
   };
   techs: {
-    [K in TechId]: Entity<{
+    [K in TechId]: SchemaEntity<{
       researched: boolean;
     }>;
   };
-  time: Entity<{
+  time: SchemaEntity<{
     paused: boolean;
     power: number;
     millisPerTick: number;
@@ -90,19 +50,25 @@ export type EventsSchema = {
   history?: HistoryEvent[];
 };
 
-type Present<T> = T extends Entity<infer E>
+type Serializable<T> = {
+  [K in keyof T as Exclude<K, (...args: unknown[]) => unknown>]: T[K];
+};
+
+type Present<T> = T extends SchemaEntity<infer E>
   ? Present<E>
-  : T extends Component<infer C>
+  : T extends SchemaComponent<infer C>
   ? Serializable<C>
   : { [K in keyof T]?: Present<T[K]> };
 
-type State<T> = T extends Entity<infer E>
+type State<T> = T extends SchemaEntity<infer E>
   ? State<E>
-  : T extends Component<infer C>
+  : T extends SchemaComponent<infer C>
   ? Serializable<C>
   : { [K in keyof T]: State<T[K]> };
 
-type Removed<T> = T extends Entity ? true : { [K in keyof T]?: Removed<T[K]> };
+type Removed<T> = T extends SchemaEntity
+  ? true
+  : { [K in keyof T]?: Removed<T[K]> };
 
 export type DeltaSchema = Present<ComponentsSchema>;
 export type StateSchema = State<ComponentsSchema>;
@@ -136,7 +102,9 @@ export function addState(dst: DeltaSchema, src: DeltaSchema) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addStateDeep(destination: any, source: any) {
   mergeWith(destination, source, (dstElement, srcElement) => {
-    if (isObject(srcElement)) {
+    if (Array.isArray(srcElement)) {
+      return srcElement;
+    } else if (isObject(srcElement)) {
       if (dstElement === undefined) {
         const newDstElement = {};
         addStateDeep(newDstElement, srcElement);
@@ -161,7 +129,9 @@ export function changeState(dst: DeltaSchema, src: DeltaSchema) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function changeStateDeep<T extends RecordObj>(destination: T, source: T) {
   mergeWith(destination, source, (dstElement, srcElement) => {
-    if (isObject(srcElement)) {
+    if (Array.isArray(srcElement)) {
+      return srcElement;
+    } else if (isObject(srcElement)) {
       if (dstElement !== undefined) {
         if (isObject(dstElement)) {
           changeStateDeep(dstElement, srcElement);

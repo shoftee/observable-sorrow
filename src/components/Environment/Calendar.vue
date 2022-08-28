@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import { useEndpoint } from "@/composables/game-endpoint";
+import { useFormatter, useStateManager } from "@/composables/game-endpoint";
 import { newCalendarView } from "@/app/presenters/views";
 
 const { t } = useI18n();
 
-const { manager, fmt } = useEndpoint((ep) => {
-  return {
-    manager: ep.stateManager,
-    fmt: ep.presenters.formatter,
-  };
-});
+const manager = useStateManager();
+const fmt = useFormatter();
 
 const state = newCalendarView(manager);
 </script>

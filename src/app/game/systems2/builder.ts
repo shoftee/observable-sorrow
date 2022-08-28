@@ -4,7 +4,7 @@ import { GameRunner, App } from "@/app/ecs";
 import { MinimalPlugins } from "@/app/ecs/plugins";
 
 import { RendererPlugin } from "./renderer";
-import { EnvironmentPlugin } from "./environment";
+import { EnvironmentPlugin } from "./environment/plugin";
 import { AstronomyPlugin } from "./astronomy";
 import { TimePlugin } from "./time";
 import {
