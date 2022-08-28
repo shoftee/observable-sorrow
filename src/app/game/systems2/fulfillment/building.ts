@@ -14,6 +14,7 @@ import {
   Receive,
   Value,
   Commands,
+  EntityMapQuery,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -39,6 +40,7 @@ import {
 import * as events from "../types/events";
 import * as F from "./types";
 import * as R from "../resource/types";
+import { BuildingEffect, Markers, NumberValue } from "../effects/types";
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new Building(meta.id);
@@ -114,18 +116,30 @@ const ProcessConstructBuildingOrders = System(
   }
 });
 
-const CalculateBuildingRequirements = System(
-  Query(
-    ChangeTrackers(Level),
+const HandleLevelChanged = System(
+  EntityMapQuery(Value(Building), ChangeTrackers(Level)),
+  EntityMapQuery(
     Value(PriceRatio),
     ChildrenQuery(Value(F.BaseRequirement), DiffMut(F.Requirement)),
   ),
-)((query) => {
-  for (const [trackers, ratio, ingredients] of query) {
+  MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(
+    Every(Markers.Effect),
+  ),
+)((trackersQuery, requirementsQuery, effectsQuery) => {
+  for (const [buildingEntity, [id, trackers]] of trackersQuery) {
     if (trackers.isAddedOrChanged()) {
       const { value: level } = trackers.value();
+
+      // Update ingredient requirements
+      const [ratio, ingredients] = requirementsQuery.get(buildingEntity)!;
       for (const [base, requirement] of ingredients) {
         requirement.value = base * Math.pow(ratio, level);
+      }
+
+      // Update effect values
+      const effectValue = effectsQuery.get(id);
+      if (effectValue) {
+        effectValue.value = level;
       }
     }
   }
@@ -135,10 +149,7 @@ export class BuildingOrderPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .registerEvent(events.ConstructBuildingOrder)
-      .addSystems([
-        ProcessConstructBuildingOrders,
-        CalculateBuildingRequirements,
-      ]);
+      .addSystems([ProcessConstructBuildingOrders, HandleLevelChanged]);
   }
 }
 

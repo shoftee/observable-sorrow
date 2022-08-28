@@ -1,10 +1,11 @@
 import { computed, reactive } from "vue";
 
 import { ResourceId } from "@/app/interfaces";
-import { Meta, UnitKind } from "@/app/state";
+import { Meta, ResourceMetadataType } from "@/app/state";
 
-import { EffectTree, NumberView } from "../common";
+import { EffectTree, numberView, NumberView } from "../common";
 import { IStateManager } from "../state-manager";
+import { StateSchema } from "@/app/game/systems2/core";
 
 export interface ResourceView {
   readonly id: ResourceId;
@@ -12,7 +13,7 @@ export interface ResourceView {
   unlocked: boolean;
   amount: number;
   change: NumberView | undefined;
-  capacity?: number;
+  capacity?: NumberView | undefined;
   modifier?: NumberView;
   deltaTree?: EffectTree;
 }
@@ -22,25 +23,36 @@ export function newResourceView(
   id: ResourceId,
 ): ResourceView {
   const meta = Meta.resource(id);
-  const state = manager.state.resources[meta.id];
+  const state = manager.state;
+  const resource = state.resources[meta.id];
 
   return reactive({
     id: meta.id,
     label: meta.label,
-    unlocked: computed(() => state.unlocked),
-    amount: computed(() => state.amount),
-    change: computed(() => change(state.delta)),
-    capacity: computed(() => state.capacity),
+    unlocked: computed(() => resource.unlocked),
+    amount: computed(() => resource.amount),
+    change: computed(() => changeView(meta, state)),
+    capacity: computed(() => capacityView(meta, state)),
   });
 }
 
-function change(change: number | undefined): NumberView | undefined {
-  if (change !== undefined) {
-    return {
-      value: change,
-      style: { unit: UnitKind.PerTick },
-      showSign: "always",
-    };
+function changeView(
+  meta: ResourceMetadataType,
+  state: StateSchema,
+): NumberView | undefined {
+  if (meta.effects.delta) {
+    return numberView(state, meta.effects.delta);
+  } else {
+    return undefined;
+  }
+}
+
+function capacityView(
+  meta: ResourceMetadataType,
+  state: StateSchema,
+): NumberView | undefined {
+  if (meta.effects.limit) {
+    return numberView(state, meta.effects.limit, "negative");
   } else {
     return undefined;
   }

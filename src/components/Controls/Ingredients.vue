@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Ingredient from "./Ingredient.vue";
 
-import { IngredientItem } from "@/app/presenters/common";
+import { IngredientItemView } from "@/app/presenters/common";
 
-const { items } = defineProps<{ items: IngredientItem[] }>();
+const { items } = defineProps<{ items: IngredientItemView[] }>();
 </script>
 
 <template>

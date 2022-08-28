@@ -56,6 +56,6 @@ export class NumberFormatter {
   }
 
   private get tps(): number {
-    return 1000 / this.manager.time().millisPerTick;
+    return 1000 / this.manager.state.time.millisPerTick;
   }
 }

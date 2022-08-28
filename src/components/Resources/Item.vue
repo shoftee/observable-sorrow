@@ -30,7 +30,7 @@ const { amount, capacity, change, modifier } = toRefs(item);
     <div class="col-3 number amount">{{ fmt.number(amount, "negative") }}</div>
     <template v-if="capacity">
       <div class="col-3 number capacity">
-        <span>/{{ fmt.number(capacity, "negative") }}</span>
+        <span>/{{ fmt.v(capacity) }}</span>
       </div>
     </template>
     <template v-else>

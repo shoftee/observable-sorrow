@@ -8,12 +8,11 @@ import { Entity } from "../basic/entity";
 
 export type IterableQueryResult<Result> = {
   [Symbol.iterator](): IterableIterator<Result>;
-  map(): ReadonlyMap<EcsEntity, Result>;
-  get(entity: EcsEntity): Result | undefined;
-  has(entity: EcsEntity): boolean;
 };
 
-class IterableQueryFactory<Q extends AllParams> {
+class IterableQueryFactory<Q extends AllParams>
+  implements FetcherFactory<IterableQueryResult<AllResults<Q>>>
+{
   private descriptor;
 
   constructor(...wq: Q) {
@@ -34,15 +33,6 @@ class IterableQueryFactory<Q extends AllParams> {
     const fetcher: IterableQueryResult<AllResults<Q>> = {
       [Symbol.iterator]() {
         return map.retrieve().values();
-      },
-      map() {
-        return map.retrieve();
-      },
-      get(entity: EcsEntity) {
-        return map.retrieve().get(entity);
-      },
-      has(entity: EcsEntity) {
-        return map.retrieve().has(entity);
       },
     };
 
@@ -131,8 +121,8 @@ export function MapQuery<K, V>(
   return new MapQueryFactory(keys, values);
 }
 
-export function EntityMapQuery<V>(
-  values: QueryDescriptor<V>,
-): MapQueryFactory<EcsEntity, V> {
-  return new MapQueryFactory(Entity(), values);
+export function EntityMapQuery<Q extends AllParams>(
+  ...qs: Q
+): MapQueryFactory<EcsEntity, AllResults<Q>> {
+  return new MapQueryFactory(Entity(), All(...qs));
 }

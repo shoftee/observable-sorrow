@@ -1,12 +1,14 @@
 import { single } from "@/app/utils/collections";
 import { round } from "@/app/utils/mathx";
 
+import { TimeConstants } from "@/app/state";
+
 import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
 import { Commands, Query, Mut, Receive, Read, DiffMut } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "./core/renderer";
-import { TimeOptions, Timer } from "./types";
+import { TimeControls, Timer } from "./types";
 import * as events from "./types/events";
 
 class DeltaTime extends EcsComponent {
@@ -14,13 +16,16 @@ class DeltaTime extends EcsComponent {
   delta = 0;
 }
 
+export class TickTimer extends EcsComponent {}
+
 const Setup = System(Commands())((cmds) => {
-  cmds.spawn(new DeltaTime(), new TimeOptions());
+  cmds.spawn(new DeltaTime(), new TimeControls());
+  cmds.spawn(new TickTimer(), new Timer(TimeConstants.MillisPerTick));
 });
 
 const HandleOptionsChanged = System(
   Receive(events.TimeOptionsChanged),
-  Query(DiffMut(TimeOptions)),
+  Query(DiffMut(TimeControls)),
 )((events, optionsQuery) => {
   const [options] = single(optionsQuery);
   for (const { intent } of events.pull()) {
@@ -36,16 +41,18 @@ const HandleOptionsChanged = System(
         break;
     }
   }
+
+  options.millisPerTick = TimeConstants.MillisPerTick / options.speed;
 });
 
-const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeOptions)))(
+const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeControls)))(
   (query) => {
     const [time, options] = single(query);
 
     const now = Date.now();
 
     // game paused <=> delta is 0
-    const speed = options.paused ? 0 : Math.pow(10, options.power);
+    const speed = options.paused ? 0 : options.speed;
     // calculate system time delta
     time.delta = (now - (time.last ?? now)) * speed;
 
@@ -79,12 +86,15 @@ const AdvanceTimers = System(
   }
 });
 
-const TimeRecorder = DeltaExtractor()((schema) => schema.time);
+const TimeExtractor = DeltaExtractor()((schema) => schema.time);
 
-const TrackTime = TimeRecorder(TimeOptions, (time, options) => {
-  time.paused = options.paused;
-  time.power = options.power;
-});
+const Extractors = [
+  TimeExtractor(TimeControls, (time, options) => {
+    time.paused = options.paused;
+    time.power = options.power;
+    time.millisPerTick = options.millisPerTick;
+  }),
+];
 
 export class TimePlugin extends EcsPlugin {
   add(app: PluginApp): void {
@@ -93,6 +103,6 @@ export class TimePlugin extends EcsPlugin {
       .addStartupSystem(Setup)
       .addSystems([UpdateGameTime, AdvanceTimers], { stage: "first" })
       .addSystem(HandleOptionsChanged)
-      .addSystem(TrackTime, { stage: "last-start" });
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }

@@ -4,15 +4,13 @@ import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsEvent } from "@/app/ecs";
 import { FetcherFactory } from "../types";
+import { consume } from "@/app/utils/collections";
 
 class Receiver<E extends EcsEvent> {
   constructor(private readonly queue: Queue<E>) {}
 
   *pull(): Iterable<E> {
-    let event: E;
-    while ((event = this.queue.dequeue())) {
-      yield event;
-    }
+    yield* consume(this.queue);
   }
 }
 

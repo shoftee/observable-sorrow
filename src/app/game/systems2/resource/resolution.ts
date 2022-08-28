@@ -11,16 +11,18 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { NumberEffectId } from "@/app/interfaces";
+import { single } from "@/app/utils/collections";
 
 import { DeltaExtractor } from "../core/renderer";
-import { RecalculateEffects } from "../effects/calculation";
-import { NumberTrackersQuery } from "../effects/types";
+import { NumberTrackersQuery, RecalculateIds } from "../effects/calculation";
+import { TickTimer } from "../time";
+import { Timer } from "../types";
 import { Resource, Unlocked } from "../types/common";
 
 import * as R from "./types";
 
-const UpdateLimitEffects = RecalculateEffects(Value(R.LimitEffect));
-const UpdateDeltaEffects = RecalculateEffects(Value(R.DeltaEffect));
+const UpdateLimitEffects = RecalculateIds(Value(R.LimitEffect));
+const UpdateDeltaEffects = RecalculateIds(Value(R.DeltaEffect));
 
 const UpdateEffectTargets = System(
   Query(DiffMut(R.Capacity), Value(R.LimitEffect)).filter(Every(Resource)),
@@ -46,9 +48,24 @@ const UpdateEffectTargets = System(
 });
 
 const ProcessLedger = System(
-  Query(Read(R.LedgerEntry), Opt(Value(R.Capacity)), DiffMut(R.Amount)),
-)((query) => {
-  for (const [{ debit, credit }, capacity, amount] of query) {
+  Query(Read(Timer)).filter(Every(TickTimer)),
+  Query(
+    Read(R.LedgerEntry),
+    Opt(Value(R.Delta)),
+    Opt(Value(R.Capacity)),
+    DiffMut(R.Amount),
+  ),
+)((ticker, query) => {
+  const [{ delta: dt }] = single(ticker);
+  for (const [ledgerEntry, delta, capacity, amount] of query) {
+    let { debit, credit } = ledgerEntry;
+    if (delta !== undefined) {
+      if (delta > 0) {
+        debit += delta * dt;
+      } else {
+        credit += delta * dt;
+      }
+    }
     if (debit !== 0 || credit !== 0) {
       amount.value = calculateAmount(amount.value, debit, credit, capacity);
     }
@@ -80,14 +97,11 @@ function calculateAmount(
   return newAmount;
 }
 
-const UnlockResources = System(
+const UnlockByQuantity = System(
   Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(
-    Every(R.UnlockOnFirstQuantity),
+    Every(Resource, R.UnlockOnFirstQuantity),
   ),
-  Query(ChangeTrackers(R.Capacity), Mut(Unlocked)).filter(
-    Every(R.UnlockOnFirstCapacity),
-  ),
-)((amounts, capacities) => {
+)((amounts) => {
   for (const [trackers, unlocked] of amounts) {
     if (
       !unlocked.value &&
@@ -97,6 +111,13 @@ const UnlockResources = System(
       unlocked.value = true;
     }
   }
+});
+
+const UnlockByCapacity = System(
+  Query(ChangeTrackers(R.Capacity), Mut(Unlocked)).filter(
+    Every(Resource, R.UnlockOnFirstCapacity),
+  ),
+)((capacities) => {
   for (const [trackers, unlock] of capacities) {
     if (
       !unlock.value &&
@@ -115,9 +136,6 @@ const ResourceExtractor = DeltaExtractor(Value(Resource))(
 const DeltaExtractors = [
   ResourceExtractor(R.Amount, (resource, { value: amount }) => {
     resource.amount = amount;
-  }),
-  ResourceExtractor(R.Capacity, (resource, { value: capacity }) => {
-    resource.capacity = capacity;
   }),
   ResourceExtractor(Unlocked, (resource, { value: unlocked }) => {
     resource.unlocked = unlocked;
@@ -139,7 +157,8 @@ export class ResourceResolutionPlugin extends EcsPlugin {
         UpdateDeltaEffects,
         UpdateEffectTargets,
         ProcessLedger,
-        UnlockResources,
+        UnlockByQuantity,
+        UnlockByCapacity,
       ])
       .addSystems(DeltaExtractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });

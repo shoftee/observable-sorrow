@@ -57,7 +57,7 @@ export class SocietyPresenter {
 
     this.happiness = reactive({
       view: computed(() =>
-        numberView(manager, "population.happiness.total", "negative"),
+        numberView(manager.state, "population.happiness.total", "negative"),
       ),
       effectTree: effectTree("population.happiness.total", manager),
     });
@@ -91,8 +91,8 @@ export class SocietyPresenter {
       reactive({
         id: meta.id,
         label: meta.label,
-        singleAmount: computed(() => numberView(manager, meta.base)),
-        totalAmount: computed(() => numberView(manager, meta.total)),
+        singleAmount: computed(() => numberView(manager.state, meta.base)),
+        totalAmount: computed(() => numberView(manager.state, meta.total)),
       }),
     );
   }

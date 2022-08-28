@@ -1,10 +1,9 @@
-import { NumberEffectId, ShowSign } from "@/app/interfaces";
-import {
-  EffectDisplayStyle,
-  EffectDisplayStyles,
-  EffectState,
-} from "@/app/state";
 import { round } from "@/app/utils/mathx";
+
+import { NumberEffectId, ShowSign } from "@/app/interfaces";
+import { EffectDisplayStyle, EffectDisplayStyles } from "@/app/state";
+
+import { StateSchema } from "@/app/game/systems2/core";
 
 function scale(limit: number, divisor: number, postfix: string) {
   return { limit, divisor, postfix };
@@ -97,17 +96,13 @@ export interface NumberView {
   showSign?: ShowSign;
 }
 
-interface NumberProvider {
-  number(id: NumberEffectId): EffectState<number>;
-}
-
 export function numberView(
-  manager: NumberProvider,
+  state: StateSchema,
   id: NumberEffectId,
   showSign?: ShowSign,
   rounded?: boolean,
 ): NumberView | undefined {
-  const value = manager.number(id).value;
+  const value = state.numbers[id]?.value;
   if (value === undefined) {
     return undefined;
   } else {

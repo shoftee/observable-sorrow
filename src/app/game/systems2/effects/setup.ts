@@ -1,7 +1,8 @@
 import { EcsPlugin, PluginApp } from "@/app/ecs";
-import { WorldCmds, EntityCmds, Commands } from "@/app/ecs/query";
+import { WorldCmds, EntityCmds, Commands, Value } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 import { NumberEffectId } from "@/app/interfaces";
+import { DeltaExtractor } from "../core/renderer";
 import {
   NumberValue,
   NumberEffect,
@@ -19,15 +20,16 @@ function* numberComponents(id?: NumberEffectId) {
 }
 
 function addEffectComponents(
-  cmd: WorldCmds,
+  cmds: WorldCmds,
   container: EntityCmds,
   item: EffectCompositeItem,
 ) {
   if (item instanceof Function) {
+    const expr = item;
     container.entity((e) => {
-      for (const innerItem of item()) {
-        const innerContainer = cmd.spawnChild(e, ...numberComponents());
-        addEffectComponents(cmd, innerContainer, innerItem);
+      const innerContainer = cmds.spawnChild(e, ...numberComponents());
+      for (const innerItem of expr()) {
+        addEffectComponents(cmds, innerContainer, innerItem);
       }
     });
   } else {
@@ -44,8 +46,20 @@ const Setup = System(Commands())((cmds) => {
   }
 });
 
+const NumberExtractor = DeltaExtractor(Value(NumberEffect))(
+  (schema, [id]) => schema.numbers[id],
+);
+
+const DeltaExtractors = [
+  NumberExtractor(NumberValue, (effect, { value }) => {
+    effect.value = value;
+  }),
+];
+
 export class EffectsSetupPlugin extends EcsPlugin {
   add(app: PluginApp): void {
-    app.addStartupSystem(Setup);
+    app
+      .addStartupSystem(Setup)
+      .addSystems(DeltaExtractors, { stage: "last-start" });
   }
 }

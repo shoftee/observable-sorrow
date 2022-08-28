@@ -54,19 +54,21 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
 
 const CalculateIngredientFulfillment = System(
   Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
-  MapQuery(Q_Resource, All(Value(R.Amount), Opt(Value(R.Capacity)))),
+  MapQuery(
+    Q_Resource,
+    All(Value(R.Amount), Opt(Value(R.Delta)), Opt(Value(R.Capacity))),
+  ),
 )((ingredients, resources) => {
   for (const [resource, requirement, progress, capped] of ingredients) {
-    const [amount, capacity] = resources.get(resource)!;
-    const change = 0; // TODO: need to add this to resources
+    const [amount, delta, capacity] = resources.get(resource)!;
 
     progress.fulfilled = amount >= requirement;
-    if (amount < requirement && change > 0) {
+    if (amount < requirement && delta !== undefined && delta > 0) {
       if (capacity !== undefined && capacity < requirement) {
         // requirement won't be fulfilled
         progress.eta = Number.POSITIVE_INFINITY;
       } else {
-        progress.eta = (requirement - amount) / change;
+        progress.eta = (requirement - amount) / delta;
       }
     } else {
       progress.eta = undefined;

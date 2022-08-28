@@ -53,7 +53,7 @@ function* collectEffectNodes(
         yield reactive({
           id: child,
           label: style.label,
-          value: computed(() => numberView(manager, child)),
+          value: computed(() => numberView(manager.state, child)),
           // Don't collect children of collapsed nodes
           nodes:
             style.disposition === "collapse"

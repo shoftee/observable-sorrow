@@ -1,7 +1,6 @@
 import { BuildingId, NumberEffectId } from "@/app/interfaces";
 
 import { EcsComponent, ValueComponent } from "@/app/ecs";
-import { ChangeTrackers, MapQuery, Value } from "@/app/ecs/query";
 
 export const Markers = {
   Effect: class extends EcsComponent {},
@@ -29,6 +28,12 @@ export class Default extends ValueComponent<number> {
   }
 }
 
+export class Constant extends ValueComponent<number> {
+  constructor(readonly value: number) {
+    super();
+  }
+}
+
 export type OperationType = "sum" | "product" | "ratio";
 
 export class Operation extends EcsComponent {
@@ -38,7 +43,7 @@ export class Operation extends EcsComponent {
 }
 
 export class Operand extends EcsComponent {
-  constructor(readonly type: "base" | "ratio" | "exponent") {
+  constructor(readonly type?: "base" | "ratio" | "exponent") {
     super();
   }
 }
@@ -49,36 +54,38 @@ export class Reference extends ValueComponent<NumberEffectId> {
   }
 }
 
-export class BuildingLevel extends EcsComponent {
-  constructor(readonly building: BuildingId) {
+export class Precalculated extends EcsComponent {}
+
+export class BuildingEffect extends ValueComponent<BuildingId> {
+  constructor(readonly value: BuildingId) {
     super();
   }
 }
-
-export const NumberTrackersQuery = MapQuery(
-  Value(NumberEffect),
-  ChangeTrackers(NumberValue),
-);
 
 export type EffectCompositeItem = EcsComponent | Expr;
 
 export type Expr = () => Iterable<EffectCompositeItem>;
 
 function constant(value: number): Expr {
-  return () => [new Default(value)];
+  return function* () {
+    yield new Constant(value);
+  };
 }
 
 function reference(id: NumberEffectId): Expr {
-  return () => [new Reference(id)];
+  return function* () {
+    yield new Reference(id);
+  };
 }
 
 function sum(...exprs: Expr[]): Expr {
   return function* () {
     yield new Operation("sum");
+    let i = 0;
     for (const id of exprs) {
-      let i = 0;
       yield function* () {
         yield* id();
+        yield new Operand();
         yield new Order(i);
       };
       i++;
@@ -86,11 +93,17 @@ function sum(...exprs: Expr[]): Expr {
   };
 }
 
-// function product(...operandExprs: Expr[]) {
+// function product(...exprs: Expr[]) {
 //   return function* () {
 //     yield new Operation("product");
-//     for (const id of operandExprs) {
-//       yield* id();
+//     let i = 0;
+//     for (const id of exprs) {
+//       yield function* () {
+//         yield* id();
+//         yield new Operand();
+//         yield new Order(i);
+//       };
+//       i++;
 //     }
 //   };
 // }
@@ -116,11 +129,13 @@ function building(building: BuildingId, singleExpr: Expr): Expr {
     yield new Operation("product");
     yield function* () {
       yield* singleExpr();
+      yield new Operand();
       yield new Order(1);
     };
     yield function* () {
-      yield new BuildingLevel(building);
-      yield new Default(0);
+      yield new Precalculated();
+      yield new BuildingEffect(building);
+      yield new Operand();
       yield new Order(2);
     };
   };
@@ -156,6 +171,19 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
     reference("weather.season-ratio"),
     reference("weather.severity-ratio"),
   ),
-  "weather.season-ratio": constant(0), // TODO
-  "weather.severity-ratio": constant(0), // TODO
+  "weather.season-ratio": constant(0), // TODO environment effects
+  "weather.severity-ratio": constant(0), // TODO environment effects
+
+  "wood.delta": reference("wood.production"),
+  "wood.production": constant(0), // TODO jobs
+
+  "minerals.delta": reference("minerals.production"),
+  "minerals.production": constant(0), // TODO jobs and minerals.ratio
+
+  "science.delta": reference("science.production"),
+  "science.production": constant(0), // TODO jobs and science.ratio
+  // TODO: astronomy rewards
+
+  "catpower.delta": reference("catpower.production"),
+  "catpower.production": constant(0), // TODO jobs
 };

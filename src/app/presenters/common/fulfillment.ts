@@ -44,14 +44,14 @@ export function fulfillmentView(
   return reactive({
     ingredients: Array.from(
       Object.entries(fulfillment.ingredients),
-      ([key, value]) => ingredient(state, key as ResourceId, value),
+      ([key, value]) => ingredientView(state, key as ResourceId, value),
     ),
     fulfilled: fulfillment.fulfilled,
     capped: fulfillment.capped,
   });
 }
 
-function ingredient(
+function ingredientView(
   state: StateSchema,
   id: ResourceId,
   value: IngredientSchema,

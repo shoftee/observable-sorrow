@@ -37,7 +37,7 @@ export function newBonfireItemView(
     case "refine-catnip":
       return refineCatnip(manager.state);
     default:
-      return buyBuilding(manager, id);
+      return buyBuilding(manager.state, id);
   }
 }
 
@@ -77,12 +77,12 @@ function refineCatnip(state: StateSchema): BonfireItemView {
 }
 
 function buyBuilding(
-  manager: IStateManager,
+  state: StateSchema,
   id: BonfireBuildingId,
 ): BonfireItemView {
   const meta = Meta.building(id);
-  const fulfillment = manager.state.fulfillments[id];
-  const building = manager.state.buildings[id];
+  const fulfillment = state.fulfillments[id];
+  const building = state.buildings[id];
   return reactive({
     id: id,
     intent: {
@@ -96,25 +96,19 @@ function buyBuilding(
 
     unlocked: computed(() => fulfillment.unlocked),
     level: computed(() => building.level),
-    fulfillment: computed(() => fulfillmentView(manager.state, fulfillment)),
-    effects: computed(() => effectViews(manager, meta.id)),
+    fulfillment: computed(() => fulfillmentView(state, fulfillment)),
+    effects: computed(() => effectViews(state, meta.id)),
   });
 }
 
-function effectViews(
-  manager: IStateManager,
-  buildingId: BuildingId,
-): EffectItem[] {
-  // TODO: Fix effects.
-  return [];
-
+function effectViews(state: StateSchema, buildingId: BuildingId): EffectItem[] {
   const effects = Meta.building(buildingId).effects;
   return Array.from(effects, (meta) =>
     reactive({
       id: meta.id,
       label: meta.label,
-      singleAmount: computed(() => numberView(manager, meta.per)),
-      totalAmount: computed(() => numberView(manager, meta.total)),
+      singleAmount: computed(() => numberView(state, meta.per)),
+      totalAmount: computed(() => numberView(state, meta.total)),
     }),
   );
 }

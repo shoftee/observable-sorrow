@@ -2,6 +2,7 @@ import { EcsComponent } from "@/app/ecs";
 import {
   BuildingId,
   FulfillmentId,
+  NumberEffectId,
   ResourceId,
   SeasonId,
   TechId,
@@ -44,8 +45,6 @@ type ComponentsSchema = {
   resources: {
     [K in ResourceId]: Entity<{
       amount: number;
-      delta?: number;
-      capacity?: number;
       unlocked: boolean;
     }>;
   };
@@ -57,6 +56,11 @@ type ComponentsSchema = {
     dateLabel: string;
     epochLabel: string;
   }>;
+  numbers: {
+    [K in NumberEffectId]: Entity<{
+      value: number | undefined;
+    }>;
+  };
   fulfillments: {
     [K in FulfillmentId]: Entity<{
       fulfilled: boolean;
@@ -78,6 +82,7 @@ type ComponentsSchema = {
   time: Entity<{
     paused: boolean;
     power: number;
+    millisPerTick: number;
   }>;
 };
 

@@ -7,7 +7,7 @@ import {
 } from "@/app/interfaces";
 
 import { EcsEvent, GameRunner } from "../ecs";
-import { Meta, ResourceMap } from "../state";
+import { Meta, ResourceMap, TimeConstants } from "../state";
 
 import { build } from "./systems2/builder";
 import * as events from "./systems2/types/events";
@@ -27,7 +27,10 @@ export class Game {
     }
     const update = this.runner.start();
     update();
-    this.handle = setInterval(() => update(), 50);
+
+    const millisPerUpdate =
+      TimeConstants.MillisPerTick / TimeConstants.UpdatesPerTick;
+    this.handle = setInterval(() => update(), millisPerUpdate);
   }
 
   stop(): void {
