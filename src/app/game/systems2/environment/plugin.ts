@@ -77,20 +77,26 @@ const AdvanceCalendar = System(
 const UpdateSeasonEffect = System(
   Query(Value(E.Season)).filter(AddedOrChanged(E.Season)),
   Query(DiffMut(NumberValue)).filter(Every(SeasonEffect)),
-)((seasonQuery, effectQuery) => {
+)((seasonQuery, numberQuery) => {
   for (const [season] of take(seasonQuery, 1)) {
-    const [effect] = single(effectQuery);
+    const [effect] = single(numberQuery);
     effect.value = getWeatherSeasonRatio(season);
   }
 });
 
-const UpdateWeatherEffect = System(
-  Query(Value(E.Weather)).filter(AddedOrChanged(E.Weather)),
+const HandleWeatherChanged = System(
+  Query(Value(E.Weather), DiffMut(E.Labels)).filter(AddedOrChanged(E.Weather)),
   Query(DiffMut(NumberValue)).filter(Every(WeatherEffect)),
-)((weatherQuery, effectQuery) => {
-  for (const [weather] of take(weatherQuery, 1)) {
-    const [effect] = single(effectQuery);
+)((weatherQuery, numberQuery) => {
+  for (const [weather, labels] of take(weatherQuery, 1)) {
+    const [effect] = single(numberQuery);
     effect.value = getWeatherSeverityRatio(weather);
+
+    // TODO: Calendar tech
+    labels.dateLabel =
+      weather === "neutral"
+        ? "calendar.full.no-weather"
+        : "calendar.full.weather";
   }
 });
 
@@ -127,7 +133,7 @@ export class EnvironmentPlugin extends EcsPlugin {
       .addSystems([
         AdvanceCalendar,
         UpdateSeasonEffect,
-        UpdateWeatherEffect,
+        HandleWeatherChanged,
         UpdateEffectTargets,
       ])
       .addSystems(DeltaRecorders, { stage: "last-start" });
