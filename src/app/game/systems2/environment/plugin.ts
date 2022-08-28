@@ -93,7 +93,7 @@ const HandleWeatherChanged = System(
     effect.value = getWeatherSeverityRatio(weather);
 
     // TODO: Calendar tech
-    labels.dateLabel =
+    labels.date =
       weather === "neutral"
         ? "calendar.full.no-weather"
         : "calendar.full.weather";
@@ -120,9 +120,9 @@ const DeltaRecorders = [
   CalendarRecorder(E.Weather, (calendar, { value: weather }) => {
     calendar.weather = weather;
   }),
-  CalendarRecorder(E.Labels, (calendar, { dateLabel, epochLabel }) => {
-    calendar.dateLabel = dateLabel;
-    calendar.epochLabel = epochLabel;
+  CalendarRecorder(E.Labels, (calendar, { date, epoch }) => {
+    calendar.labels.date = date;
+    calendar.labels.epoch = epoch;
   }),
 ];
 

@@ -21,6 +21,6 @@ export class Weather extends ValueComponent<WeatherId> {
 }
 
 export class Labels extends EcsComponent {
-  dateLabel = "calendar.full.no-weather";
-  epochLabel = "calendar.epoch.full";
+  date = "calendar.full.no-weather";
+  epoch = "calendar.epoch.full";
 }

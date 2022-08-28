@@ -5,6 +5,8 @@ export type CalendarSchema = {
   season: SeasonId;
   year: number;
   weather: WeatherId;
-  dateLabel: string;
-  epochLabel: string;
+  labels: {
+    date: string;
+    epoch: string;
+  };
 };

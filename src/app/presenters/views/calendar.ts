@@ -13,8 +13,8 @@ export function newCalendarView(manager: IStateManager): CalendarView {
     season: computed(() => state.season),
     year: computed(() => state.year),
     weather: computed(() => state.weather),
-    dateLabel: computed(() => state.dateLabel),
-    epochLabel: computed(() => state.epochLabel),
+    dateLabel: computed(() => state.labels.date),
+    epochLabel: computed(() => state.labels.epoch),
     seasonLabel: computed(() => Meta.season(state.season).label),
     weatherLabel: computed(() => Meta.weather(state.weather).label),
   });
