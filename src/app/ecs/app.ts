@@ -143,6 +143,10 @@ export class GameRunner {
     this.runStageParts("first");
     this.runStageParts("main");
     this.runStageParts("last");
+
+    // change detection cleanup
+    this.world.ticks.updateLast();
+    this.world.components.forgetRemovedComponents();
   }
 
   private runStageParts(stageType: EcsStageType) {

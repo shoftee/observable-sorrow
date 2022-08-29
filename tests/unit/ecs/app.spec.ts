@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { MultiMap } from "@/app/utils/collections";
+import { MultiMap, single } from "@/app/utils/collections";
 
 import { App, EcsComponent, EcsEvent, EcsStage } from "@/app/ecs";
 import { System } from "@/app/ecs/system";
@@ -14,8 +14,10 @@ import {
   Commands,
   Added,
   ChangeTrackers,
+  EntityMapQuery,
+  Removed,
+  Value,
 } from "@/app/ecs/query";
-import { MinimalPlugins } from "@/app/ecs/plugins";
 
 describe("ecs app", () => {
   describe("events", () => {
@@ -90,8 +92,7 @@ describe("ecs app", () => {
 
       const runner = new App()
         .registerEvent(NumberEvent)
-        .addSystem(Dispatcher)
-        .addSystem(Receiver)
+        .addSystems([Dispatcher, Receiver])
         .buildRunner();
 
       const updater = runner.start();
@@ -191,7 +192,6 @@ describe("ecs app", () => {
       });
 
       const runner = new App()
-        .addPlugin(new MinimalPlugins())
         .addStartupSystem(SpawnSystem)
         .addSystem(LevelUpSystem)
         .addSystem(ChangedCounter, { stage: "last" })
@@ -231,7 +231,6 @@ describe("ecs app", () => {
       );
 
       const runner = new App()
-        .addPlugin(new MinimalPlugins())
         .addSystem(SpawnSystem)
         .addSystem(AddedCounter, { stage: "last" })
         .buildRunner();
@@ -287,11 +286,9 @@ describe("ecs app", () => {
       });
 
       const runner = new App()
-        .addPlugin(new MinimalPlugins())
         .addSystem(SpawnSystem, { stage: "first" })
         .addSystem(LevelUpper)
-        .addSystem(AddedCounter, { stage: "last" })
-        .addSystem(ChangedCounter, { stage: "last" })
+        .addSystems([AddedCounter, ChangedCounter], { stage: "last" })
         .buildRunner();
 
       const updater = runner.start();
@@ -306,6 +303,55 @@ describe("ecs app", () => {
       // level ups only happen for added entities, so changes also stop at 2
       updater();
       expect(detectedAdditions).to.eq(detectedChanges).and.eq(2);
+    });
+    it("should track component removals corectly", () => {
+      let counter = 0;
+      const Increment = System()(() => {
+        counter++;
+      });
+
+      const Spawn = System(Commands())((cmds) => {
+        cmds.spawn(new Id("shoftee"), new Player(123));
+      });
+
+      const RemovePlayer = System(
+        EntityMapQuery(Read(Id)),
+        Commands(),
+      )((query, cmds) => {
+        if (counter > 0) {
+          // try to remove it every update after the first
+          const [entity] = single(query);
+          cmds.with(entity).remove(Player);
+        }
+      });
+
+      const TrackRemovedPlayer = System(
+        Query(Value(Id)).filter(Removed(Player)),
+      )((query) => {
+        if (counter === 1) {
+          expect(Array.from(query)).to.deep.equal([["shoftee"]]);
+        } else if (counter === 2) {
+          expect(Array.from(query)).to.be.empty;
+        }
+      });
+
+      const runner = new App()
+        .addStartupSystem(Spawn)
+        .addSystem(RemovePlayer)
+        .addSystem(TrackRemovedPlayer, { stage: "main-end" })
+        .addSystem(Increment, { stage: "last-end" })
+        .buildRunner();
+
+      const updater = runner.start();
+
+      updater();
+      expect(counter).to.eq(1);
+
+      updater();
+      expect(counter).to.eq(2);
+
+      updater();
+      expect(counter).to.eq(3);
     });
   });
 });

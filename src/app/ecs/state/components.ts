@@ -1,4 +1,4 @@
-import { Table } from "@/app/utils/collections";
+import { MultiMap, Table } from "@/app/utils/collections";
 import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 
 import {
@@ -17,10 +17,12 @@ export class ComponentState {
     EcsComponent
   >();
 
+  private readonly removed = new MultiMap<Ctor<EcsComponent>, EcsEntity>();
+
   constructor(private readonly ticks: WorldTicks) {}
 
   insert(entity: EcsEntity, ...components: EcsComponent[]) {
-    const added = this.ticks.advance();
+    const added = this.ticks.current;
     for (const component of components) {
       component[ChangeTicks] = new ComponentTicks(added);
       const ctor = getConstructorOf(component);
@@ -35,12 +37,25 @@ export class ComponentState {
 
   remove(entity: EcsEntity, ...ctors: Ctor<EcsComponent>[]) {
     for (const ctor of ctors) {
-      this.components.removeCell(entity, ctor);
+      if (this.components.removeCell(entity, ctor)) {
+        this.removed.add(ctor, entity);
+      }
     }
   }
 
   removeAll(entity: EcsEntity) {
+    for (const ctor of this.components.row(entity).keys()) {
+      this.removed.add(ctor, entity);
+    }
     this.components.removeRow(entity);
+  }
+
+  removedComponents(ctor: Ctor<EcsComponent>) {
+    return this.removed.entriesForKey(ctor);
+  }
+
+  forgetRemovedComponents() {
+    this.removed.clear();
   }
 
   archetype(entity: EcsEntity): Archetype {

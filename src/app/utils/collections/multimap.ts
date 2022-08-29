@@ -42,4 +42,8 @@ export class MultiMap<K, V> {
   removeAll(key: K) {
     this.map.delete(key);
   }
+
+  clear() {
+    this.map.clear();
+  }
 }

@@ -7,6 +7,7 @@ import {
   FilterDescriptor,
   QueryDescriptor,
 } from "../types";
+import { cache } from "@/app/utils/cache";
 
 type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;
@@ -105,6 +106,23 @@ export function AddedOrChanged<C extends EcsComponent>(
             component[ChangeTicks].isAdded(ticks.last, ticks.current) ||
             component[ChangeTicks].isChanged(ticks.last, ticks.current)
           );
+        },
+      });
+    },
+  };
+}
+
+type Removed = FilterDescriptor;
+export function Removed<C extends EcsComponent>(ctor: Ctor<C>): Removed {
+  return {
+    newFilter({ components }) {
+      const cached = cache(() => components.removedComponents(ctor));
+      return defaultFilter({
+        matches({ entity }) {
+          return cached.retrieve().has(entity);
+        },
+        cleanup() {
+          cached.invalidate();
         },
       });
     },

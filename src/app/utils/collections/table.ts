@@ -23,8 +23,10 @@ export class Table<Row, Column, Cell> {
 
   removeCell(row: Row, column: Column): boolean {
     const cellColumns = this.table.get(row);
-    if (cellColumns && cellColumns.delete(column) && cellColumns.size === 0) {
-      this.table.delete(row);
+    if (cellColumns && cellColumns.delete(column)) {
+      if (cellColumns.size === 0) {
+        this.table.delete(row);
+      }
       return true;
     }
     return false;

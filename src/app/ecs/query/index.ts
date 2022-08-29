@@ -12,4 +12,3 @@ export * from "./system/dispatch";
 export * from "./system/receiver";
 export * from "./system/res";
 export * from "./system/query";
-export * from "./system/world";
