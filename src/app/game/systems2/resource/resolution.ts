@@ -31,10 +31,10 @@ const UpdateLimitEffects = RecalculateByQuery(Value(R.LimitEffect));
 const UpdateDeltaEffects = RecalculateByQuery(Value(R.DeltaEffect));
 
 const UpdateEffectTargets = System(
-  Query(DiffMut(R.Capacity), Value(R.LimitEffect)).filter(Every(Resource)),
+  Query(DiffMut(R.Limit), Value(R.LimitEffect)).filter(Every(Resource)),
   Query(DiffMut(R.Delta), Value(R.DeltaEffect)).filter(Every(Resource)),
   NumberTrackersQuery,
-)((capacities, deltas, numbers) => {
+)((limits, deltas, numbers) => {
   function update(effect: NumberEffectId, component: { set value(v: number) }) {
     const tracker = numbers.get(effect);
     if (tracker && tracker.isAddedOrChanged()) {
@@ -45,8 +45,8 @@ const UpdateEffectTargets = System(
     }
   }
 
-  for (const [capacity, effect] of capacities) {
-    update(effect, capacity);
+  for (const [limit, effect] of limits) {
+    update(effect, limit);
   }
   for (const [delta, effect] of deltas) {
     update(effect, delta);
@@ -58,12 +58,12 @@ const ProcessLedger = System(
   Query(
     Read(R.LedgerEntry),
     Opt(Value(R.Delta)),
-    Opt(Value(R.Capacity)),
+    Opt(Value(R.Limit)),
     DiffMut(R.Amount),
   ),
 )((ticker, query) => {
   const [{ delta: dt }] = single(ticker);
-  for (const [ledgerEntry, delta, capacity, amount] of query) {
+  for (const [ledgerEntry, delta, limit, amount] of query) {
     let { debit, credit } = ledgerEntry;
     if (delta !== undefined) {
       if (delta > 0) {
@@ -73,7 +73,7 @@ const ProcessLedger = System(
       }
     }
     if (debit !== 0 || credit !== 0) {
-      amount.value = calculateAmount(amount.value, debit, credit, capacity);
+      amount.value = calculateAmount(amount.value, debit, credit, limit);
     }
   }
 });
@@ -82,19 +82,19 @@ function calculateAmount(
   currentAmount: number,
   debit: number,
   credit: number,
-  capacity: number | undefined,
+  limit: number | undefined,
 ): number {
-  const effectiveCapacity = capacity ?? Number.POSITIVE_INFINITY;
+  const effectiveLimit = limit ?? Number.POSITIVE_INFINITY;
 
   // subtract losses first
   let newAmount = currentAmount - credit;
 
-  if (newAmount < effectiveCapacity) {
-    // new resources are gained only when under capacity
+  if (newAmount < effectiveLimit) {
+    // new resources are gained only when under limit
     newAmount += debit;
 
-    // but they only go up to capacity at most
-    newAmount = Math.min(newAmount, effectiveCapacity);
+    // but they only go up to limit at most
+    newAmount = Math.min(newAmount, effectiveLimit);
   }
 
   // negative resource amount is nonsense (for now)
@@ -119,12 +119,12 @@ const UnlockByQuantity = System(
   }
 });
 
-const UnlockByCapacity = System(
-  Query(ChangeTrackers(R.Capacity), Mut(Unlocked)).filter(
+const UnlockByLimit = System(
+  Query(ChangeTrackers(R.Limit), Mut(Unlocked)).filter(
     Every(Resource, R.UnlockOnFirstCapacity),
   ),
-)((capacities) => {
-  for (const [trackers, unlock] of capacities) {
+)((limits) => {
+  for (const [trackers, unlock] of limits) {
     if (
       !unlock.value &&
       trackers.isAddedOrChanged() &&
@@ -164,7 +164,7 @@ export class ResourceResolutionPlugin extends EcsPlugin {
         UpdateEffectTargets,
         ProcessLedger,
         UnlockByQuantity,
-        UnlockByCapacity,
+        UnlockByLimit,
       ])
       .addSystems(Extractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });

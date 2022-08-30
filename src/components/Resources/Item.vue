@@ -13,7 +13,7 @@ const { t } = useI18n();
 
 const fmt = useFormatter();
 
-const { amount, capacity, change, modifier } = toRefs(item);
+const { amount, limit, change, modifier } = toRefs(item);
 </script>
 
 <template>
@@ -26,9 +26,9 @@ const { amount, capacity, change, modifier } = toRefs(item);
       }">{{  fmt.v(modifier)  }}</span>
     </div>
     <div class="col-3 number amount">{{  fmt.number(amount, "negative")  }}</div>
-    <template v-if="capacity">
+    <template v-if="limit">
       <div class="col-3 number capacity">
-        <span>/{{  fmt.v(capacity)  }}</span>
+        <span>/{{  fmt.v(limit)  }}</span>
       </div>
     </template>
     <template v-else>

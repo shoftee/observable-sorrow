@@ -15,7 +15,7 @@ export interface ResourceView {
   unlocked: boolean;
   amount: number;
   change?: NumberView;
-  capacity?: NumberView;
+  limit?: NumberView;
   modifier?: NumberView;
   deltaTree?: EffectTree;
 }
@@ -41,7 +41,7 @@ export function newResourceView(
     unlocked: computed(() => resource.unlocked),
     amount: computed(() => resource.amount),
     change: computed(() => changeView(meta, state)),
-    capacity: computed(() => capacityView(meta, state)),
+    limit: computed(() => limitView(meta, state)),
     modifier: computed(() => modifierView(meta, state)),
     deltaTree: computed(() => deltaTreeView(meta, state)),
   });
@@ -55,7 +55,7 @@ function changeView(meta: ResourceMetadataType, state: StateSchema) {
   }
 }
 
-function capacityView(meta: ResourceMetadataType, state: StateSchema) {
+function limitView(meta: ResourceMetadataType, state: StateSchema) {
   if (meta.effects.limit) {
     return numberView(state, meta.effects.limit, "negative");
   } else {

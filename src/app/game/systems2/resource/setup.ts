@@ -17,7 +17,7 @@ function* resourceComponents(
   yield new R.LedgerEntry();
   if (meta.effects) {
     if (meta.effects.limit) {
-      yield new R.Capacity();
+      yield new R.Limit();
       yield new R.LimitEffect(meta.effects.limit);
     }
     if (meta.effects.delta) {

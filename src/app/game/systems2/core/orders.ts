@@ -2,12 +2,12 @@ import { MapQuery, Value, All, Opt, DiffMut } from "@/app/ecs/query";
 import { ResourceId } from "@/app/interfaces";
 import { Ledger, ResourceMap } from "@/app/state";
 
-import { Amount, Capacity, LedgerEntry } from "../resource/types";
+import { Amount, Limit, LedgerEntry } from "../resource/types";
 import { Resource } from "../types/common";
 
 export const ResourceMapQuery = MapQuery(
   Value(Resource),
-  All(Value(Amount), Opt(Value(Capacity)), DiffMut(LedgerEntry)),
+  All(Value(Amount), Opt(Value(Limit)), DiffMut(LedgerEntry)),
 );
 
 type Order = Partial<{
@@ -58,14 +58,14 @@ export function applyOrder(
   for (const [id, quantity] of order.debits ?? []) {
     transaction.addDebit(id, quantity);
 
-    const [amount, capacity] = resources.get(id)!;
-    if (capacity) {
+    const [amount, limit] = resources.get(id)!;
+    if (limit) {
       const debit = transaction.getDebit(id);
       const credit = transaction.getCredit(id);
       const total = amount + debit - credit;
 
-      // if total > capacity, record only the part until cap.
-      rewards.set(id, Math.min(capacity, total) - amount);
+      // if total > limit, record only the part until cap.
+      rewards.set(id, Math.min(limit, total) - amount);
     } else {
       // resources that are uncapped are always fulfilled completely.
       rewards.set(id, quantity);

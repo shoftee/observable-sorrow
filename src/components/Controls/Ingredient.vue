@@ -16,8 +16,7 @@ const { t } = useI18n();
     <div class="label">{{  t(item.label)  }}</div>
     <div class="fulfillment number">
       <template v-if="!item.fulfilled">
-        {{  fmt.number(item.fulfillment)  }} /
-        {{  fmt.number(item.requirement)  }}
+        {{  fmt.number(item.fulfillment)  }} / {{  fmt.number(item.requirement)  }}
         <template v-if="item.eta !== undefined">
           <template v-if="item.eta.value === Number.POSITIVE_INFINITY">(&infin;)</template>
           <template v-else>({{  fmt.v(item.eta)  }})</template>

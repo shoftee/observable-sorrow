@@ -6,7 +6,7 @@ export class Amount extends ValueComponent<number> {
   value = 0;
 }
 
-export class Capacity extends ValueComponent<number> {
+export class Limit extends ValueComponent<number> {
   value = 0;
 }
 

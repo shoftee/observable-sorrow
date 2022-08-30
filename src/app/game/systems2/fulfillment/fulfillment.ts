@@ -56,15 +56,15 @@ const CalculateIngredientFulfillment = System(
   Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
   MapQuery(
     Q_Resource,
-    All(Value(R.Amount), Opt(Value(R.Delta)), Opt(Value(R.Capacity))),
+    All(Value(R.Amount), Opt(Value(R.Delta)), Opt(Value(R.Limit))),
   ),
 )((ingredients, resources) => {
   for (const [resource, requirement, progress, capped] of ingredients) {
-    const [amount, delta, capacity] = resources.get(resource)!;
+    const [amount, delta, limit] = resources.get(resource)!;
 
     progress.fulfilled = amount >= requirement;
     if (amount < requirement && delta !== undefined && delta > 0) {
-      if (capacity !== undefined && capacity < requirement) {
+      if (limit !== undefined && limit < requirement) {
         // requirement won't be fulfilled
         progress.eta = Number.POSITIVE_INFINITY;
       } else {
@@ -77,7 +77,7 @@ const CalculateIngredientFulfillment = System(
     // if the ingredient is fulfilled, it's automatically non-capped
     // this is done to handle overcapped resources correctly
     capped.value =
-      !progress.fulfilled && capacity !== undefined && requirement > capacity;
+      !progress.fulfilled && limit !== undefined && requirement > limit;
   }
 });
 
