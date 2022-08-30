@@ -15,22 +15,23 @@ const events = inject(KeyboardEventsKey);
 
 const ingredients = computed(() => item.fulfillment.ingredients);
 const effects = computed(() => item.effects ?? []);
+const title = computed(() => {
+  if (events?.shift) {
+    return "effects.buildings.total";
+  } else {
+    return "effects.buildings.per-level";
+  }
+})
 </script>
 <template>
   <div>
     <div class="card-header">
-      <p class="description">{{ t(item.description) }}</p>
-      <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
+      <p class="description">{{  t(item.description)  }}</p>
+      <p class="flavor" v-if="item.flavor">{{  t(item.flavor)  }}</p>
     </div>
     <Ingredients v-if="ingredients.length > 0" :items="ingredients" />
     <Effects v-if="effects.length > 0" :items="effects">
-      <template #title>{{
-          t(
-            events?.shift
-              ? "effects.buildings.total"
-              : "effects.buildings.per-level",
-          )
-      }}</template>
+      <template #title>{{  t(title)  }}</template>
     </Effects>
   </div>
 </template>

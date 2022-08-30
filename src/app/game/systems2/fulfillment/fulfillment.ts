@@ -17,10 +17,10 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { Fulfillment, Resource, Unlocked } from "../types/common";
-
-import * as F from "./types";
+import { Fulfillment, Resource } from "../types/common";
+import { Unlocked } from "../unlock/types";
 import * as R from "../resource/types";
+import * as F from "./types";
 
 const Q_Fulfillment = Value(Fulfillment);
 const Q_Resource = Value(Resource);
@@ -30,7 +30,7 @@ const Q_CappedMut = DiffMut(F.Capped);
 
 const SpawnFulfillments = System(Commands())((cmds) => {
   for (const meta of Meta.recipes()) {
-    cmds.spawn(...F.fulfillmentComponents(meta.id)).entity((e) => {
+    cmds.spawn(...F.fulfillmentComponents(meta.id)).defer((e) => {
       for (const [id, requirement] of resourceQtyIterable(meta.ingredients)) {
         cmds.spawnChild(e, ...F.ingredientComponents(id, requirement));
       }

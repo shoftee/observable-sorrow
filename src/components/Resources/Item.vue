@@ -19,16 +19,16 @@ const { amount, capacity, change, modifier } = toRefs(item);
 <template>
   <div class="item-container">
     <div class="name col-3">
-      <span>{{ t(item.label) }}</span>
+      <span>{{  t(item.label)  }}</span>
       <span v-if="modifier?.value" class="resource-modifier number-annotation" :class="{
         'bg-success': modifier.value > 0,
         'bg-danger': modifier.value < 0,
-      }">{{ fmt.v(modifier) }}</span>
+      }">{{  fmt.v(modifier)  }}</span>
     </div>
-    <div class="col-3 number amount">{{ fmt.number(amount, "negative") }}</div>
+    <div class="col-3 number amount">{{  fmt.number(amount, "negative")  }}</div>
     <template v-if="capacity">
       <div class="col-3 number capacity">
-        <span>/{{ fmt.v(capacity) }}</span>
+        <span>/{{  fmt.v(capacity)  }}</span>
       </div>
     </template>
     <template v-else>
@@ -38,7 +38,7 @@ const { amount, capacity, change, modifier } = toRefs(item);
       <template v-if="item.deltaTree">
         <tippy class="col-3">
           <div class="number change" :class="{ 'text-danger': change.value < 0 }">
-            {{ fmt.v(change) }}
+            {{  fmt.v(change)  }}
           </div>
           <template #content>
             <div class="effect-tree">
@@ -49,7 +49,7 @@ const { amount, capacity, change, modifier } = toRefs(item);
       </template>
       <template v-else>
         <div class="col-3 number change" :class="{ 'text-danger': change.value < 0 }">
-          {{ fmt.v(change) }}
+          {{  fmt.v(change)  }}
         </div>
       </template>
     </template>

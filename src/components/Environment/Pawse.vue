@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
-import { useSend, useStateManager } from "@/composables/game-endpoint";
 import { newTimeView } from "@/app/presenters/views";
+
+import { useI18n } from "vue-i18n";
+import { useSend, useStateManager } from "@/composables/game-endpoint";
 
 const send = useSend();
 const manager = useStateManager();
@@ -11,15 +13,24 @@ const { t } = useI18n();
 
 const time = newTimeView(manager.state);
 
-async function pause() {
-  await send({ kind: "time", id: "pawse" })
-}
-async function unpause() {
-  await send({ kind: "time", id: "unpawse" })
+const label = computed(() => {
+  if (time.paused) {
+    return "game.control.unpawse";
+  } else {
+    return "game.control.pawse";
+  }
+});
+
+async function dispatch() {
+  if (time.paused) {
+    await send({ kind: "time", id: "unpawse" })
+  } else {
+    await send({ kind: "time", id: "pawse" })
+  }
 }
 </script>
 <template>
-  <button type="button" :class="{ active: time.paused }" @click="time.paused ? unpause() : pause()">
-    {{ t(time.paused ? "game.control.unpawse" : "game.control.pawse") }}
+  <button type="button" :class="{ active: time.paused }" @click="dispatch">
+    {{  t(label)  }}
   </button>
 </template>

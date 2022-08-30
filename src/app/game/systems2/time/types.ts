@@ -2,6 +2,8 @@ import { TimeConstants } from "@/app/state";
 
 import { EcsComponent } from "@/app/ecs";
 
+export class TickTimer extends EcsComponent {}
+
 export class Timer extends EcsComponent {
   /** Absolute time, adjusted to the timer's period. */
   ticks = 0;

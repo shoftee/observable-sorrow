@@ -1,6 +1,7 @@
 import { PluginApp, EcsPlugin } from "@/app/ecs";
 import { Commands } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
+
 import { DeltaExtractor } from "../core";
 
 import { RareEvent } from "./types";

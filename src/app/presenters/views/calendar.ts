@@ -3,10 +3,10 @@ import { reactive, computed } from "vue";
 import { SeasonId, WeatherId } from "@/app/interfaces";
 import { Meta } from "@/app/state";
 
-import { IStateManager } from "..";
+import { StateSchema } from "@/app/game/systems2/core";
 
-export function newCalendarView(manager: IStateManager): CalendarView {
-  const state = manager.state.calendar;
+export function newCalendarView(schema: StateSchema): CalendarView {
+  const state = schema.calendar;
 
   return reactive({
     day: computed(() => state.day),

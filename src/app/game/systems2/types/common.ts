@@ -1,9 +1,4 @@
-import {
-  BooleanEffectId,
-  BuildingId,
-  FulfillmentId,
-  ResourceId,
-} from "@/app/interfaces";
+import { BuildingId, FulfillmentId, ResourceId } from "@/app/interfaces";
 
 import { EcsComponent, ValueComponent } from "@/app/ecs";
 
@@ -11,19 +6,8 @@ export class Level extends ValueComponent<number> {
   value = 0;
 }
 
-export class Unlocked extends ValueComponent<boolean> {
-  constructor(public value: boolean) {
-    super();
-  }
-}
 export class PriceRatio extends ValueComponent<number> {
   constructor(public value: number) {
-    super();
-  }
-}
-
-export class BooleanEffect extends ValueComponent<BooleanEffectId> {
-  constructor(readonly value: BooleanEffectId) {
     super();
   }
 }

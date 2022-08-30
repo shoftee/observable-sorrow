@@ -17,7 +17,7 @@ const { happiness } = society;
 
 <template>
   <div class="card">
-    <div class="card-header">{{ t("management.title") }}</div>
+    <div class="card-header">{{  t("management.title")  }}</div>
     <div class="card-body">
       <div class="row">
         <div class="col-xl-6 col-12">
@@ -25,13 +25,13 @@ const { happiness } = society;
             <tippy>
               <i18n-t keypath="management.happiness.label" scope="global">
                 <template #amount>
-                  <span class="ms-1 number">{{ fmt.v(happiness.view) }}</span>
+                  <span class="ms-1 number">{{  fmt.v(happiness.view)  }}</span>
                 </template>
               </i18n-t>
               <template #content>
                 <div>
                   <div class="card-header">
-                    {{ t("management.happiness.detail") }}
+                    {{  t("management.happiness.detail")  }}
                   </div>
                 </div>
               </template>

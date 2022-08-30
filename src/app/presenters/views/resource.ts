@@ -7,6 +7,7 @@ import { StateSchema } from "@/app/game/systems2/core";
 
 import { effectTree, EffectTree, numberView, NumberView } from "../common";
 import { IStateManager } from "../state-manager";
+import { fromIds } from "./array";
 
 export interface ResourceView {
   readonly id: ResourceId;
@@ -17,6 +18,13 @@ export interface ResourceView {
   capacity?: NumberView;
   modifier?: NumberView;
   deltaTree?: EffectTree;
+}
+
+export function allResourceViews(manager: IStateManager) {
+  const ids = computed(
+    () => Object.keys(manager.state.resources) as ResourceId[],
+  );
+  return fromIds(manager, ids, newResourceView);
 }
 
 export function newResourceView(

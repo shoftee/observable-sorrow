@@ -3,6 +3,8 @@ import { reactive, computed } from "vue";
 import { BuildingId, Intent } from "@/app/interfaces";
 import { BonfireBuildingId, BonfireItemId, Meta } from "@/app/state";
 
+import { StateSchema } from "@/app/game/systems2/core";
+
 import {
   FulfillmentItemView,
   EffectItem,
@@ -10,7 +12,12 @@ import {
   numberView,
 } from "../common";
 import { IStateManager } from "../state-manager";
-import { StateSchema } from "@/app/game/systems2/core";
+
+import { fromIds } from "./array";
+
+export function allBonfireItemViews(manager: IStateManager) {
+  return fromIds(manager, Meta.bonfireItems(), newBonfireItemView);
+}
 
 export interface BonfireItemView {
   id: BonfireItemId;

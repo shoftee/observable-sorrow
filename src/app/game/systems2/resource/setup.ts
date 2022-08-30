@@ -4,7 +4,8 @@ import { EcsComponent, EcsPlugin, PluginApp } from "@/app/ecs";
 import { Commands } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { Resource, Unlocked } from "../types/common";
+import { Resource } from "../types/common";
+import { Unlocked } from "../unlock/types";
 
 import * as R from "./types";
 
@@ -14,7 +15,6 @@ function* resourceComponents(
   yield new Resource(meta.id);
   yield new R.Amount();
   yield new R.LedgerEntry();
-  yield new Unlocked(false);
   if (meta.effects) {
     if (meta.effects.limit) {
       yield new R.Capacity();
@@ -25,6 +25,8 @@ function* resourceComponents(
       yield new R.DeltaEffect(meta.effects.delta);
     }
   }
+
+  yield new Unlocked(false);
   if (meta.unlockMode === UnlockMode.FirstCapacity) {
     yield new R.UnlockOnFirstCapacity();
   } else {

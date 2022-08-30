@@ -1,3 +1,5 @@
+import { NumberEffectId } from "@/app/interfaces";
+
 import { EcsEntity, EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   WorldCmds,
@@ -17,7 +19,6 @@ import {
   Opt,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
-import { NumberEffectId } from "@/app/interfaces";
 
 import { DeltaExtractor } from "../core";
 
@@ -47,7 +48,7 @@ function addEffectComponents(
 ) {
   if (item instanceof Function) {
     const expr = item;
-    container.entity((e) => {
+    container.defer((e) => {
       const innerContainer = cmds.spawnChild(e, ...numberComponents());
       for (const innerItem of expr()) {
         addEffectComponents(cmds, innerContainer, innerItem);

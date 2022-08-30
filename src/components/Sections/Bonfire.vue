@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { Meta } from "@/app/state";
-
 import BuildingButton from "@/components/Controls/Building/Button.vue";
 
 import { useStateManager } from "@/composables/game-endpoint";
-import { filterArrayView, fromIds, newBonfireItemView } from "@/app/presenters/views";
+import { allBonfireItemViews, filterArrayView } from "@/app/presenters/views";
 
 const manager = useStateManager();
 
-const all = fromIds(manager, Meta.bonfireItems(), newBonfireItemView)
+const all = allBonfireItemViews(manager)
 const items = filterArrayView(all, b => b.unlocked);
 </script>
 

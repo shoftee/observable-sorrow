@@ -11,7 +11,7 @@ export type WorldCmds = {
 export type EntityCmds = {
   insert(...components: EcsComponent[]): EntityCmds;
   remove(...ctors: Ctor<EcsComponent>[]): EntityCmds;
-  entity(fn: (entity: EcsEntity) => void): EntityCmds;
+  defer(fn: (entity: EcsEntity) => void): EntityCmds;
 };
 
 type CommandParams = {
@@ -56,7 +56,7 @@ class EntityCommandsImpl {
     return this;
   }
 
-  entity(fn: (entity: EcsEntity) => void): EntityCommandsImpl {
+  defer(fn: (entity: EcsEntity) => void): EntityCommandsImpl {
     this.world.defer((world) => {
       const entity = this.ensureSpawned(world);
       fn(entity);

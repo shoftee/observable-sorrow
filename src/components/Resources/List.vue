@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import Item from "./Item.vue";
 
 import { useStateManager } from "@/composables/game-endpoint";
-import { filterArrayView, fromIds, newResourceView } from "@/app/presenters/views";
-import { ResourceId } from "@/app/interfaces";
+import { filterArrayView, allResourceViews } from "@/app/presenters/views";
 
 const { t } = useI18n();
 
 const show = ref(true);
 const manager = useStateManager();
 
-const ids = computed(() => Object.keys(manager.state.resources) as ResourceId[]);
-const all = fromIds(manager, ids, newResourceView);
+const all = allResourceViews(manager);
 const items = filterArrayView(all, r => r.unlocked);
 </script>
 
@@ -22,12 +20,12 @@ const items = filterArrayView(all, r => r.unlocked);
   <div class="resources-container">
     <div class="card">
       <div v-if="items.length === 0" class="no-resources">
-        {{ t("resources.section.empty") }}
+        {{  t("resources.section.empty")  }}
       </div>
       <div v-else class="base-resources">
         <button class="btn shadow-none" @click="show = !show">
           <div class="clearfix">
-            <span class="float-start">{{ t("resources.section.label") }}</span>
+            <span class="float-start">{{  t("resources.section.label")  }}</span>
             <span class="float-end">
               <i v-if="!show" class="bi bi-arrows-expand"></i>
             </span>

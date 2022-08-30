@@ -22,7 +22,7 @@ const fmt = useFormatter()
         <li v-for="item in items.filter((i) => i.totalAmount?.value !== undefined)" :key="item.id">
           <i18n-t scope="global" :keypath="item.label" tag="span">
             <template #amount>
-              <span class="number">{{ fmt.v(item.totalAmount!) }}</span>
+              <span class="number">{{  fmt.v(item.totalAmount!)  }}</span>
             </template>
           </i18n-t>
         </li>
@@ -31,7 +31,7 @@ const fmt = useFormatter()
         <li v-for="item in items.filter((i) => i.singleAmount?.value !== undefined)" :key="item.id">
           <i18n-t scope="global" :keypath="item.label" tag="span">
             <template #amount>
-              <span class="number">{{ fmt.v(item.singleAmount!) }}</span>
+              <span class="number">{{  fmt.v(item.singleAmount!)  }}</span>
             </template>
           </i18n-t>
         </li>

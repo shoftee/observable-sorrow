@@ -26,16 +26,16 @@ const idle = computed(() =>
   <div class="card">
     <template v-if="total === 0">
       <div class="card-body">
-        <div class="text-center p-2">{{ t("jobs.status.empty") }}</div>
+        <div class="text-center p-2">{{  t("jobs.status.empty")  }}</div>
       </div>
     </template>
     <template v-else>
-      <div class="card-header">{{ t("jobs.title") }}</div>
+      <div class="card-header">{{  t("jobs.title")  }}</div>
       <div class="card-body">
         <div>
-          <p v-if="idle === 0">{{ t("jobs.status.good") }}</p>
+          <p v-if="idle === 0">{{  t("jobs.status.good")  }}</p>
           <p v-else>
-            <span>{{ t("jobs.status.idle", { idle }, idle) }}</span>
+            <span>{{  t("jobs.status.idle", { idle }, idle)  }}</span>
           </p>
         </div>
         <div class="button-stack">

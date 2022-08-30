@@ -1,13 +1,20 @@
 import { cache } from "@/app/utils/cache";
 import { any } from "@/app/utils/collections";
 
+import {
+  BuildingMetadataType,
+  Ledger,
+  Meta,
+  ResourceMap,
+  resourceQtyIterable,
+} from "@/app/state";
+
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   All,
   ChangeTrackers,
   ChildrenQuery,
   DiffMut,
-  Eager,
   Every,
   MapQuery,
   Query,
@@ -18,28 +25,13 @@ import {
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import {
-  BuildingMetadataType,
-  Ledger,
-  Meta,
-  ResourceMap,
-  resourceQtyIterable,
-} from "@/app/state";
-
 import { DeltaExtractor } from "../core";
 import { applyOrder, ResourceMapQuery } from "../core/orders";
-import {
-  Building,
-  Level,
-  PriceRatio,
-  Unlocked,
-  BooleanEffect,
-  Resource,
-} from "../types/common";
-import * as events from "../types/events";
-
-import * as R from "../resource/types";
+import { Building, Level, PriceRatio, Resource } from "../types/common";
+import { Unlocked, UnlockOnEffect } from "../unlock/types";
 import { BuildingEffect, Effect, NumberValue } from "../effects/types";
+import * as events from "../types/events";
+import * as R from "../resource/types";
 
 import * as F from "./types";
 
@@ -54,14 +46,14 @@ const SpawnBuildings = System(Commands())((cmds) => {
   for (const meta of Meta.buildings()) {
     cmds
       .spawn(...F.fulfillmentComponents(meta.id), ...buildingComponents(meta))
-      .entity((e) => {
+      .defer((e) => {
         if (meta.unlock) {
           const { priceRatio: ratio, unlockEffect: effect } = meta.unlock;
           if (ratio) {
             cmds.spawnChild(e, new Unlocked(false), new PriceRatio(ratio));
           }
           if (effect) {
-            cmds.spawnChild(e, new Unlocked(false), new BooleanEffect(effect));
+            cmds.spawnChild(e, new Unlocked(false), new UnlockOnEffect(effect));
           }
         }
         for (const [id, requirement] of resourceQtyIterable(meta.prices.base)) {
@@ -125,12 +117,12 @@ const HandleLevelChanged = System(
   ),
   MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(Every(Effect)),
 )((trackersQuery, requirementsQuery, effectsQuery) => {
-  for (const [buildingEntity, [id, trackers]] of trackersQuery) {
+  for (const [entity, [id, trackers]] of trackersQuery) {
     if (trackers.isAddedOrChanged()) {
       const { value: level } = trackers.value();
 
       // Update ingredient requirements
-      const [ratio, ingredients] = requirementsQuery.get(buildingEntity)!;
+      const [ratio, ingredients] = requirementsQuery.get(entity)!;
       for (const [base, requirement] of ingredients) {
         requirement.value = base * Math.pow(ratio, level);
       }
@@ -138,7 +130,7 @@ const HandleLevelChanged = System(
       // Update effect values
       const effectValue = effectsQuery.get(id);
       if (effectValue) {
-        effectValue.value = level;
+        effectValue.value = level || undefined;
       }
     }
   }
@@ -156,7 +148,7 @@ const Q_Resource = Value(Resource);
 
 const ProcessRatioUnlocks = System(
   Query(
-    Eager(ChildrenQuery(Q_Resource, Value(F.Requirement))),
+    ChildrenQuery(Q_Resource, Value(F.Requirement)),
     ChildrenQuery(DiffMut(Unlocked), Value(PriceRatio)),
   ).filter(Every(Building)),
   MapQuery(Q_Resource, Value(R.Amount)),

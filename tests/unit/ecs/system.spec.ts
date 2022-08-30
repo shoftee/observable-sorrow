@@ -100,11 +100,11 @@ describe("ecs systems", () => {
       const world = new World();
 
       const Setup = System(Commands())((cmds) => {
-        cmds.spawn(new Id("mage"), new Player(20)).entity((e) => {
+        cmds.spawn(new Id("mage"), new Player(20)).defer((e) => {
           cmds.spawnChild(e, new ItemStack("Health Potion", 5));
           cmds.spawnChild(e, new ItemStack("Mana Potion", 20));
         });
-        cmds.spawn(new Id("brawler"), new Player(10)).entity((e) => {
+        cmds.spawn(new Id("brawler"), new Player(10)).defer((e) => {
           cmds.spawnChild(e, new ItemStack("Health Potion", 10));
           cmds.spawnChild(e, new ItemStack("Mana Potion", 15));
         });
@@ -142,22 +142,22 @@ describe("ecs systems", () => {
       const world = new World();
 
       const Setup = System(Commands())((cmds) => {
-        cmds.spawn(new Id("name 1")).entity((level1) => {
-          cmds.spawnChild(level1, new Id("name 3")).entity((level2) => {
+        cmds.spawn(new Id("name 1")).defer((level1) => {
+          cmds.spawnChild(level1, new Id("name 3")).defer((level2) => {
             cmds.spawnChild(level2, new Id("name 7"));
             cmds.spawnChild(level2, new Id("name 8"));
           });
-          cmds.spawnChild(level1, new Id("name 4")).entity((level2) => {
+          cmds.spawnChild(level1, new Id("name 4")).defer((level2) => {
             cmds.spawnChild(level2, new Id("name 9"));
             cmds.spawnChild(level2, new Id("name 10"));
           });
         });
-        cmds.spawn(new Id("name 2")).entity((level1) => {
-          cmds.spawnChild(level1, new Id("name 5")).entity((level2) => {
+        cmds.spawn(new Id("name 2")).defer((level1) => {
+          cmds.spawnChild(level1, new Id("name 5")).defer((level2) => {
             cmds.spawnChild(level2, new Id("name 11"));
             cmds.spawnChild(level2, new Id("name 12"));
           });
-          cmds.spawnChild(level1, new Id("name 6")).entity((level2) => {
+          cmds.spawnChild(level1, new Id("name 6")).defer((level2) => {
             cmds.spawnChild(level2, new Id("name 13"));
             cmds.spawnChild(level2, new Id("name 14"));
           });

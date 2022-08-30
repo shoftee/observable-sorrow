@@ -1,4 +1,5 @@
 import {
+  BooleanEffectId,
   BuildingId,
   NumberEffectId,
   SeasonId,
@@ -15,14 +16,18 @@ export class NumberEffect extends ValueComponent<NumberEffectId> {
   }
 }
 
-export class Order extends ValueComponent<number> {
-  constructor(readonly value: number) {
+export class NumberValue extends ValueComponent<number | undefined> {
+  value: number | undefined;
+}
+
+export class BooleanEffect extends ValueComponent<BooleanEffectId> {
+  constructor(readonly value: BooleanEffectId) {
     super();
   }
 }
 
-export class NumberValue extends ValueComponent<number | undefined> {
-  value: number | undefined;
+export class BooleanValue extends ValueComponent<boolean | undefined> {
+  value: boolean | undefined;
 }
 
 export class Default extends ValueComponent<number> {
@@ -47,6 +52,12 @@ export class Operation extends EcsComponent {
 
 export class Operand extends EcsComponent {
   constructor(readonly type?: "base" | "ratio" | "exponent") {
+    super();
+  }
+}
+
+export class Order extends ValueComponent<number> {
+  constructor(readonly value: number) {
     super();
   }
 }

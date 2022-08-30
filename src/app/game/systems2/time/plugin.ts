@@ -7,16 +7,15 @@ import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
 import { Commands, Query, Mut, Receive, Read, DiffMut } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
-import { DeltaExtractor } from "./core";
-import { TimeControls, Timer } from "./types";
-import * as events from "./types/events";
+import { DeltaExtractor } from "../core";
+import * as events from "../types/events";
+
+import { TickTimer, TimeControls, Timer } from "./types";
 
 class DeltaTime extends EcsComponent {
   last?: number;
   delta = 0;
 }
-
-export class TickTimer extends EcsComponent {}
 
 const Setup = System(Commands())((cmds) => {
   cmds.spawn(new DeltaTime(), new TimeControls());

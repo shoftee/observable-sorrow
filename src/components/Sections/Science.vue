@@ -20,7 +20,7 @@ const techs = computed(() =>
 
 <template>
   <div class="card">
-    <div class="card-header">{{ t("tech.section.title") }}</div>
+    <div class="card-header">{{  t("tech.section.title")  }}</div>
     <div class="card-body">
       <div class="button-stack">
         <div class="row" v-for="tech in techs" :key="tech.id">

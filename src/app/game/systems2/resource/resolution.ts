@@ -20,9 +20,10 @@ import {
   NumberTrackersQuery,
   RecalculateByQuery,
 } from "../effects/calculation";
-import { TickTimer } from "../time";
-import { Timer } from "../types";
-import { Resource, Unlocked } from "../types/common";
+
+import { Resource } from "../types/common";
+import { Unlocked } from "../unlock/types";
+import { Timer, TickTimer } from "../time/types";
 
 import * as R from "./types";
 

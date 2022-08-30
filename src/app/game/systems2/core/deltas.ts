@@ -3,6 +3,7 @@ import {
   FulfillmentId,
   NumberEffectId,
   ResourceId,
+  SectionId,
   TechId,
 } from "@/app/interfaces";
 
@@ -11,9 +12,11 @@ import { SchemaEntity, SchemaComponent, SchemaEvent } from "./schema";
 import { CalendarSchema } from "../environment/schema";
 import { BuildingSchema, FulfillmentSchema } from "../fulfillment/schema";
 import { ResourceSchema } from "../resource/schema";
+import { NumberEffectSchema } from "../effects/schema";
+import { SectionSchema } from "../section/schema";
 
 import { HistoryEvent } from "../types";
-import { NumberEffectSchema } from "../effects/schema";
+import { TimeSchema } from "../time/schema";
 
 type RecordObj = Record<string, unknown>;
 
@@ -39,11 +42,10 @@ type ComponentsSchema = {
       researched: boolean;
     }>;
   };
-  time: SchemaEntity<{
-    paused: boolean;
-    power: number;
-    millisPerTick: number;
-  }>;
+  sections: {
+    [K in SectionId]: SchemaEntity<SectionSchema>;
+  };
+  time: SchemaEntity<TimeSchema>;
 };
 
 type EventsSchema = {

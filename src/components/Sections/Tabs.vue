@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 import { SectionId } from "@/app/interfaces";
 import { useStateManager } from "@/composables/game-endpoint";
 
-import { filterArrayView, fromIds, newSectionView } from "@/app/presenters/views";
+import { allSectionViews, filterArrayView } from "@/app/presenters/views";
 
 const props = defineProps<{ active: SectionId }>();
 const emit = defineEmits<{
@@ -16,7 +16,8 @@ const manager = useStateManager();
 
 const { t } = useI18n();
 const active = ref(props.active);
-const all = fromIds(manager, manager.sections().keys(), newSectionView);
+
+const all = allSectionViews(manager);
 
 // the tabs consist of all sections that have no parents and are unlocked
 const items = filterArrayView(all, (s) => !s.parentId && s.unlocked);
@@ -34,10 +35,8 @@ function onTabClick(id: SectionId) {
         disabled: items.length < 2,
       }" @click="onTabClick(section.id)">
         <slot>
-          {{ t(section.label) }}
-          <span v-if="section.alert" class="number-annotation bg-danger">{{
-              section.alert
-          }}</span>
+          {{  t(section.title)  }}
+          <span v-if="section.alert" class="number-annotation bg-danger">{{  section.alert  }}</span>
         </slot>
       </button>
     </li>

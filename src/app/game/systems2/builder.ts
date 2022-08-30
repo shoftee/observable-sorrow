@@ -3,8 +3,8 @@ import { OnRenderHandler } from "@/app/interfaces";
 import { GameRunner, App } from "@/app/ecs";
 
 import { RendererPlugin } from "./renderer";
-import { EnvironmentPlugin } from "./environment/plugin";
-import { AstronomyPlugin } from "./astronomy/plugin";
+import { EnvironmentPlugin } from "./environment";
+import { AstronomyPlugin } from "./astronomy";
 import { TimePlugin } from "./time";
 import {
   ResourceSetupPlugin,
@@ -18,9 +18,10 @@ import {
   FulfillmentSetupPlugin,
   FulfillmentResolutionPlugin,
 } from "./fulfillment";
+import { UnlockResolutionPlugin } from "./unlock";
 
-import { AggregateBuildingUnlocks } from "./core/unlock";
 import { EffectsSetupPlugin } from "./effects/setup";
+import { SectionResolutionPlugin, SectionSetupPlugin } from "./section";
 
 export function build(onRender: OnRenderHandler): GameRunner {
   return new App()
@@ -28,6 +29,7 @@ export function build(onRender: OnRenderHandler): GameRunner {
     .addPlugin(new ResourceSetupPlugin())
     .addPlugin(new BuildingSetupPlugin())
     .addPlugin(new FulfillmentSetupPlugin())
+    .addPlugin(new SectionSetupPlugin())
     .addPlugin(new TimePlugin())
     .addPlugin(new EnvironmentPlugin())
     .addPlugin(new AstronomyPlugin())
@@ -36,7 +38,8 @@ export function build(onRender: OnRenderHandler): GameRunner {
     .addPlugin(new ResourceResolutionPlugin())
     .addPlugin(new BuildingResolutionPlugin())
     .addPlugin(new FulfillmentResolutionPlugin())
-    .addSystem(AggregateBuildingUnlocks)
+    .addPlugin(new SectionResolutionPlugin())
+    .addPlugin(new UnlockResolutionPlugin())
     .addPlugin(new RendererPlugin(onRender))
     .buildRunner();
 }

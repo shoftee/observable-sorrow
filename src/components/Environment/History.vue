@@ -6,17 +6,15 @@ import ObserveSky from "./ObserveSky.vue";
 import Pawse from "./Pawse.vue";
 
 import { LogItem } from "@/app/presenters";
-import { useEndpoint } from "@/composables/game-endpoint";
+import { newCalendarView } from "@/app/presenters/views";
+import { useFormatter, useStateManager } from "@/composables/game-endpoint";
 import { useLogItemEvent } from "@/composables/use-event-listener";
 
 import { LogEpoch, newLogEpoch, removeClippedEvents } from "./_types";
 
-const { calendar, fmt } = useEndpoint((ep) => {
-  return {
-    calendar: ep.stateManager.state.calendar,
-    fmt: ep.presenters.formatter,
-  };
-});
+const manager = useStateManager();
+const calendar = newCalendarView(manager.state);
+const fmt = useFormatter()
 
 const { t } = useI18n();
 
@@ -62,11 +60,11 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
 <template>
   <section unscrollable class="history-container">
     <div class="game-controls-container">
-      <div>{{ t("game.blurb") }}</div>
+      <div>{{  t("game.blurb")  }}</div>
       <div class="btn-group">
         <ObserveSky class="btn btn-outline-secondary" />
         <button type="button" class="btn btn-outline-secondary" @click="clearLog">
-          {{ t("game.control.clear-log") }}
+          {{  t("game.control.clear-log")  }}
         </button>
         <Pawse class="btn btn-outline-secondary" />
       </div>
@@ -77,14 +75,14 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
         <div class="border-bottom">
           <i18n-t scope="global" :keypath="calendar.epochLabel">
             <template #year>
-              <span class="number">{{ fmt.number(epoch.year) }}</span>
+              <span class="number">{{  fmt.number(epoch.year)  }}</span>
             </template>
-            <template #season>{{ t(epoch.seasonLabel) }}</template>
+            <template #season>{{  t(epoch.seasonLabel)  }}</template>
           </i18n-t>
         </div>
         <div class="log-event" v-for="event in epoch.events" :key="event.id"
           :ref="el => { if (el) event.ref = el as Element }">
-          {{ event.text }}
+          {{  event.text  }}
         </div>
       </div>
     </div>

@@ -22,14 +22,12 @@ async function dispatch(intent: Intent): Promise<void> {
 
 <template>
   <tippy>
-    <!-- We need a container div because tippy listens to hover events to trigger and buttons don't fire events when disabled.-->
+    <!-- We need a container div because tippy listens to hover events to trigger and buttons don't fire events when disabled. -->
     <div>
       <button type="button" class="btn btn-outline-secondary w-100" :class="{ capped: item.fulfillment.capped }"
         :disabled="!item.fulfillment.fulfilled" @click="dispatch(item.intent)">
-        {{ t(item.label) }}
-        <span v-if="level > 0" class="number-annotation border">{{
-            level
-        }}</span>
+        {{  t(item.label)  }}
+        <span v-if="level > 0" class="number-annotation border">{{  level  }}</span>
       </button>
     </div>
     <template #content>
