@@ -10,6 +10,7 @@ import { AlertLabel, Section, Title } from "./types";
 function* sectionComponents(meta: SectionMetadataType) {
   yield new Section(meta.id);
   yield new Title(meta.label);
+  yield new Unlocked(!meta.unlockEffect);
   yield new AlertLabel();
 }
 
@@ -18,7 +19,7 @@ const Setup = System(Commands())((cmds) => {
     const entity = cmds.spawn(...sectionComponents(meta));
     if (meta.unlockEffect) {
       const effect = meta.unlockEffect;
-      entity.insert(new Unlocked(false)).defer((e) => {
+      entity.defer((e) => {
         cmds.spawnChild(e, new Unlocked(false), new UnlockOnEffect(effect));
       });
     }
