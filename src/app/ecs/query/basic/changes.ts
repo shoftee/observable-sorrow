@@ -1,13 +1,13 @@
+import { cache } from "@/app/utils/cache";
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { ChangeTicks, EcsComponent } from "@/app/ecs";
+import { ChangeTicksSym, EcsComponent } from "@/app/ecs";
 import {
   defaultFilter,
   defaultQuery,
-  FilterDescriptor,
-  QueryDescriptor,
+  EntityFilterFactory,
+  EntityQueryFactory,
 } from "../types";
-import { cache } from "@/app/utils/cache";
 
 type Tracker<C extends EcsComponent> = {
   isAdded(): boolean;
@@ -16,7 +16,7 @@ type Tracker<C extends EcsComponent> = {
   value(): Readonly<C>;
 };
 
-type ChangeTrackers<C extends EcsComponent> = QueryDescriptor<Tracker<C>>;
+type ChangeTrackers<C extends EcsComponent> = EntityQueryFactory<Tracker<C>>;
 export function ChangeTrackers<C extends EcsComponent>(
   ctor: Ctor<C>,
 ): ChangeTrackers<C> {
@@ -42,10 +42,10 @@ function createTracker<C extends EcsComponent>(
 ): Tracker<C> {
   return {
     isAdded(): boolean {
-      return component[ChangeTicks].isAdded(last, current);
+      return component[ChangeTicksSym].isAdded(last, current);
     },
     isChanged(): boolean {
-      return component[ChangeTicks].isChanged(last, current);
+      return component[ChangeTicksSym].isChanged(last, current);
     },
     isAddedOrChanged(): boolean {
       return this.isAdded() || this.isChanged();
@@ -56,7 +56,7 @@ function createTracker<C extends EcsComponent>(
   };
 }
 
-type Added = FilterDescriptor;
+type Added = EntityFilterFactory;
 export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
   return {
     newFilter({ ticks }) {
@@ -66,14 +66,14 @@ export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
         },
         matches({ archetype }) {
           const component = archetype.get(ctor)!;
-          return component[ChangeTicks].isAdded(ticks.last, ticks.current);
+          return component[ChangeTicksSym].isAdded(ticks.last, ticks.current);
         },
       });
     },
   };
 }
 
-type Changed = FilterDescriptor;
+type Changed = EntityFilterFactory;
 export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
   return {
     newFilter({ ticks }) {
@@ -83,14 +83,14 @@ export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
         },
         matches({ archetype }) {
           const component = archetype.get(ctor)!;
-          return component[ChangeTicks].isChanged(ticks.last, ticks.current);
+          return component[ChangeTicksSym].isChanged(ticks.last, ticks.current);
         },
       });
     },
   };
 }
 
-type AddedOrChanged = FilterDescriptor;
+type AddedOrChanged = EntityFilterFactory;
 export function AddedOrChanged<C extends EcsComponent>(
   ctor: Ctor<C>,
 ): AddedOrChanged {
@@ -103,8 +103,8 @@ export function AddedOrChanged<C extends EcsComponent>(
         matches({ archetype }) {
           const component = archetype.get(ctor)!;
           return (
-            component[ChangeTicks].isAdded(ticks.last, ticks.current) ||
-            component[ChangeTicks].isChanged(ticks.last, ticks.current)
+            component[ChangeTicksSym].isAdded(ticks.last, ticks.current) ||
+            component[ChangeTicksSym].isChanged(ticks.last, ticks.current)
           );
         },
       });
@@ -112,7 +112,7 @@ export function AddedOrChanged<C extends EcsComponent>(
   };
 }
 
-type Removed = FilterDescriptor;
+type Removed = EntityFilterFactory;
 export function Removed<C extends EcsComponent>(ctor: Ctor<C>): Removed {
   return {
     newFilter({ components }) {

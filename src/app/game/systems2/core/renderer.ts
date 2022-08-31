@@ -1,15 +1,12 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, EcsResource, World } from "@/app/ecs";
+import { All, ChangeTrackers, Query, Res } from "@/app/ecs/query";
 import {
-  All,
-  AllParams,
-  AllResults,
-  ChangeTrackers,
-  Query,
-  Res,
-} from "@/app/ecs/query";
-import { InstantiatedQuery } from "@/app/ecs/query/types";
+  EntityQuery,
+  EntityQueryFactoryTuple,
+  EntityQueryResultTuple,
+} from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
 import {
@@ -55,18 +52,18 @@ export class DeltaBuffer extends EcsResource {
   readonly components: ComponentDeltas = new ComponentDeltas();
 }
 
-type SchemaStateExtractor<S, Q extends AllParams> = (
+type SchemaStateExtractor<S, Q extends EntityQueryFactoryTuple> = (
   schema: StateSchema,
-  results: AllResults<Q>,
+  results: EntityQueryResultTuple<Q>,
 ) => S;
 
 type StateExtractor<S> = (schema: StateSchema) => S;
 
-function SchemaExtratorQuery<Q extends AllParams>(...qs: Q) {
+function SchemaExtratorQuery<Q extends EntityQueryFactoryTuple>(...qs: Q) {
   return <S>(extractor: SchemaStateExtractor<S, Q>) => {
     const descriptor = All(...qs);
     return {
-      newQuery(world: World): InstantiatedQuery<StateExtractor<S>> {
+      newQuery(world: World): EntityQuery<StateExtractor<S>> {
         const query = descriptor.newQuery(world);
         return {
           includes(ctx) {
@@ -91,7 +88,9 @@ const R_DeltaBuffer = Res(DeltaBuffer);
 
 type MutatorFn<S, C extends EcsComponent> = (state: S, tracked: C) => void;
 
-export function DeltaExtractor<Q extends AllParams>(...stateQuery: Q) {
+export function DeltaExtractor<Q extends EntityQueryFactoryTuple>(
+  ...stateQuery: Q
+) {
   return <S>(schemaExtractor: SchemaStateExtractor<S, Q>) => {
     return <C extends EcsComponent>(
       tracked: Ctor<C>,

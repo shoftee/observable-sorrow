@@ -3,8 +3,8 @@ import { Queue } from "queue-typescript";
 import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { any, MultiMap, TypeSet } from "@/app/utils/collections";
 
-import { SystemRunner, SystemSpecification as SystemSpec } from "./system";
 import { EcsResource, EcsEvent, EcsStage, EcsStageType } from "./types";
+import { SystemRunner, SystemSpecification as SystemSpec } from "./system";
 import { World } from "./world";
 
 type SystemId = { id: string };

@@ -10,8 +10,10 @@ const Setup = System(Commands())((cmds) => {
   cmds.spawn(new RareEvent());
 });
 
+const TimeExtractor = DeltaExtractor()((schema) => schema.astronomy);
+
 const Extractors = [
-  DeltaExtractor()((schema) => schema.astronomy)(RareEvent, (astronomy) => {
+  TimeExtractor(RareEvent, (astronomy) => {
     astronomy.hasRareEvent = false;
   }),
 ];

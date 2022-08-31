@@ -1,7 +1,8 @@
 import { EcsEntity } from "@/app/ecs";
-import { defaultQuery, QueryDescriptor } from "../types";
 
-type EntityQuery = QueryDescriptor<Readonly<EcsEntity>>;
+import { defaultQuery, EntityQueryFactory } from "../types";
+
+type EntityQuery = EntityQueryFactory<Readonly<EcsEntity>>;
 
 /** Include the entity object in the query results. */
 export function Entity(): EntityQuery {

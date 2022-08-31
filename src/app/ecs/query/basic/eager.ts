@@ -1,11 +1,11 @@
-import { QueryDescriptor } from "../types";
+import { EntityQueryFactory } from "../types";
 
 /**
  * Eagerly turn iterables into arrays before they are included into a query's results.
  */
 export function Eager<T>(
-  query: QueryDescriptor<Iterable<T>>,
-): QueryDescriptor<T[]> {
+  query: EntityQueryFactory<Iterable<T>>,
+): EntityQueryFactory<T[]> {
   return {
     newQuery(world) {
       const inner = query.newQuery(world);

@@ -3,35 +3,34 @@ import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, World } from "@/app/ecs";
 import {
-  QueryDescriptor,
-  FilterDescriptor,
-  InstantiatedQuery,
+  EntityQueryFactory,
+  EntityFilterFactory,
+  EntityFilterFactoryTuple,
+  EntityQueryFactoryTuple,
+  EntityQueryResultTuple,
+  EntityQuery,
   defaultFilter,
 } from "../types";
 
-export type AllParams = [...QueryDescriptor[]];
-export type AllResults<T> = T extends [infer Head, ...infer Tail]
-  ? [...UnwrapResult<Head>, ...AllResults<Tail>]
-  : [];
-type UnwrapResult<T> = T extends QueryDescriptor<infer Fetch> ? [Fetch] : [T];
+export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
 
-export type Filters = [...FilterDescriptor[]];
-
-class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
-  private filters?: FilterDescriptor[];
+class AllComponentQuery<
+  Q extends EntityQueryFactoryTuple,
+> extends EntityQueryFactory<EntityQueryResultTuple<Q>> {
+  private filters?: EntityFilterFactory[];
 
   constructor(private readonly queries: Q) {
     super();
   }
 
-  newQuery(world: World): InstantiatedQuery<AllResults<Q>> {
+  newQuery(world: World): EntityQuery<EntityQueryResultTuple<Q>> {
     const queries = this.queries.map((inner) => inner.newQuery(world));
     const filters = this.filters?.map((inner) => inner.newFilter(world));
     const filterIterator = function* () {
-      yield* queries;
       if (filters) {
         yield* filters;
       }
+      yield* queries;
     };
 
     return {
@@ -42,7 +41,7 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
         return all(filterIterator(), (f) => f.matches(ctx));
       },
       fetch(ctx) {
-        return queries.map((q) => q.fetch(ctx)) as AllResults<Q>;
+        return queries.map((q) => q.fetch(ctx)) as EntityQueryResultTuple<Q>;
       },
       cleanup() {
         queries.forEach((q) => q.cleanup());
@@ -51,20 +50,22 @@ class AllQuery<Q extends AllParams> extends QueryDescriptor<AllResults<Q>> {
     };
   }
 
-  filter<F extends Filters>(...filters: F): AllQuery<Q> {
+  filter<F extends EntityFilterFactoryTuple>(
+    ...filters: F
+  ): AllComponentQuery<Q> {
     this.filters = filters;
     return this;
   }
 }
 
 /** Includes results only when they match all provided sub-queries. */
-export function All<Q extends AllParams>(...qs: Q): AllQuery<Q> {
-  return new AllQuery(qs);
+export function All<Q extends EntityQueryFactoryTuple>(
+  ...qs: Q
+): AllComponentQuery<Q> {
+  return new AllComponentQuery(qs);
 }
 
-export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
-
-type Every = FilterDescriptor;
+type Every = EntityFilterFactory;
 export function Every(...ctors: OneOrMoreCtors): Every {
   return {
     newFilter() {
@@ -77,7 +78,7 @@ export function Every(...ctors: OneOrMoreCtors): Every {
   };
 }
 
-type Any = FilterDescriptor;
+type Any = EntityFilterFactory;
 export function Any(...ctors: OneOrMoreCtors): Any {
   return {
     newFilter() {
@@ -90,7 +91,7 @@ export function Any(...ctors: OneOrMoreCtors): Any {
   };
 }
 
-type None = FilterDescriptor;
+type None = EntityFilterFactory;
 export function None(...ctors: OneOrMoreCtors): None {
   return {
     newFilter() {

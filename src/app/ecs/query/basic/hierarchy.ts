@@ -1,22 +1,16 @@
 import { EcsEntity } from "@/app/ecs";
 
-import {
-  All,
-  AllParams,
-  AllResults,
-  Entity,
-  MapQuery,
-  OneOrMoreCtors,
-  Every,
-} from "..";
+import { All, Entity, MapQuery, OneOrMoreCtors, Every } from "..";
 import {
   defaultFilter,
   defaultQuery,
-  FilterDescriptor,
-  QueryDescriptor,
+  EntityFilterFactory,
+  EntityQueryFactory,
+  EntityQueryFactoryTuple,
+  EntityQueryResultTuple,
 } from "../types";
 
-type WithParent = FilterDescriptor;
+type WithParent = EntityFilterFactory;
 export function WithParent(...ctors: OneOrMoreCtors): WithParent {
   return {
     newFilter({ queries, hierarchy }) {
@@ -37,7 +31,7 @@ export function WithParent(...ctors: OneOrMoreCtors): WithParent {
   };
 }
 
-type Parent = QueryDescriptor<EcsEntity | undefined>;
+type Parent = EntityQueryFactory<EcsEntity | undefined>;
 export function Parent(): Parent {
   return {
     newQuery({ hierarchy }) {
@@ -50,7 +44,7 @@ export function Parent(): Parent {
   };
 }
 
-type Parents = QueryDescriptor<Iterable<EcsEntity>>;
+type Parents = EntityQueryFactory<Iterable<EcsEntity>>;
 export function Parents(): Parents {
   return {
     newQuery({ hierarchy }) {
@@ -63,10 +57,12 @@ export function Parents(): Parents {
   };
 }
 
-type ParentQuery<Q extends AllParams> = QueryDescriptor<
-  AllResults<Q> | undefined
+type ParentQuery<Q extends EntityQueryFactoryTuple> = EntityQueryFactory<
+  EntityQueryResultTuple<Q> | undefined
 >;
-export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
+export function ParentQuery<Q extends EntityQueryFactoryTuple>(
+  ...qs: Q
+): ParentQuery<Q> {
   const mapQuery = MapQuery(Entity(), All(...qs));
   return {
     newQuery(world) {
@@ -90,7 +86,7 @@ export function ParentQuery<Q extends AllParams>(...qs: Q): ParentQuery<Q> {
   };
 }
 
-type Children = QueryDescriptor<Iterable<EcsEntity>>;
+type Children = EntityQueryFactory<Iterable<EcsEntity>>;
 export function Children(): Children {
   return {
     newQuery({ hierarchy }) {
@@ -103,10 +99,12 @@ export function Children(): Children {
   };
 }
 
-type ChildrenQuery<Q extends AllParams> = QueryDescriptor<
-  Iterable<AllResults<Q>>
+type ChildrenQuery<Q extends EntityQueryFactoryTuple> = EntityQueryFactory<
+  Iterable<EntityQueryResultTuple<Q>>
 >;
-export function ChildrenQuery<Q extends AllParams>(...qs: Q): ChildrenQuery<Q> {
+export function ChildrenQuery<Q extends EntityQueryFactoryTuple>(
+  ...qs: Q
+): ChildrenQuery<Q> {
   const mapQuery = MapQuery(Entity(), All(...qs));
   return {
     newQuery(world) {

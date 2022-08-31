@@ -35,19 +35,15 @@ export type FetchContext<C extends EcsComponent = EcsComponent> = {
   archetype: Archetype<C>;
 };
 
-export interface InstantiatedFilter {
+export interface EntityFilter {
   includes(ctx: FetchContext): boolean;
   matches(ctx: FetchContext): boolean;
   cleanup(): void;
 }
 
-interface Fetch<QueryResult> {
-  fetch(ctx: FetchContext): QueryResult;
+export interface EntityQuery<Result> extends EntityFilter {
+  fetch(ctx: FetchContext): Result;
 }
-
-export interface InstantiatedQuery<QueryResult>
-  extends InstantiatedFilter,
-    Fetch<QueryResult> {}
 
 function alwaysTrue() {
   return true;
@@ -56,38 +52,52 @@ function noOp() {
   return;
 }
 
-type SimpleFilter = Partial<InstantiatedFilter>;
-export function defaultFilter(
-  inner: Partial<SimpleFilter>,
-): InstantiatedFilter {
+export function defaultFilter(inner: Partial<EntityFilter>): EntityFilter {
   inner.includes ?? (inner.includes = alwaysTrue);
   inner.matches ?? (inner.matches = alwaysTrue);
   inner.cleanup ?? (inner.cleanup = noOp);
-  return inner as InstantiatedFilter;
+  return inner as EntityFilter;
 }
 
-type SimpleQuery<QueryResult> = Partial<InstantiatedFilter> &
-  Fetch<QueryResult>;
-export function defaultQuery<QueryResult>(
-  inner: SimpleQuery<QueryResult>,
-): InstantiatedQuery<QueryResult> {
+export function defaultQuery<Result>(
+  inner: Partial<EntityQuery<Result>>,
+): EntityQuery<Result> {
   defaultFilter(inner);
-  return inner as InstantiatedQuery<QueryResult>;
+  return inner as EntityQuery<Result>;
 }
 
-export abstract class FilterDescriptor {
-  abstract newFilter(world: World): InstantiatedFilter;
+export abstract class EntityFilterFactory {
+  abstract newFilter(world: World): EntityFilter;
 }
 
-export abstract class QueryDescriptor<QueryResult = unknown> {
-  abstract newQuery(world: World): InstantiatedQuery<QueryResult>;
+export abstract class EntityQueryFactory<Result = unknown> {
+  abstract newQuery(world: World): EntityQuery<Result>;
 }
 
-type Fetcher<FetchResult = unknown> = {
-  fetch(): FetchResult;
+export type EntityQueryFactoryTuple = [...EntityQueryFactory[]];
+export type EntityFilterFactoryTuple = [...EntityFilterFactory[]];
+
+export type EntityQueryResultTuple<F> = F extends [infer Head, ...infer Tail]
+  ? [...UnwrapFactory<Head>, ...EntityQueryResultTuple<Tail>]
+  : [];
+type UnwrapFactory<T> = T extends EntityQueryFactory<infer Result>
+  ? [Result]
+  : [T];
+
+export type WorldQuery<Result = unknown> = {
+  fetch(): Result;
   cleanup?(): void;
 };
 
-export type FetcherFactory<FetchResult = unknown> = {
-  create(world: World): Fetcher<FetchResult>;
+export type WorldQueryFactory<Result = unknown> = {
+  create(world: World): WorldQuery<Result>;
 };
+
+export type WorldQueryFactoryTuple = [...WorldQueryFactory[]];
+
+export type WorldQueryTuple<F> = F extends [infer Head, ...infer Tail]
+  ? [...UnwrapWorldQueryFactory<Head>, ...WorldQueryTuple<Tail>]
+  : [];
+type UnwrapWorldQueryFactory<F> = F extends WorldQueryFactory<infer T>
+  ? [T]
+  : [];

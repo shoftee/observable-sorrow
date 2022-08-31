@@ -4,7 +4,7 @@ import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import {
   EcsEntity,
   EcsComponent,
-  ChangeTicks,
+  ChangeTicksSym,
   ComponentTicks,
   Archetype,
   WorldTicks,
@@ -24,7 +24,7 @@ export class ComponentState {
   insert(entity: EcsEntity, ...components: EcsComponent[]) {
     const added = this.ticks.current;
     for (const component of components) {
-      component[ChangeTicks] = new ComponentTicks(added);
+      component[ChangeTicksSym] = new ComponentTicks(added);
       const ctor = getConstructorOf(component);
       this.components.add(entity, ctor, (exists) => {
         if (exists) {

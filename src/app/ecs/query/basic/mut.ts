@@ -1,14 +1,15 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { ChangeTicks, EcsComponent } from "@/app/ecs";
-import { defaultQuery, InstantiatedQuery, QueryDescriptor } from "../types";
+import { ChangeTicksSym, EcsComponent } from "@/app/ecs";
 
-type Mut<C extends EcsComponent> = QueryDescriptor<C>;
+import { defaultQuery, EntityQuery, EntityQueryFactory } from "../types";
+
+type Mut<C extends EcsComponent> = EntityQueryFactory<C>;
 
 /** Include a mutable view of a component in the query results. */
 export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
-    newQuery({ ticks }): InstantiatedQuery<C> {
+    newQuery({ ticks }): EntityQuery<C> {
       return defaultQuery({
         includes({ archetype }) {
           return archetype.has(ctor);
@@ -20,7 +21,7 @@ export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
               const success = Reflect.set(target, propertKey, receiver);
               if (success) {
                 // set changed tick to current tick from world state
-                component[ChangeTicks].changed = ticks.current;
+                component[ChangeTicksSym].changed = ticks.current;
               }
               return success;
             },
@@ -34,7 +35,7 @@ export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
 /** Like Mut, but only sets new value if it's strictly different from old value. */
 export function DiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
-    newQuery({ ticks }): InstantiatedQuery<C> {
+    newQuery({ ticks }): EntityQuery<C> {
       return defaultQuery({
         includes({ archetype }) {
           return archetype.has(ctor);
@@ -51,7 +52,7 @@ export function DiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
               const success = Reflect.set(target, key, value, receiver);
               if (success) {
                 // set changed tick to current tick from world state
-                component[ChangeTicks].changed = ticks.current;
+                component[ChangeTicksSym].changed = ticks.current;
               }
               return success;
             },

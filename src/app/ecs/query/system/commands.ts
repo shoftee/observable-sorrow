@@ -1,6 +1,8 @@
-import { EcsComponent, EcsEntity, World } from "@/app/ecs";
 import { Constructor as Ctor } from "@/app/utils/types";
-import { FetcherFactory } from "../types";
+
+import { EcsComponent, EcsEntity, World } from "@/app/ecs";
+
+import { WorldQueryFactory } from "../types";
 
 export type WorldCmds = {
   with(entity: EcsEntity): EntityCmds;
@@ -66,7 +68,7 @@ class EntityCommandsImpl {
   }
 }
 
-type CommandsFactory = FetcherFactory<WorldCmds>;
+type CommandsFactory = WorldQueryFactory<WorldCmds>;
 
 /** Used to spawn entities and populate them with components. */
 export function Commands(): CommandsFactory {

@@ -1,13 +1,13 @@
 import { EcsEntity, Archetype } from "../types";
 
-import { QueryDescriptor, InstantiatedQuery } from "../query/types";
+import { EntityQueryFactory, EntityQuery } from "../query/types";
 import { ComponentState } from "./components";
 import { World } from "../world";
 
-type Result<T = unknown> = T extends QueryDescriptor<infer R> ? R : never;
+type Result<T = unknown> = T extends EntityQueryFactory<infer R> ? R : never;
 
 export class QueryState {
-  private readonly fetches = new Map<QueryDescriptor, FetchCache>();
+  private readonly fetches = new Map<EntityQueryFactory, FetchCache>();
   private readonly components: ComponentState;
   private generation = 0;
 
@@ -25,7 +25,7 @@ export class QueryState {
     }
   }
 
-  register(descriptor: QueryDescriptor) {
+  register(descriptor: EntityQueryFactory) {
     const fetches = this.fetches;
     if (fetches.has(descriptor)) {
       // query descriptors can be reused
@@ -39,7 +39,7 @@ export class QueryState {
     }
   }
 
-  get<Q extends QueryDescriptor>(descriptor: Q): FetchCache<Result<Q>> {
+  get<Q extends EntityQueryFactory>(descriptor: Q): FetchCache<Result<Q>> {
     const fetch = this.fetches.get(descriptor);
     if (fetch === undefined) {
       throw new Error("Query is not registered.");
@@ -56,7 +56,7 @@ type FetchCacheEntry = {
 class FetchCache<F = unknown> {
   private readonly entries = new Map<EcsEntity, FetchCacheEntry>();
 
-  constructor(private readonly query: InstantiatedQuery<F>) {}
+  constructor(private readonly query: EntityQuery<F>) {}
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.includes({ entity, archetype })) {

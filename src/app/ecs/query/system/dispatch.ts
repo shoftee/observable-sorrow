@@ -3,7 +3,8 @@ import { Queue } from "queue-typescript";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsEvent } from "@/app/ecs";
-import { FetcherFactory } from "../types";
+
+import { WorldQueryFactory } from "../types";
 
 class Dispatcher<E extends EcsEvent> {
   constructor(private readonly queue: Queue<E>) {}
@@ -13,15 +14,16 @@ class Dispatcher<E extends EcsEvent> {
   }
 }
 
+type DispatcherFactory<E extends EcsEvent> = WorldQueryFactory<Dispatcher<E>>;
 /** Used to dispatch events of type E. */
 export function Dispatch<E extends EcsEvent>(
   ctor: Ctor<E>,
-): FetcherFactory<Dispatcher<E>> {
+): DispatcherFactory<E> {
   return {
     create({ events }) {
       const dispatcher = new Dispatcher<E>(events.get(ctor));
       return {
-        fetch(): Dispatcher<E> {
+        fetch() {
           return dispatcher;
         },
       };

@@ -2,16 +2,22 @@ import { cache } from "@/app/utils/cache";
 
 import { EcsEntity, World } from "@/app/ecs";
 
-import { FetcherFactory, QueryDescriptor } from "../types";
-import { All, AllParams, AllResults, Filters } from "../basic/all";
-import { Entity } from "../basic/entity";
+import {
+  WorldQueryFactory,
+  EntityQueryFactory,
+  EntityFilterFactoryTuple,
+  EntityQueryFactoryTuple,
+  EntityQueryResultTuple,
+} from "../types";
+
+import { All, Entity } from "..";
 
 export type IterableQueryResult<Result> = {
   [Symbol.iterator](): IterableIterator<Result>;
 };
 
-class IterableQueryFactory<Q extends AllParams>
-  implements FetcherFactory<IterableQueryResult<AllResults<Q>>>
+class IterableQueryFactory<Q extends EntityQueryFactoryTuple>
+  implements WorldQueryFactory<IterableQueryResult<EntityQueryResultTuple<Q>>>
 {
   private descriptor;
 
@@ -19,7 +25,7 @@ class IterableQueryFactory<Q extends AllParams>
     this.descriptor = All(...wq);
   }
 
-  filter<F extends Filters>(...f: F): IterableQueryFactory<Q> {
+  filter<F extends EntityFilterFactoryTuple>(...f: F): IterableQueryFactory<Q> {
     this.descriptor = this.descriptor.filter(...f);
     return this;
   }
@@ -30,7 +36,7 @@ class IterableQueryFactory<Q extends AllParams>
 
     const fetchCache = world.queries.get(descriptor);
     const map = cache(() => new Map(fetchCache.results()));
-    const fetcher: IterableQueryResult<AllResults<Q>> = {
+    const fetcher: IterableQueryResult<EntityQueryResultTuple<Q>> = {
       [Symbol.iterator]() {
         return map.retrieve().values();
       },
@@ -48,7 +54,9 @@ class IterableQueryFactory<Q extends AllParams>
   }
 }
 
-export function Query<Q extends AllParams>(...wq: Q): IterableQueryFactory<Q> {
+export function Query<Q extends EntityQueryFactoryTuple>(
+  ...wq: Q
+): IterableQueryFactory<Q> {
   return new IterableQueryFactory<Q>(...wq);
 }
 
@@ -61,13 +69,16 @@ export type MapQueryResult<K, V> = {
   has(key: Readonly<K>): boolean;
 };
 
-class MapQueryFactory<K, V> implements FetcherFactory<MapQueryResult<K, V>> {
+class MapQueryFactory<K, V> implements WorldQueryFactory<MapQueryResult<K, V>> {
   private descriptor;
-  constructor(keys: QueryDescriptor<Readonly<K>>, values: QueryDescriptor<V>) {
+  constructor(
+    keys: EntityQueryFactory<Readonly<K>>,
+    values: EntityQueryFactory<V>,
+  ) {
     this.descriptor = All(keys, values);
   }
 
-  filter<F extends Filters>(...f: F): MapQueryFactory<K, V> {
+  filter<F extends EntityFilterFactoryTuple>(...f: F): MapQueryFactory<K, V> {
     this.descriptor = this.descriptor.filter(...f);
     return this;
   }
@@ -115,14 +126,14 @@ class MapQueryFactory<K, V> implements FetcherFactory<MapQueryResult<K, V>> {
  *
  * If you want the key to be the entity, use `EntityMapQuery()` instead. */
 export function MapQuery<K, V>(
-  keys: QueryDescriptor<Readonly<K>>,
-  values: QueryDescriptor<V>,
+  keys: EntityQueryFactory<Readonly<K>>,
+  values: EntityQueryFactory<V>,
 ): MapQueryFactory<K, V> {
   return new MapQueryFactory(keys, values);
 }
 
-export function EntityMapQuery<Q extends AllParams>(
+export function EntityMapQuery<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
-): MapQueryFactory<EcsEntity, AllResults<Q>> {
+): MapQueryFactory<EcsEntity, EntityQueryResultTuple<Q>> {
   return new MapQueryFactory(Entity(), All(...qs));
 }

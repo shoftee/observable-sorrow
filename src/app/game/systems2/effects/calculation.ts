@@ -20,7 +20,7 @@ import {
   Read,
   Value,
 } from "@/app/ecs/query";
-import { FetcherFactory, QueryDescriptor } from "@/app/ecs/query/types";
+import { WorldQueryFactory, EntityQueryFactory } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
 import {
@@ -100,7 +100,7 @@ export const RecalculateByList = function (...ids: NumberEffectId[]) {
 };
 
 export const RecalculateByQuery = function (
-  selectionQuery: QueryDescriptor<NumberEffectId>,
+  selectionQuery: EntityQueryFactory<NumberEffectId>,
 ) {
   return System(
     EffectsQuery(selectionQuery),
@@ -214,8 +214,8 @@ type EffectsQueryFetcher = {
 };
 
 function EffectsQuery(
-  idsQuery: QueryDescriptor<NumberEffectId>,
-): FetcherFactory<EffectsQueryFetcher> {
+  idsQuery: EntityQueryFactory<NumberEffectId>,
+): WorldQueryFactory<EffectsQueryFetcher> {
   return {
     create(world) {
       world.queries.register(idsQuery);

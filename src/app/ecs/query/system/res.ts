@@ -1,10 +1,12 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsResource } from "@/app/ecs";
-import { FetcherFactory } from "../types";
+import { WorldQueryFactory } from "../types";
 
 /** Used to retrieve the resource of type R from the world state. */
-export function Res<R extends EcsResource>(ctor: Ctor<R>): FetcherFactory<R> {
+export function Res<R extends EcsResource>(
+  ctor: Ctor<R>,
+): WorldQueryFactory<R> {
   return {
     create({ resources }) {
       return {

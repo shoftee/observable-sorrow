@@ -1,20 +1,6 @@
 import { World } from "./world";
-import { FetcherFactory } from "./query/types";
+import { WorldQueryFactoryTuple, WorldQueryTuple } from "./query/types";
 import { v4 as uuidv4 } from "uuid";
-
-type FactoryTuple = [...FetcherFactory[]];
-
-type ResultTuple<FactoryTuple> = FactoryTuple extends [
-  infer Head,
-  ...infer Tail,
-]
-  ? [...UnwrapResultFromFactory<Head>, ...ResultTuple<Tail>]
-  : [];
-type UnwrapResultFromFactory<Factory> = Factory extends FetcherFactory<infer T>
-  ? [T]
-  : [];
-
-type RunnerFn<F extends FactoryTuple> = (...args: ResultTuple<F>) => void;
 
 export type SystemSpecification = {
   id: string;
@@ -26,29 +12,36 @@ export type SystemRunner = {
   run(): void;
 };
 
-class SystemBuilder<F extends FactoryTuple> {
+type SystemFn<F extends WorldQueryFactoryTuple> = (
+  ...args: WorldQueryTuple<F>
+) => void;
+
+class SystemBuilder<F extends WorldQueryFactoryTuple> {
   readonly id = uuidv4();
 
-  constructor(
-    private readonly factories: F,
-    private readonly run: RunnerFn<F>,
-  ) {}
+  constructor(private readonly fs: F, private readonly run: SystemFn<F>) {}
 
   build(world: World): SystemRunner {
-    const fetchers = this.factories.map((f) => f.create(world));
+    const worldQueries = this.fs.map((f) => f.create(world));
     return {
       id: this.id,
       run: () => {
-        const args = fetchers.map((p) => p.fetch()) as ResultTuple<F>;
+        const args = worldQueries.map((p) => p.fetch()) as WorldQueryTuple<F>;
         this.run(...args);
-        fetchers.forEach((f) => f.cleanup?.());
+        worldQueries.forEach((f) => f.cleanup?.());
       },
     };
   }
 }
 
-export function System<F extends FactoryTuple>(...f: F) {
-  return (runner: RunnerFn<F>) => {
-    return new SystemBuilder(f, runner);
+/**
+ * Used to define a system.
+ *
+ * A system queries a `World` for data and passes the extracted data to a specified runner function.
+ * @param fs a tuple of `WorldQueryFactory` objects
+ */
+export function System<F extends WorldQueryFactoryTuple>(...fs: F) {
+  return (runner: SystemFn<F>) => {
+    return new SystemBuilder(fs, runner);
   };
 }

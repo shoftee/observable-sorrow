@@ -1,27 +1,27 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-export const EntityType = Symbol.for("Entity");
+export const EntitySym = Symbol.for("Entity");
 export class EcsEntity {
-  [EntityType]!: number;
+  [EntitySym]!: number;
 }
 
-export const ChangeTicks = Symbol.for("ChangeTicks");
+export const ChangeTicksSym = Symbol.for("ChangeTicks");
 export abstract class EcsComponent {
-  [ChangeTicks]!: ComponentTicks;
+  [ChangeTicksSym]!: ComponentTicks;
 }
 
 export abstract class ValueComponent<T = unknown> extends EcsComponent {
   abstract get value(): T;
 }
 
-export const ResourceType = Symbol.for("Resource");
+export const ResourceSym = Symbol.for("Resource");
 export abstract class EcsResource {
-  protected [ResourceType]!: true;
+  protected [ResourceSym]!: true;
 }
 
-export const EventType = Symbol.for("Event");
+export const EventSym = Symbol.for("Event");
 export abstract class EcsEvent {
-  protected [EventType]!: true;
+  protected [EventSym]!: true;
 }
 
 export type EcsStageType = "startup" | "first" | "main" | "last";
@@ -44,8 +44,7 @@ export class ComponentTicks {
   }
 
   isAdded(last: number, current: number): boolean {
-    const added = this.added;
-    return compare(added, last, current);
+    return compare(this.added, last, current);
   }
 
   isChanged(last: number, current: number): boolean {

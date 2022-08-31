@@ -1,6 +1,6 @@
 import { Queue } from "queue-typescript";
 
-import { EcsComponent, EcsEntity, EntityType, WorldTicks } from "./types";
+import { EcsComponent, EcsEntity, EntitySym, WorldTicks } from "./types";
 import {
   ComponentState,
   EventState,
@@ -25,7 +25,7 @@ export class World {
   private newEntityId = 0;
 
   spawn(...components: EcsComponent[]): EcsEntity {
-    const entity = Object.freeze({ [EntityType]: ++this.newEntityId });
+    const entity = Object.freeze({ [EntitySym]: ++this.newEntityId });
     this.entities.add(entity);
     this.components.insert(entity, ...components);
     return entity;

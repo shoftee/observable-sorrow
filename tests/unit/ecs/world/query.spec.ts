@@ -15,7 +15,7 @@ import {
   ChildrenQuery,
   Eager,
 } from "@/app/ecs/query";
-import { QueryDescriptor } from "@/app/ecs/query/types";
+import { EntityQueryFactory } from "@/app/ecs/query/types";
 
 describe("ecs world query", () => {
   class Id extends ValueComponent<string> {
@@ -36,7 +36,7 @@ describe("ecs world query", () => {
     }
   }
 
-  function results<Q extends QueryDescriptor>(world: World, query: Q) {
+  function results<Q extends EntityQueryFactory>(world: World, query: Q) {
     return world.queries.get(query).resultValues();
   }
 
