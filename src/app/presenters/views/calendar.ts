@@ -6,7 +6,7 @@ import { Meta } from "@/app/state";
 import { StateSchema } from "@/app/game/systems2/core";
 
 export function newCalendarView(schema: StateSchema): CalendarView {
-  const state = schema.calendar;
+  const { calendar: state } = schema;
 
   return reactive({
     day: computed(() => state.day),

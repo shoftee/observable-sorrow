@@ -6,7 +6,7 @@ import { allBonfireItemViews, filterArrayView } from "@/app/presenters/views";
 
 const manager = useStateManager();
 
-const all = allBonfireItemViews(manager)
+const all = allBonfireItemViews(manager.state)
 const items = filterArrayView(all, b => b.unlocked);
 </script>
 

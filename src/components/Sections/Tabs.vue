@@ -17,7 +17,7 @@ const manager = useStateManager();
 const { t } = useI18n();
 const active = ref(props.active);
 
-const all = allSectionViews(manager);
+const all = allSectionViews(manager.state);
 
 // the tabs consist of all sections that have no parents and are unlocked
 const items = filterArrayView(all, (s) => !s.parentId && s.unlocked);

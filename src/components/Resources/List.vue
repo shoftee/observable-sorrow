@@ -12,7 +12,7 @@ const { t } = useI18n();
 const show = ref(true);
 const manager = useStateManager();
 
-const all = allResourceViews(manager);
+const all = allResourceViews(manager.state);
 const items = filterArrayView(all, r => r.unlocked);
 </script>
 

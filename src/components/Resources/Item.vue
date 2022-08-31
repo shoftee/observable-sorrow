@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
 import EffectTree from "@/components/Controls/EffectTree.vue";
@@ -12,33 +11,33 @@ const { item } = defineProps<{ item: ResourceView }>();
 const { t } = useI18n();
 
 const fmt = useFormatter();
-
-const { amount, limit, change, modifier } = toRefs(item);
 </script>
 
 <template>
   <div class="item-container">
     <div class="name col-3">
       <span>{{  t(item.label)  }}</span>
-      <span v-if="modifier?.value" class="resource-modifier number-annotation" :class="{
-        'bg-success': modifier.value > 0,
-        'bg-danger': modifier.value < 0,
-      }">{{  fmt.v(modifier)  }}</span>
+      <template v-if="item.modifier">
+        <span v-if="item.modifier.value" class="resource-modifier number-annotation" :class="{
+          'bg-success': item.modifier.value > 0,
+          'bg-danger': item.modifier.value < 0,
+        }">{{  fmt.v(item.modifier)  }}</span>
+      </template>
     </div>
-    <div class="col-3 number amount">{{  fmt.number(amount, "negative")  }}</div>
-    <template v-if="limit">
+    <div class="col-3 number amount">{{  fmt.number(item.amount, "negative")  }}</div>
+    <template v-if="item.limit">
       <div class="col-3 number capacity">
-        <span>/{{  fmt.v(limit)  }}</span>
+        <span>/{{  fmt.v(item.limit)  }}</span>
       </div>
     </template>
     <template v-else>
       <div class="col-3 no-capacity"></div>
     </template>
-    <template v-if="change">
+    <template v-if="item.change">
       <template v-if="item.deltaTree">
         <tippy class="col-3">
-          <div class="number change" :class="{ 'text-danger': change.value < 0 }">
-            {{  fmt.v(change)  }}
+          <div class="number change" :class="{ 'text-danger': item.change.value < 0 }">
+            {{  fmt.v(item.change)  }}
           </div>
           <template #content>
             <div class="effect-tree">
@@ -48,8 +47,8 @@ const { amount, limit, change, modifier } = toRefs(item);
         </tippy>
       </template>
       <template v-else>
-        <div class="col-3 number change" :class="{ 'text-danger': change.value < 0 }">
-          {{  fmt.v(change)  }}
+        <div class="col-3 number change" :class="{ 'text-danger': item.change.value < 0 }">
+          {{  fmt.v(item.change)  }}
         </div>
       </template>
     </template>

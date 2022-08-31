@@ -1,9 +1,10 @@
 import { computed, reactive } from "vue";
-import { IStateManager } from "../state-manager";
 
-export function newAstronomyView(manager: IStateManager): AstronomyView {
+import { StateSchema } from "@/app/game/systems2/core";
+
+export function newAstronomyView(schema: StateSchema): AstronomyView {
   return reactive({
-    hasRareEvent: computed(() => manager.state.astronomy.hasRareEvent),
+    hasRareEvent: computed(() => schema.astronomy.hasRareEvent),
   });
 }
 

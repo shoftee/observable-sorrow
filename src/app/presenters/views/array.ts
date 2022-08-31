@@ -1,13 +1,13 @@
+import { StateSchema } from "@/app/game/systems2/core";
+
 import { computed, ComputedRef, Ref, unref } from "vue";
 
-import { IStateManager } from "..";
-
 export function fromIds<Id, View>(
-  manager: IStateManager,
+  schema: StateSchema,
   ids: Ref<Iterable<Id>> | Iterable<Id>,
-  fn: (mgr: IStateManager, id: Id) => View,
+  fn: (s: StateSchema, id: Id) => View,
 ): ComputedRef<View[]> {
-  return computed(() => Array.from(unref(ids), (id) => fn(manager, id)));
+  return computed(() => Array.from(unref(ids), (id) => fn(schema, id)));
 }
 
 export function filterArrayView<T>(

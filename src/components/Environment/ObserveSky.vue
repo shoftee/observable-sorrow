@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+
 import { useSend, useStateManager } from "@/composables/game-endpoint";
 
 import { newAstronomyView } from "@/app/presenters/views";
 
+const { t } = useI18n();
 const send = useSend()
 const manager = useStateManager()
 
-const { t } = useI18n();
-
-const astronomy = newAstronomyView(manager);
+const astronomy = newAstronomyView(manager.state);
 
 async function observeSky(): Promise<void> {
   await send({ kind: "astronomy", id: "observe-sky" });

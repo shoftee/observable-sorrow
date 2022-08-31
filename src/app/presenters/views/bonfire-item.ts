@@ -11,12 +11,11 @@ import {
   fulfillmentView,
   numberView,
 } from "../common";
-import { IStateManager } from "../state-manager";
 
 import { fromIds } from "./array";
 
-export function allBonfireItemViews(manager: IStateManager) {
-  return fromIds(manager, Meta.bonfireItems(), newBonfireItemView);
+export function allBonfireItemViews(schema: StateSchema) {
+  return fromIds(schema, Meta.bonfireItems(), newBonfireItemView);
 }
 
 export interface BonfireItemView {
@@ -35,16 +34,16 @@ export interface BonfireItemView {
 }
 
 export function newBonfireItemView(
-  manager: IStateManager,
+  schema: StateSchema,
   id: BonfireItemId,
 ): BonfireItemView {
   switch (id) {
     case "gather-catnip":
       return gatherCatnip();
     case "refine-catnip":
-      return refineCatnip(manager.state);
+      return refineCatnip(schema);
     default:
-      return buyBuilding(manager.state, id);
+      return buyBuilding(schema, id);
   }
 }
 

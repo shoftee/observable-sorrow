@@ -6,7 +6,7 @@ import { Meta, ResourceMetadataType } from "@/app/state";
 import { StateSchema } from "@/app/game/systems2/core";
 
 import { effectTree, EffectTree, numberView, NumberView } from "../common";
-import { IStateManager } from "../state-manager";
+
 import { fromIds } from "./array";
 
 export interface ResourceView {
@@ -20,30 +20,27 @@ export interface ResourceView {
   deltaTree?: EffectTree;
 }
 
-export function allResourceViews(manager: IStateManager) {
-  const ids = computed(
-    () => Object.keys(manager.state.resources) as ResourceId[],
-  );
-  return fromIds(manager, ids, newResourceView);
+export function allResourceViews(schema: StateSchema) {
+  const ids = computed(() => Object.keys(schema.resources) as ResourceId[]);
+  return fromIds(schema, ids, newResourceView);
 }
 
 export function newResourceView(
-  manager: IStateManager,
+  schema: StateSchema,
   id: ResourceId,
 ): ResourceView {
   const meta = Meta.resource(id);
-  const state = manager.state;
-  const resource = state.resources[meta.id];
+  const resource = schema.resources[meta.id];
 
   return reactive({
     id: meta.id,
     label: meta.label,
     unlocked: computed(() => resource.unlocked),
     amount: computed(() => resource.amount),
-    change: computed(() => changeView(meta, state)),
-    limit: computed(() => limitView(meta, state)),
-    modifier: computed(() => modifierView(meta, state)),
-    deltaTree: computed(() => deltaTreeView(meta, state)),
+    change: computed(() => changeView(meta, schema)),
+    limit: computed(() => limitView(meta, schema)),
+    modifier: computed(() => modifierView(meta, schema)),
+    deltaTree: computed(() => deltaTreeView(meta, schema)),
   });
 }
 

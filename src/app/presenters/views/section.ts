@@ -3,14 +3,13 @@ import { computed, reactive } from "vue";
 import { SectionId } from "@/app/interfaces";
 import { Meta } from "@/app/state";
 
-import { IStateManager } from "..";
+import { StateSchema } from "@/app/game/systems2/core";
+
 import { fromIds } from "./array";
 
-export function allSectionViews(manager: IStateManager) {
-  const ids = computed(
-    () => Object.keys(manager.state.sections) as SectionId[],
-  );
-  return fromIds(manager, ids, newSectionView);
+export function allSectionViews(schema: StateSchema) {
+  const ids = computed(() => Object.keys(schema.sections) as SectionId[]);
+  return fromIds(schema, ids, newSectionView);
 }
 
 export interface SectionView {
@@ -22,11 +21,11 @@ export interface SectionView {
 }
 
 export function newSectionView(
-  manager: IStateManager,
+  schema: StateSchema,
   id: SectionId,
 ): SectionView {
   const meta = Meta.section(id);
-  const state = manager.state.sections[id];
+  const state = schema.sections[id];
   return reactive({
     id: id,
     parentId: meta.parent,
