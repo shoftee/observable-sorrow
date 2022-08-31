@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import Detail from "./Detail.vue";
+import TechnologyDetail from "./TechnologyDetail.vue";
 
 import { TechId } from "@/app/interfaces";
 import { TechItem } from "@/app/presenters";
@@ -29,7 +29,7 @@ async function research(id: TechId): Promise<void> {
       </button>
     </div>
     <template #content>
-      <Detail :item="tech" />
+      <TechnologyDetail :item="tech" />
     </template>
   </tippy>
 </template>

@@ -3,18 +3,15 @@ import { defineAsyncComponent, provide, ref } from "vue";
 import { Endpoint, Setup } from "./app/endpoint";
 
 import { EndpointKey } from "./composables/game-endpoint";
-import {
-  KeyboardEventsKey,
-  getKeyboardEvents,
-} from "./composables/keyboard-events";
-provide(KeyboardEventsKey, getKeyboardEvents());
+import { provideKeyboardEvents } from "./composables/keyboard-events";
+provideKeyboardEvents()
 
 let endpoint = ref<Endpoint>();
 provide(EndpointKey, endpoint);
 
-const Main = defineAsyncComponent(async () => {
+const MainView = defineAsyncComponent(async () => {
   endpoint.value = await Setup();
-  return import("./components/Main.vue");
+  return import("./components/MainView.vue");
 });
 </script>
 
@@ -39,7 +36,7 @@ const Main = defineAsyncComponent(async () => {
     <main unscrollable>
       <Suspense>
         <template #default>
-          <Main class="w-100 h-100" />
+          <MainView class="w-100 h-100" />
         </template>
         <template #fallback>
           <div class="loader">

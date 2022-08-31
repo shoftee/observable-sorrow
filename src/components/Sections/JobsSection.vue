@@ -2,7 +2,7 @@
 import { computed, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import JobButton from "@/components/Controls/Job/Button.vue";
+import JobButton from "@/components/Controls/Job/JobButton.vue";
 
 import { count } from "@/app/utils/collections";
 import { useEndpoint } from "@/composables/game-endpoint";

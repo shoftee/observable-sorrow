@@ -1,4 +1,12 @@
-import { InjectionKey, onMounted, onUnmounted, reactive, readonly } from "vue";
+import {
+  inject,
+  InjectionKey,
+  onMounted,
+  onUnmounted,
+  provide,
+  reactive,
+  readonly,
+} from "vue";
 
 export interface KeyboardEvents {
   ctrl: boolean;
@@ -6,10 +14,18 @@ export interface KeyboardEvents {
   alt: boolean;
 }
 
-export const KeyboardEventsKey: InjectionKey<KeyboardEvents> =
+const KeyboardEventsKey: InjectionKey<KeyboardEvents> =
   Symbol("KeyboardEvents");
 
-export function getKeyboardEvents(): KeyboardEvents {
+export function provideKeyboardEvents() {
+  provide(KeyboardEventsKey, getKeyboardEvents());
+}
+
+export function useKeyboardEvents() {
+  return inject(KeyboardEventsKey)!;
+}
+
+function getKeyboardEvents(): KeyboardEvents {
   const keys = reactive({
     ctrl: false,
     shift: false,

@@ -2,9 +2,10 @@
 import { computed } from "vue";
 import { Offcanvas } from "bootstrap";
 
+import { newTimeView } from "@/app/presenters/views";
+
 import { useSend, useStateManager } from "@/composables/game-endpoint";
 import { useKeyboardEvent } from "@/composables/use-event-listener";
-import { newTimeView } from "@/app/presenters/views";
 
 const manager = useStateManager()
 const send = useSend();
@@ -37,7 +38,7 @@ useKeyboardEvent("keyup", (e) => {
       <div class="offcanvas-body">
         <div class="row">
           <label for="time-acceleration" class="form-label">
-            Time Acceleration = <span class="number">10<sup>{{ acceleration }}</sup></span>
+            Time Acceleration = <span class="number">10<sup>{{  acceleration  }}</sup></span>
           </label>
           <input id="time-acceleration" type="range" class="form-range" min="0" max="2" step="0.1"
             v-model.number="acceleration" />

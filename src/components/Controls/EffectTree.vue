@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { EffectTreeNode } from "@/app/presenters/common";
+
 import { useFormatter } from "@/composables/game-endpoint";
 
 const { nodes } = defineProps<{ nodes: EffectTreeNode[] }>();

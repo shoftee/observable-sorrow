@@ -2,7 +2,7 @@
 import { computed, unref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import TechButton from "@/components/Controls/Technology/Button.vue";
+import TechnologyButton from "@/components/Controls/Technology/TechnologyButton.vue";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 const { science } = useEndpoint((ep) => {
@@ -25,7 +25,7 @@ const techs = computed(() =>
       <div class="button-stack">
         <div class="row" v-for="tech in techs" :key="tech.id">
           <div class="col-xl-6 col-12">
-            <TechButton :tech="tech" />
+            <TechnologyButton :tech="tech" />
           </div>
         </div>
       </div>

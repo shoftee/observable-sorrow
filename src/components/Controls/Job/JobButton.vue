@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Effects from "../Effects.vue";
+import EffectList from "../EffectList.vue";
 
 import { JobId } from "@/app/interfaces";
 import { JobItem } from "@/app/presenters";
 
 import { useSend } from "@/composables/game-endpoint";
-import { KeyboardEventsKey } from "@/composables/keyboard-events";
+import { useKeyboardEvents } from "@/composables/keyboard-events";
 
 const { item } = defineProps<{ item: JobItem; noIdle: boolean }>();
 
 const send = useSend();
 const { t } = useI18n();
-const events = inject(KeyboardEventsKey);
+const events = useKeyboardEvents()
 
 const effects = computed(() => item.effects ?? []);
 
@@ -48,11 +48,11 @@ async function unassignJob(id: JobId): Promise<void> {
           <p class="description">{{  t(item.description)  }}</p>
           <p class="flavor" v-if="item.flavor">{{  t(item.flavor)  }}</p>
         </div>
-        <Effects v-if="effects.length > 0" :items="effects">
+        <EffectList v-if="effects.length > 0" :items="effects">
           <template #title>{{
-             t(events?.shift ? "effects.jobs.total" : "effects.jobs.per-worker") 
+             t(events.shift ? "effects.jobs.total" : "effects.jobs.per-worker") 
             }}</template>
-        </Effects>
+        </EffectList>
       </div>
     </template>
   </tippy>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useEndpoint } from "@/composables/game-endpoint";
 import { computed } from "vue";
 
 import EffectTree from "./EffectTree.vue";
+
+import { useEndpoint } from "@/composables/game-endpoint";
 
 const { society, fmt } = useEndpoint((ep) => {
   return {

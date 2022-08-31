@@ -2,6 +2,7 @@
 import { useI18n } from "vue-i18n";
 
 import { IngredientItemView } from "@/app/presenters/common";
+
 import { useFormatter } from "@/composables/game-endpoint";
 
 const { item } = defineProps<{ item: IngredientItemView }>();

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import EffectTree from "@/components/Controls/EffectTree.vue";
+import EffectTree from "../Controls/EffectTree.vue";
 
 import { ResourceView } from "@/app/presenters/views";
 import { useFormatter } from "@/composables/game-endpoint";

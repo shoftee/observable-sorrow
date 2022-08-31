@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import Bonfire from "./Bonfire.vue";
-import Society from "./Society.vue";
-import Science from "./Science.vue";
+import BonfireSection from "./BonfireSection.vue";
+import SocietySection from "./SocietySection.vue";
+import ScienceSection from "./ScienceSection.vue";
 
 import { SectionId } from "@/app/interfaces";
 
@@ -13,11 +13,11 @@ const content = computed(() => {
   const sectionId = props.active;
   switch (sectionId) {
     case "bonfire":
-      return Bonfire;
+      return BonfireSection;
     case "society":
-      return Society;
+      return SocietySection;
     case "science":
-      return Science;
+      return ScienceSection;
     default:
       throw new Error(`unexpected section name ${sectionId}`);
   }

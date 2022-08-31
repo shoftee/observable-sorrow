@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Jobs from "./Jobs.vue";
-import Management from "./Management.vue";
+import JobsSection from "./JobsSection.vue";
+import ManagementSection from "./ManagementSection.vue";
 
 import { useEndpoint } from "@/composables/game-endpoint";
 
@@ -11,7 +11,7 @@ const { management } = useEndpoint((ep) => {
 
 <template>
   <div class="section-stack">
-    <Jobs />
-    <Management v-if="management.unlocked" />
+    <JobsSection />
+    <ManagementSection v-if="management.unlocked" />
   </div>
 </template>

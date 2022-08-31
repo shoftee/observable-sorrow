@@ -2,8 +2,8 @@
 import { reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-import ObserveSky from "./ObserveSky.vue";
-import Pawse from "./Pawse.vue";
+import ObserveSkyButton from "./ObserveSkyButton.vue";
+import PawseButton from "./PawseButton.vue";
 
 import { LogItem } from "@/app/presenters";
 import { newCalendarView } from "@/app/presenters/views";
@@ -62,11 +62,11 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
     <div class="game-controls-container">
       <div>{{  t("game.blurb")  }}</div>
       <div class="btn-group">
-        <ObserveSky class="btn btn-outline-secondary" />
+        <ObserveSkyButton class="btn btn-outline-secondary" />
         <button type="button" class="btn btn-outline-secondary" @click="clearLog">
           {{  t("game.control.clear-log")  }}
         </button>
-        <Pawse class="btn btn-outline-secondary" />
+        <PawseButton class="btn btn-outline-secondary" />
       </div>
     </div>
     <div class="log-container small p-2">

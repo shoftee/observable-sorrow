@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BuildingButton from "@/components/Controls/Building/Button.vue";
+import BuildingButton from "@/components/Controls/Building/BuildingButton.vue";
 
 import { useStateManager } from "@/composables/game-endpoint";
 import { allBonfireItemViews, filterArrayView } from "@/app/presenters/views";

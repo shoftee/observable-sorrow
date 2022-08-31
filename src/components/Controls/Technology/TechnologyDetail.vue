@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-import Ingredients from "@/components/Controls/Ingredients.vue";
+import IngredientList from "@/components/Controls/IngredientList.vue";
 
 import { TechItem } from "@/app/presenters";
 
@@ -15,7 +15,7 @@ const { t } = useI18n();
       <p class="description">{{  t(item.description)  }}</p>
       <p class="flavor" v-if="item.flavor">{{  t(item.flavor)  }}</p>
     </div>
-    <Ingredients class="border-bottom" v-if="!item.researched" :items="item.fulfillment.ingredients" />
+    <IngredientList class="border-bottom" v-if="!item.researched" :items="item.fulfillment.ingredients" />
     <ul class="effects-list">
       <li v-for="effect in item.effects" :key="effect.id">
         <span>{{  t(effect.label)  }}</span>

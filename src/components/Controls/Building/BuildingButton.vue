@@ -2,12 +2,12 @@
 import { computed, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Detail from "./Detail.vue";
+import BuildingDetail from "./BuildingDetail.vue";
 
+import { Intent } from "@/app/interfaces";
 import { BonfireItemView } from "@/app/presenters/views";
 
 import { useSend } from "@/composables/game-endpoint";
-import { Intent } from "@/app/interfaces";
 
 const { item } = defineProps<{ item: BonfireItemView }>();
 const { t } = useI18n();
@@ -31,7 +31,7 @@ async function dispatch(intent: Intent): Promise<void> {
       </button>
     </div>
     <template #content>
-      <Detail :item="item" />
+      <BuildingDetail :item="item" />
     </template>
   </tippy>
 </template>

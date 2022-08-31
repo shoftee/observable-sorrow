@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import Item from "./Item.vue";
+import ResourceItem from "./ResourceItem.vue";
 
 import { useStateManager } from "@/composables/game-endpoint";
 import { filterArrayView, allResourceViews } from "@/app/presenters/views";
@@ -33,7 +33,7 @@ const items = filterArrayView(all, r => r.unlocked);
         </button>
         <ul v-if="show">
           <li v-for="item in items" :key="item.id">
-            <Item :item="item" class="w-100" />
+            <ResourceItem :item="item" class="w-100" />
           </li>
         </ul>
       </div>
