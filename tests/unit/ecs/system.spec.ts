@@ -46,8 +46,7 @@ describe("ecs systems", () => {
         cmds.spawn(new Id("shoftee3"), new Player(20));
       });
 
-      const setupInstance = Setup.build(world);
-      setupInstance.run();
+      Setup.build(world)();
       world.flush();
 
       const LevelUpper = System(Query(Mut(Player)))((players) => {
@@ -55,7 +54,7 @@ describe("ecs systems", () => {
           player.levelUp();
         }
       });
-      const levelUpperInstance = LevelUpper.build(world);
+      const levelUpperRunner = LevelUpper.build(world);
 
       const ChangeTracker = System(Query(ChangeTrackers(Player)))((query) => {
         let changed = 0;
@@ -65,10 +64,10 @@ describe("ecs systems", () => {
         }
         expect(changed).to.eq(3);
       });
-      const changeTrackerInstance = ChangeTracker.build(world);
+      const changeTrackerRunner = ChangeTracker.build(world);
 
-      levelUpperInstance.run();
-      changeTrackerInstance.run();
+      levelUpperRunner();
+      changeTrackerRunner();
     });
   });
 
@@ -81,8 +80,7 @@ describe("ecs systems", () => {
         cmds.spawn(new Id("shoftee"), new Player(20));
         cmds.spawn(new Id("shoftee"), new Player(20));
       });
-      const setupInstance = Setup.build(world);
-      setupInstance.run();
+      Setup.build(world)();
       world.flush();
 
       const PlayerChecker = System(Query(Value(Id), Read(Player)))(
@@ -93,8 +91,7 @@ describe("ecs systems", () => {
           }
         },
       );
-      const playerCheckerInstance = PlayerChecker.build(world);
-      playerCheckerInstance.run();
+      PlayerChecker.build(world)();
     });
     it("should spawn entities with children and insert components", () => {
       const world = new World();
@@ -109,8 +106,7 @@ describe("ecs systems", () => {
           cmds.spawnChild(e, new ItemStack("Mana Potion", 15));
         });
       });
-      const setupInstance = Setup.build(world);
-      setupInstance.run();
+      Setup.build(world)();
       world.flush();
 
       const HierarchyChecker = System(
@@ -135,8 +131,7 @@ describe("ecs systems", () => {
           ],
         ]);
       });
-      const hierarchyCheckerInstance = HierarchyChecker.build(world);
-      hierarchyCheckerInstance.run();
+      HierarchyChecker.build(world)();
     });
     it("should spawn multiple levels of children correctly", () => {
       const world = new World();
@@ -163,8 +158,7 @@ describe("ecs systems", () => {
           });
         });
       });
-      const setupInstance = Setup.build(world);
-      setupInstance.run();
+      Setup.build(world)();
       world.flush();
 
       const HierarchyChecker = System(
@@ -187,8 +181,7 @@ describe("ecs systems", () => {
           ["name 14", []],
         ]);
       });
-      const hierarchyCheckerInstance = HierarchyChecker.build(world);
-      hierarchyCheckerInstance.run();
+      HierarchyChecker.build(world)();
     });
   });
 });

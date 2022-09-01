@@ -105,7 +105,7 @@ const NumberExtractor = DeltaExtractor(Value(NumberEffect))(
 );
 
 const EffectTreeExtractor = DeltaExtractor(
-  All(Value(NumberEffect)).filter(Added(EffectTree)),
+  All(Value(NumberEffect)).newWithFilters(Added(EffectTree)),
 )((schema, [[id]]) => schema.numbers[id]);
 
 const Extractors = [

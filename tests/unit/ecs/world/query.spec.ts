@@ -37,7 +37,7 @@ describe("ecs world query", () => {
   }
 
   function results<Q extends EntityQueryFactory>(world: World, query: Q) {
-    return world.queries.get(query).resultValues();
+    return world.queries.get(query).values();
   }
 
   let world: World;
@@ -177,13 +177,13 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const bothQuery = All(Read(Player)).filter(Every(Id, Name));
+        const bothQuery = All(Read(Player)).newWithFilters(Every(Id, Name));
         world.queries.register(bothQuery);
         const bothEntries = Array.from(results(world, bothQuery));
 
         expect(bothEntries).to.deep.equal([[{ level: 20, exp: 123 }]]);
 
-        const nameQuery = All(Read(Player)).filter(Every(Name));
+        const nameQuery = All(Read(Player)).newWithFilters(Every(Name));
         world.queries.register(nameQuery);
         const nameEntries = Array.from(results(world, nameQuery));
         expect(nameEntries).to.deep.equal([
@@ -191,7 +191,7 @@ describe("ecs world query", () => {
           [{ level: 30, exp: 345 }],
         ]);
 
-        const idQuery = All(Read(Player)).filter(Every(Id));
+        const idQuery = All(Read(Player)).newWithFilters(Every(Id));
         world.queries.register(idQuery);
         const idEntries = Array.from(results(world, idQuery));
         expect(idEntries).to.deep.equal([
@@ -213,12 +213,12 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const withoutName = All(Read(Player)).filter(None(Name));
+        const withoutName = All(Read(Player)).newWithFilters(None(Name));
         world.queries.register(withoutName);
         const withoutNameEntries = single(results(world, withoutName));
         expect(withoutNameEntries).to.deep.equal([{ level: 40, exp: 456 }]);
 
-        const withoutId = All(Read(Player)).filter(None(Id));
+        const withoutId = All(Read(Player)).newWithFilters(None(Id));
         world.queries.register(withoutId);
         const withoutIdEntries = single(results(world, withoutId));
         expect(withoutIdEntries).to.deep.equal([{ level: 30, exp: 345 }]);

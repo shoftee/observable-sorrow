@@ -1,5 +1,3 @@
-import { single } from "@/app/utils/collections";
-
 import { NumberEffectId } from "@/app/interfaces";
 
 import { EcsPlugin, PluginApp } from "@/app/ecs";
@@ -11,6 +9,7 @@ import {
   Opt,
   Query,
   Read,
+  Single,
   Value,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
@@ -54,15 +53,14 @@ const UpdateEffectTargets = System(
 });
 
 const ProcessLedger = System(
-  Query(Read(Timer)).filter(Every(TickTimer)),
+  Single(Read(Timer)).filter(Every(TickTimer)),
   Query(
     Read(R.LedgerEntry),
     Opt(Value(R.Delta)),
     Opt(Value(R.Limit)),
     DiffMut(R.Amount),
   ),
-)((ticker, query) => {
-  const [{ delta: dt }] = single(ticker);
+)(([{ delta: dt }], query) => {
   for (const [ledgerEntry, delta, limit, amount] of query) {
     let { debit, credit } = ledgerEntry;
     if (delta !== undefined) {

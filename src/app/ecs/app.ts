@@ -4,7 +4,7 @@ import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 import { any, MultiMap, TypeSet } from "@/app/utils/collections";
 
 import { EcsResource, EcsEvent, EcsStage, EcsStageType } from "./types";
-import { SystemRunner, SystemSpecification as SystemSpec } from "./system";
+import { SystemSpecification as SystemSpec } from "./system";
 import { World } from "./world";
 
 type SystemId = { id: string };
@@ -65,7 +65,7 @@ export class App {
       world.events.register(event);
     }
 
-    const systems = new MultiMap<string, SystemRunner>();
+    const systems = new MultiMap<string, () => void>();
     for (const [stage, topologySpec] of this.topology) {
       for (const spec of this.orderByTopology(stage, topologySpec)) {
         systems.add(stage, spec.build(world));
@@ -128,7 +128,7 @@ export class GameRunner {
 
   constructor(
     private readonly world: World,
-    private readonly stages: MultiMap<string, SystemRunner>,
+    private readonly stages: MultiMap<string, () => void>,
   ) {}
 
   start(): () => void {
@@ -157,7 +157,7 @@ export class GameRunner {
 
   private run(id: string) {
     for (const system of this.stages.entriesForKey(id)) {
-      system.run();
+      system();
     }
     this.world.flush();
   }

@@ -11,6 +11,7 @@ import {
 } from "../types";
 
 import { All, Entity } from "..";
+import { single } from "@/app/utils/collections";
 
 export type IterableQueryResult<Result> = {
   [Symbol.iterator](): IterableIterator<Result>;
@@ -25,29 +26,27 @@ class IterableQueryFactory<Q extends EntityQueryFactoryTuple>
     this.descriptor = All(...wq);
   }
 
-  filter<F extends EntityFilterFactoryTuple>(...f: F): IterableQueryFactory<Q> {
-    this.descriptor = this.descriptor.filter(...f);
+  filter<F extends EntityFilterFactoryTuple>(...f: F) {
+    this.descriptor = this.descriptor.newWithFilters(...f);
     return this;
   }
 
   create(world: World) {
     const descriptor = this.descriptor;
     world.queries.register(descriptor);
-
     const fetchCache = world.queries.get(descriptor);
-    const map = cache(() => new Map(fetchCache.results()));
-    const fetcher: IterableQueryResult<EntityQueryResultTuple<Q>> = {
-      [Symbol.iterator]() {
-        return map.retrieve().values();
-      },
-    };
+
+    const fetcher = cache(() => {
+      const array = Array.from(fetchCache.values());
+      return array as IterableQueryResult<EntityQueryResultTuple<Q>>;
+    });
 
     return {
       fetch() {
-        return fetcher;
+        return fetcher.retrieve();
       },
       cleanup() {
-        map.invalidate();
+        fetcher.invalidate();
         fetchCache.cleanup();
       },
     };
@@ -55,9 +54,49 @@ class IterableQueryFactory<Q extends EntityQueryFactoryTuple>
 }
 
 export function Query<Q extends EntityQueryFactoryTuple>(
-  ...wq: Q
+  ...qs: Q
 ): IterableQueryFactory<Q> {
-  return new IterableQueryFactory<Q>(...wq);
+  return new IterableQueryFactory(...qs);
+}
+
+class SingleQueryFactory<Q extends EntityQueryFactoryTuple>
+  implements WorldQueryFactory<EntityQueryResultTuple<Q>>
+{
+  private descriptor;
+
+  constructor(...wq: Q) {
+    this.descriptor = All(...wq);
+  }
+
+  filter<F extends EntityFilterFactoryTuple>(...f: F) {
+    this.descriptor = this.descriptor.newWithFilters(...f);
+    return this;
+  }
+
+  create(world: World) {
+    const descriptor = this.descriptor;
+    world.queries.register(descriptor);
+    const fetchCache = world.queries.get(descriptor);
+
+    const fetcher = cache(() => single(fetchCache.values()));
+
+    return {
+      fetch() {
+        return fetcher.retrieve();
+      },
+      cleanup() {
+        fetcher.invalidate();
+        fetchCache.cleanup();
+      },
+    };
+  }
+}
+
+/** Like `All(...)`, but only works if there's a single result from the query. If there are 0 or more than 1 results, an error is thrown during data retrieval. */
+export function Single<Q extends EntityQueryFactoryTuple>(
+  ...qs: Q
+): SingleQueryFactory<Q> {
+  return new SingleQueryFactory(...qs);
 }
 
 export type MapQueryResult<K, V> = {
@@ -78,44 +117,27 @@ class MapQueryFactory<K, V> implements WorldQueryFactory<MapQueryResult<K, V>> {
     this.descriptor = All(keys, values);
   }
 
-  filter<F extends EntityFilterFactoryTuple>(...f: F): MapQueryFactory<K, V> {
-    this.descriptor = this.descriptor.filter(...f);
+  filter<F extends EntityFilterFactoryTuple>(...f: F) {
+    this.descriptor = this.descriptor.newWithFilters(...f);
     return this;
   }
 
   create(world: World) {
     const descriptor = this.descriptor;
     world.queries.register(descriptor);
-
     const fetchCache = world.queries.get(descriptor);
-    const map = cache(() => new Map(fetchCache.resultValues()));
-    const fetcher: MapQueryResult<K, V> = {
-      [Symbol.iterator]() {
-        return map.retrieve()[Symbol.iterator]();
-      },
-      entries() {
-        return map.retrieve().entries();
-      },
-      keys() {
-        return map.retrieve().keys();
-      },
-      values() {
-        return map.retrieve().values();
-      },
-      get(key) {
-        return map.retrieve().get(key);
-      },
-      has(key) {
-        return map.retrieve().has(key);
-      },
-    };
+
+    const fetcher = cache(() => {
+      const map = new Map(fetchCache.values());
+      return map as MapQueryResult<K, V>;
+    });
 
     return {
       fetch() {
-        return fetcher;
+        return fetcher.retrieve();
       },
       cleanup() {
-        map.invalidate();
+        fetcher.invalidate();
         fetchCache.cleanup();
       },
     };

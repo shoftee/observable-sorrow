@@ -1,3 +1,5 @@
+import { Constructor as Ctor } from "@/app/utils/types";
+
 import { Archetype, EcsComponent, EcsEntity } from "../types";
 import { World } from "../world";
 
@@ -101,3 +103,5 @@ export type WorldQueryTuple<F> = F extends [infer Head, ...infer Tail]
 type UnwrapWorldQueryFactory<F> = F extends WorldQueryFactory<infer T>
   ? [T]
   : [];
+
+export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];

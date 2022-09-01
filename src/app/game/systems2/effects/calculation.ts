@@ -230,7 +230,7 @@ function EffectsQuery(
 
       const fetcher = {
         *entities() {
-          const filter = idsFetcher.resultValues();
+          const filter = idsFetcher.values();
           const initial = map(filter, (id) => idsLookup.get(id)!);
 
           const idsLookup = idsCache.retrieve();

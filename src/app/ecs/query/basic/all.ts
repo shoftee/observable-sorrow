@@ -1,7 +1,7 @@
 import { all, any } from "@/app/utils/collections";
-import { Constructor as Ctor } from "@/app/utils/types";
 
-import { EcsComponent, World } from "@/app/ecs";
+import { World } from "@/app/ecs";
+
 import {
   EntityQueryFactory,
   EntityFilterFactory,
@@ -10,35 +10,33 @@ import {
   EntityQueryResultTuple,
   EntityQuery,
   defaultFilter,
+  OneOrMoreCtors,
 } from "../types";
 
-export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
-
-class AllComponentQuery<
+class AllEntityQuery<
   Q extends EntityQueryFactoryTuple,
 > extends EntityQueryFactory<EntityQueryResultTuple<Q>> {
-  private filters?: EntityFilterFactory[];
-
-  constructor(private readonly queries: Q) {
+  constructor(
+    private readonly queries: Q,
+    private readonly filters: EntityFilterFactoryTuple,
+  ) {
     super();
   }
 
   newQuery(world: World): EntityQuery<EntityQueryResultTuple<Q>> {
+    const filters = this.filters.map((inner) => inner.newFilter(world));
     const queries = this.queries.map((inner) => inner.newQuery(world));
-    const filters = this.filters?.map((inner) => inner.newFilter(world));
-    const filterIterator = function* () {
-      if (filters) {
-        yield* filters;
-      }
+    const iterator = function* () {
+      yield* filters;
       yield* queries;
     };
 
     return {
       includes(ctx) {
-        return all(filterIterator(), (f) => f.includes(ctx));
+        return all(iterator(), (f) => f.includes(ctx));
       },
       matches(ctx) {
-        return all(filterIterator(), (f) => f.matches(ctx));
+        return all(iterator(), (f) => f.matches(ctx));
       },
       fetch(ctx) {
         return queries.map((q) => q.fetch(ctx)) as EntityQueryResultTuple<Q>;
@@ -50,19 +48,18 @@ class AllComponentQuery<
     };
   }
 
-  filter<F extends EntityFilterFactoryTuple>(
+  newWithFilters<F extends EntityFilterFactoryTuple>(
     ...filters: F
-  ): AllComponentQuery<Q> {
-    this.filters = filters;
-    return this;
+  ): AllEntityQuery<Q> {
+    return new AllEntityQuery(this.queries, [...this.filters, ...filters]);
   }
 }
 
 /** Includes results only when they match all provided sub-queries. */
 export function All<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
-): AllComponentQuery<Q> {
-  return new AllComponentQuery(qs);
+): AllEntityQuery<Q> {
+  return new AllEntityQuery(qs, []);
 }
 
 type Every = EntityFilterFactory;

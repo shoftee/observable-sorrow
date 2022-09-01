@@ -1,4 +1,4 @@
-type Cached<T> = { retrieve(): T; invalidate(): void };
+export type Cached<T> = { retrieve(): T; invalidate(): void };
 
 /** Returns a caching wrapper of the provided factory function.
  *

@@ -1,6 +1,6 @@
 import { EcsEntity } from "@/app/ecs";
 
-import { All, Entity, MapQuery, OneOrMoreCtors, Every } from "..";
+import { All, Entity, MapQuery, Every } from "..";
 import {
   defaultFilter,
   defaultQuery,
@@ -8,13 +8,14 @@ import {
   EntityQueryFactory,
   EntityQueryFactoryTuple,
   EntityQueryResultTuple,
+  OneOrMoreCtors,
 } from "../types";
 
 type WithParent = EntityFilterFactory;
 export function WithParent(...ctors: OneOrMoreCtors): WithParent {
   return {
     newFilter({ queries, hierarchy }) {
-      const descriptor = All(Entity()).filter(Every(...ctors));
+      const descriptor = All(Entity()).newWithFilters(Every(...ctors));
       queries.register(descriptor);
       const parentsQuery = queries.get(descriptor);
 

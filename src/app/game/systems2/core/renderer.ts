@@ -59,7 +59,7 @@ type SchemaStateExtractor<S, Q extends EntityQueryFactoryTuple> = (
 
 type StateExtractor<S> = (schema: StateSchema) => S;
 
-function SchemaExtratorQuery<Q extends EntityQueryFactoryTuple>(...qs: Q) {
+function SchemaExtractorQuery<Q extends EntityQueryFactoryTuple>(...qs: Q) {
   return <S>(extractor: SchemaStateExtractor<S, Q>) => {
     const descriptor = All(...qs);
     return {
@@ -100,7 +100,7 @@ export function DeltaExtractor<Q extends EntityQueryFactoryTuple>(
         R_DeltaBuffer,
         Query(
           ChangeTrackers(tracked),
-          SchemaExtratorQuery(...stateQuery)(schemaExtractor),
+          SchemaExtractorQuery(...stateQuery)(schemaExtractor),
         ),
       )(({ components }, trackers) => {
         for (const [tracker, extractor] of trackers) {

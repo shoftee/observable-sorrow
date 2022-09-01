@@ -1,10 +1,17 @@
-import { single } from "@/app/utils/collections";
 import { round } from "@/app/utils/mathx";
 
 import { TimeConstants } from "@/app/state";
 
 import { PluginApp, EcsComponent, EcsPlugin } from "@/app/ecs";
-import { Commands, Query, Mut, Receive, Read, DiffMut } from "@/app/ecs/query";
+import {
+  Commands,
+  Query,
+  Mut,
+  Receive,
+  Read,
+  DiffMut,
+  Single,
+} from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
@@ -24,9 +31,8 @@ const Setup = System(Commands())((cmds) => {
 
 const HandleOptionsChanged = System(
   Receive(events.TimeOptionsChanged),
-  Query(DiffMut(TimeControls)),
-)((events, optionsQuery) => {
-  const [options] = single(optionsQuery);
+  Single(DiffMut(TimeControls)),
+)((events, [options]) => {
   for (const { intent } of events.pull()) {
     switch (intent.id) {
       case "pawse":
@@ -44,10 +50,8 @@ const HandleOptionsChanged = System(
   options.millisPerTick = TimeConstants.MillisPerTick / options.speed;
 });
 
-const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeControls)))(
-  (query) => {
-    const [time, options] = single(query);
-
+const UpdateGameTime = System(Single(Mut(DeltaTime), Read(TimeControls)))(
+  ([time, options]) => {
     const now = Date.now();
 
     // game paused <=> delta is 0
@@ -60,10 +64,9 @@ const UpdateGameTime = System(Query(Mut(DeltaTime), Read(TimeControls)))(
 );
 
 const AdvanceTimers = System(
-  Query(Read(DeltaTime)),
+  Single(Read(DeltaTime)),
   Query(DiffMut(Timer)),
-)((timeQuery, timers) => {
-  const [{ delta }] = single(timeQuery);
+)(([{ delta }], timers) => {
   if (delta > 0) {
     for (const [timer] of timers) {
       const last = timer.ticks;

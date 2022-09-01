@@ -1,13 +1,13 @@
 import { EcsEntity, Archetype } from "../types";
-
 import { EntityQueryFactory, EntityQuery } from "../query/types";
-import { ComponentState } from "./components";
 import { World } from "../world";
+
+import { ComponentState } from "./components";
 
 type Result<T = unknown> = T extends EntityQueryFactory<infer R> ? R : never;
 
 export class QueryState {
-  private readonly fetches = new Map<EntityQueryFactory, FetchCache>();
+  private readonly fetches = new Map<EntityQueryFactory, FetchState>();
   private readonly components: ComponentState;
   private generation = 0;
 
@@ -32,7 +32,7 @@ export class QueryState {
       return;
     }
 
-    const fetch = new FetchCache(descriptor.newQuery(this.world));
+    const fetch = new FetchState(descriptor.newQuery(this.world));
     fetches.set(descriptor, fetch);
     for (const [entity, row] of this.components.archetypes()) {
       fetch.notify(this.generation, entity, row);
@@ -53,29 +53,37 @@ type FetchCacheEntry = {
   generation: number;
 };
 
-class FetchCache<F = unknown> {
-  private readonly entries = new Map<EcsEntity, FetchCacheEntry>();
+export interface FetchCache<F> {
+  entries(): IterableIterator<[EcsEntity, F]>;
+  values(): IterableIterator<F>;
+  get(entity: EcsEntity): F | undefined;
+  has(entity: EcsEntity): boolean;
+  cleanup(): void;
+}
+
+class FetchState<F = unknown> {
+  private readonly _entries = new Map<EcsEntity, FetchCacheEntry>();
 
   constructor(private readonly query: EntityQuery<F>) {}
 
   notify(generation: number, entity: EcsEntity, archetype: Archetype) {
     if (archetype.size === 0 || !this.query.includes({ entity, archetype })) {
-      this.entries.delete(entity);
+      this._entries.delete(entity);
     } else {
-      const result = this.entries.get(entity);
+      const result = this._entries.get(entity);
       if (result !== undefined) {
         if (result.generation !== generation) {
           result.archetype = archetype;
           result.generation = generation;
         }
       } else {
-        this.entries.set(entity, { archetype, generation });
+        this._entries.set(entity, { archetype, generation });
       }
     }
   }
 
-  *results(): IterableIterator<[EcsEntity, F]> {
-    for (const [entity, { archetype }] of this.entries) {
+  *entries(): IterableIterator<[EcsEntity, F]> {
+    for (const [entity, { archetype }] of this._entries) {
       const ctx = { entity, archetype };
       if (this.query.matches(ctx)) {
         yield [entity, this.query.fetch(ctx)];
@@ -83,14 +91,14 @@ class FetchCache<F = unknown> {
     }
   }
 
-  *resultValues(): IterableIterator<F> {
-    for (const [, value] of this.results()) {
+  *values(): IterableIterator<F> {
+    for (const [, value] of this.entries()) {
       yield value;
     }
   }
 
   get(entity: EcsEntity): F | undefined {
-    const entry = this.entries.get(entity);
+    const entry = this._entries.get(entity);
     if (entry) {
       const ctx = { entity, archetype: entry.archetype };
       if (this.query.matches(ctx)) {
@@ -101,7 +109,7 @@ class FetchCache<F = unknown> {
   }
 
   has(entity: EcsEntity): boolean {
-    const entry = this.entries.get(entity);
+    const entry = this._entries.get(entity);
     return (
       !!entry && this.query.matches({ entity, archetype: entry.archetype })
     );

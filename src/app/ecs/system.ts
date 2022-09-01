@@ -1,37 +1,16 @@
-import { World } from "./world";
-import { WorldQueryFactoryTuple, WorldQueryTuple } from "./query/types";
 import { v4 as uuidv4 } from "uuid";
 
-export type SystemSpecification = {
-  id: string;
-  build(world: World): SystemRunner;
-};
+import { WorldQueryFactoryTuple, WorldQueryTuple } from "./query/types";
 
-export type SystemRunner = {
-  id: string;
-  run(): void;
-};
+import { World } from "./world";
 
-type SystemFn<F extends WorldQueryFactoryTuple> = (
+export type SystemFn<F extends WorldQueryFactoryTuple> = (
   ...args: WorldQueryTuple<F>
 ) => void;
 
-class SystemBuilder<F extends WorldQueryFactoryTuple> {
-  readonly id = uuidv4();
-
-  constructor(private readonly fs: F, private readonly run: SystemFn<F>) {}
-
-  build(world: World): SystemRunner {
-    const worldQueries = this.fs.map((f) => f.create(world));
-    return {
-      id: this.id,
-      run: () => {
-        const args = worldQueries.map((p) => p.fetch()) as WorldQueryTuple<F>;
-        this.run(...args);
-        worldQueries.forEach((f) => f.cleanup?.());
-      },
-    };
-  }
+export interface SystemSpecification {
+  readonly id: string;
+  build(world: World): () => void;
 }
 
 /**
@@ -42,6 +21,16 @@ class SystemBuilder<F extends WorldQueryFactoryTuple> {
  */
 export function System<F extends WorldQueryFactoryTuple>(...fs: F) {
   return (runner: SystemFn<F>) => {
-    return new SystemBuilder(fs, runner);
+    return {
+      id: uuidv4(),
+      build(world: World) {
+        const worldQueries = fs.map((f) => f.create(world));
+        return () => {
+          const args = worldQueries.map((p) => p.fetch()) as WorldQueryTuple<F>;
+          runner(...args);
+          worldQueries.forEach((f) => f.cleanup?.());
+        };
+      },
+    };
   };
 }
