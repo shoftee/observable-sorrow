@@ -4,11 +4,11 @@ import { single } from "@/app/utils/collections";
 
 import { EcsComponent, ValueComponent, World } from "@/app/ecs";
 import {
-  All,
+  Tuple,
   Read,
   Mut,
-  Every,
-  None,
+  Has,
+  HasNone,
   Opt,
   Value,
   ParentQuery,
@@ -49,7 +49,7 @@ describe("ecs world query", () => {
       world.spawn(new Id("shoftee1"));
       world.spawn(new Id("shoftee2"));
 
-      const idQuery = All(Value(Id));
+      const idQuery = Tuple(Value(Id));
       world.queries.register(idQuery);
 
       const ids = Array.from(results(world, idQuery));
@@ -61,7 +61,7 @@ describe("ecs world query", () => {
       world.spawn(new Id("shoftee1"));
       world.spawn(new Id("shoftee2"));
 
-      const query = All(Value(Id));
+      const query = Tuple(Value(Id));
       world.queries.register(query);
 
       for (const [id] of results(world, query)) {
@@ -80,7 +80,7 @@ describe("ecs world query", () => {
       world.spawn(new Id("shoftee"), new Player(20, 123));
       world.spawn(new Id("another shoftee"), new Player(20, 123));
 
-      const query = All(Value(Id), Read(Player));
+      const query = Tuple(Value(Id), Read(Player));
       world.queries.register(query);
 
       const entries = Array.from(results(world, query));
@@ -93,7 +93,7 @@ describe("ecs world query", () => {
       world.spawn(new Id("shoftee"), new Player(20, 123));
       world.spawn(new Id("another shoftee"));
 
-      const query = All(Value(Id), Read(Player));
+      const query = Tuple(Value(Id), Read(Player));
       world.queries.register(query);
 
       const entries = Array.from(results(world, query));
@@ -103,7 +103,7 @@ describe("ecs world query", () => {
       const entity = world.spawn(new Id("shoftee"));
       world.queries.notifyChanged(entity);
 
-      const query = All(Value(Id), Read(Player));
+      const query = Tuple(Value(Id), Read(Player));
       world.queries.register(query);
 
       assert(Array.from(results(world, query)).length === 0);
@@ -128,7 +128,7 @@ describe("ecs world query", () => {
         new Name("shoftee3"),
         new Player(30, 345),
       );
-      const query = All(Value(Id), Opt(Value(Name)), Opt(Read(Player)));
+      const query = Tuple(Value(Id), Opt(Value(Name)), Opt(Read(Player)));
       world.queries.register(query);
 
       const entries = Array.from(results(world, query));
@@ -148,7 +148,7 @@ describe("ecs world query", () => {
       world.spawn(new Id("shoftee1"), new Player(20, 123));
       world.spawn(new Id("shoftee2"), new Player(30, 345));
 
-      const query = All(Value(Id), Mut(Player));
+      const query = Tuple(Value(Id), Mut(Player));
       world.queries.register(query);
 
       for (const [, player] of results(world, query)) {
@@ -164,7 +164,7 @@ describe("ecs world query", () => {
     });
   });
   describe("filters", () => {
-    describe("Every", () => {
+    describe("Has", () => {
       it("excludes entities correctly", () => {
         world.spawn(
           new Id("96a8c161-0100-4ec1-bbb1-049f32dab366"),
@@ -177,13 +177,13 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const bothQuery = All(Read(Player)).newWithFilters(Every(Id, Name));
+        const bothQuery = Tuple(Read(Player)).filter(Has(Id, Name));
         world.queries.register(bothQuery);
         const bothEntries = Array.from(results(world, bothQuery));
 
         expect(bothEntries).to.deep.equal([[{ level: 20, exp: 123 }]]);
 
-        const nameQuery = All(Read(Player)).newWithFilters(Every(Name));
+        const nameQuery = Tuple(Read(Player)).filter(Has(Name));
         world.queries.register(nameQuery);
         const nameEntries = Array.from(results(world, nameQuery));
         expect(nameEntries).to.deep.equal([
@@ -191,7 +191,7 @@ describe("ecs world query", () => {
           [{ level: 30, exp: 345 }],
         ]);
 
-        const idQuery = All(Read(Player)).newWithFilters(Every(Id));
+        const idQuery = Tuple(Read(Player)).filter(Has(Id));
         world.queries.register(idQuery);
         const idEntries = Array.from(results(world, idQuery));
         expect(idEntries).to.deep.equal([
@@ -200,7 +200,7 @@ describe("ecs world query", () => {
         ]);
       });
     });
-    describe("None", () => {
+    describe("HasNone", () => {
       it("excludes entities correctly", () => {
         world.spawn(
           new Id("96a8c161-0100-4ec1-bbb1-049f32dab366"),
@@ -213,12 +213,12 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const withoutName = All(Read(Player)).newWithFilters(None(Name));
+        const withoutName = Tuple(Read(Player)).filter(HasNone(Name));
         world.queries.register(withoutName);
         const withoutNameEntries = single(results(world, withoutName));
         expect(withoutNameEntries).to.deep.equal([{ level: 40, exp: 456 }]);
 
-        const withoutId = All(Read(Player)).newWithFilters(None(Id));
+        const withoutId = Tuple(Read(Player)).filter(HasNone(Id));
         world.queries.register(withoutId);
         const withoutIdEntries = single(results(world, withoutId));
         expect(withoutIdEntries).to.deep.equal([{ level: 30, exp: 345 }]);
@@ -239,7 +239,7 @@ describe("ecs world query", () => {
           [world.spawn(new Item("potion", 10))],
         );
 
-        const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
+        const query = Tuple(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
         expect(single(results(world, query))).to.deep.equal([
@@ -252,7 +252,7 @@ describe("ecs world query", () => {
           world.spawn(new Item("potion", 10)),
         ]);
 
-        const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
+        const query = Tuple(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
         expect(single(results(world, query))).to.deep.equal([
@@ -263,7 +263,7 @@ describe("ecs world query", () => {
       it("returns undefined result when no parent", () => {
         world.spawn(new Item("potion", 10));
 
-        const query = All(Read(Item), ParentQuery(Value(Id), Read(Player)));
+        const query = Tuple(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
         expect(single(results(world, query))).to.deep.equal([
@@ -283,7 +283,7 @@ describe("ecs world query", () => {
           ],
         );
 
-        const query = All(
+        const query = Tuple(
           Value(Id),
           Read(Player),
           Eager(ChildrenQuery(Read(Item))),
@@ -302,7 +302,7 @@ describe("ecs world query", () => {
       it("returns empty list", () => {
         world.spawn(new Id("shoftee"), new Player(20, 123));
 
-        const query = All(
+        const query = Tuple(
           Value(Id),
           Read(Player),
           Eager(ChildrenQuery(Read(Item))),

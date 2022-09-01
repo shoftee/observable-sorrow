@@ -3,7 +3,7 @@ import { all } from "@/app/utils/collections";
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   AddedOrChanged,
-  Any,
+  HasAny,
   ChildrenQuery,
   DiffMut,
   MapQuery,
@@ -34,7 +34,7 @@ const MarkUnlockedFromEffects = System(
 
 const MarkAggregateUnlocks = System(
   Query(DiffMut(Unlocked), ChildrenQuery(Value(Unlocked))).filter(
-    Any(Building, Section),
+    HasAny(Building, Section),
   ),
 )((query) => {
   for (const [unlocked, parts] of query) {

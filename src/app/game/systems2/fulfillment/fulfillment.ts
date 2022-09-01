@@ -2,7 +2,7 @@ import { Meta, resourceQtyIterable } from "@/app/state";
 
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
-  All,
+  Tuple,
   ChildrenQuery,
   MapQuery,
   DiffMut,
@@ -44,19 +44,11 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
   }
 }
 
-// TODO: support for multi-level recipes
-// const CalculateRecipeRequirements = System(
-//   MapQuery(
-//     Entity(),
-//     All(ChangeTrackers(F.Requirement), DiffMut(F.Requirement), Children()),
-//   ),
-// )((query) => { });
-
 const CalculateIngredientFulfillment = System(
   Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
   MapQuery(
     Q_Resource,
-    All(Value(R.Amount), Opt(Value(R.Delta)), Opt(Value(R.Limit))),
+    Tuple(Value(R.Amount), Opt(Value(R.Delta)), Opt(Value(R.Limit))),
   ),
 )((ingredients, resources) => {
   for (const [resource, requirement, progress, capped] of ingredients) {

@@ -7,7 +7,7 @@ import {
   Commands,
   Query,
   Read,
-  Every,
+  Has,
   DiffMut,
   Value,
   AddedOrChanged,
@@ -43,7 +43,7 @@ const Setup = System(Commands())((cmds) => {
 });
 
 const AdvanceCalendar = PerTickSystem(
-  Query(Read(Timer)).filter(Every(E.DayTimer)),
+  Query(Read(Timer)).filter(Has(E.DayTimer)),
   Single(
     DiffMut(E.Day),
     DiffMut(E.Season),
@@ -73,7 +73,7 @@ const AdvanceCalendar = PerTickSystem(
 
 const UpdateSeasonEffect = System(
   Query(Value(E.Season)).filter(AddedOrChanged(E.Season)),
-  Single(DiffMut(NumberValue)).filter(Every(SeasonEffect)),
+  Single(DiffMut(NumberValue)).filter(Has(SeasonEffect)),
 )((seasonQuery, [effect]) => {
   for (const [season] of take(seasonQuery, 1)) {
     effect.value = getWeatherSeasonRatio(season);
@@ -82,7 +82,7 @@ const UpdateSeasonEffect = System(
 
 const HandleWeatherChanged = System(
   Query(Value(E.Weather), DiffMut(E.Labels)).filter(AddedOrChanged(E.Weather)),
-  Single(DiffMut(NumberValue)).filter(Every(WeatherEffect)),
+  Single(DiffMut(NumberValue)).filter(Has(WeatherEffect)),
 )((weatherQuery, [effect]) => {
   for (const [weather, labels] of take(weatherQuery, 1)) {
     effect.value = getWeatherSeverityRatio(weather);

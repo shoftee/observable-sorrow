@@ -1,4 +1,4 @@
-import { MapQuery, Value, All, Opt, DiffMut } from "@/app/ecs/query";
+import { MapQuery, Value, Tuple, Opt, DiffMut } from "@/app/ecs/query";
 import { ResourceId } from "@/app/interfaces";
 import { Ledger, ResourceMap } from "@/app/state";
 
@@ -7,7 +7,7 @@ import { Resource } from "../types/common";
 
 export const ResourceMapQuery = MapQuery(
   Value(Resource),
-  All(Value(Amount), Opt(Value(Limit)), DiffMut(LedgerEntry)),
+  Tuple(Value(Amount), Opt(Value(Limit)), DiffMut(LedgerEntry)),
 );
 
 type Order = Partial<{

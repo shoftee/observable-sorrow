@@ -77,7 +77,6 @@ export abstract class EntityQueryFactory<Result = unknown> {
 }
 
 export type EntityQueryFactoryTuple = [...EntityQueryFactory[]];
-export type EntityFilterFactoryTuple = [...EntityFilterFactory[]];
 
 export type EntityQueryResultTuple<F> = F extends [infer Head, ...infer Tail]
   ? [...UnwrapFactory<Head>, ...EntityQueryResultTuple<Tail>]
@@ -105,3 +104,5 @@ type UnwrapWorldQueryFactory<F> = F extends WorldQueryFactory<infer T>
   : [];
 
 export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
+
+export type OneOrMoreFilters = [EntityFilterFactory, ...EntityFilterFactory[]];

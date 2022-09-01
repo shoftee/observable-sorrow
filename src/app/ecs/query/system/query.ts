@@ -1,45 +1,38 @@
 import { cache } from "@/app/utils/cache";
+import { single } from "@/app/utils/collections";
 
 import { EcsEntity, World } from "@/app/ecs";
+import { FetchCache } from "@/app/ecs/state";
 
 import {
   WorldQueryFactory,
   EntityQueryFactory,
-  EntityFilterFactoryTuple,
   EntityQueryFactoryTuple,
   EntityQueryResultTuple,
+  OneOrMoreFilters,
+  WorldQuery,
 } from "../types";
 
-import { All, Entity } from "..";
-import { single } from "@/app/utils/collections";
+import { Tuple, Entity, TupleQueryFactory } from "..";
 
-export type IterableQueryResult<Result> = {
-  [Symbol.iterator](): IterableIterator<Result>;
-};
-
-class IterableQueryFactory<Q extends EntityQueryFactoryTuple>
-  implements WorldQueryFactory<IterableQueryResult<EntityQueryResultTuple<Q>>>
+abstract class QueryFactoryBase<Q extends EntityQueryFactoryTuple, R>
+  implements WorldQueryFactory<R>
 {
-  private descriptor;
-
-  constructor(...wq: Q) {
-    this.descriptor = All(...wq);
-  }
-
-  filter<F extends EntityFilterFactoryTuple>(...f: F) {
-    this.descriptor = this.descriptor.newWithFilters(...f);
+  constructor(private factory: TupleQueryFactory<Q>) {}
+  filter(...filters: OneOrMoreFilters) {
+    this.factory = this.factory.filter(...filters);
     return this;
   }
 
-  create(world: World) {
-    const descriptor = this.descriptor;
-    world.queries.register(descriptor);
-    const fetchCache = world.queries.get(descriptor);
+  protected abstract getQueryResult(
+    fetchCache: FetchCache<EntityQueryResultTuple<Q>>,
+  ): R;
 
-    const fetcher = cache(() => {
-      const array = Array.from(fetchCache.values());
-      return array as IterableQueryResult<EntityQueryResultTuple<Q>>;
-    });
+  create(world: World): WorldQuery<R> {
+    const { factory } = this;
+    world.queries.register(factory);
+    const fetchCache = world.queries.get(factory);
+    const fetcher = cache(() => this.getQueryResult(fetchCache));
 
     return {
       fetch() {
@@ -50,6 +43,23 @@ class IterableQueryFactory<Q extends EntityQueryFactoryTuple>
         fetchCache.cleanup();
       },
     };
+  }
+}
+
+export type IterableQueryResult<Result> = {
+  [Symbol.iterator](): IterableIterator<Result>;
+};
+
+class IterableQueryFactory<Q extends EntityQueryFactoryTuple>
+  extends QueryFactoryBase<Q, IterableQueryResult<EntityQueryResultTuple<Q>>>
+  implements WorldQueryFactory<IterableQueryResult<EntityQueryResultTuple<Q>>>
+{
+  constructor(...wq: Q) {
+    super(Tuple(...wq));
+  }
+
+  protected getQueryResult(fetchCache: FetchCache<EntityQueryResultTuple<Q>>) {
+    return Array.from(fetchCache.values());
   }
 }
 
@@ -60,39 +70,19 @@ export function Query<Q extends EntityQueryFactoryTuple>(
 }
 
 class SingleQueryFactory<Q extends EntityQueryFactoryTuple>
+  extends QueryFactoryBase<Q, EntityQueryResultTuple<Q>>
   implements WorldQueryFactory<EntityQueryResultTuple<Q>>
 {
-  private descriptor;
-
   constructor(...wq: Q) {
-    this.descriptor = All(...wq);
+    super(Tuple(...wq));
   }
 
-  filter<F extends EntityFilterFactoryTuple>(...f: F) {
-    this.descriptor = this.descriptor.newWithFilters(...f);
-    return this;
-  }
-
-  create(world: World) {
-    const descriptor = this.descriptor;
-    world.queries.register(descriptor);
-    const fetchCache = world.queries.get(descriptor);
-
-    const fetcher = cache(() => single(fetchCache.values()));
-
-    return {
-      fetch() {
-        return fetcher.retrieve();
-      },
-      cleanup() {
-        fetcher.invalidate();
-        fetchCache.cleanup();
-      },
-    };
+  protected getQueryResult(fetchCache: FetchCache<EntityQueryResultTuple<Q>>) {
+    return single(fetchCache.values());
   }
 }
 
-/** Like `All(...)`, but only works if there's a single result from the query. If there are 0 or more than 1 results, an error is thrown during data retrieval. */
+/** Like `Query(...)`, but only works if there's a single result from the query. If there are 0 or more than 1 results, an error is thrown during data retrieval. */
 export function Single<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
 ): SingleQueryFactory<Q> {
@@ -108,39 +98,19 @@ export type MapQueryResult<K, V> = {
   has(key: Readonly<K>): boolean;
 };
 
-class MapQueryFactory<K, V> implements WorldQueryFactory<MapQueryResult<K, V>> {
-  private descriptor;
+class MapQueryFactory<K, V> extends QueryFactoryBase<
+  [EntityQueryFactory<Readonly<K>>, EntityQueryFactory<V>],
+  MapQueryResult<K, V>
+> {
   constructor(
     keys: EntityQueryFactory<Readonly<K>>,
     values: EntityQueryFactory<V>,
   ) {
-    this.descriptor = All(keys, values);
+    super(Tuple(keys, values));
   }
 
-  filter<F extends EntityFilterFactoryTuple>(...f: F) {
-    this.descriptor = this.descriptor.newWithFilters(...f);
-    return this;
-  }
-
-  create(world: World) {
-    const descriptor = this.descriptor;
-    world.queries.register(descriptor);
-    const fetchCache = world.queries.get(descriptor);
-
-    const fetcher = cache(() => {
-      const map = new Map(fetchCache.values());
-      return map as MapQueryResult<K, V>;
-    });
-
-    return {
-      fetch() {
-        return fetcher.retrieve();
-      },
-      cleanup() {
-        fetcher.invalidate();
-        fetchCache.cleanup();
-      },
-    };
+  protected getQueryResult(fetchCache: FetchCache<[Readonly<K>, V]>) {
+    return new Map(fetchCache.values());
   }
 }
 
@@ -157,5 +127,5 @@ export function MapQuery<K, V>(
 export function EntityMapQuery<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
 ): MapQueryFactory<EcsEntity, EntityQueryResultTuple<Q>> {
-  return new MapQueryFactory(Entity(), All(...qs));
+  return new MapQueryFactory(Entity(), Tuple(...qs));
 }

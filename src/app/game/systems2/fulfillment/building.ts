@@ -11,11 +11,11 @@ import {
 
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
-  All,
+  Tuple,
   ChangeTrackers,
   ChildrenQuery,
   DiffMut,
-  Every,
+  Has,
   MapQuery,
   Query,
   Receive,
@@ -77,7 +77,7 @@ const ProcessConstructBuildingOrders = System(
   Receive(events.ConstructBuildingOrder),
   MapQuery(
     Value(Building),
-    All(DiffMut(Level), ChildrenQuery(Value(Resource), Value(F.Requirement))),
+    Tuple(DiffMut(Level), ChildrenQuery(Value(Resource), Value(F.Requirement))),
   ),
   ResourceMapQuery,
 )((orders, buildings, resources) => {
@@ -115,7 +115,7 @@ const HandleLevelChanged = System(
     Value(PriceRatio),
     ChildrenQuery(Value(F.BaseRequirement), DiffMut(F.Requirement)),
   ),
-  MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(Every(Effect)),
+  MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(Has(Effect)),
 )((trackersQuery, requirementsQuery, effectsQuery) => {
   for (const [entity, [id, trackers]] of trackersQuery) {
     if (trackers.isAddedOrChanged()) {
@@ -150,7 +150,7 @@ const ProcessRatioUnlocks = System(
   Query(
     ChildrenQuery(Q_Resource, Value(F.Requirement)),
     ChildrenQuery(DiffMut(Unlocked), Value(PriceRatio)),
-  ).filter(Every(Building)),
+  ).filter(Has(Building)),
   MapQuery(Q_Resource, Value(R.Amount)),
 )((buildings, amounts) => {
   for (const [ingredients, unlocks] of buildings) {

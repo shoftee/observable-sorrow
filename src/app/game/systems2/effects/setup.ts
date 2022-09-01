@@ -6,14 +6,14 @@ import {
   EntityCmds,
   Commands,
   Value,
-  All,
+  Tuple,
   Read,
   Added,
   Children,
   Eager,
   Entity,
   EntityMapQuery,
-  Every,
+  Has,
   MapQuery,
   Mut,
   Opt,
@@ -69,10 +69,10 @@ const Setup = System(Commands())((cmds) => {
 });
 
 const CollectEffectTrees = System(
-  MapQuery(Value(NumberEffect), All(Entity(), Mut(EffectTree))).filter(
+  MapQuery(Value(NumberEffect), Tuple(Entity(), Mut(EffectTree))).filter(
     Added(NumberEffect),
   ),
-  EntityMapQuery(Opt(Read(Reference)), Eager(Children())).filter(Every(Effect)),
+  EntityMapQuery(Opt(Read(Reference)), Eager(Children())).filter(Has(Effect)),
 )((ids, effects) => {
   for (const [entity, { references }] of ids.values()) {
     collectReferences(
@@ -105,7 +105,7 @@ const NumberExtractor = DeltaExtractor(Value(NumberEffect))(
 );
 
 const EffectTreeExtractor = DeltaExtractor(
-  All(Value(NumberEffect)).newWithFilters(Added(EffectTree)),
+  Tuple(Value(NumberEffect)).filter(Added(EffectTree)),
 )((schema, [[id]]) => schema.numbers[id]);
 
 const Extractors = [

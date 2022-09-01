@@ -1,36 +1,12 @@
 import { EcsEntity } from "@/app/ecs";
 
-import { All, Entity, MapQuery, Every } from "..";
+import { Tuple, Entity, MapQuery } from "..";
 import {
-  defaultFilter,
   defaultQuery,
-  EntityFilterFactory,
   EntityQueryFactory,
   EntityQueryFactoryTuple,
   EntityQueryResultTuple,
-  OneOrMoreCtors,
 } from "../types";
-
-type WithParent = EntityFilterFactory;
-export function WithParent(...ctors: OneOrMoreCtors): WithParent {
-  return {
-    newFilter({ queries, hierarchy }) {
-      const descriptor = All(Entity()).newWithFilters(Every(...ctors));
-      queries.register(descriptor);
-      const parentsQuery = queries.get(descriptor);
-
-      return defaultFilter({
-        matches({ entity }) {
-          const parent = hierarchy.parentOf(entity);
-          return !!parent && parentsQuery.has(parent);
-        },
-        cleanup() {
-          parentsQuery.cleanup();
-        },
-      });
-    },
-  };
-}
 
 type Parent = EntityQueryFactory<EcsEntity | undefined>;
 export function Parent(): Parent {
@@ -64,7 +40,7 @@ type ParentQuery<Q extends EntityQueryFactoryTuple> = EntityQueryFactory<
 export function ParentQuery<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
 ): ParentQuery<Q> {
-  const mapQuery = MapQuery(Entity(), All(...qs));
+  const mapQuery = MapQuery(Entity(), Tuple(...qs));
   return {
     newQuery(world) {
       const { hierarchy } = world;
@@ -106,7 +82,7 @@ type ChildrenQuery<Q extends EntityQueryFactoryTuple> = EntityQueryFactory<
 export function ChildrenQuery<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
 ): ChildrenQuery<Q> {
-  const mapQuery = MapQuery(Entity(), All(...qs));
+  const mapQuery = MapQuery(Entity(), Tuple(...qs));
   return {
     newQuery(world) {
       const fetcher = mapQuery.create(world);

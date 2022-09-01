@@ -4,7 +4,7 @@ import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   ChangeTrackers,
   DiffMut,
-  Every,
+  Has,
   Mut,
   Opt,
   Query,
@@ -28,8 +28,8 @@ const UpdateLimitEffects = RecalculateByQuery(Value(R.LimitEffect));
 const UpdateDeltaEffects = RecalculateByQuery(Value(R.DeltaEffect));
 
 const UpdateEffectTargets = System(
-  Query(DiffMut(R.Limit), Value(R.LimitEffect)).filter(Every(Resource)),
-  Query(DiffMut(R.Delta), Value(R.DeltaEffect)).filter(Every(Resource)),
+  Query(DiffMut(R.Limit), Value(R.LimitEffect)).filter(Has(Resource)),
+  Query(DiffMut(R.Delta), Value(R.DeltaEffect)).filter(Has(Resource)),
   NumberTrackersQuery,
 )((limits, deltas, numbers) => {
   function update(effect: NumberEffectId, component: { set value(v: number) }) {
@@ -51,7 +51,7 @@ const UpdateEffectTargets = System(
 });
 
 const ProcessLedger = System(
-  Single(Read(Timer)).filter(Every(TickTimer)),
+  Single(Read(Timer)).filter(Has(TickTimer)),
   Query(
     Read(R.LedgerEntry),
     Opt(Value(R.Delta)),
@@ -101,7 +101,7 @@ function calculateAmount(
 
 const UnlockByQuantity = System(
   Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(
-    Every(Resource, R.UnlockOnFirstQuantity),
+    Has(Resource, R.UnlockOnFirstQuantity),
   ),
 )((amounts) => {
   for (const [trackers, unlocked] of amounts) {
@@ -115,9 +115,9 @@ const UnlockByQuantity = System(
   }
 });
 
-const UnlockByLimit = System(
+const UnlockByCapacity = System(
   Query(ChangeTrackers(R.Limit), Mut(Unlocked)).filter(
-    Every(Resource, R.UnlockOnFirstCapacity),
+    Has(Resource, R.UnlockOnFirstCapacity),
   ),
 )((limits) => {
   for (const [trackers, unlock] of limits) {
@@ -160,7 +160,7 @@ export class ResourceResolutionPlugin extends EcsPlugin {
         UpdateEffectTargets,
         ProcessLedger,
         UnlockByQuantity,
-        UnlockByLimit,
+        UnlockByCapacity,
       ])
       .addSystems(Extractors, { stage: "last-start" })
       .addSystem(CleanupLedger, { stage: "last-end" });

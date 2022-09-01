@@ -1,7 +1,7 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import { EcsComponent, EcsResource, World } from "@/app/ecs";
-import { All, ChangeTrackers, Query, Res } from "@/app/ecs/query";
+import { Tuple, ChangeTrackers, Query, Res } from "@/app/ecs/query";
 import {
   EntityQuery,
   EntityQueryFactoryTuple,
@@ -61,7 +61,7 @@ type StateExtractor<S> = (schema: StateSchema) => S;
 
 function SchemaExtractorQuery<Q extends EntityQueryFactoryTuple>(...qs: Q) {
   return <S>(extractor: SchemaStateExtractor<S, Q>) => {
-    const descriptor = All(...qs);
+    const descriptor = Tuple(...qs);
     return {
       newQuery(world: World): EntityQuery<StateExtractor<S>> {
         const query = descriptor.newQuery(world);

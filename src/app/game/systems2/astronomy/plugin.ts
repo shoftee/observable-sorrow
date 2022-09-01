@@ -1,5 +1,5 @@
 import { PluginApp, EcsPlugin, EcsComponent } from "@/app/ecs";
-import { Commands, DiffMut, Every, Query, Read, Single } from "@/app/ecs/query";
+import { Commands, DiffMut, Has, Query, Read, Single } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
@@ -18,8 +18,8 @@ const Setup = System(Commands())((cmds) => {
 });
 
 const ProcessRareEvent = PerTickSystem(
-  Query(Read(Timer)).filter(Every(DayTimer)),
-  Single(DiffMut(Countdown)).filter(Every(RareEvent)),
+  Query(Read(Timer)).filter(Has(DayTimer)),
+  Single(DiffMut(Countdown)).filter(Has(RareEvent)),
 )(([countdown]) => {
   if (countdown.remaining > 0) {
     countdown.remaining--;
