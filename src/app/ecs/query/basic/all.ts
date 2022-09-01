@@ -1,6 +1,7 @@
 import { all, any } from "@/app/utils/collections";
+import { cache } from "@/app/utils/cache";
 
-import { World } from "@/app/ecs";
+import { World, EcsEntity } from "@/app/ecs";
 
 import {
   EntityQueryFactory,
@@ -11,6 +12,7 @@ import {
   EntityQuery,
   defaultFilter,
   OneOrMoreCtors,
+  WorldQueryFactory,
 } from "../types";
 
 class AllEntityQuery<
@@ -26,17 +28,17 @@ class AllEntityQuery<
   newQuery(world: World): EntityQuery<EntityQueryResultTuple<Q>> {
     const filters = this.filters.map((inner) => inner.newFilter(world));
     const queries = this.queries.map((inner) => inner.newQuery(world));
-    const iterator = function* () {
+    const filterIterator = function* () {
       yield* filters;
       yield* queries;
     };
 
     return {
       includes(ctx) {
-        return all(iterator(), (f) => f.includes(ctx));
+        return all(filterIterator(), (f) => f.includes(ctx));
       },
       matches(ctx) {
-        return all(iterator(), (f) => f.matches(ctx));
+        return all(filterIterator(), (f) => f.matches(ctx));
       },
       fetch(ctx) {
         return queries.map((q) => q.fetch(ctx)) as EntityQueryResultTuple<Q>;
@@ -95,6 +97,27 @@ export function None(...ctors: OneOrMoreCtors): None {
       return defaultFilter({
         includes({ archetype }) {
           return all(ctors, (ctor) => !archetype.has(ctor));
+        },
+      });
+    },
+  };
+}
+
+type Intersect = EntityFilterFactory;
+export function Intersect(
+  other: WorldQueryFactory<IterableIterator<EcsEntity>>,
+): Intersect {
+  return {
+    newFilter(world) {
+      const wq = other.create(world);
+      const cached = cache(() => new Set(wq.fetch()));
+      return defaultFilter({
+        includes({ entity }) {
+          return cached.retrieve().has(entity);
+        },
+        cleanup() {
+          cached.invalidate();
+          wq.cleanup?.();
         },
       });
     },

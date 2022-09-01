@@ -1,32 +1,21 @@
-import { Queue } from "queue-typescript";
-
-import { cache } from "@/app/utils/cache";
-import { consume, map, MultiMap } from "@/app/utils/collections";
-
 import { NumberEffectId } from "@/app/interfaces";
 
 import { EcsEntity } from "@/app/ecs";
 import {
-  ChangeTrackers,
   ChildrenQuery,
   DiffMut,
   Eager,
   Entity,
   EntityMapQuery,
-  MapQuery,
   Opt,
-  Parents,
-  Query,
   Read,
-  Value,
 } from "@/app/ecs/query";
-import { WorldQueryFactory, EntityQueryFactory } from "@/app/ecs/query/types";
+import { EntityQueryFactory } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
 import {
   Default,
   NumberValue,
-  NumberEffect,
   Operation,
   OperationType,
   Reference,
@@ -34,11 +23,7 @@ import {
   Constant,
   Precalculated,
 } from "./types";
-
-export const NumberTrackersQuery = MapQuery(
-  Value(NumberEffect),
-  ChangeTrackers(NumberValue),
-);
+import { DependentEffectsQuery, EntityByIdQuery } from "./ecs";
 
 type EffectTuple = [
   NumberValue,
@@ -48,9 +33,6 @@ type EffectTuple = [
   Readonly<Precalculated> | undefined,
 ];
 
-const ParentsQuery = MapQuery(Entity(), Parents());
-const EntityByIdQuery = MapQuery(Value(NumberEffect), Entity());
-const ReferencesQuery = Query(Value(Reference), Entity());
 const EffectsTupleQuery = EntityMapQuery(
   DiffMut(NumberValue),
   Opt(Read(Reference)),
@@ -103,13 +85,11 @@ export const RecalculateByQuery = function (
   selectionQuery: EntityQueryFactory<NumberEffectId>,
 ) {
   return System(
-    EffectsQuery(selectionQuery),
+    DependentEffectsQuery(selectionQuery),
     EntityByIdQuery,
     EffectsTupleQuery,
     OperationsTupleQuery,
-  )((selected, idsLookup, effectsQuery, operationsQuery) => {
-    const entities = selected.entities();
-
+  )((entities, idsLookup, effectsQuery, operationsQuery) => {
     const ctx: UpdateContext = {
       effect: (entity) => effectsQuery.get(entity),
       operation: (entity) => operationsQuery.get(entity),
@@ -208,90 +188,3 @@ const Calculators: Record<OperationType, CalculatorFn> = {
       : base * (1 + ratio);
   },
 };
-
-type EffectsQueryFetcher = {
-  entities(): IterableIterator<EcsEntity>;
-};
-
-function EffectsQuery(
-  idsQuery: EntityQueryFactory<NumberEffectId>,
-): WorldQueryFactory<EffectsQueryFetcher> {
-  return {
-    create(world) {
-      world.queries.register(idsQuery);
-
-      const idsFetcher = world.queries.get(idsQuery);
-
-      const idsCache = cache(() => EntityByIdQuery.create(world).fetch());
-      const parentsCache = cache(() => ParentsQuery.create(world).fetch());
-      const referencesCache = cache(() =>
-        ReferencesQuery.create(world).fetch(),
-      );
-
-      const fetcher = {
-        *entities() {
-          const filter = idsFetcher.values();
-          const initial = map(filter, (id) => idsLookup.get(id)!);
-
-          const idsLookup = idsCache.retrieve();
-          const referencesLookup = referencesCache.retrieve();
-          const referrersLookup = new MultiMap<EcsEntity, EcsEntity>();
-          for (const [reference, referrer] of referencesLookup) {
-            const referenced = idsLookup.get(reference)!;
-            referrersLookup.add(referenced, referrer);
-          }
-
-          const parentsLookup = parentsCache.retrieve();
-
-          yield* findDependentEffects(
-            initial,
-            (e) => parentsLookup.get(e)!,
-            (e) => referrersLookup.entriesForKey(e),
-          );
-        },
-      };
-
-      return {
-        fetch() {
-          return fetcher;
-        },
-        cleanup() {
-          idsFetcher.cleanup();
-
-          idsCache.invalidate();
-          parentsCache.invalidate();
-          referencesCache.invalidate();
-        },
-      };
-    },
-  };
-}
-
-function* findDependentEffects(
-  base: Iterable<EcsEntity>,
-  parentsOf: (entity: EcsEntity) => Iterable<EcsEntity>,
-  referrersOf: (entity: EcsEntity) => Iterable<EcsEntity>,
-): Iterable<EcsEntity> {
-  const found = new Set<EcsEntity>();
-
-  const queue = new Queue<EcsEntity>();
-  for (const effect of base) {
-    queue.enqueue(effect);
-  }
-
-  for (const effect of consume(queue)) {
-    for (const parent of parentsOf(effect)) {
-      if (!found.has(parent)) {
-        queue.enqueue(parent);
-      }
-    }
-    for (const referrer of referrersOf(effect)) {
-      if (!found.has(referrer)) {
-        queue.enqueue(referrer);
-      }
-    }
-    found.add(effect);
-  }
-
-  yield* found;
-}

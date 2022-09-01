@@ -1,26 +1,48 @@
-import { PluginApp, EcsPlugin } from "@/app/ecs";
-import { Commands } from "@/app/ecs/query";
+import { PluginApp, EcsPlugin, EcsComponent } from "@/app/ecs";
+import { Commands, DiffMut, Every, Query, Read, Single } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
+import { DayTimer } from "../environment/types";
+import { PerTickSystem } from "../time/ecs";
+import { Timer } from "../time/types";
 
 import { RareEvent } from "./types";
 
+class Countdown extends EcsComponent {
+  remaining = 0;
+}
+
 const Setup = System(Commands())((cmds) => {
-  cmds.spawn(new RareEvent());
+  cmds.spawn(new RareEvent(), new Countdown());
 });
 
-const TimeExtractor = DeltaExtractor()((schema) => schema.astronomy);
+const ProcessRareEvent = PerTickSystem(
+  Query(Read(Timer)).filter(Every(DayTimer)),
+  Single(DiffMut(Countdown)).filter(Every(RareEvent)),
+)(([countdown]) => {
+  if (countdown.remaining > 0) {
+    countdown.remaining--;
+  }
+
+  // TODO: begin celestial events
+});
+
+const TimeExtractor = DeltaExtractor(Read(RareEvent))(
+  (schema) => schema.astronomy,
+);
 
 const Extractors = [
-  TimeExtractor(RareEvent, (astronomy) => {
-    astronomy.hasRareEvent = false;
+  TimeExtractor(Countdown, (astronomy, countdown) => {
+    astronomy.hasRareEvent = countdown.remaining > 0;
   }),
 ];
 
 export class AstronomyPlugin extends EcsPlugin {
   add(app: PluginApp): void {
-    app.addStartupSystem(Setup);
-    app.addSystems(Extractors, { stage: "last-start" });
+    app
+      .addStartupSystem(Setup)
+      .addSystem(ProcessRareEvent)
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }
