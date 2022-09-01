@@ -247,7 +247,7 @@ describe("ecs world query", () => {
           ["shoftee", { level: 20, exp: 123 }],
         ]);
       });
-      it("returns undefined result when parent does not match query", () => {
+      it("skips result when parent does not match query", () => {
         world.hierarchy.link(world.spawn(new Id("shoftee")), [
           world.spawn(new Item("potion", 10)),
         ]);
@@ -255,21 +255,15 @@ describe("ecs world query", () => {
         const query = Tuple(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
-        expect(single(results(world, query))).to.deep.equal([
-          { itemId: "potion", count: 10 },
-          undefined,
-        ]);
+        expect(Array.from(results(world, query))).to.be.empty;
       });
-      it("returns undefined result when no parent", () => {
+      it("skips result when no parent", () => {
         world.spawn(new Item("potion", 10));
 
         const query = Tuple(Read(Item), ParentQuery(Value(Id), Read(Player)));
         world.queries.register(query);
 
-        expect(single(results(world, query))).to.deep.equal([
-          { itemId: "potion", count: 10 },
-          undefined,
-        ]);
+        expect(Array.from(results(world, query))).to.be.empty;
       });
     });
 

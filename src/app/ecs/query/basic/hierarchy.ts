@@ -8,11 +8,14 @@ import {
   EntityQueryResultTuple,
 } from "../types";
 
-type Parent = EntityQueryFactory<EcsEntity | undefined>;
+type Parent = EntityQueryFactory<EcsEntity>;
 export function Parent(): Parent {
   return {
     newQuery({ hierarchy }) {
       return defaultQuery({
+        matches({ entity }) {
+          return !!hierarchy.parentOf(entity);
+        },
         fetch({ entity }) {
           return hierarchy.parentOf(entity)!;
         },
@@ -35,7 +38,7 @@ export function Parents(): Parents {
 }
 
 type ParentQuery<Q extends EntityQueryFactoryTuple> = EntityQueryFactory<
-  EntityQueryResultTuple<Q> | undefined
+  EntityQueryResultTuple<Q>
 >;
 export function ParentQuery<Q extends EntityQueryFactoryTuple>(
   ...qs: Q
@@ -47,13 +50,13 @@ export function ParentQuery<Q extends EntityQueryFactoryTuple>(
       const fetcher = mapQuery.create(world);
 
       return defaultQuery({
+        matches({ entity }) {
+          const parent = hierarchy.parentOf(entity)!;
+          return !!parent && fetcher.fetch().has(parent);
+        },
         fetch({ entity }) {
-          const parent = hierarchy.parentOf(entity);
-          if (parent) {
-            return fetcher.fetch().get(parent)!;
-          } else {
-            return undefined;
-          }
+          const parent = hierarchy.parentOf(entity)!;
+          return fetcher.fetch().get(parent)!;
         },
         cleanup() {
           fetcher.cleanup?.();

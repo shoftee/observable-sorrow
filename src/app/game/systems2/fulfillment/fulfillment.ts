@@ -109,9 +109,8 @@ const CalculateRecipeFulfillment = System(
 const IngredientExtractor = DeltaExtractor(
   Q_ParentFulfillment,
   Q_Resource,
-)((schema, [fulfillment, resource]) => {
-  const [id] = fulfillment!;
-  return schema.fulfillments[id].ingredients[resource]!;
+)((schema, [[fulfillment], resource]) => {
+  return schema.fulfillments[fulfillment].ingredients[resource]!;
 });
 
 const FulfillmentExtractor = DeltaExtractor(Value(Fulfillment))(
