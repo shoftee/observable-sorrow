@@ -1,4 +1,4 @@
-import { firstOrDefault, getOrAddWeak } from "@/app/utils/collections";
+import { firstOrDefault, getOrAdd } from "@/app/utils/collections";
 
 import { EcsEntity } from "../types";
 
@@ -74,7 +74,7 @@ export class HierarchyState {
   }
 
   private node(entity: EcsEntity): Node {
-    return getOrAddWeak(this.nodes, entity, (entity) => ({
+    return getOrAdd(this.nodes, entity, (entity) => ({
       entity,
       parent: undefined,
       children: new Set<Node>(),

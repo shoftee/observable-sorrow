@@ -10,7 +10,7 @@ import {
   Opt,
   Read,
 } from "@/app/ecs/query";
-import { EntityQueryFactory } from "@/app/ecs/query/types";
+import { QueryDescriptor } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
 import {
@@ -82,10 +82,10 @@ export const RecalculateByList = function (...ids: NumberEffectId[]) {
 };
 
 export const RecalculateByQuery = function (
-  selectionQuery: EntityQueryFactory<NumberEffectId>,
+  selector: QueryDescriptor<NumberEffectId>,
 ) {
   return System(
-    DependentEffectsQuery(selectionQuery),
+    DependentEffectsQuery(selector),
     EntityByIdQuery,
     EffectsTupleQuery,
     OperationsTupleQuery,

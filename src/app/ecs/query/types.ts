@@ -1,6 +1,6 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { Archetype, EcsComponent, EcsEntity } from "../types";
+import { Archetype, EcsComponent, EcsEntity, Inspectable } from "../types";
 import { World } from "../world";
 
 /**
@@ -37,72 +37,54 @@ export type FetchContext<C extends EcsComponent = EcsComponent> = {
   archetype: Archetype<C>;
 };
 
-export interface EntityFilter {
-  includes(ctx: FetchContext): boolean;
-  matches(ctx: FetchContext): boolean;
-  cleanup(): void;
+export interface WorldFilter {
+  matches?(ctx: FetchContext): boolean;
+  cleanup?(): void;
 }
 
-export interface EntityQuery<Result> extends EntityFilter {
+export interface WorldQuery<Result> extends WorldFilter {
   fetch(ctx: FetchContext): Result;
 }
 
-function alwaysTrue() {
-  return true;
-}
-function noOp() {
-  return;
+export interface Descriptor extends Inspectable {
+  includes?(archetype: Archetype): boolean;
+  dependencies?(): Iterable<Descriptor>;
 }
 
-export function defaultFilter(inner: Partial<EntityFilter>): EntityFilter {
-  inner.includes ?? (inner.includes = alwaysTrue);
-  inner.matches ?? (inner.matches = alwaysTrue);
-  inner.cleanup ?? (inner.cleanup = noOp);
-  return inner as EntityFilter;
+export interface FilterDescriptor extends Descriptor {
+  newFilter(world: World): WorldFilter;
 }
 
-export function defaultQuery<Result>(
-  inner: Partial<EntityQuery<Result>>,
-): EntityQuery<Result> {
-  defaultFilter(inner);
-  return inner as EntityQuery<Result>;
+export function isFilterDescriptor(d: Descriptor): d is FilterDescriptor {
+  return (d as FilterDescriptor).newFilter !== undefined;
 }
 
-export abstract class EntityFilterFactory {
-  abstract newFilter(world: World): EntityFilter;
+export interface QueryDescriptor<Result = unknown> extends Descriptor {
+  newQuery(world: World): WorldQuery<Result>;
 }
 
-export abstract class EntityQueryFactory<Result = unknown> {
-  abstract newQuery(world: World): EntityQuery<Result>;
+export function isQueryDescriptor<R = unknown>(
+  d: Descriptor,
+): d is QueryDescriptor<R> {
+  return (d as QueryDescriptor<R>).newQuery !== undefined;
 }
 
-export type EntityQueryFactoryTuple = [...EntityQueryFactory[]];
-
-export type EntityQueryResultTuple<F> = F extends [infer Head, ...infer Tail]
-  ? [...UnwrapFactory<Head>, ...EntityQueryResultTuple<Tail>]
+export type QueryTuple<F> = F extends [infer Head, ...infer Tail]
+  ? [...UnwrapQueryDescriptor<Head>, ...QueryTuple<Tail>]
   : [];
-type UnwrapFactory<T> = T extends EntityQueryFactory<infer Result>
+type UnwrapQueryDescriptor<T> = T extends QueryDescriptor<infer Result>
   ? [Result]
   : [T];
 
-export type WorldQuery<Result = unknown> = {
+export type SystemParameter<Result = unknown> = {
   fetch(): Result;
   cleanup?(): void;
 };
 
-export type WorldQueryFactory<Result = unknown> = {
-  create(world: World): WorldQuery<Result>;
+export type SystemParamDescriptor<Result = unknown> = Inspectable & {
+  create(world: World): SystemParameter<Result>;
 };
-
-export type WorldQueryFactoryTuple = [...WorldQueryFactory[]];
-
-export type WorldQueryTuple<F> = F extends [infer Head, ...infer Tail]
-  ? [...UnwrapWorldQueryFactory<Head>, ...WorldQueryTuple<Tail>]
-  : [];
-type UnwrapWorldQueryFactory<F> = F extends WorldQueryFactory<infer T>
-  ? [T]
-  : [];
 
 export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
 
-export type OneOrMoreFilters = [EntityFilterFactory, ...EntityFilterFactory[]];
+export type OneOrMoreFilters = [FilterDescriptor, ...FilterDescriptor[]];

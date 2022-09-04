@@ -2,7 +2,7 @@ import { all } from "@/app/utils/collections";
 
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
-  AddedOrChanged,
+  Fresh,
   HasAny,
   ChildrenQuery,
   DiffMut,
@@ -20,7 +20,7 @@ import { Unlocked, UnlockOnEffect } from "./types";
 
 const MarkUnlockedFromEffects = System(
   MapQuery(Value(BooleanEffect), Value(BooleanValue)).filter(
-    AddedOrChanged(BooleanValue),
+    Fresh(BooleanValue),
   ),
   MapQuery(Value(UnlockOnEffect), DiffMut(Unlocked)),
 )((effects, unlockedLookup) => {

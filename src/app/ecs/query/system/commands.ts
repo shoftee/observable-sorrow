@@ -1,8 +1,8 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { EcsComponent, EcsEntity, World } from "@/app/ecs";
+import { EcsComponent, EcsEntity, World, inspectable } from "@/app/ecs";
 
-import { WorldQueryFactory } from "../types";
+import { SystemParamDescriptor } from "../types";
 
 export type WorldCmds = {
   with(entity: EcsEntity): EntityCmds;
@@ -68,11 +68,14 @@ class EntityCommandsImpl {
   }
 }
 
-type CommandsFactory = WorldQueryFactory<WorldCmds>;
+type CommandsFactory = SystemParamDescriptor<WorldCmds>;
 
 /** Used to spawn entities and populate them with components. */
 export function Commands(): CommandsFactory {
   return {
+    inspect() {
+      return inspectable(Commands);
+    },
     create(world: World) {
       const commands: WorldCmds = {
         with(entity) {

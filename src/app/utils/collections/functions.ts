@@ -74,22 +74,14 @@ export function count<T>(
   return count;
 }
 
+type GetOrAddMap<K, V> = {
+  get(key: K): V | undefined;
+  set(key: K, value: V): void;
+};
+
 /** Retrieves the value for key from map, or calls factory to create a value for it if it is not present. */
 export function getOrAdd<K, V>(
-  map: Map<K, V>,
-  key: K,
-  factory: (key: K) => V,
-): V {
-  let existing = map.get(key);
-  if (existing === undefined) {
-    existing = factory(key);
-    map.set(key, existing);
-  }
-  return existing;
-}
-
-export function getOrAddWeak<K extends object, V>(
-  map: WeakMap<K, V>,
+  map: GetOrAddMap<K, V>,
   key: K,
   factory: (key: K) => V,
 ): V {
@@ -103,7 +95,7 @@ export function getOrAddWeak<K extends object, V>(
 
 /** Returns whether first contains all elements from second. */
 export function containsAll<T>(
-  first: ReadonlySet<T>,
+  first: { has(item: T): boolean },
   second: Iterable<T>,
 ): boolean {
   for (const item of second) {

@@ -1,45 +1,72 @@
 import { EcsEntity, Archetype } from "../types";
-import { EntityQueryFactory, EntityQuery } from "../query/types";
+import {
+  Descriptor,
+  isQueryDescriptor,
+  QueryDescriptor,
+  WorldQuery,
+} from "../query/types";
 import { World } from "../world";
 
 import { ComponentState } from "./components";
+import { getOrAdd, MultiMap } from "@/app/utils/collections";
 
-type Result<T = unknown> = T extends EntityQueryFactory<infer R> ? R : never;
+type Result<T = unknown> = T extends QueryDescriptor<infer R> ? R : never;
 
 export class QueryState {
-  private readonly fetches = new Map<EntityQueryFactory, FetchState>();
+  private readonly fetches = new Map<Descriptor, FetchState>();
+  private readonly topology = new MultiMap<Descriptor, Descriptor>();
   private readonly components: ComponentState;
-  private generation = 0;
+
+  private epoch = 0;
 
   constructor(private readonly world: World) {
     this.components = world.components;
   }
 
   notifyChanged(...entities: EcsEntity[]) {
-    const newGeneration = ++this.generation;
-    for (const entity of entities) {
-      const row = this.components.archetype(entity);
-      for (const [, fetch] of this.fetches) {
-        fetch.notify(newGeneration, entity, row);
-      }
-    }
-  }
-
-  register(descriptor: EntityQueryFactory) {
-    const fetches = this.fetches;
-    if (fetches.has(descriptor)) {
-      // query descriptors can be reused
+    if (entities.length === 0) {
       return;
     }
 
-    const fetch = new FetchState(descriptor.newQuery(this.world));
-    fetches.set(descriptor, fetch);
-    for (const [entity, row] of this.components.archetypes()) {
-      fetch.notify(this.generation, entity, row);
+    const newEpoch = ++this.epoch;
+    for (const [descriptor] of this.topology) {
+      this.notifyChangedRecursive(newEpoch, entities, descriptor);
     }
   }
 
-  get<Q extends EntityQueryFactory>(descriptor: Q): FetchCache<Result<Q>> {
+  private notifyChangedRecursive(
+    epoch: number,
+    entities: EcsEntity[],
+    descriptor: Descriptor,
+  ) {
+    for (const dependency of this.topology.entriesForKey(descriptor)) {
+      this.notifyChangedRecursive(epoch, entities, dependency);
+    }
+
+    const fetch = this.fetches.get(descriptor)!;
+    fetch.notify(epoch, entities);
+  }
+
+  register(descriptor: Descriptor) {
+    const deps = Array.from(descriptor.dependencies?.() ?? []);
+    for (const dep of deps) {
+      this.register(dep);
+    }
+    const fetch = getOrAdd(this.fetches, descriptor, (key) => {
+      if (deps.length > 0) {
+        this.topology.addAll(descriptor, deps);
+      }
+      return new FetchState(
+        key,
+        (entity) => this.components.archetype(entity),
+        isQueryDescriptor(key) ? key.newQuery(this.world) : undefined,
+      );
+    });
+
+    fetch.notify(this.epoch, this.components.entities());
+  }
+
+  get<Q extends QueryDescriptor>(descriptor: Q): FetchCache<Result<Q>> {
     const fetch = this.fetches.get(descriptor);
     if (fetch === undefined) {
       throw new Error("Query is not registered.");
@@ -47,11 +74,6 @@ export class QueryState {
     return fetch as FetchCache<Result<Q>>;
   }
 }
-
-type FetchCacheEntry = {
-  archetype: Archetype;
-  generation: number;
-};
 
 export interface FetchCache<F> {
   entries(): IterableIterator<[EcsEntity, F]>;
@@ -61,61 +83,72 @@ export interface FetchCache<F> {
   cleanup(): void;
 }
 
-class FetchState<F = unknown> {
-  private readonly _entries = new Map<EcsEntity, FetchCacheEntry>();
+class FetchState<Result = unknown> {
+  private readonly entities = new Set<EcsEntity>();
 
-  constructor(private readonly query: EntityQuery<F>) {}
+  private epoch?: number;
 
-  notify(generation: number, entity: EcsEntity, archetype: Archetype) {
-    if (archetype.size === 0 || !this.query.includes({ entity, archetype })) {
-      this._entries.delete(entity);
-    } else {
-      const result = this._entries.get(entity);
-      if (result !== undefined) {
-        if (result.generation !== generation) {
-          result.archetype = archetype;
-          result.generation = generation;
-        }
+  constructor(
+    private readonly descriptor: Descriptor,
+    private readonly getArchetype: (entity: EcsEntity) => Archetype,
+    private readonly query?: WorldQuery<Result>,
+  ) {}
+
+  notify(epoch: number, entities: Iterable<EcsEntity>) {
+    if (this.epoch == epoch) {
+      return;
+    }
+
+    for (const entity of entities) {
+      const archetype = this.getArchetype(entity);
+      if (
+        archetype.size === 0 ||
+        !(this.descriptor.includes?.(archetype) ?? true)
+      ) {
+        this.entities.delete(entity);
       } else {
-        this._entries.set(entity, { archetype, generation });
+        this.entities.add(entity);
+      }
+    }
+
+    this.epoch = epoch;
+  }
+
+  *entries(): IterableIterator<[EcsEntity, Result]> {
+    for (const entity of this.entities) {
+      const ctx = { entity, archetype: this.getArchetype(entity) };
+      if (this.query!.matches?.(ctx) ?? true) {
+        yield [entity, this.query!.fetch(ctx)];
       }
     }
   }
 
-  *entries(): IterableIterator<[EcsEntity, F]> {
-    for (const [entity, { archetype }] of this._entries) {
-      const ctx = { entity, archetype };
-      if (this.query.matches(ctx)) {
-        yield [entity, this.query.fetch(ctx)];
-      }
-    }
-  }
-
-  *values(): IterableIterator<F> {
+  *values(): IterableIterator<Result> {
     for (const [, value] of this.entries()) {
       yield value;
     }
   }
 
-  get(entity: EcsEntity): F | undefined {
-    const entry = this._entries.get(entity);
-    if (entry) {
-      const ctx = { entity, archetype: entry.archetype };
-      if (this.query.matches(ctx)) {
-        return this.query.fetch(ctx);
+  get(entity: EcsEntity): Result | undefined {
+    if (this.entities.has(entity)) {
+      const ctx = { entity, archetype: this.getArchetype(entity) };
+      if (this.query!.matches?.(ctx) ?? true) {
+        return this.query!.fetch(ctx);
       }
     }
     return undefined;
   }
 
   has(entity: EcsEntity): boolean {
-    const entry = this._entries.get(entity);
-    return (
-      !!entry && this.query.matches({ entity, archetype: entry.archetype })
-    );
+    if (this.entities.has(entity)) {
+      const ctx = { entity, archetype: this.getArchetype(entity) };
+      return this.query!.matches?.(ctx) ?? true;
+    } else {
+      return false;
+    }
   }
 
   cleanup() {
-    this.query.cleanup();
+    this.query!.cleanup?.();
   }
 }

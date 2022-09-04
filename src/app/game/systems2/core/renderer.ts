@@ -1,12 +1,14 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-import { EcsComponent, EcsResource, World } from "@/app/ecs";
-import { Tuple, ChangeTrackers, Query, Res } from "@/app/ecs/query";
 import {
-  EntityQuery,
-  EntityQueryFactoryTuple,
-  EntityQueryResultTuple,
-} from "@/app/ecs/query/types";
+  Archetype,
+  EcsComponent,
+  EcsResource,
+  inspectable,
+  World,
+} from "@/app/ecs";
+import { Tuple, ChangeTrackers, Query, Res } from "@/app/ecs/query";
+import { QueryDescriptor, QueryTuple, WorldQuery } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
 import {
@@ -52,31 +54,38 @@ export class DeltaBuffer extends EcsResource {
   readonly components: ComponentDeltas = new ComponentDeltas();
 }
 
-type SchemaStateExtractor<S, Q extends EntityQueryFactoryTuple> = (
+type SchemaStateExtractor<S, Q extends [...QueryDescriptor[]]> = (
   schema: StateSchema,
-  results: EntityQueryResultTuple<Q>,
+  results: QueryTuple<Q>,
 ) => S;
 
 type StateExtractor<S> = (schema: StateSchema) => S;
 
-function SchemaExtractorQuery<Q extends EntityQueryFactoryTuple>(...qs: Q) {
+function SchemaExtractorQuery<Q extends [...QueryDescriptor[]]>(...qs: Q) {
   return <S>(extractor: SchemaStateExtractor<S, Q>) => {
     const descriptor = Tuple(...qs);
     return {
-      newQuery(world: World): EntityQuery<StateExtractor<S>> {
+      inspect() {
+        return inspectable(SchemaExtractorQuery, [descriptor]);
+      },
+      includes(archetype: Archetype) {
+        // pass filters through
+        return descriptor.includes(archetype);
+      },
+      *dependencies() {
+        yield descriptor;
+      },
+      newQuery(world: World): WorldQuery<StateExtractor<S>> {
         const query = descriptor.newQuery(world);
         return {
-          includes(ctx) {
-            return query.includes(ctx);
-          },
           matches(ctx) {
-            return query.matches(ctx);
+            return query.matches?.(ctx) ?? true;
+          },
+          cleanup() {
+            query.cleanup?.();
           },
           fetch(ctx) {
             return (schema) => extractor(schema, query.fetch(ctx));
-          },
-          cleanup() {
-            query.cleanup();
           },
         };
       },
@@ -88,7 +97,7 @@ const R_DeltaBuffer = Res(DeltaBuffer);
 
 type MutatorFn<S, C extends EcsComponent> = (state: S, tracked: C) => void;
 
-export function DeltaExtractor<Q extends EntityQueryFactoryTuple>(
+export function DeltaExtractor<Q extends [...QueryDescriptor[]]>(
   ...stateQuery: Q
 ) {
   return <S>(schemaExtractor: SchemaStateExtractor<S, Q>) => {

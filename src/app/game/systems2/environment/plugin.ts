@@ -10,7 +10,7 @@ import {
   Has,
   DiffMut,
   Value,
-  AddedOrChanged,
+  Fresh,
   Single,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
@@ -72,7 +72,7 @@ const AdvanceCalendar = PerTickSystem(
 });
 
 const UpdateSeasonEffect = System(
-  Query(Value(E.Season)).filter(AddedOrChanged(E.Season)),
+  Query(Value(E.Season)).filter(Fresh(E.Season)),
   Single(DiffMut(NumberValue)).filter(Has(SeasonEffect)),
 )((seasonQuery, [effect]) => {
   for (const [season] of take(seasonQuery, 1)) {
@@ -81,7 +81,7 @@ const UpdateSeasonEffect = System(
 });
 
 const HandleWeatherChanged = System(
-  Query(Value(E.Weather), DiffMut(E.Labels)).filter(AddedOrChanged(E.Weather)),
+  Query(Value(E.Weather), DiffMut(E.Labels)).filter(Fresh(E.Weather)),
   Single(DiffMut(NumberValue)).filter(Has(WeatherEffect)),
 )((weatherQuery, [effect]) => {
   for (const [weather, labels] of take(weatherQuery, 1)) {

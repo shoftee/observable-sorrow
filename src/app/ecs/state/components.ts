@@ -65,4 +65,10 @@ export class ComponentState {
   *archetypes(): Iterable<[EcsEntity, Archetype]> {
     yield* this.components.rows();
   }
+
+  *entities(): Iterable<EcsEntity> {
+    for (const [entity] of this.components.rows()) {
+      yield entity;
+    }
+  }
 }

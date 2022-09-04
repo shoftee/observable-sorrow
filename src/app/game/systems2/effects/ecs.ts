@@ -5,8 +5,8 @@ import { cache } from "@/app/utils/cache";
 
 import { NumberEffectId } from "@/app/interfaces";
 
-import { EcsEntity } from "@/app/ecs";
-import { EntityQueryFactory, WorldQueryFactory } from "@/app/ecs/query/types";
+import { EcsEntity, inspectable } from "@/app/ecs";
+import { QueryDescriptor, SystemParamDescriptor } from "@/app/ecs/query/types";
 import {
   ChangeTrackers,
   Entity,
@@ -32,12 +32,15 @@ type EffectEntityFetcher = {
 };
 
 export function DependentEffectsQuery(
-  idsQuery: EntityQueryFactory<NumberEffectId>,
-): WorldQueryFactory<EffectEntityFetcher> {
+  selector: QueryDescriptor<NumberEffectId>,
+): SystemParamDescriptor<EffectEntityFetcher> {
   return {
+    inspect() {
+      return inspectable(DependentEffectsQuery, [selector]);
+    },
     create(world) {
-      world.queries.register(idsQuery);
-      const idsFetcher = world.queries.get(idsQuery);
+      world.queries.register(selector);
+      const idsFetcher = world.queries.get(selector);
 
       const idsLookupQuery = EntityByIdQuery.create(world);
       const idsLookupCache = cache(() => idsLookupQuery.fetch());

@@ -26,8 +26,8 @@ export abstract class EcsEvent {
 
 export type EcsStageType = "startup" | "first" | "main" | "last";
 export type EcsStage =
-  | EcsStageType
   | `${EcsStageType}-start`
+  | EcsStageType
   | `${EcsStageType}-end`;
 
 export type Archetype<C extends EcsComponent = EcsComponent> = ReadonlyMap<
@@ -80,5 +80,40 @@ export class WorldTicks {
 
   updateLast() {
     this._last = this.advance();
+  }
+}
+
+interface Named {
+  name: string;
+}
+
+export interface Inspectable {
+  inspect(): EcsMetadata;
+}
+
+export interface EcsMetadata extends Named {
+  children?: Iterable<Inspectable>;
+}
+
+export function inspectable(
+  root: Named,
+  children?: Iterable<Inspectable>,
+): EcsMetadata {
+  if (children) {
+    return { name: root.name, children };
+  } else {
+    return { name: root.name };
+  }
+}
+
+export function* inspectableNames(
+  children: Iterable<Named>,
+): Iterable<Inspectable> {
+  for (const child of children) {
+    yield {
+      inspect() {
+        return { name: child.name };
+      },
+    };
   }
 }
