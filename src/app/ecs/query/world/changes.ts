@@ -1,4 +1,4 @@
-import { getOrAdd } from "@/app/utils/collections";
+import { memoizer } from "@/app/utils/collections/memo";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import {
@@ -18,23 +18,24 @@ type Tracker<C extends EcsComponent> = {
 };
 type ChangeTrackers<C extends EcsComponent> = QueryDescriptor<Tracker<C>>;
 type Added = FilterDescriptor;
-type Fresh = FilterDescriptor;
 type Changed = FilterDescriptor;
+type Fresh = FilterDescriptor;
 type Removed = FilterDescriptor;
 
-const TrackerDescriptors = new WeakMap<Ctor, ChangeTrackers<EcsComponent>>();
-const AddedDescriptors = new WeakMap<Ctor, Added>();
-const FreshDescriptors = new WeakMap<Ctor, Fresh>();
-const ChangedDescriptors = new WeakMap<Ctor, Changed>();
-const RemovedDescriptors = new WeakMap<Ctor, Removed>();
+const ChangeTrackersMemo = memoizer<
+  Ctor<EcsComponent>,
+  ChangeTrackers<EcsComponent>
+>();
+const AddedMemo = memoizer<Ctor<EcsComponent>, Added>();
+const ChangedMemo = memoizer<Ctor<EcsComponent>, Changed>();
+const FreshMemo = memoizer<Ctor<EcsComponent>, Fresh>();
+const RemovedMemo = memoizer<Ctor<EcsComponent>, Removed>();
 
 export function ChangeTrackers<C extends EcsComponent>(
   ctor: Ctor<C>,
 ): ChangeTrackers<C> {
-  const cache = TrackerDescriptors as WeakMap<Ctor<C>, ChangeTrackers<C>>;
-  return getOrAdd(cache, ctor, newChangeTrackers);
+  return ChangeTrackersMemo.get(ctor, newChangeTrackers) as ChangeTrackers<C>;
 }
-
 function newChangeTrackers<C extends EcsComponent>(
   ctor: Ctor<C>,
 ): ChangeTrackers<C> {
@@ -71,7 +72,7 @@ function newChangeTrackers<C extends EcsComponent>(
 }
 
 export function Added<C extends EcsComponent>(ctor: Ctor<C>): Added {
-  return getOrAdd(AddedDescriptors, ctor, newAdded);
+  return AddedMemo.get(ctor, newAdded);
 }
 
 function newAdded<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
@@ -94,7 +95,7 @@ function newAdded<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
 }
 
 export function Changed<C extends EcsComponent>(ctor: Ctor<C>): Changed {
-  return getOrAdd(ChangedDescriptors, ctor, newChanged);
+  return ChangedMemo.get(ctor, newChanged);
 }
 function newChanged<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
   return {
@@ -116,7 +117,7 @@ function newChanged<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
 }
 
 export function Fresh<C extends EcsComponent>(ctor: Ctor<C>): Fresh {
-  return getOrAdd(FreshDescriptors, ctor, newFresh);
+  return FreshMemo.get(ctor, newFresh);
 }
 
 function newFresh<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
@@ -142,7 +143,7 @@ function newFresh<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
 }
 
 export function Removed<C extends EcsComponent>(ctor: Ctor<C>): Removed {
-  return getOrAdd(RemovedDescriptors, ctor, newRemoved);
+  return RemovedMemo.get(ctor, newRemoved);
 }
 function newRemoved<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
   return {

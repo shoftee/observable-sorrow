@@ -1,4 +1,4 @@
-import { getOrAdd } from "@/app/utils/collections";
+import { memoizer } from "@/app/utils/collections/memo";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import {
@@ -10,23 +10,18 @@ import {
 
 import { QueryDescriptor } from "../types";
 
-type Value<C extends EcsComponent> = C extends ValueComponent<infer T>
+type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
+type ExtractValue<C extends EcsComponent> = C extends ValueComponent<infer T>
   ? Readonly<T>
   : never;
+type Value<C extends ValueComponent> = QueryDescriptor<ExtractValue<C>>;
 
-const ReadDescriptors = new WeakMap<Ctor<EcsComponent>, Read<EcsComponent>>();
-const ValueDescriptors = new WeakMap<
-  Ctor<EcsComponent>,
-  QueryDescriptor<Value<EcsComponent>>
->();
-
-type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
-type ValueDescriptor<C extends EcsComponent> = QueryDescriptor<Value<C>>;
+const ReadMemo = memoizer<Ctor<EcsComponent>, Read<EcsComponent>>();
+const ValueMemo = memoizer<Ctor<ValueComponent>, Value<ValueComponent>>();
 
 /** Include a read-only view of a component in the query results. */
 export function Read<C extends EcsComponent>(ctor: Ctor<C>) {
-  const cache = ReadDescriptors as Map<Ctor<C>, Read<C>>;
-  return getOrAdd(cache, ctor, newRead);
+  return ReadMemo.get(ctor, newRead) as Read<C>;
 }
 function newRead<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
   return {
@@ -47,13 +42,10 @@ function newRead<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
 }
 
 /** Include a single-valued component in the query results. */
-export function Value<C extends ValueComponent>(
-  ctor: Ctor<C>,
-): ValueDescriptor<C> {
-  const cache = ValueDescriptors as WeakMap<Ctor<C>, ValueDescriptor<C>>;
-  return getOrAdd(cache, ctor, newValue);
+export function Value<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
+  return ValueMemo.get(ctor, newValue) as Value<C>;
 }
-function newValue<C extends ValueComponent>(ctor: Ctor<C>): ValueDescriptor<C> {
+function newValue<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
   return {
     inspect() {
       return inspectable(Value, inspectableNames([ctor]));
@@ -65,7 +57,7 @@ function newValue<C extends ValueComponent>(ctor: Ctor<C>): ValueDescriptor<C> {
       return {
         fetch({ archetype }) {
           const entry = archetype.get(ctor)! as C;
-          return entry.value as Value<C>;
+          return entry.value as ExtractValue<C>;
         },
       };
     },

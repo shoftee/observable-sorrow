@@ -1,4 +1,4 @@
-import { getOrAdd } from "@/app/utils/collections";
+import { memoizer } from "@/app/utils/collections/memo";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import {
@@ -11,13 +11,12 @@ import {
 import { WorldQuery, QueryDescriptor } from "../types";
 
 type Mut<C extends EcsComponent> = QueryDescriptor<C>;
-const MutDescriptors = new WeakMap<Ctor<EcsComponent>, Mut<EcsComponent>>();
-const DiffMutDescriptors = new WeakMap<Ctor<EcsComponent>, Mut<EcsComponent>>();
+const MutMemo = memoizer<Ctor<EcsComponent>, Mut<EcsComponent>>();
+const DiffMutMemo = memoizer<Ctor<EcsComponent>, Mut<EcsComponent>>();
 
 /** Include a mutable view of a component in the query results. */
 export function Mut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
-  const cache = MutDescriptors as WeakMap<Ctor<C>, QueryDescriptor<C>>;
-  return getOrAdd(cache, ctor, newMut);
+  return MutMemo.get(ctor, newMut) as Mut<C>;
 }
 function newMut<C extends EcsComponent>(ctor: Ctor<C>): QueryDescriptor<C> {
   return {
@@ -49,8 +48,7 @@ function newMut<C extends EcsComponent>(ctor: Ctor<C>): QueryDescriptor<C> {
 
 /** Like Mut, but only sets new value if it's strictly different from old value. */
 export function DiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
-  const cache = DiffMutDescriptors as WeakMap<Ctor<C>, Mut<C>>;
-  return getOrAdd(cache, ctor, newDiffMut);
+  return DiffMutMemo.get(ctor, newDiffMut) as Mut<C>;
 }
 function newDiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
   return {
