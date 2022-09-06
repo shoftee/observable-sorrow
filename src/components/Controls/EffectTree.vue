@@ -20,9 +20,9 @@ const nonZeroNodes = computed(() =>
 <template>
   <ul class="effects-list">
     <li v-for="node in nonZeroNodes" :key="node.id">
-      <span class="label" v-if="node.label">{{  t(node.label)  }}</span>
-      <span class="amount number">{{  fmt.v(node.value!)  }}</span>
+      <span class="label" v-if="node.label">{{ t(node.label) }}</span>
+      <span class="amount number">{{ fmt.v(node.value!) }}</span>
       <EffectTree v-if="node.nodes.length > 0" :nodes="node.nodes" />
     </li>
   </ul>
-</template>
+</template> 

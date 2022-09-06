@@ -20,12 +20,12 @@ const items = filterArrayView(all, r => r.unlocked);
   <div class="resources-container">
     <div class="card">
       <div v-if="items.length === 0" class="no-resources">
-        {{  t("resources.section.empty")  }}
+        {{ t("resources.section.empty") }}
       </div>
       <div v-else class="base-resources">
         <button class="btn shadow-none" @click="show = !show">
           <div class="clearfix">
-            <span class="float-start">{{  t("resources.section.label")  }}</span>
+            <span class="float-start">{{ t("resources.section.label") }}</span>
             <span class="float-end">
               <i v-if="!show" class="bi bi-arrows-expand"></i>
             </span>

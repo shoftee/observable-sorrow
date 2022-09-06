@@ -26,8 +26,8 @@ async function dispatch(intent: Intent): Promise<void> {
     <div>
       <button type="button" class="btn btn-outline-secondary w-100" :class="{ capped: item.fulfillment.capped }"
         :disabled="!item.fulfillment.fulfilled" @click="dispatch(item.intent)">
-        {{  t(item.label)  }}
-        <span v-if="level > 0" class="number-annotation border">{{  level  }}</span>
+        {{ t(item.label) }}
+        <span v-if="level > 0" class="number-annotation border">{{ level }}</span>
       </button>
     </div>
     <template #content>

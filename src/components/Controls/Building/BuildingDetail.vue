@@ -27,12 +27,13 @@ const title = computed(() => {
 <template>
   <div>
     <div class="card-header">
-      <p class="description">{{  t(item.description)  }}</p>
-      <p class="flavor" v-if="item.flavor">{{  t(item.flavor)  }}</p>
+      <p class="description">{{ t(item.description) }}</p>
+      <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
     </div>
     <IngredientList v-if="ingredients.length > 0" :items="ingredients" />
     <EffectList v-if="effects.length > 0" :items="effects">
-      <template #title>{{  t(title)  }}</template>
+      <template #title>{{ t(title) }}</template>
     </EffectList>
   </div>
 </template>
+ 

@@ -17,7 +17,7 @@ async function research(id: TechId): Promise<void> {
   await send({ kind: "research", id: "research-tech", tech: id });
 }
 </script>
-
+ 
 <template>
   <tippy>
     <!-- We need a container div because tippy listens to hover events to trigger and buttons don't fire events when disabled.-->
@@ -25,7 +25,7 @@ async function research(id: TechId): Promise<void> {
       <button type="button" class="btn btn-outline-secondary w-100" :class="{ capped: tech.fulfillment.capped }"
         :disabled="!tech.fulfillment.fulfilled || tech.researched" @click="research(tech.id)">
         <span v-if="tech.researched" class="bi bi-check"></span>
-        {{  t(tech.label)  }}
+        {{ t(tech.label) }}
       </button>
     </div>
     <template #content>

@@ -13,4 +13,4 @@ const { items } = defineProps<{ items: IngredientItemView[] }>();
     </ul>
   </div>
 </template>
- 
+  

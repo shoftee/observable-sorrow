@@ -31,6 +31,6 @@ async function dispatch() {
 </script>
 <template>
   <button type="button" :class="{ active: time.paused }" @click="dispatch">
-    {{  t(label)  }}
+    {{ t(label) }}
   </button>
 </template>

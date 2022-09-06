@@ -35,8 +35,8 @@ function onTabClick(id: SectionId) {
         disabled: items.length < 2,
       }" @click="onTabClick(section.id)">
         <slot>
-          {{  t(section.title)  }}
-          <span v-if="section.alert" class="number-annotation bg-danger">{{  section.alert  }}</span>
+          {{ t(section.title) }}
+          <span v-if="section.alert" class="number-annotation bg-danger">{{ section.alert }}</span>
         </slot>
       </button>
     </li>

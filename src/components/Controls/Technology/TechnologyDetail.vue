@@ -12,13 +12,13 @@ const { t } = useI18n();
 <template>
   <div>
     <div class="card-header">
-      <p class="description">{{  t(item.description)  }}</p>
-      <p class="flavor" v-if="item.flavor">{{  t(item.flavor)  }}</p>
+      <p class="description">{{ t(item.description) }}</p>
+      <p class="flavor" v-if="item.flavor">{{ t(item.flavor) }}</p>
     </div>
     <IngredientList class="border-bottom" v-if="!item.researched" :items="item.fulfillment.ingredients" />
     <ul class="effects-list">
       <li v-for="effect in item.effects" :key="effect.id">
-        <span>{{  t(effect.label)  }}</span>
+        <span>{{ t(effect.label) }}</span>
       </li>
     </ul>
   </div>

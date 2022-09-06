@@ -16,18 +16,18 @@ const fmt = useFormatter();
 <template>
   <div class="item-container">
     <div class="name col-3">
-      <span>{{  t(item.label)  }}</span>
+      <span>{{ t(item.label) }}</span>
       <template v-if="item.modifier">
         <span v-if="item.modifier.value" class="resource-modifier number-annotation" :class="{
           'bg-success': item.modifier.value > 0,
           'bg-danger': item.modifier.value < 0,
-        }">{{  fmt.v(item.modifier)  }}</span>
+        }">{{ fmt.v(item.modifier) }}</span>
       </template>
     </div>
-    <div class="col-3 number amount">{{  fmt.number(item.amount, "negative")  }}</div>
+    <div class="col-3 number amount">{{ fmt.number(item.amount, "negative") }}</div>
     <template v-if="item.limit">
       <div class="col-3 number capacity">
-        <span>/{{  fmt.v(item.limit)  }}</span>
+        <span>/{{ fmt.v(item.limit) }}</span>
       </div>
     </template>
     <template v-else>
@@ -37,7 +37,7 @@ const fmt = useFormatter();
       <template v-if="item.deltaTree">
         <tippy class="col-3">
           <div class="number change" :class="{ 'text-danger': item.change.value < 0 }">
-            {{  fmt.v(item.change)  }}
+            {{ fmt.v(item.change) }}
           </div>
           <template #content>
             <div class="effect-tree">
@@ -48,7 +48,7 @@ const fmt = useFormatter();
       </template>
       <template v-else>
         <div class="col-3 number change" :class="{ 'text-danger': item.change.value < 0 }">
-          {{  fmt.v(item.change)  }}
+          {{ fmt.v(item.change) }}
         </div>
       </template>
     </template>

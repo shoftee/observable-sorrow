@@ -45,7 +45,7 @@ const { happiness } = society;
       <tippy>
         <div class="d-flex align-items-baseline">
           <span class="bi" :class="{ [icon]: true }"></span>
-          <span class="ms-2 number">{{  fmt.v(happiness.view)  }}</span>
+          <span class="ms-2 number">{{ fmt.v(happiness.view) }}</span>
         </div>
         <template #content>
           <div class="effect-tree">
@@ -56,3 +56,4 @@ const { happiness } = society;
     </div>
   </div>
 </template>
+ 

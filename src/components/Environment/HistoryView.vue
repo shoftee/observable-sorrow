@@ -25,7 +25,7 @@ const requireNewEpoch = ref(true);
 watch(
   () => calendar.season,
   () => { requireNewEpoch.value = true; },
-);
+); 
 
 function clearLog() {
   epochs.length = 0;
@@ -60,11 +60,11 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
 <template>
   <section unscrollable class="history-container">
     <div class="game-controls-container">
-      <div>{{  t("game.blurb")  }}</div>
+      <div>{{ t("game.blurb") }}</div>
       <div class="btn-group">
         <ObserveSkyButton class="btn btn-outline-secondary" />
         <button type="button" class="btn btn-outline-secondary" @click="clearLog">
-          {{  t("game.control.clear-log")  }}
+          {{ t("game.control.clear-log") }}
         </button>
         <PawseButton class="btn btn-outline-secondary" />
       </div>
@@ -75,14 +75,14 @@ useLogItemEvent((e: CustomEvent<LogItem>): void => {
         <div class="border-bottom">
           <i18n-t scope="global" :keypath="calendar.epochLabel">
             <template #year>
-              <span class="number">{{  fmt.number(epoch.year)  }}</span>
+              <span class="number">{{ fmt.number(epoch.year) }}</span>
             </template>
-            <template #season>{{  t(epoch.seasonLabel)  }}</template>
+            <template #season>{{ t(epoch.seasonLabel) }}</template>
           </i18n-t>
         </div>
         <div class="log-event" v-for="event in epoch.events" :key="event.id"
           :ref="el => { if (el) event.ref = el as Element }">
-          {{  event.text  }}
+          {{ event.text }}
         </div>
       </div>
     </div>
