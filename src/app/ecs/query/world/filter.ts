@@ -1,14 +1,36 @@
 import { all, any } from "@/app/utils/collections";
+import { memoizer } from "@/app/utils/collections/memo";
+import { Constructor as Ctor } from "@/app/utils/types";
 
-import { inspectableNames, inspectable } from "../../types";
+import { inspectableNames, inspectable, EcsComponent } from "../../types";
 
 import { FilterDescriptor, OneOrMoreCtors } from "../types";
 
 type Has = FilterDescriptor;
-export function Has(...ctors: OneOrMoreCtors): Has {
+const HasMemo = memoizer<Ctor, Has>();
+
+export function Has(ctor: Ctor<EcsComponent>): Has {
+  return HasMemo.get(ctor, newHas) as Has;
+}
+function newHas(ctor: Ctor): FilterDescriptor {
   return {
     inspect() {
-      return inspectable(Has, inspectableNames(ctors));
+      return inspectable(Has, inspectableNames([ctor]));
+    },
+    includes(archetype) {
+      return archetype.has(ctor);
+    },
+    newFilter() {
+      return {};
+    },
+  };
+}
+
+type HasAll = FilterDescriptor;
+export function HasAll(...ctors: OneOrMoreCtors): HasAll {
+  return {
+    inspect() {
+      return inspectable(HasAll, inspectableNames(ctors));
     },
     includes(archetype) {
       return all(ctors, (ctor) => archetype.has(ctor));

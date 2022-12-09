@@ -5,6 +5,7 @@ import {
   ChangeTrackers,
   DiffMut,
   Has,
+  HasAll,
   Mut,
   Opt,
   Query,
@@ -101,7 +102,7 @@ function calculateAmount(
 
 const UnlockByQuantity = System(
   Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(
-    Has(Resource, R.UnlockOnFirstQuantity),
+    HasAll(Resource, R.UnlockOnFirstQuantity),
   ),
 )((amounts) => {
   for (const [trackers, unlocked] of amounts) {
@@ -117,7 +118,7 @@ const UnlockByQuantity = System(
 
 const UnlockByCapacity = System(
   Query(ChangeTrackers(R.Limit), Mut(Unlocked)).filter(
-    Has(Resource, R.UnlockOnFirstCapacity),
+    HasAll(Resource, R.UnlockOnFirstQuantity),
   ),
 )((limits) => {
   for (const [trackers, unlock] of limits) {

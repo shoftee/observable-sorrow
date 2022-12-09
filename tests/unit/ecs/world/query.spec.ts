@@ -177,7 +177,7 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const bothQuery = Tuple(Read(Player)).filter(Has(Id, Name));
+        const bothQuery = Tuple(Read(Player)).filter(Has(Id), Has(Name));
         world.queries.register(bothQuery);
         const bothEntries = Array.from(results(world, bothQuery));
 
