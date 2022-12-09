@@ -27,8 +27,17 @@ type OrderHandlers = Partial<{
 }>;
 
 type ResourceTupleMap = {
+  [Symbol.iterator](): IterableIterator<[ResourceId, ResourceTuple]>;
   get(id: ResourceId): ResourceTuple | undefined;
 };
+
+export function createLedger(resources: ResourceTupleMap) {
+  const ambient = new Ledger();
+  for (const [id, [, , entry]] of resources) {
+    ambient.add(id, entry);
+  }
+  return ambient;
+}
 
 export function applyOrder(
   order: Order,

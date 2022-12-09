@@ -3,7 +3,6 @@ import { any } from "@/app/utils/collections";
 
 import {
   BuildingMetadataType,
-  Ledger,
   Meta,
   ResourceMap,
   resourceQtyIterable,
@@ -26,7 +25,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { applyOrder, ResourceMapQuery } from "../core/orders";
+import { applyOrder, createLedger, ResourceMapQuery } from "../core/orders";
 import { Building, Level, PriceRatio, Resource } from "../types/common";
 import { Unlocked, UnlockOnEffect } from "../unlock/types";
 import { BuildingEffect, Effect, NumberValue } from "../effects/types";
@@ -81,31 +80,22 @@ const ProcessConstructBuildingOrders = System(
   ),
   ResourceMapQuery,
 )((orders, buildings, resources) => {
-  const ambientCache = cache(() => {
-    // Initialize the ambient deltas.
-    const ambient = new Ledger();
-    for (const [id, [, , entry]] of resources) {
-      ambient.add(id, entry);
-    }
-    return ambient;
-  });
+  // Initialize the ambient ledger.
+  const ambientCache = cache(() => createLedger(resources));
 
-  for (const order of orders.pull()) {
+  for (const constructionOrder of orders.pull()) {
     const ambient = ambientCache.retrieve();
 
-    const [level, requirements] = buildings.get(order.building)!;
-    applyOrder(
-      {
-        credits: new ResourceMap(requirements),
+    const [level, requirements] = buildings.get(constructionOrder.building)!;
+    const order = {
+      credits: new ResourceMap(requirements),
+    };
+
+    applyOrder(order, ambient, resources, {
+      success() {
+        level.value++;
       },
-      ambient,
-      resources,
-      {
-        success() {
-          level.value++;
-        },
-      },
-    );
+    });
   }
 });
 
