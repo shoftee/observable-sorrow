@@ -1,4 +1,3 @@
-import { cache } from "@/app/utils/cache";
 import { any } from "@/app/utils/collections";
 
 import {
@@ -17,7 +16,6 @@ import {
   Has,
   MapQuery,
   Query,
-  Receive,
   Value,
   Commands,
   EntityMapQuery,
@@ -25,7 +23,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { applyOrder, createLedger, ResourceMapQuery } from "../core/orders";
+import { ResourceLedger } from "../core/orders";
 import { Building, Level, PriceRatio, Resource } from "../types/common";
 import { Unlocked, UnlockOnEffect } from "../unlock/types";
 import { BuildingEffect, Effect, NumberValue } from "../effects/types";
@@ -33,6 +31,7 @@ import * as events from "../types/events";
 import * as R from "../resource/types";
 
 import * as F from "./types";
+import { BufferedReceiverSystem } from "../types/ecs";
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new Building(meta.id);
@@ -72,31 +71,27 @@ export class BuildingSetupPlugin extends EcsPlugin {
   }
 }
 
-const ProcessConstructBuildingOrders = System(
-  Receive(events.ConstructBuildingOrder),
+const ProcessConstructBuildingOrders = BufferedReceiverSystem(
+  events.ConstructBuildingOrder,
+)(
   MapQuery(
     Value(Building),
     Tuple(DiffMut(Level), ChildrenQuery(Value(Resource), Value(F.Requirement))),
   ),
-  ResourceMapQuery,
-)((orders, buildings, resources) => {
-  // Initialize the ambient ledger.
-  const ambientCache = cache(() => createLedger(resources));
+  ResourceLedger(),
+)((event, buildings, ledger) => {
+  const [level, requirements] = buildings.get(event.building)!;
 
-  for (const constructionOrder of orders.pull()) {
-    const ambient = ambientCache.retrieve();
-
-    const [level, requirements] = buildings.get(constructionOrder.building)!;
-    const order = {
+  ledger.applyOrder(
+    {
       credits: new ResourceMap(requirements),
-    };
-
-    applyOrder(order, ambient, resources, {
+    },
+    {
       success() {
         level.value++;
       },
-    });
-  }
+    },
+  );
 });
 
 const HandleLevelChanged = System(

@@ -1,9 +1,11 @@
-export type Cached<T> = { retrieve(): T; invalidate(): void };
+interface Cached<T> {
+  /** Retrieves the cached value. If uninitialized, will call the factory function and cache the result. */
+  retrieve(): T;
+  /** Resets the cache to its uninitialized state. */
+  invalidate(): void;
+}
 
-/** Returns a caching wrapper of the provided factory function.
- *
- * Calling `retrieve` will call the provided factory function if the cached value is undefined.
- * Calling `invalidate` will reset the cached value to undefined. */
+/** Returns a caching wrapper of the provided factory function. */
 export function cache<T>(getter: () => T): Cached<T> {
   let cached: T | undefined;
   return {

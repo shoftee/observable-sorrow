@@ -14,7 +14,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { applyOrder, createLedger, ResourceMapQuery } from "../core/orders";
+import { ResourceLedger } from "../core/orders";
 
 import { NumberState } from "../effects/ecs";
 import { SectionPredicate } from "../section/ecs";
@@ -26,7 +26,7 @@ import { Unlocked } from "../unlock/types";
 
 import { HistoryEventOccurred, SkyObserved } from "../types/events";
 import { Prng } from "../types/common";
-import { ReceiverSystem } from "../types/ecs";
+import { ThrottledReceiverSystem } from "../types/ecs";
 
 import { RareEvent } from "./types";
 
@@ -40,16 +40,13 @@ const Setup = System(Commands())((cmds) => {
   cmds.spawn(new RareEvent(), new Countdown(), new Prng());
 });
 
-const ProcessSkyObserved = ReceiverSystem(SkyObserved, true)(
+const ProcessSkyObserved = ThrottledReceiverSystem(SkyObserved)(
   Single(DiffMut(Countdown)).filter(Has(RareEvent)),
   NumberState(),
-  ResourceMapQuery,
+  ResourceLedger(),
   Dispatch(HistoryEventOccurred),
-)((_, [countdown], numbers, resources, history) => {
+)((_, [countdown], numbers, ledger, history) => {
   countdown.remaining = 0;
-
-  // Initialize the ambient ledger.
-  const ambient = createLedger(resources);
 
   const order = {
     debits: ResourceMap.fromObject({
@@ -57,7 +54,7 @@ const ProcessSkyObserved = ReceiverSystem(SkyObserved, true)(
     }),
   };
 
-  applyOrder(order, ambient, resources, {
+  ledger.applyOrder(order, {
     success(rewards) {
       const scienceAmount = rewards.get("science") ?? 0;
       history.dispatch(

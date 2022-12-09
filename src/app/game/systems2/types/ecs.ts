@@ -17,7 +17,17 @@ type ReceiverSystemFn<
   F extends [...SystemParamDescriptor[]],
 > = (event: E, ...args: SystemParamTuple<F>) => void;
 
-export function ReceiverSystem<E extends EcsEvent>(
+/** Calls the runner as if the events appeared one at a time. */
+export function ThrottledReceiverSystem<E extends EcsEvent>(ctor: Ctor<E>) {
+  return ReceiverSystem(ctor, true);
+}
+
+/** Calls the runner with all the events in order. */
+export function BufferedReceiverSystem<E extends EcsEvent>(ctor: Ctor<E>) {
+  return ReceiverSystem(ctor, false);
+}
+
+function ReceiverSystem<E extends EcsEvent>(
   eventCtor: Ctor<E>,
   throttle: boolean,
 ) {
