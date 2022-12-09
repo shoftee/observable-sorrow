@@ -44,6 +44,7 @@ const Setup = System(Commands())((cmds) => {
 
 const AdvanceCalendar = PerTickSystem(
   Query(Read(Timer)).filter(Has(E.DayTimer)),
+)(
   Single(
     DiffMut(E.Day),
     DiffMut(E.Season),

@@ -73,6 +73,7 @@ const ProcessSkyObserved = ReceiverSystem(SkyObserved, true)(
 
 const ProcessRareEvent = PerTickSystem(
   Query(Read(Timer)).filter(Has(DayTimer)),
+)(
   Single(DiffMut(Countdown), Read(Prng)).filter(Has(RareEvent)),
   Single(Value(Unlocked)).filter(SectionPredicate("science")),
   Dispatch(HistoryEventOccurred),
