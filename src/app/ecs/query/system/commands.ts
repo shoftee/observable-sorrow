@@ -34,7 +34,7 @@ class EntityCommandsImpl {
     if (!this.self) {
       this.self = world.spawn();
       if (this.parent) {
-        world.hierarchy.link(this.parent, [this.self]);
+        world.hierarchy.linkOne(this.parent, this.self);
       }
     }
     return this.self;
