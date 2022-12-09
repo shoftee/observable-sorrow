@@ -6,6 +6,7 @@ import {
   ChildrenQuery,
   Commands,
   Eager,
+  EntityLookup,
   Mut,
   Query,
   Read,
@@ -44,17 +45,16 @@ describe("ecs systems", () => {
         cmds.spawn(new Id("shoftee1"), new Player(20));
         cmds.spawn(new Id("shoftee2"), new Player(20));
         cmds.spawn(new Id("shoftee3"), new Player(20));
-      });
+      }).build(world);
 
-      Setup.build(world)();
+      Setup();
       world.flush();
 
       const LevelUpper = System(Query(Mut(Player)))((players) => {
         for (const [player] of players) {
           player.levelUp();
         }
-      });
-      const levelUpperRunner = LevelUpper.build(world);
+      }).build(world);
 
       const ChangeTracker = System(Query(ChangeTrackers(Player)))((query) => {
         let changed = 0;
@@ -63,11 +63,10 @@ describe("ecs systems", () => {
           changed++;
         }
         expect(changed).to.eq(3);
-      });
-      const changeTrackerRunner = ChangeTracker.build(world);
+      }).build(world);
 
-      levelUpperRunner();
-      changeTrackerRunner();
+      LevelUpper();
+      ChangeTracker();
     });
   });
 
@@ -79,8 +78,8 @@ describe("ecs systems", () => {
         cmds.spawn(new Id("shoftee"), new Player(20));
         cmds.spawn(new Id("shoftee"), new Player(20));
         cmds.spawn(new Id("shoftee"), new Player(20));
-      });
-      Setup.build(world)();
+      }).build(world);
+      Setup();
       world.flush();
 
       const PlayerChecker = System(Query(Value(Id), Read(Player)))(
@@ -90,8 +89,39 @@ describe("ecs systems", () => {
             expect(player).to.deep.equal({ level: 20 });
           }
         },
-      );
-      PlayerChecker.build(world)();
+      ).build(world);
+      PlayerChecker();
+    });
+    it("should no longer match removed entities", () => {
+      const world = new World();
+
+      const Setup = System(Commands())((cmds) => {
+        cmds.spawn(new Id("shoftee1"));
+        cmds.spawn(new Id("shoftee2"));
+        cmds.spawn(new Id("shoftee3"));
+      }).build(world);
+      Setup();
+      world.flush();
+
+      let playerIdMatcher = /^shoftee[123]$/;
+      const IdChecker = System(Query(Value(Id)))((players) => {
+        for (const [id] of players) {
+          expect(id).to.match(playerIdMatcher);
+        }
+      }).build(world);
+      IdChecker();
+
+      const RemovePlayers = System(
+        EntityLookup(Value(Id)),
+        Commands(),
+      )((map, cmds) => {
+        cmds.despawn(map.get("shoftee2")!);
+      }).build(world);
+      RemovePlayers();
+      world.flush();
+
+      playerIdMatcher = /^shoftee[13]$/;
+      IdChecker();
     });
     it("should spawn entities with children and insert components", () => {
       const world = new World();
@@ -105,8 +135,8 @@ describe("ecs systems", () => {
           cmds.spawnChild(e, new ItemStack("Health Potion", 10));
           cmds.spawnChild(e, new ItemStack("Mana Potion", 15));
         });
-      });
-      Setup.build(world)();
+      }).build(world);
+      Setup();
       world.flush();
 
       const HierarchyChecker = System(
@@ -130,8 +160,8 @@ describe("ecs systems", () => {
             ],
           ],
         ]);
-      });
-      HierarchyChecker.build(world)();
+      }).build(world);
+      HierarchyChecker();
     });
     it("should spawn multiple levels of children correctly", () => {
       const world = new World();
@@ -157,8 +187,8 @@ describe("ecs systems", () => {
             cmds.spawnChild(level2, new Id("name 14"));
           });
         });
-      });
-      Setup.build(world)();
+      }).build(world);
+      Setup();
       world.flush();
 
       const HierarchyChecker = System(
@@ -180,8 +210,8 @@ describe("ecs systems", () => {
           ["name 13", []],
           ["name 14", []],
         ]);
-      });
-      HierarchyChecker.build(world)();
+      }).build(world);
+      HierarchyChecker();
     });
   });
 });

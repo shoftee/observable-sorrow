@@ -5,9 +5,11 @@ import { EcsComponent, EcsEntity, World, inspectable } from "@/app/ecs";
 import { SystemParamDescriptor } from "../types";
 
 export type WorldCmds = {
-  with(entity: EcsEntity): EntityCmds;
   spawn(...components: EcsComponent[]): EntityCmds;
   spawnChild(parent: EcsEntity, ...components: EcsComponent[]): EntityCmds;
+  with(entity: EcsEntity): EntityCmds;
+  link(parent: EcsEntity, ...children: EcsEntity[]): WorldCmds;
+  despawn(...entities: EcsEntity[]): WorldCmds;
 };
 
 export type EntityCmds = {
@@ -70,7 +72,7 @@ class EntityCommandsImpl {
 
 type CommandsFactory = SystemParamDescriptor<WorldCmds>;
 
-/** Used to spawn entities and populate them with components. */
+/** Used to create and remove entities and components. */
 export function Commands(): CommandsFactory {
   return {
     inspect() {
@@ -78,9 +80,6 @@ export function Commands(): CommandsFactory {
     },
     create(world: World) {
       const commands: WorldCmds = {
-        with(entity) {
-          return new EntityCommandsImpl(world, { self: entity });
-        },
         spawn(...components) {
           return new EntityCommandsImpl(world).insert(...components);
         },
@@ -88,6 +87,26 @@ export function Commands(): CommandsFactory {
           return new EntityCommandsImpl(world, { parent }).insert(
             ...components,
           );
+        },
+        with(entity) {
+          return new EntityCommandsImpl(world, { self: entity });
+        },
+        link(parent, ...children) {
+          world.defer(function* (world: World) {
+            world.hierarchy.link(parent, children);
+            yield parent;
+            yield* children;
+          });
+          return this;
+        },
+        despawn(...entities) {
+          world.defer(function* (world: World) {
+            for (const entity of entities) {
+              world.despawn(entity);
+            }
+            yield* entities;
+          });
+          return this;
         },
       };
       return {
