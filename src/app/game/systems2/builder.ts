@@ -22,6 +22,7 @@ import { UnlockResolutionPlugin } from "./unlock";
 
 import { EffectsSetupPlugin } from "./effects/setup";
 import { SectionResolutionPlugin, SectionSetupPlugin } from "./section";
+import { HistoryPlugin } from "./history/plugin";
 
 export function build(onRender: OnRenderHandler): GameRunner {
   return new App()
@@ -40,6 +41,7 @@ export function build(onRender: OnRenderHandler): GameRunner {
     .addPlugin(new FulfillmentResolutionPlugin())
     .addPlugin(new SectionResolutionPlugin())
     .addPlugin(new UnlockResolutionPlugin())
+    .addPlugin(new HistoryPlugin())
     .addPlugin(new RendererPlugin(onRender))
     .buildRunner();
 }

@@ -3,6 +3,8 @@ import { ResourceMap } from "@/app/state";
 
 import { EcsEvent } from "@/app/ecs";
 
+import { HistoryEvent } from "../history/types";
+
 export class TimeOptionsChanged extends EcsEvent {
   constructor(readonly intent: TimeIntent) {
     super();
@@ -17,6 +19,12 @@ export class ResourceOrder extends EcsEvent {
 
 export class ConstructBuildingOrder extends EcsEvent {
   constructor(readonly building: BuildingId) {
+    super();
+  }
+}
+
+export class HistoryEventOccurred extends EcsEvent {
+  constructor(readonly event: HistoryEvent) {
     super();
   }
 }

@@ -6,13 +6,13 @@ describe("pushEvents", () => {
   it("should create missing sink and add events", () => {
     const events: EventSources = {};
     const pusher = getEventSinkPusher(events);
-    pusher.history(
+    pusher.history([
       label("astronomy.rare-event"),
       label("astronomy.observed-sky-reward.capped"),
       label("astronomy.observed-sky-reward.gained", {
         scienceAmount: 250,
       }),
-    );
+    ]);
 
     expect(events.history).to.deep.equal([
       { kind: "label", label: "astronomy.rare-event", named: undefined },
@@ -36,12 +36,12 @@ describe("pushEvents", () => {
     };
 
     const pusher = getEventSinkPusher(events);
-    pusher.history(
+    pusher.history([
       label("astronomy.observed-sky-reward.capped"),
       label("astronomy.observed-sky-reward.gained", {
         scienceAmount: 250,
       }),
-    );
+    ]);
 
     expect(events.history).to.deep.equal([
       { kind: "label", label: "astronomy.rare-event", named: undefined },

@@ -1,7 +1,5 @@
-type HistoryEventDisposition = "none" | "ignore";
-
 type Named = { named?: Record<string, unknown> };
-type AllEvents = { disposition?: HistoryEventDisposition };
+type AllEvents = { disposition?: "none" | "ignore" };
 
 type LabelEvent = { kind: "label"; label: string } & Named & AllEvents;
 type PluralLabelEvent = {

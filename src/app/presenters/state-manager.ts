@@ -124,7 +124,7 @@ export class StateManager implements IPresenterChangeSink, IStateManager {
 
     const sinks = Object.entries(deltas.events);
     if (sinks.length > 0) {
-      console.log("Events", sinks);
+      console.log("Events", deltas.events);
       for (const [id, events] of sinks) {
         this.events.ensure(id as EventSourceId).push(events);
       }

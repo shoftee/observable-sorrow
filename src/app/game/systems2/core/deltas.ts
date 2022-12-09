@@ -15,8 +15,8 @@ import { ResourceSchema } from "../resource/schema";
 import { NumberEffectSchema } from "../effects/schema";
 import { SectionSchema } from "../section/schema";
 
-import { HistoryEvent } from "../types";
 import { TimeSchema } from "../time/schema";
+import { HistoryEvent } from "../history/types";
 
 type RecordObj = Record<string, unknown>;
 
@@ -75,8 +75,14 @@ type Removed<T> = T extends SchemaEntity
 export type EventSourceId = keyof EventsSchema;
 
 export type EventSources = {
-  [K in keyof EventsSchema]?: EventsSchema[K] extends SchemaEvent<infer E>
+  [K in EventSourceId]?: EventsSchema[K] extends SchemaEvent<infer E>
     ? Serializable<E>[]
+    : never;
+};
+
+export type EventSinks = {
+  [K in EventSourceId]?: EventsSchema[K] extends SchemaEvent<infer E>
+    ? Iterable<Serializable<E>>
     : never;
 };
 
@@ -92,15 +98,11 @@ export function visitState<T extends RecordObj>(dst: T, fn: (root: T) => void) {
 function createDeltaProxy(target: any): any {
   return new Proxy(target, {
     get(_, key) {
-      let innerTarget = Reflect.get(target, key);
-      if (innerTarget === undefined) {
-        innerTarget = {};
-        Reflect.set(target, key, innerTarget);
-      }
-      return createDeltaProxy(innerTarget);
+      return createDeltaProxy(target[key] ?? (target[key] = {}));
     },
     set(_, key, value) {
-      return Reflect.set(target, key, value);
+      target[key] = value;
+      return true;
     },
   });
 }
@@ -214,8 +216,7 @@ function mergeWith<T1 extends RecordObj, T2 extends RecordObj>(
     if (Object.prototype.hasOwnProperty.call(source, key)) {
       const dstElement = destination[key];
       const srcElement = source[key];
-      const newValue = fn(dstElement, srcElement, key);
-      Reflect.set(destination, key, newValue);
+      destination[key] = fn(dstElement, srcElement, key);
     }
   }
 }
@@ -225,16 +226,19 @@ function isObject<T>(obj: T): obj is T & RecordObj {
 }
 
 type EventSinkPusher = {
-  [K in keyof EventSources]-?: (...items: NonNullable<EventSources[K]>) => void;
+  [K in EventSourceId]-?: (items: EventSinks[K]) => void;
 };
 
 export function getEventSinkPusher(events: EventSources): EventSinkPusher {
   return new Proxy({} as EventSinkPusher, {
-    get(_, propertyKey: keyof EventSources) {
-      const array = events[propertyKey] ?? (events[propertyKey] = []);
+    get(_, propertyKey: EventSourceId) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (...items: any[]) => {
-        array.push(...items);
+      return (iterable: Iterable<any>) => {
+        const items = Array.from(iterable);
+        if (items.length > 0) {
+          const target = events[propertyKey] ?? (events[propertyKey] = []);
+          target.push(...items);
+        }
       };
     },
   });
