@@ -147,6 +147,16 @@ export function EntityMapQuery<Q extends [...QueryDescriptor[]]>(
   return new MapQueryFactory(Entity(), Tuple(...qs));
 }
 
+/** Used to create a lookup from a component's value to the component's associated entity.
+ *
+ * If you want the entity to be the key instead of the value, use `EntityMapQuery()` instead.
+ */
+export function EntityLookup<K>(
+  keys: QueryDescriptor<Readonly<K>>,
+): MapQueryFactory<K, Readonly<EcsEntity>> {
+  return new MapQueryFactory(keys, Entity());
+}
+
 /**
  * Eagerly turn iterables into arrays before they are included into a query's results.
  */

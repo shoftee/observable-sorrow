@@ -70,3 +70,25 @@ export function HasNone(...ctors: OneOrMoreCtors): HasNone {
     },
   };
 }
+
+type Predicate = FilterDescriptor;
+export function Predicate<C extends EcsComponent>(
+  ctor: Ctor<C>,
+  predicate: (component: C) => boolean,
+): Predicate {
+  return {
+    inspect() {
+      return inspectable(Predicate, inspectableNames([ctor]));
+    },
+    includes(archetype) {
+      return archetype.has(ctor);
+    },
+    newFilter() {
+      return {
+        matches({ archetype }) {
+          return predicate(archetype.get(ctor)! as C);
+        },
+      };
+    },
+  };
+}

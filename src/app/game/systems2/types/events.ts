@@ -28,3 +28,5 @@ export class HistoryEventOccurred extends EcsEvent {
     super();
   }
 }
+
+export class SkyObserved extends EcsEvent {}

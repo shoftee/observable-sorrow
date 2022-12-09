@@ -14,7 +14,7 @@ export interface SystemSpecification extends Inspectable {
   build(world: World): () => void;
 }
 
-type SystemParamTuple<F> = F extends [infer Head, ...infer Tail]
+export type SystemParamTuple<F> = F extends [infer Head, ...infer Tail]
   ? [...UnwrapSystemParamDescriptor<Head>, ...SystemParamTuple<Tail>]
   : [];
 type UnwrapSystemParamDescriptor<F> = F extends SystemParamDescriptor<infer T>

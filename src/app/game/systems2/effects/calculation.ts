@@ -23,7 +23,7 @@ import {
   Constant,
   Precalculated,
 } from "./types";
-import { DependentEffectsQuery, EntityByIdQuery } from "./ecs";
+import { DependentEffectsQuery, NumberEffectEntities } from "./ecs";
 
 type EffectTuple = [
   NumberValue,
@@ -62,7 +62,7 @@ type UpdateContext = {
 
 export const RecalculateByList = function (...ids: NumberEffectId[]) {
   return System(
-    EntityByIdQuery,
+    NumberEffectEntities,
     EffectsTupleQuery,
     OperationsTupleQuery,
   )((idsLookup, effectsQuery, operationsQuery) => {
@@ -86,7 +86,7 @@ export const RecalculateByQuery = function (
 ) {
   return System(
     DependentEffectsQuery(selector),
-    EntityByIdQuery,
+    NumberEffectEntities,
     EffectsTupleQuery,
     OperationsTupleQuery,
   )((entities, idsLookup, effectsQuery, operationsQuery) => {

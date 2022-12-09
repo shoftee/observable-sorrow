@@ -1,7 +1,6 @@
 import { Queue } from "queue-typescript";
 
 import { consume, map, MultiMap } from "@/app/utils/collections";
-import { cache } from "@/app/utils/cache";
 
 import { NumberEffectId } from "@/app/interfaces";
 
@@ -10,6 +9,8 @@ import { QueryDescriptor, SystemParamDescriptor } from "@/app/ecs/query/types";
 import {
   ChangeTrackers,
   Entity,
+  EntityLookup,
+  EntityMapQuery,
   MapQuery,
   Parents,
   Query,
@@ -23,17 +24,47 @@ export const NumberTrackersQuery = MapQuery(
   ChangeTrackers(NumberValue),
 );
 
-export const EntityByIdQuery = MapQuery(Value(NumberEffect), Entity());
-const ParentsQuery = MapQuery(Entity(), Parents());
+export const NumberEffectEntities = EntityLookup(Value(NumberEffect));
+const NumberValues = MapQuery(Value(NumberEffect), Value(NumberValue));
+
+const ParentsQuery = EntityMapQuery(Parents());
 const RefsQuery = Query(Value(Reference), Entity());
 
-type EffectEntityFetcher = {
+type NumberState = { [K in NumberEffectId]: number | undefined };
+export function NumberState(): SystemParamDescriptor<NumberState> {
+  return {
+    inspect() {
+      return inspectable(NumberState);
+    },
+    create(world) {
+      const valuesQuery = NumberValues.create(world);
+      return {
+        fetch() {
+          const values = valuesQuery.fetch();
+          return new Proxy(
+            {},
+            {
+              get(_, key) {
+                return values.get(key as NumberEffectId);
+              },
+            },
+          ) as NumberState;
+        },
+        cleanup() {
+          valuesQuery.cleanup?.();
+        },
+      };
+    },
+  };
+}
+
+type EffectEntities = {
   [Symbol.iterator](): IterableIterator<EcsEntity>;
 };
 
 export function DependentEffectsQuery(
   selector: QueryDescriptor<NumberEffectId>,
-): SystemParamDescriptor<EffectEntityFetcher> {
+): SystemParamDescriptor<EffectEntities> {
   return {
     inspect() {
       return inspectable(DependentEffectsQuery, [selector]);
@@ -42,32 +73,27 @@ export function DependentEffectsQuery(
       world.queries.register(selector);
       const idsFetcher = world.queries.get(selector);
 
-      const idsLookupQuery = EntityByIdQuery.create(world);
-      const idsLookupCache = cache(() => idsLookupQuery.fetch());
-
+      const idsLookupQuery = NumberEffectEntities.create(world);
       const parentsQuery = ParentsQuery.create(world);
-      const parentsCache = cache(() => parentsQuery.fetch());
-
       const refsQuery = RefsQuery.create(world);
-      const refsCache = cache(() => refsQuery.fetch());
 
       const fetcher = {
         *[Symbol.iterator]() {
           const initial = map(idsFetcher.values(), (id) => idsLookup.get(id)!);
 
-          const idsLookup = idsLookupCache.retrieve();
-          const refsLookup = refsCache.retrieve();
+          const idsLookup = idsLookupQuery.fetch();
+          const refsLookup = refsQuery.fetch();
           const referrersLookup = new MultiMap<EcsEntity, EcsEntity>();
           for (const [ref, referrer] of refsLookup) {
             const referenced = idsLookup.get(ref)!;
             referrersLookup.add(referenced, referrer);
           }
 
-          const parentsLookup = parentsCache.retrieve();
+          const parentsLookup = parentsQuery.fetch();
 
           yield* findDependentEffects(
             initial,
-            (e) => parentsLookup.get(e)!,
+            (e) => parentsLookup.get(e)![0],
             (e) => referrersLookup.entriesForKey(e),
           );
         },
@@ -80,13 +106,8 @@ export function DependentEffectsQuery(
         cleanup() {
           idsFetcher.cleanup();
 
-          idsLookupCache.invalidate();
           idsLookupQuery.cleanup?.();
-
-          parentsCache.invalidate();
           parentsQuery.cleanup?.();
-
-          refsCache.invalidate();
           refsQuery.cleanup?.();
         },
       };
