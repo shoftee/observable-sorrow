@@ -1,34 +1,23 @@
 import { BuildingId, FulfillmentId, ResourceId } from "@/app/interfaces";
 
-import { EcsComponent, ValueComponent } from "@/app/ecs";
+import {
+  EcsComponent,
+  ReadonlyValueComponent,
+  ValueComponent,
+} from "@/app/ecs";
+import { ChoiceSpecification, choose } from "@/app/utils/probability";
 
 export class Level extends ValueComponent<number> {
   value = 0;
 }
 
-export class PriceRatio extends ValueComponent<number> {
-  constructor(public value: number) {
-    super();
-  }
-}
+export class PriceRatio extends ReadonlyValueComponent<number> {}
 
-export class Fulfillment extends ValueComponent<FulfillmentId> {
-  constructor(readonly value: FulfillmentId) {
-    super();
-  }
-}
+export class Fulfillment extends ReadonlyValueComponent<FulfillmentId> {}
 
-export class Building extends ValueComponent<BuildingId> {
-  constructor(readonly value: BuildingId) {
-    super();
-  }
-}
+export class Building extends ReadonlyValueComponent<BuildingId> {}
 
-export class Resource extends ValueComponent<ResourceId> {
-  constructor(readonly value: ResourceId) {
-    super();
-  }
-}
+export class Resource extends ReadonlyValueComponent<ResourceId> {}
 
 export class Prng extends EcsComponent {
   state: number;
@@ -40,6 +29,14 @@ export class Prng extends EcsComponent {
 
   next(): number {
     return this.mulberry32();
+  }
+
+  binary(threshold: number): boolean {
+    return this.next() < threshold;
+  }
+
+  choice<T>(spec: ChoiceSpecification<T>): T {
+    return choose(spec, () => this.next());
   }
 
   // https://stackoverflow.com/a/47593316/586472

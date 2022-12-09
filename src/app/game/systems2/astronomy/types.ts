@@ -1,6 +1,6 @@
-import { EcsComponent } from "@/app/ecs";
+import { EcsComponent, MarkerComponent } from "@/app/ecs";
 
-export const RareEvent = class extends EcsComponent {};
+export class RareEvent extends MarkerComponent {}
 
 export class Countdown extends EcsComponent {
   remaining: number;

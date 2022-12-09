@@ -25,7 +25,7 @@ import {
   getWeatherSeasonRatio,
   getWeatherSeverityRatio,
   nextSeason,
-  nextWeather,
+  WeatherChoices,
 } from "./functions";
 import * as E from "./types";
 import { PerTickSystem } from "../time/ecs";
@@ -66,7 +66,7 @@ const AdvanceCalendar = PerTickSystem(
     }
 
     if (year.value > 3) {
-      weather.value = nextWeather(() => prng.next());
+      weather.value = prng.choice(WeatherChoices);
     }
   }
 });

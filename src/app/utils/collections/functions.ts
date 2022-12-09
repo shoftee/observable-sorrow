@@ -15,7 +15,7 @@ export function reduce<T, TResult>(
   return accumulator;
 }
 
-/** Returns true iff no provided entries map to false. */
+/** Returns true iff no elements of `iterable` return `false` from `predicate`. */
 export function all<T>(
   iterable: Iterable<T>,
   predicate: (item: T) => boolean,
@@ -28,7 +28,7 @@ export function all<T>(
   return true;
 }
 
-/** Returns true iff a provided entry maps to true. */
+/** Returns true iff at least one element of `iterable` returns `true` from `predicate`. */
 export function any<T>(
   iterable: Iterable<T>,
   predicate: (item: T) => boolean,
@@ -41,6 +41,7 @@ export function any<T>(
   return false;
 }
 
+/** Generates a new iterable by calling `map` on each element of `iterable`. */
 export function* map<T, V>(
   iterable: Iterable<T>,
   proj: (item: T) => V,
@@ -60,7 +61,7 @@ export function firstOrDefault<T>(
   return defaultValue;
 }
 
-/** Counts the items that return true for the specified condition. */
+/** Counts how many items from `iterable` return true from `predicate`. */
 export function count<T>(
   iterable: Iterable<T>,
   predicate: (item: T) => boolean,
@@ -79,7 +80,7 @@ type GetOrAddMap<K, V> = {
   set(key: K, value: V): void;
 };
 
-/** Retrieves the value for key from map, or calls factory to create a value for it if it is not present. */
+/** Retrieves the value for `key` from `map`, or calls `factory` to create a value for it if it is not present. */
 export function getOrAdd<K, V>(
   map: GetOrAddMap<K, V>,
   key: K,
@@ -93,7 +94,7 @@ export function getOrAdd<K, V>(
   return existing;
 }
 
-/** Returns whether first contains all elements from second. */
+/** Returns whether `first` contains all elements from `second`. */
 export function containsAll<T>(
   first: { has(item: T): boolean },
   second: Iterable<T>,
@@ -106,6 +107,7 @@ export function containsAll<T>(
   return true;
 }
 
+/** Returns the first element of `iterable`. If `iterable` has 0 or more than 1 elements, throws an error. */
 export function single<T>(iterable: Iterable<T>): T {
   let found;
   for (const item of iterable) {
@@ -121,6 +123,7 @@ export function single<T>(iterable: Iterable<T>): T {
   return found;
 }
 
+/** Returns the first `count` elements of `iterable`. */
 export function* take<T>(iterable: Iterable<T>, count: number): Iterable<T> {
   let taken = 0;
   for (const item of iterable) {
@@ -132,12 +135,14 @@ export function* take<T>(iterable: Iterable<T>, count: number): Iterable<T> {
   }
 }
 
+/** Adds all elements of the `iterable` to `set`. */
 export function addRange<T>(set: Set<T>, iterable: Iterable<T>) {
   for (const item of iterable) {
     set.add(item);
   }
 }
 
+/** Generates an iterable by dequeueing the elements `queue`. */
 export function* consume<T>(queue: Queue<T>): Iterable<T> {
   let next;
   while ((next = queue.dequeue())) {

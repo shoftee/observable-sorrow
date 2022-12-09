@@ -126,7 +126,10 @@ class MapQueryFactory<K, V> extends QueryFactoryBase<
 
 /** Used to create maps out of components.
  *
- * If you want the key to be the entity, use `EntityMapQuery()` instead. */
+ * If you want the key to be the entity, use `EntityMapQuery()` instead.
+ *
+ * If you want the value to be the entity instead of the key, use `EntityLookup()` instead.
+ */
 export function MapQuery<K, V>(
   keys: QueryDescriptor<Readonly<K>>,
   values: QueryDescriptor<V>,
@@ -134,6 +137,10 @@ export function MapQuery<K, V>(
   return new MapQueryFactory(keys, values);
 }
 
+/** Used to create maps out of components where the lookup key is the associated entity.
+ *
+ * If you want to use a component's value as an entity, use `MapQuery()` instead.
+ */
 export function EntityMapQuery<Q extends [...QueryDescriptor[]]>(
   ...qs: Q
 ): MapQueryFactory<EcsEntity, QueryTuple<Q>> {

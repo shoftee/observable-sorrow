@@ -8,6 +8,7 @@ import {
   ComponentTicks,
   Archetype,
   WorldTicks,
+  ImmutableSym,
 } from "../types";
 
 export class ComponentState {
@@ -24,12 +25,17 @@ export class ComponentState {
   insert(entity: EcsEntity, ...components: EcsComponent[]) {
     const added = this.ticks.current;
     for (const component of components) {
-      component[ChangeTicksSym] = new ComponentTicks(added);
       const ctor = getConstructorOf(component);
       this.components.add(entity, ctor, (exists) => {
         if (exists) {
           throw new Error(`Entity already has component of type ${ctor}.`);
         }
+
+        component[ChangeTicksSym] = new ComponentTicks(added);
+        if (ImmutableSym in component) {
+          Object.freeze(component);
+        }
+
         return component;
       });
     }

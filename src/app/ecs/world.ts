@@ -1,6 +1,9 @@
 import { Queue } from "queue-typescript";
 
-import { EcsComponent, EcsEntity, EntitySym, WorldTicks } from "./types";
+import { addRange, consume } from "@/app/utils/collections";
+
+import { EcsComponent, EcsEntity, WorldTicks } from "./types";
+
 import {
   ComponentState,
   EventState,
@@ -25,7 +28,7 @@ export class World {
   private newEntityId = 0;
 
   spawn(...components: EcsComponent[]): EcsEntity {
-    const entity = Object.freeze({ [EntitySym]: ++this.newEntityId });
+    const entity = Object.freeze(new EcsEntity(this.newEntityId++));
     this.entities.add(entity);
     this.components.insert(entity, ...components);
     return entity;
@@ -33,8 +36,7 @@ export class World {
 
   despawn(entity: EcsEntity) {
     this.components.removeAll(entity);
-    this.hierarchy.unlinkFromChildren(entity);
-    this.hierarchy.unlinkFromParent(entity);
+    this.hierarchy.unlink(entity);
     this.entities.delete(entity);
   }
 
@@ -44,14 +46,9 @@ export class World {
 
   flush() {
     const entities = new Set<EcsEntity>();
-
-    let command;
-    while ((command = this.commands.dequeue())) {
-      for (const entity of command(this)) {
-        entities.add(entity);
-      }
+    for (const command of consume(this.commands)) {
+      addRange(entities, command(this));
     }
-
     this.queries.notifyChanged(...entities);
   }
 }

@@ -11,10 +11,12 @@ import {
 import { QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
-type ExtractValue<C extends EcsComponent> = C extends ValueComponent<infer T>
+type UnwrapValueComponent<C extends EcsComponent> = C extends ValueComponent<
+  infer T
+>
   ? Readonly<T>
   : never;
-type Value<C extends ValueComponent> = QueryDescriptor<ExtractValue<C>>;
+type Value<C extends ValueComponent> = QueryDescriptor<UnwrapValueComponent<C>>;
 
 const ReadMemo = memoizer<Ctor<EcsComponent>, Read<EcsComponent>>();
 const ValueMemo = memoizer<Ctor<ValueComponent>, Value<ValueComponent>>();
@@ -57,7 +59,7 @@ function newValue<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
       return {
         fetch({ archetype }) {
           const entry = archetype.get(ctor)! as C;
-          return entry.value as ExtractValue<C>;
+          return entry.value as UnwrapValueComponent<C>;
         },
       };
     },

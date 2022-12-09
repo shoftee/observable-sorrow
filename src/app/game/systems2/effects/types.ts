@@ -6,79 +6,58 @@ import {
   WeatherId,
 } from "@/app/interfaces";
 
-import { EcsComponent, ValueComponent } from "@/app/ecs";
+import {
+  EcsComponent,
+  ImmutableSym,
+  MarkerComponent,
+  ReadonlyValueComponent,
+  ValueComponent,
+} from "@/app/ecs";
 
-export class Effect extends EcsComponent {}
+export class Effect extends MarkerComponent {}
 
-export class NumberEffect extends ValueComponent<NumberEffectId> {
-  constructor(readonly value: NumberEffectId) {
-    super();
-  }
-}
+export class NumberEffect extends ReadonlyValueComponent<NumberEffectId> {}
 
 export class NumberValue extends ValueComponent<number | undefined> {
   value: number | undefined;
 }
 
-export class BooleanEffect extends ValueComponent<BooleanEffectId> {
-  constructor(readonly value: BooleanEffectId) {
-    super();
-  }
-}
-
+export class BooleanEffect extends ReadonlyValueComponent<BooleanEffectId> {}
 export class BooleanValue extends ValueComponent<boolean | undefined> {
   value: boolean | undefined;
 }
 
-export class Default extends ValueComponent<number> {
-  constructor(readonly value: number) {
-    super();
-  }
-}
-
-export class Constant extends ValueComponent<number> {
-  constructor(readonly value: number) {
-    super();
-  }
-}
+export class Default extends ReadonlyValueComponent<number> {}
+export class Constant extends ReadonlyValueComponent<number> {}
 
 export type OperationType = "sum" | "product" | "ratio";
 
 export class Operation extends EcsComponent {
+  [ImmutableSym] = true;
   constructor(readonly type: OperationType) {
     super();
   }
 }
 
 export class Operand extends EcsComponent {
+  [ImmutableSym] = true;
   constructor(readonly type?: "base" | "ratio" | "exponent") {
     super();
   }
 }
 
-export class Order extends ValueComponent<number> {
-  constructor(readonly value: number) {
-    super();
-  }
-}
+export class Order extends ReadonlyValueComponent<number> {}
 
-export class Reference extends ValueComponent<NumberEffectId> {
-  constructor(readonly value: NumberEffectId) {
-    super();
-  }
-}
+export class Reference extends ReadonlyValueComponent<NumberEffectId> {}
 
 export class EffectTree extends EcsComponent {
+  [ImmutableSym] = true;
   readonly references = new Set<NumberEffectId>();
 }
 
-export class Precalculated extends EcsComponent {}
+export class Precalculated extends MarkerComponent {}
 
-export class BuildingEffect extends ValueComponent<BuildingId> {
-  constructor(readonly value: BuildingId) {
-    super();
-  }
-}
+export class BuildingEffect extends ReadonlyValueComponent<BuildingId> {}
 
 export class WeatherEffect extends ValueComponent<WeatherId> {
   value: WeatherId = "neutral";

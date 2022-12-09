@@ -1,8 +1,8 @@
-import { ChoiceSpecification, choose } from "@/app/utils/probability";
+import { ChoiceSpecification } from "@/app/utils/probability";
 
 import { SeasonId, WeatherId } from "@/app/interfaces";
 
-const WeatherChoices: ChoiceSpecification<WeatherId> = {
+export const WeatherChoices: ChoiceSpecification<WeatherId> = {
   options: [
     { frequency: 175, result: "cold" },
     { frequency: 175, result: "warm" },
@@ -10,10 +10,6 @@ const WeatherChoices: ChoiceSpecification<WeatherId> = {
   ],
   total: 1000,
 };
-
-export function nextWeather(random: () => number): WeatherId {
-  return choose(WeatherChoices, random);
-}
 
 const NextSeasonMap: Record<SeasonId, SeasonId> = {
   ["spring"]: "summer",

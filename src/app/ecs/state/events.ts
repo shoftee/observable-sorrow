@@ -10,7 +10,7 @@ export class EventState {
   register<E extends EcsEvent>(ctor: Ctor<E>) {
     const events = this.queues;
     if (events.has(ctor)) {
-      throw new Error("Event already registered.");
+      throw new Error(`Event ${ctor.name} already registered.`);
     }
     events.set(ctor, new Queue<E>());
   }
@@ -18,7 +18,7 @@ export class EventState {
   get<E extends EcsEvent>(ctor: Ctor<E>): Queue<E> {
     const queue = this.queues.get(ctor);
     if (queue === undefined) {
-      throw new Error("Event not registered.");
+      throw new Error(`Event ${ctor.name} not registered.`);
     }
     return queue as Queue<E>;
   }

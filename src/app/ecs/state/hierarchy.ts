@@ -34,24 +34,17 @@ export class HierarchyState {
     parent.children.add(child);
   }
 
-  unlinkFromParent(child: EcsEntity) {
-    const node = this.node(child);
-    if (node.parent === undefined) {
-      throw new Error(
-        `Entity ${node.entity} does not have a parent to unlink.`,
-      );
+  unlink(entity: EcsEntity) {
+    const node = this.node(entity);
+    if (node.parent) {
+      node.parent.children.delete(node);
+      node.parent = undefined;
     }
-
-    node.parent.children.delete(node);
-    node.parent = undefined;
-  }
-
-  unlinkFromChildren(parent: EcsEntity) {
-    const node = this.node(parent);
     for (const child of node.children) {
       child.parent = undefined;
     }
     node.children.clear();
+    this.nodes.delete(entity);
   }
 
   *parentsOf(entity: EcsEntity): Iterable<EcsEntity> {

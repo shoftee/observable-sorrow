@@ -1,17 +1,34 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-export const EntitySym = Symbol.for("Entity");
+const EntitySym = Symbol.for("Entity");
 export class EcsEntity {
-  [EntitySym]!: number;
+  readonly [EntitySym]: number;
+
+  constructor(id: number) {
+    this[EntitySym] = id;
+  }
 }
 
+export const ImmutableSym = Symbol.for("Immutable");
 export const ChangeTicksSym = Symbol.for("ChangeTicks");
+
 export abstract class EcsComponent {
   [ChangeTicksSym]!: ComponentTicks;
 }
 
+export abstract class MarkerComponent extends EcsComponent {
+  [ImmutableSym] = true;
+}
+
 export abstract class ValueComponent<T = unknown> extends EcsComponent {
   abstract get value(): T;
+}
+
+export abstract class ReadonlyValueComponent<T> extends ValueComponent<T> {
+  [ImmutableSym] = true;
+  constructor(readonly value: T) {
+    super();
+  }
 }
 
 export const ResourceSym = Symbol.for("Resource");
