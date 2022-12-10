@@ -1,4 +1,14 @@
-import { all, any, count } from "./collections";
+import {
+  all,
+  any,
+  concat,
+  count,
+  defined,
+  filter,
+  flatMap,
+  map,
+  take,
+} from "./collections";
 
 const TrueFn = (_: unknown) => true;
 
@@ -9,6 +19,38 @@ export class Enumerable<T> implements Iterable<T> {
     yield* this.iterable;
   }
 
+  map<TResult>(selector: (item: T) => TResult): Enumerable<TResult> {
+    return new Enumerable(map(this, selector));
+  }
+
+  flatMap<TResult>(
+    selector: (item: T) => Iterable<TResult>,
+  ): Enumerable<TResult> {
+    return new Enumerable(flatMap(this, selector));
+  }
+
+  concat(...others: Iterable<T>[]): Enumerable<T> {
+    return new Enumerable(concat(this, ...others));
+  }
+
+  take(count: number): Enumerable<T> {
+    return new Enumerable(take(this, count));
+  }
+
+  filter(predicate: (item: T) => boolean): Enumerable<T> {
+    return new Enumerable(filter(this, predicate));
+  }
+
+  filterMap<V>(
+    selector: (item: T) => V | undefined,
+  ): Enumerable<NonNullable<V>> {
+    return new Enumerable(defined(map(this, selector)));
+  }
+
+  defined(): Enumerable<NonNullable<T>> {
+    return new Enumerable(defined(this));
+  }
+
   toArray(): T[] {
     return Array.from(this);
   }
@@ -17,45 +59,19 @@ export class Enumerable<T> implements Iterable<T> {
     keySelector: (item: T) => K,
     valueSelector: (item: T) => V,
   ): Map<K, V> {
-    return new Map<K, V>(this.map((i) => [keySelector(i), valueSelector(i)]));
+    return new Map<K, V>(map(this, (i) => [keySelector(i), valueSelector(i)]));
   }
 
-  map<TResult>(selector: (item: T) => TResult): Enumerable<TResult> {
-    const that = this as Iterable<T>;
-    return new Enumerable(
-      (function* () {
-        for (const item of that) {
-          yield selector(item);
-        }
-      })(),
-    );
+  all(predicate?: (item: T) => boolean): boolean {
+    return all(this, predicate ?? TrueFn);
   }
 
-  flatMap<TResult>(
-    selector: (item: T) => Iterable<TResult>,
-  ): Enumerable<TResult> {
-    const that = this as Iterable<T>;
-    return new Enumerable(
-      (function* () {
-        for (const outer of that) {
-          for (const inner of selector(outer)) {
-            yield inner;
-          }
-        }
-      })(),
-    );
+  any(predicate?: (item: T) => boolean): boolean {
+    return any(this, predicate ?? TrueFn);
   }
 
-  all(selector?: (item: T) => boolean): boolean {
-    return all(this, selector ?? TrueFn);
-  }
-
-  any(selector?: (item: T) => boolean): boolean {
-    return any(this, selector ?? TrueFn);
-  }
-
-  count(selector?: (item: T) => boolean): number {
-    return count(this, selector ?? TrueFn);
+  count(predicate?: (item: T) => boolean): number {
+    return count(this, predicate ?? TrueFn);
   }
 
   first(): T {
@@ -63,51 +79,6 @@ export class Enumerable<T> implements Iterable<T> {
       return item;
     }
     throw new Error("Expected at least one item but iterable was empty.");
-  }
-
-  take(count: number): Enumerable<T> {
-    const that = this as Iterable<T>;
-    return new Enumerable(
-      (function* () {
-        let taken = 0;
-        for (const item of that) {
-          if (taken++ >= count) break;
-          yield item;
-        }
-      })(),
-    );
-  }
-
-  filter(selector: (item: T) => boolean): Enumerable<T> {
-    const that = this as Iterable<T>;
-    return new Enumerable(
-      (function* () {
-        for (const item of that) {
-          if (selector(item)) {
-            yield item;
-          }
-        }
-      })(),
-    );
-  }
-
-  filterMap<V>(
-    selector: (item: T) => V | undefined,
-  ): Enumerable<Exclude<V, undefined>> {
-    return this.map(selector).defined();
-  }
-
-  defined(): Enumerable<Exclude<T, undefined>> {
-    const that = this as Iterable<T>;
-    return new Enumerable(
-      (function* () {
-        for (const item of that) {
-          if (item !== undefined) {
-            yield item as Exclude<T, undefined>;
-          }
-        }
-      })(),
-    );
   }
 
   reduce<TResult>(

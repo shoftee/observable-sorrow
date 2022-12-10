@@ -41,13 +41,41 @@ export function any<T>(
   return false;
 }
 
-/** Generates a new iterable by calling `map` on each element of `iterable`. */
+/** Generates a new iterable by calling `selector` on each element of `iterable`. */
 export function* map<T, V>(
   iterable: Iterable<T>,
-  proj: (item: T) => V,
+  selector: (item: T) => V,
 ): Iterable<V> {
   for (const item of iterable) {
-    yield proj(item);
+    yield selector(item);
+  }
+}
+
+export function* flatMap<T, V>(
+  iterable: Iterable<T>,
+  selector: (item: T) => Iterable<V>,
+): Iterable<V> {
+  for (const projected of map(iterable, selector)) {
+    yield* projected;
+  }
+}
+
+export function* filter<T>(
+  iterable: Iterable<T>,
+  predicate: (item: T) => boolean,
+): Iterable<T> {
+  for (const item of iterable) {
+    if (predicate(item)) {
+      yield item;
+    }
+  }
+}
+
+export function* defined<T>(iterable: Iterable<T>): Iterable<NonNullable<T>> {
+  for (const item of iterable) {
+    if (item !== undefined && item !== null) {
+      yield item!;
+    }
   }
 }
 
@@ -73,6 +101,16 @@ export function count<T>(
     }
   }
   return count;
+}
+
+export function* concat<T>(
+  first: Iterable<T>,
+  ...others: Iterable<T>[]
+): Iterable<T> {
+  yield* first;
+  for (const other of others) {
+    yield* other;
+  }
 }
 
 type GetOrAddMap<K, V> = {
@@ -147,5 +185,12 @@ export function* consume<T>(queue: Queue<T>): Iterable<T> {
   let next;
   while ((next = queue.dequeue())) {
     yield next;
+  }
+}
+
+/** Enqueues all elements of `iterable` into `queue`. */
+export function enqueueAll<T>(queue: Queue<T>, values: Iterable<T>) {
+  for (const value of values) {
+    queue.enqueue(value);
   }
 }
