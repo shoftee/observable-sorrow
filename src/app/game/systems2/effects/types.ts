@@ -1,3 +1,5 @@
+import { enumerate } from "@/app/utils/collections";
+
 import {
   BooleanEffectId,
   BuildingId,
@@ -152,11 +154,13 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
   "minerals.limit": reference("minerals.limit.base"),
   "minerals.limit.base": constant(250),
 
-  "science.limit": constant(0),
+  "catpower.limit": sum(reference("hut.catpower-limit")),
+  "hut.catpower-limit.base": constant(75),
+  "hut.catpower-limit": building("hut", reference("hut.catpower-limit.base")),
 
-  "catpower.limit": constant(0),
-
-  "kittens.limit": constant(0),
+  "kittens.limit": sum(reference("hut.kittens-limit")),
+  "hut.kittens-limit.base": constant(2),
+  "hut.kittens-limit": building("hut", reference("hut.kittens-limit.base")),
 
   "catnip.delta": reference("catnip.production"),
   "catnip.production": ratio(
@@ -183,6 +187,20 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
     yield new WeatherEffect();
   },
 
+  "science.limit": sum(reference("library.science-limit")),
+  "library.science-limit.base": constant(250),
+  "library.science-limit": building(
+    "library",
+    reference("library.science-limit.base"),
+  ),
+
+  "science.ratio": sum(reference("library.science-ratio")),
+  "library.science-ratio.base": constant(0.1),
+  "library.science-ratio": building(
+    "library",
+    reference("library.science-ratio.base"),
+  ),
+
   "wood.delta": reference("wood.production"),
   "wood.production": constant(0), // TODO jobs
 
@@ -190,8 +208,13 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
   "minerals.production": constant(0), // TODO jobs and minerals.ratio
 
   "science.delta": reference("science.production"),
-  "science.production": constant(0), // TODO jobs and science.ratio
-  // TODO: astronomy rewards
+  "science.production": constant(0), // TODO jobs
+
+  "astronomy.rare-event.reward.base": constant(25),
+  "astronomy.rare-event.reward": ratio(
+    reference("astronomy.rare-event.reward.base"),
+    reference("science.ratio"),
+  ),
 
   "catpower.delta": reference("catpower.production"),
   "catpower.production": constant(0), // TODO jobs
