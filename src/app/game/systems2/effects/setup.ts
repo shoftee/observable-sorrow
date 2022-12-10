@@ -31,6 +31,7 @@ import {
   EffectTree,
   Reference,
 } from "./types";
+import { EffectValueResolver, NumberEffectEntities } from "./ecs";
 
 function* numberComponents(id?: NumberEffectId) {
   yield new Effect();
@@ -59,12 +60,21 @@ function addEffectComponents(
   }
 }
 
-const Setup = System(Commands())((cmds) => {
+const SpawnEffects = System(Commands())((cmds) => {
   for (const [id, expr] of Object.entries(NumberExprs)) {
     const current = cmds.spawn(...numberComponents(id as NumberEffectId));
     for (const item of expr()) {
       addEffectComponents(cmds, current, item);
     }
+  }
+});
+
+const InitializeEffectValues = System(
+  NumberEffectEntities,
+  EffectValueResolver(),
+)((lookup, resolver) => {
+  for (const entity of lookup.values()) {
+    resolver.resolve(entity);
   }
 });
 
@@ -120,8 +130,10 @@ const Extractors = [
 export class EffectsSetupPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
-      .addStartupSystem(Setup)
-      .addSystem(CollectEffectTrees, { stage: "startup-end" })
+      .addStartupSystem(SpawnEffects)
+      .addSystems([InitializeEffectValues, CollectEffectTrees], {
+        stage: "startup-end",
+      })
       .addSystems(Extractors, { stage: "last-start" });
   }
 }
