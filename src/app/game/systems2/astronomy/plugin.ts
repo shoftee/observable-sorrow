@@ -91,17 +91,19 @@ const TimeExtractor = DeltaExtractor(Read(RareEvent))(
   (schema) => schema.astronomy,
 );
 
-const AstronomyExtractor = TimeExtractor(Countdown, (astronomy, countdown) => {
-  astronomy.hasRareEvent = countdown.remaining > 0;
-});
+const Extractors = [
+  TimeExtractor(Countdown, (astronomy, countdown) => {
+    astronomy.hasRareEvent = countdown.remaining > 0;
+  }),
+];
 
 export class AstronomyPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
-      .addStartupSystem(Setup)
       .registerEvent(SkyObserved)
+      .addStartupSystem(Setup)
       .addSystem(ProcessSkyObserved, { stage: "main-start" })
       .addSystem(ProcessRareEvent)
-      .addSystem(AstronomyExtractor, { stage: "last-start" });
+      .addSystems(Extractors, { stage: "last-start" });
   }
 }
