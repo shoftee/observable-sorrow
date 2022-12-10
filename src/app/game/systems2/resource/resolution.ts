@@ -118,7 +118,7 @@ const UnlockByQuantity = System(
 
 const UnlockByCapacity = System(
   Query(ChangeTrackers(R.Limit), Mut(Unlocked)).filter(
-    HasAll(Resource, R.UnlockOnFirstQuantity),
+    HasAll(Resource, R.UnlockOnFirstCapacity),
   ),
 )((limits) => {
   for (const [trackers, unlock] of limits) {
