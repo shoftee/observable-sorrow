@@ -30,9 +30,7 @@ abstract class QueryFactoryBase<Q extends [...QueryDescriptor[]], R>
   protected abstract getQueryResult(fetchCache: FetchCache<QueryTuple<Q>>): R;
 
   create(world: World): SystemParameter<R> {
-    const { descriptor: factory } = this;
-    world.queries.register(factory);
-    const fetchCache = world.queries.get(factory);
+    const fetchCache = world.queries.registerAndGet(this.descriptor);
     const fetcher = cache(() => this.getQueryResult(fetchCache));
 
     return {

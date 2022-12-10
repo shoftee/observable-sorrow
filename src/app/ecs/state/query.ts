@@ -73,6 +73,15 @@ export class QueryState {
     }
     return fetch as FetchCache<Result<Q>>;
   }
+
+  registerAndGet<Q extends QueryDescriptor>(
+    descriptor: Q,
+  ): FetchCache<Result<Q>> {
+    if (!this.fetches.has(descriptor)) {
+      this.register(descriptor);
+    }
+    return this.get(descriptor);
+  }
 }
 
 export interface FetchCache<F> {
