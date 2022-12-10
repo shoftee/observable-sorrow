@@ -13,17 +13,18 @@ import {
 import { QueryDescriptor } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
+import { NumberEffectEntities } from "./common";
+import { DependentEffectsQuery } from "./dependency-resolver";
 import {
-  Default,
   NumberValue,
-  Operation,
-  OperationType,
   Reference,
-  Operand,
+  Default,
   Constant,
   Precalculated,
-} from "./types";
-import { DependentEffectsQuery, NumberEffectEntities } from "./ecs";
+  Operation,
+  Operand,
+  OperationType,
+} from "../types";
 
 type EffectTuple = [
   NumberValue,

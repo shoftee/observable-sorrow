@@ -16,8 +16,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { NumberTrackersQuery } from "../effects/ecs";
-import { RecalculateByQuery } from "../effects/calculation";
+import { NumberTrackersQuery, RecalculateByQuery } from "../effects/ecs";
 
 import { Resource } from "../types/common";
 import { Unlocked } from "../unlock/types";

@@ -1,62 +1,18 @@
 import { Queue } from "queue-typescript";
 
-import { consume, map, MultiMap } from "@/app/utils/collections";
+import { map, MultiMap, consume } from "@/app/utils/collections";
 
 import { NumberEffectId } from "@/app/interfaces";
 
 import { EcsEntity, inspectable } from "@/app/ecs";
+import { Entity, EntityMapQuery, Parents, Query, Value } from "@/app/ecs/query";
 import { QueryDescriptor, SystemParamDescriptor } from "@/app/ecs/query/types";
-import {
-  ChangeTrackers,
-  Entity,
-  EntityLookup,
-  EntityMapQuery,
-  MapQuery,
-  Parents,
-  Query,
-  Value,
-} from "@/app/ecs/query";
 
-import { NumberEffect, NumberValue, Reference } from "./types";
-
-export const NumberTrackersQuery = MapQuery(
-  Value(NumberEffect),
-  ChangeTrackers(NumberValue),
-);
-
-export const NumberEffectEntities = EntityLookup(Value(NumberEffect));
-const NumberValues = MapQuery(Value(NumberEffect), Value(NumberValue));
+import { NumberEffectEntities } from "../ecs";
+import { Reference } from "../types";
 
 const ParentsQuery = EntityMapQuery(Parents());
 const RefsQuery = Query(Value(Reference), Entity());
-
-type NumberState = { [K in NumberEffectId]: number | undefined };
-export function NumberState(): SystemParamDescriptor<NumberState> {
-  return {
-    inspect() {
-      return inspectable(NumberState);
-    },
-    create(world) {
-      const valuesQuery = NumberValues.create(world);
-      return {
-        fetch() {
-          const values = valuesQuery.fetch();
-          return new Proxy(
-            {},
-            {
-              get(_, key) {
-                return values.get(key as NumberEffectId);
-              },
-            },
-          ) as NumberState;
-        },
-        cleanup() {
-          valuesQuery.cleanup?.();
-        },
-      };
-    },
-  };
-}
 
 type EffectEntities = {
   [Symbol.iterator](): IterableIterator<EcsEntity>;
@@ -67,7 +23,12 @@ export function DependentEffectsQuery(
 ): SystemParamDescriptor<EffectEntities> {
   return {
     inspect() {
-      return inspectable(DependentEffectsQuery, [selector]);
+      return inspectable(DependentEffectsQuery, [
+        selector,
+        NumberEffectEntities,
+        ParentsQuery,
+        RefsQuery,
+      ]);
     },
     create(world) {
       world.queries.register(selector);
