@@ -1,8 +1,6 @@
 import { cache } from "@/app/utils/cache";
 import { single } from "@/app/utils/collections";
 
-import { FetchCache } from "@/app/ecs/state";
-
 import { EcsEntity, EcsMetadata, World, inspectable } from "@/app/ecs";
 
 import {
@@ -13,12 +11,25 @@ import {
   SystemParameter,
 } from "../types";
 
-import { Tuple, Entity, TupleQueryDescriptor as TupleQd } from "..";
+import { Tuple, Entity, TupleQueryDescriptor } from "..";
+
+export interface IterableQueryResult<Result> {
+  [Symbol.iterator](): IterableIterator<Result>;
+}
+
+export interface MapQueryResult<K, V>
+  extends IterableQueryResult<[Readonly<K>, V]> {
+  entries(): IterableIterator<[Readonly<K>, V]>;
+  keys(): IterableIterator<Readonly<K>>;
+  values(): IterableIterator<V>;
+  get(key: Readonly<K>): V | undefined;
+  has(key: Readonly<K>): boolean;
+}
 
 abstract class QueryFactoryBase<Q extends [...QueryDescriptor[]], R>
   implements SystemParamDescriptor<R>
 {
-  constructor(protected descriptor: TupleQd<Q>) {}
+  constructor(protected descriptor: TupleQueryDescriptor<Q>) {}
 
   filter(...filters: OneOrMoreFilters) {
     this.descriptor = this.descriptor.filter(...filters);
@@ -27,11 +38,13 @@ abstract class QueryFactoryBase<Q extends [...QueryDescriptor[]], R>
 
   abstract inspect(): EcsMetadata;
 
-  protected abstract getQueryResult(fetchCache: FetchCache<QueryTuple<Q>>): R;
+  protected abstract getQueryResult(
+    iterable: IterableIterator<QueryTuple<Q>>,
+  ): R;
 
   create(world: World): SystemParameter<R> {
     const fetchCache = world.queries.registerAndGet(this.descriptor);
-    const fetcher = cache(() => this.getQueryResult(fetchCache));
+    const fetcher = cache(() => this.getQueryResult(fetchCache.values()));
 
     return {
       fetch() {
@@ -45,14 +58,9 @@ abstract class QueryFactoryBase<Q extends [...QueryDescriptor[]], R>
   }
 }
 
-export type IterableQueryResult<Result> = {
-  [Symbol.iterator](): IterableIterator<Result>;
-};
-
-class IterableQueryFactory<Q extends [...QueryDescriptor[]]>
-  extends QueryFactoryBase<Q, IterableQueryResult<QueryTuple<Q>>>
-  implements SystemParamDescriptor<IterableQueryResult<QueryTuple<Q>>>
-{
+class IterableQueryFactory<
+  Q extends [...QueryDescriptor[]],
+> extends QueryFactoryBase<Q, IterableQueryResult<QueryTuple<Q>>> {
   constructor(...wq: Q) {
     super(Tuple(...wq));
   }
@@ -61,8 +69,44 @@ class IterableQueryFactory<Q extends [...QueryDescriptor[]]>
     return this.descriptor.inspect();
   }
 
-  protected getQueryResult(fetchCache: FetchCache<QueryTuple<Q>>) {
-    return Array.from(fetchCache.values());
+  protected getQueryResult(iterable: IterableIterator<QueryTuple<Q>>) {
+    return Array.from(iterable);
+  }
+}
+
+class SingleQueryFactory<
+  Q extends [...QueryDescriptor[]],
+> extends QueryFactoryBase<Q, QueryTuple<Q>> {
+  constructor(...wq: Q) {
+    super(Tuple(...wq));
+  }
+
+  inspect() {
+    return inspectable(Single, this.descriptor.inspect().children);
+  }
+
+  protected getQueryResult(iterable: IterableIterator<QueryTuple<Q>>) {
+    return single(iterable);
+  }
+}
+
+class MapQueryFactory<K, V> extends QueryFactoryBase<
+  [QueryDescriptor<Readonly<K>>, QueryDescriptor<V>],
+  MapQueryResult<K, V>
+> {
+  constructor(
+    readonly keys: QueryDescriptor<Readonly<K>>,
+    readonly values: QueryDescriptor<V>,
+  ) {
+    super(Tuple(keys, values));
+  }
+
+  inspect() {
+    return inspectable(MapQuery, this.descriptor.inspect().children);
+  }
+
+  protected getQueryResult(iterable: IterableIterator<[Readonly<K>, V]>) {
+    return new Map(iterable);
   }
 }
 
@@ -72,54 +116,11 @@ export function Query<Q extends [...QueryDescriptor[]]>(
   return new IterableQueryFactory(...qs);
 }
 
-class SingleQueryFactory<Q extends [...QueryDescriptor[]]>
-  extends QueryFactoryBase<Q, QueryTuple<Q>>
-  implements SystemParamDescriptor<QueryTuple<Q>>
-{
-  constructor(...wq: Q) {
-    super(Tuple(...wq));
-  }
-
-  inspect() {
-    return inspectable(Single, this.descriptor.inspect().children);
-  }
-
-  protected getQueryResult(fetchCache: FetchCache<QueryTuple<Q>>) {
-    return single(fetchCache.values());
-  }
-}
-
 /** Like `Query(...)`, but only works if there's a single result from the query. If there are 0 or more than 1 results, an error is thrown during data retrieval. */
 export function Single<Q extends [...QueryDescriptor[]]>(
   ...qs: Q
 ): SingleQueryFactory<Q> {
   return new SingleQueryFactory(...qs);
-}
-
-export type MapQueryResult<K, V> = {
-  [Symbol.iterator](): IterableIterator<[Readonly<K>, V]>;
-  entries(): IterableIterator<[Readonly<K>, V]>;
-  keys(): IterableIterator<Readonly<K>>;
-  values(): IterableIterator<V>;
-  get(key: Readonly<K>): V | undefined;
-  has(key: Readonly<K>): boolean;
-};
-
-class MapQueryFactory<K, V> extends QueryFactoryBase<
-  [QueryDescriptor<Readonly<K>>, QueryDescriptor<V>],
-  MapQueryResult<K, V>
-> {
-  constructor(keys: QueryDescriptor<Readonly<K>>, values: QueryDescriptor<V>) {
-    super(Tuple(keys, values));
-  }
-
-  inspect() {
-    return inspectable(MapQuery, this.descriptor.inspect().children);
-  }
-
-  protected getQueryResult(fetchCache: FetchCache<[Readonly<K>, V]>) {
-    return new Map(fetchCache.values());
-  }
 }
 
 /** Used to create maps out of components.

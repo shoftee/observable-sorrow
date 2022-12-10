@@ -1,12 +1,13 @@
 import { NumberEffectId } from "@/app/interfaces";
 
 import { inspectable } from "@/app/ecs";
-import { MapQuery, Value } from "@/app/ecs/query";
 import { SystemParamDescriptor } from "@/app/ecs/query/types";
+import { MapQuery, Value } from "@/app/ecs/query";
 
 import { NumberEffect, NumberValue } from "../types";
 
 const NumberValues = MapQuery(Value(NumberEffect), Value(NumberValue));
+
 type NumberState = { [K in NumberEffectId]: number | undefined };
 export function NumberState(): SystemParamDescriptor<NumberState> {
   return {
