@@ -103,6 +103,14 @@ export function count<T>(
   return count;
 }
 
+/** Generates an iterable that includes a 0-based index for each element of `iterable`. */
+export function* enumerate<T>(iterable: Iterable<T>): Iterable<[T, number]> {
+  let i = 0;
+  for (const item of iterable) {
+    yield [item, i++];
+  }
+}
+
 export function* concat<T>(
   first: Iterable<T>,
   ...others: Iterable<T>[]

@@ -4,6 +4,7 @@ import {
   concat,
   count,
   defined,
+  enumerate,
   filter,
   flatMap,
   map,
@@ -49,6 +50,10 @@ export class Enumerable<T> implements Iterable<T> {
 
   defined(): Enumerable<NonNullable<T>> {
     return new Enumerable(defined(this));
+  }
+
+  enumerate(): Enumerable<[T, number]> {
+    return new Enumerable(enumerate(this));
   }
 
   toArray(): T[] {

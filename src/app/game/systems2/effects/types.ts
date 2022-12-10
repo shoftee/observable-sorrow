@@ -86,14 +86,12 @@ function reference(id: NumberEffectId): Expr {
 function sum(...exprs: Expr[]): Expr {
   return function* () {
     yield new Operation("sum");
-    let i = 0;
-    for (const id of exprs) {
+    for (const [expr, i] of enumerate(exprs)) {
       yield function* () {
-        yield* id();
+        yield* expr();
         yield new Operand();
-        yield new Order(i);
+        yield new Order(i + 1);
       };
-      i++;
     }
   };
 }
@@ -101,14 +99,12 @@ function sum(...exprs: Expr[]): Expr {
 // function product(...exprs: Expr[]) {
 //   return function* () {
 //     yield new Operation("product");
-//     let i = 0;
-//     for (const id of exprs) {
+//     for (const [expr, i] of enumerate(exprs)) {
 //       yield function* () {
-//         yield* id();
+//         yield* expr();
 //         yield new Operand();
-//         yield new Order(i);
+//         yield new Order(i + 1);
 //       };
-//       i++;
 //     }
 //   };
 // }
