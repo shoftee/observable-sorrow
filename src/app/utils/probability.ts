@@ -1,6 +1,9 @@
 export type ChoiceSpecification<TResult> = {
-  options: { frequency?: number; result: TResult }[];
-  total: number;
+  readonly options: {
+    readonly frequency?: number;
+    readonly result: TResult;
+  }[];
+  readonly total: number;
 };
 
 type RandomFunc = () => number;
