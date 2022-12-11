@@ -39,14 +39,14 @@ export function Opt<F>(inner: QueryDescriptor<F>): Opt<F> {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type IsMarked<M extends MarkerComponent> = QueryDescriptor<boolean>;
-const isMarkedMemo = memoizer<
+const IsMarkedMemo = memoizer<
   Ctor<MarkerComponent>,
   IsMarked<MarkerComponent>
 >();
 export function IsMarked<M extends MarkerComponent>(
   ctor: Ctor<M>,
 ): IsMarked<M> {
-  return isMarkedMemo.get(ctor, newIsMarked);
+  return IsMarkedMemo.get(ctor, newIsMarked);
 }
 function newIsMarked<M extends MarkerComponent>(ctor: Ctor<M>): IsMarked<M> {
   return {

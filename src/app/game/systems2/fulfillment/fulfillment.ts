@@ -22,11 +22,7 @@ import { Unlocked } from "../unlock/types";
 import * as R from "../resource/types";
 import * as F from "./types";
 
-const Q_Fulfillment = Value(Fulfillment);
-const Q_Resource = Value(Resource);
-const Q_ParentFulfillment = ParentQuery(Q_Fulfillment);
-const Q_ProgressMut = DiffMut(F.Progress);
-const Q_CappedMut = DiffMut(F.Capped);
+const Q_ParentFulfillment = ParentQuery(Value(Fulfillment));
 
 const SpawnFulfillments = System(Commands())((cmds) => {
   for (const meta of Meta.recipes()) {
@@ -45,9 +41,14 @@ export class FulfillmentSetupPlugin extends EcsPlugin {
 }
 
 const CalculateIngredientFulfillment = System(
-  Query(Q_Resource, Value(F.Requirement), Q_ProgressMut, Q_CappedMut),
+  Query(
+    Value(Resource),
+    Value(F.Requirement),
+    DiffMut(F.Progress),
+    DiffMut(F.Capped),
+  ),
   MapQuery(
-    Q_Resource,
+    Value(Resource),
     Tuple(Value(R.Amount), Opt(Value(R.Delta)), Opt(Value(R.Limit))),
   ),
 )((ingredients, resources) => {
@@ -75,8 +76,8 @@ const CalculateIngredientFulfillment = System(
 
 const CalculateRecipeFulfillment = System(
   Query(
-    Q_ProgressMut,
-    Q_CappedMut,
+    DiffMut(F.Progress),
+    DiffMut(F.Capped),
     Eager(ChildrenQuery(Read(F.Progress), Value(F.Capped))),
   ),
 )((fulfillments) => {
@@ -108,7 +109,7 @@ const CalculateRecipeFulfillment = System(
 
 const IngredientExtractor = DeltaExtractor(
   Q_ParentFulfillment,
-  Q_Resource,
+  Value(Resource),
 )((schema, [[fulfillment], resource]) => {
   return schema.fulfillments[fulfillment].ingredients[resource]!;
 });

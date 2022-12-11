@@ -59,7 +59,7 @@ export class EffectTree extends EcsComponent {
 
 export class Precalculated extends MarkerComponent {}
 
-export class BuildingEffect extends ReadonlyValueComponent<BuildingId> {}
+export class BuildingLevelEffect extends ReadonlyValueComponent<BuildingId> {}
 
 export class WeatherEffect extends ValueComponent<WeatherId> {
   value: WeatherId = "neutral";
@@ -77,6 +77,10 @@ function constant(value: number): Expr {
   return function* () {
     yield new Constant(value);
   };
+}
+
+function TODO(_reason: string): Expr {
+  return () => [];
 }
 
 function reference(id: NumberEffectId): Expr {
@@ -137,7 +141,7 @@ function building(building: BuildingId, singleExpr: Expr): Expr {
     };
     yield function* () {
       yield new Precalculated();
-      yield new BuildingEffect(building);
+      yield new BuildingLevelEffect(building);
       yield new Operand();
       yield new Order(2);
     };
@@ -202,13 +206,13 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
   ),
 
   "wood.delta": reference("wood.production"),
-  "wood.production": constant(0), // TODO jobs
+  "wood.production": TODO("needs jobs"),
 
   "minerals.delta": reference("minerals.production"),
-  "minerals.production": constant(0), // TODO jobs and minerals.ratio
+  "minerals.production": TODO("needs jobs and minerals.ratio"),
 
   "science.delta": reference("science.production"),
-  "science.production": constant(0), // TODO jobs
+  "science.production": TODO("needs jobs"),
 
   "astronomy.rare-event.reward.base": constant(25),
   "astronomy.rare-event.reward": ratio(
@@ -217,5 +221,5 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
   ),
 
   "catpower.delta": reference("catpower.production"),
-  "catpower.production": constant(0), // TODO jobs
+  "catpower.production": TODO("needs jobs"),
 };

@@ -10,7 +10,6 @@ import {
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   Tuple,
-  ChangeTrackers,
   ChildrenQuery,
   DiffMut,
   Has,
@@ -19,6 +18,7 @@ import {
   Value,
   Commands,
   EntityMapQuery,
+  Fresh,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -26,7 +26,7 @@ import { DeltaExtractor } from "../core";
 import { ResourceLedger } from "../core/orders";
 import { Building, Level, PriceRatio, Resource } from "../types/common";
 import { Unlocked, UnlockOnEffect } from "../unlock/types";
-import { BuildingEffect, Effect, NumberValue } from "../effects/types";
+import { BuildingLevelEffect, Effect, NumberValue } from "../effects/types";
 import * as events from "../types/events";
 import * as R from "../resource/types";
 
@@ -95,28 +95,26 @@ const ProcessConstructBuildingOrders = BufferedReceiverSystem(
 });
 
 const HandleLevelChanged = System(
-  EntityMapQuery(Value(Building), ChangeTrackers(Level)),
+  EntityMapQuery(Value(Building), Value(Level)).filter(Fresh(Level)),
   EntityMapQuery(
     Value(PriceRatio),
     ChildrenQuery(Value(F.BaseRequirement), DiffMut(F.Requirement)),
   ),
-  MapQuery(Value(BuildingEffect), DiffMut(NumberValue)).filter(Has(Effect)),
+  MapQuery(Value(BuildingLevelEffect), DiffMut(NumberValue)).filter(
+    Has(Effect),
+  ),
 )((trackersQuery, requirementsQuery, effectsQuery) => {
-  for (const [entity, [id, trackers]] of trackersQuery) {
-    if (trackers.isAddedOrChanged()) {
-      const { value: level } = trackers.value();
+  for (const [entity, [id, level]] of trackersQuery) {
+    // Update ingredient requirements
+    const [ratio, ingredients] = requirementsQuery.get(entity)!;
+    for (const [base, requirement] of ingredients) {
+      requirement.value = base * Math.pow(ratio, level);
+    }
 
-      // Update ingredient requirements
-      const [ratio, ingredients] = requirementsQuery.get(entity)!;
-      for (const [base, requirement] of ingredients) {
-        requirement.value = base * Math.pow(ratio, level);
-      }
-
-      // Update effect values
-      const effectValue = effectsQuery.get(id);
-      if (effectValue) {
-        effectValue.value = level || undefined;
-      }
+    // Update effect values
+    const effectValue = effectsQuery.get(id);
+    if (effectValue) {
+      effectValue.value = level || undefined;
     }
   }
 });
