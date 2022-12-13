@@ -163,22 +163,28 @@ export function EntityLookup<K>(
 /**
  * Eagerly turn iterables into arrays before they are included into a query's results.
  */
-export function Eager<T>(
-  query: QueryDescriptor<Iterable<T>>,
-): QueryDescriptor<T[]> {
+export function Eager<T>(query: QueryDescriptor<Iterable<T>>) {
+  function Eager(result: Iterable<T>): T[] {
+    return Array.from(result);
+  }
+  return Transform(query, Eager);
+}
+
+export function Transform<T, V>(
+  qd: QueryDescriptor<T>,
+  transformer: (result: T) => V,
+): QueryDescriptor<V> {
   return {
+    ...qd,
     inspect() {
-      return inspectable(Eager, [query]);
-    },
-    *dependencies() {
-      yield query;
+      return inspectable(transformer, [qd]);
     },
     newQuery(world) {
-      const inner = query.newQuery(world);
+      const query = qd.newQuery(world);
       return {
-        ...inner,
+        ...query,
         fetch(ctx) {
-          return Array.from(inner.fetch(ctx));
+          return transformer(query.fetch(ctx));
         },
       };
     },

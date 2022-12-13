@@ -104,6 +104,30 @@ interface Named {
   name: string;
 }
 
+type InspectedMetadata = {
+  name: string;
+  children?: InspectedMetadata[];
+  toString(): string;
+};
+export function toInspectedMetadata(
+  inspectable: Inspectable,
+): InspectedMetadata {
+  const md = inspectable.inspect();
+  return {
+    name: md.name,
+    children: md.children
+      ? Array.from(md.children, (c) => toInspectedMetadata(c))
+      : undefined,
+    toString(): string {
+      if (this.children) {
+        return `${this.name}[${this.children.join()}]`;
+      } else {
+        return this.name;
+      }
+    },
+  };
+}
+
 export interface Inspectable {
   inspect(): EcsMetadata;
 }

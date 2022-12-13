@@ -41,10 +41,10 @@ export class Operation extends EcsComponent {
   }
 }
 
-export class Operand extends EcsComponent {
-  [IMMUTABLE] = true;
-  constructor(readonly type?: "base" | "ratio" | "exponent") {
-    super();
+type OperandType = "base" | "ratio" | "exponent" | undefined;
+export class Operand extends ReadonlyValueComponent<OperandType> {
+  constructor(value?: NonNullable<OperandType>) {
+    super(value);
   }
 }
 

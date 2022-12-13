@@ -9,59 +9,70 @@ import {
   Opt,
   Read,
   IsMarked,
-  Eager,
   ChildrenQuery,
   Entity,
   Query,
   MapQueryResult,
+  Keyed,
+  Value,
+  Transform,
 } from "@/app/ecs/query";
 import { QueryDescriptor, SystemParamDescriptor } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
-import {
-  NumberValue,
-  Reference,
-  Default,
-  Constant,
-  Precalculated,
-  Operation,
-  Operand,
-  OperationType,
-  Order,
-} from "../types";
+import * as E from "../types";
 
 import { EffectDependencyResolver } from "./dependency-resolver";
 import { NumberEffectEntities } from "./ecs";
 
-type EffectTuple = [
-  NumberValue,
-  Readonly<Reference> | undefined,
-  Readonly<Default> | undefined,
-  Readonly<Constant> | undefined,
-  boolean,
-];
+type EffectType = {
+  value: E.NumberValue;
+  reference?: NumberEffectId;
+  default?: number;
+  constant?: number;
+  precalculated: boolean;
+};
 
-const EffectTuples = EntityMapQuery(
-  DiffMut(NumberValue),
-  Opt(Read(Reference)),
-  Opt(Read(Default)),
-  Opt(Read(Constant)),
-  IsMarked(Precalculated),
+const EffectsQuery = EntityMapQuery(
+  Keyed({
+    value: DiffMut(E.NumberValue),
+    reference: Opt(Value(E.Reference)),
+    default: Opt(Value(E.Default)),
+    constant: Opt(Value(E.Constant)),
+    precalculated: IsMarked(E.Precalculated),
+  }),
 );
 
-const OperationTuples = EntityMapQuery(
-  Read(Operation),
-  Eager(ChildrenQuery(Entity(), Read(Operand), Read(Order), Read(NumberValue))),
+const OperationsQuery = EntityMapQuery(
+  Keyed({
+    operation: Read(E.Operation),
+    operands: Transform(
+      ChildrenQuery(
+        Keyed({
+          entity: Entity(),
+          operand: Value(E.Operand),
+          order: Value(E.Order),
+          value: Value(E.NumberValue),
+        }),
+      ),
+      function UnpackOperands(operands) {
+        return Array.from(operands, ([operand]) => operand);
+      },
+    ),
+  }),
 );
 
-type OperandTuple = [
-  Readonly<EcsEntity>,
-  Readonly<Operand>,
-  Readonly<Order>,
-  Readonly<NumberValue>,
-];
+type Operation = {
+  operation: Readonly<E.Operation>;
+  operands: Operand[];
+};
 
-type OperationTuple = [Readonly<Operation>, OperandTuple[]];
+type Operand = {
+  entity: EcsEntity;
+  operand: E.Operand["value"];
+  order: number;
+  value?: number;
+};
 
 export const RecalculateByList = function (...ids: NumberEffectId[]) {
   return System(
@@ -97,14 +108,14 @@ export function EffectValueResolver(): SystemParamDescriptor<EffectValueResolver
     inspect() {
       return inspectable(EffectValueResolver, [
         NumberEffectEntities,
-        EffectTuples,
-        OperationTuples,
+        EffectsQuery,
+        OperationsQuery,
       ]);
     },
     create(world) {
       const lookupQuery = NumberEffectEntities.create(world);
-      const effectsQuery = EffectTuples.create(world);
-      const operationsQuery = OperationTuples.create(world);
+      const effectsQuery = EffectsQuery.create(world);
+      const operationsQuery = OperationsQuery.create(world);
 
       return {
         fetch() {
@@ -132,8 +143,8 @@ class EffectValueResolverImpl implements EffectValueResolver {
       NumberEffectId,
       Readonly<EcsEntity>
     >,
-    private readonly effects: MapQueryResult<EcsEntity, EffectTuple>,
-    private readonly operations: MapQueryResult<EcsEntity, OperationTuple>,
+    private readonly effects: MapQueryResult<EcsEntity, [EffectType]>,
+    private readonly operations: MapQueryResult<EcsEntity, [Operation]>,
   ) {}
 
   resolve(entity: EcsEntity) {
@@ -141,50 +152,46 @@ class EffectValueResolverImpl implements EffectValueResolver {
   }
 
   private gather(current: EcsEntity): number | undefined {
-    const [val, ref, def, constant, precalculated] = this.effects.get(current)!;
+    const [{ value, ...effect }] = this.effects.get(current)!;
     if (!this.resolved.has(current)) {
-      if (precalculated) {
+      if (effect.precalculated) {
         // effect already has a value to use
         // assume gathered and proceed
         this.resolved.add(current);
       } else {
         let gatheredValue: number | undefined;
-        if (constant) {
-          // effect value should be constant
-          // assign to make sure actual value matches the constant
-          gatheredValue = constant.value;
+        if (effect.constant) {
+          gatheredValue = effect.constant;
         } else {
           // effect requires calculation
-          if (ref) {
-            const referenced = this.lookup.get(ref.value)!;
+          if (effect.reference) {
+            const referenced = this.lookup.get(effect.reference)!;
             gatheredValue = this.gather(referenced);
           } else {
             const operationTuple = this.operations.get(current);
             if (operationTuple) {
-              const [operation, operandsTuples] = operationTuple;
+              const [{ operation, operands }] = operationTuple;
               gatheredValue = Calculators[operation.type](
-                this.gatherValues(toOperands(operandsTuples)),
+                this.gatherValues(operands),
               );
             }
           }
-          if (gatheredValue === undefined && def) {
+          if (gatheredValue === undefined && effect.default) {
             // effect calculation yielded no result, use default value
-            gatheredValue = def.value;
+            gatheredValue = effect.default;
           }
         }
 
         this.resolved.add(current);
-        val.value = gatheredValue;
+        value.value = gatheredValue;
         return gatheredValue;
       }
     }
 
-    return val.value;
+    return value.value;
   }
 
-  private *gatherValues(
-    operands: Iterable<CalculationOperand>,
-  ): IterableIterator<CalculationOperand> {
+  private *gatherValues(operands: Iterable<Operand>): Iterable<Operand> {
     for (const operand of operands) {
       this.gather(operand.entity);
       yield operand;
@@ -192,26 +199,8 @@ class EffectValueResolverImpl implements EffectValueResolver {
   }
 }
 
-type CalculationOperand = Readonly<{
-  entity: EcsEntity;
-  type: "base" | "ratio" | "exponent" | undefined;
-  order: number;
-  value: number | undefined;
-}>;
-
-function* toOperands(
-  tuples: Iterable<OperandTuple>,
-): Iterable<CalculationOperand> {
-  for (const [entity, { type }, { value: order }, { value }] of tuples) {
-    yield { entity, type, order, value };
-  }
-}
-
-type CalculatorFn = (
-  tuples: Iterable<CalculationOperand>,
-) => number | undefined;
-
-const Calculators: Record<OperationType, CalculatorFn> = {
+type CalculatorFn = (tuples: Iterable<Operand>) => number | undefined;
+const Calculators: Record<E.OperationType, CalculatorFn> = {
   sum: (tuples) => {
     let sum = 0;
     for (const { value } of tuples) {
