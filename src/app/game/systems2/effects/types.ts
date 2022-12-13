@@ -102,18 +102,18 @@ function sum(...exprs: Expr[]): Expr {
   };
 }
 
-// function product(...exprs: Expr[]) {
-//   return function* () {
-//     yield new Operation("product");
-//     for (const [expr, i] of enumerate(exprs)) {
-//       yield function* () {
-//         yield* expr();
-//         yield new Operand();
-//         yield new Order(i + 1);
-//       };
-//     }
-//   };
-// }
+function product(...exprs: Expr[]) {
+  return function* () {
+    yield new Operation("product");
+    for (const [expr, i] of enumerate(exprs)) {
+      yield function* () {
+        yield* expr();
+        yield new Operand();
+        yield new Order(i + 1);
+      };
+    }
+  };
+}
 
 function ratio(baseExpr: Expr, ratioExpr: Expr): Expr {
   return function* () {
@@ -131,20 +131,10 @@ function ratio(baseExpr: Expr, ratioExpr: Expr): Expr {
   };
 }
 
-function building(building: BuildingId, singleExpr: Expr): Expr {
+function buildingLevel(building: BuildingId): Expr {
   return function* () {
-    yield new Operation("product");
-    yield function* () {
-      yield* singleExpr();
-      yield new Operand();
-      yield new Order(1);
-    };
-    yield function* () {
-      yield new Precalculated();
-      yield new BuildingLevelEffect(building);
-      yield new Operand();
-      yield new Order(2);
-    };
+    yield new Precalculated();
+    yield new BuildingLevelEffect(building);
   };
 }
 
@@ -160,20 +150,26 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
 
   "catpower.limit": sum(reference("hut.catpower-limit")),
   "hut.catpower-limit.base": constant(75),
-  "hut.catpower-limit": building("hut", reference("hut.catpower-limit.base")),
+  "hut.catpower-limit": product(
+    reference("hut.catpower-limit.base"),
+    buildingLevel("hut"),
+  ),
 
   "kittens.limit": sum(reference("hut.kittens-limit")),
   "hut.kittens-limit.base": constant(2),
-  "hut.kittens-limit": building("hut", reference("hut.kittens-limit.base")),
+  "hut.kittens-limit": product(
+    reference("hut.kittens-limit.base"),
+    buildingLevel("hut"),
+  ),
 
   "catnip.delta": reference("catnip.production"),
   "catnip.production": ratio(
     reference("catnip-field.catnip"),
     reference("weather.ratio"),
   ),
-  "catnip-field.catnip": building(
-    "catnip-field",
+  "catnip-field.catnip": product(
     reference("catnip-field.catnip.base"),
+    buildingLevel("catnip-field"),
   ),
   "catnip-field.catnip.base": constant(0.125),
   "weather.ratio": sum(
@@ -193,16 +189,16 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
 
   "science.limit": sum(reference("library.science-limit")),
   "library.science-limit.base": constant(250),
-  "library.science-limit": building(
-    "library",
+  "library.science-limit": product(
     reference("library.science-limit.base"),
+    buildingLevel("library"),
   ),
 
   "science.ratio": sum(reference("library.science-ratio")),
   "library.science-ratio.base": constant(0.1),
-  "library.science-ratio": building(
-    "library",
+  "library.science-ratio": product(
     reference("library.science-ratio.base"),
+    buildingLevel("library"),
   ),
 
   "wood.delta": reference("wood.production"),
