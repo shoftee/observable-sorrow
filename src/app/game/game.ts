@@ -12,6 +12,9 @@ import { EcsEvent, GameRunner } from "@/app/ecs";
 import { build } from "./systems2/builder";
 import * as events from "./systems2/types/events";
 
+const MillisPerUpdate =
+  TimeConstants.MillisPerTick / TimeConstants.UpdatesPerTick;
+
 export class Game {
   readonly runner: GameRunner;
 
@@ -19,6 +22,12 @@ export class Game {
 
   constructor(onRender: OnRenderHandler) {
     this.runner = build(onRender);
+    import.meta.webpackHot?.dispose?.(() => {
+      if (this.handle !== undefined) {
+        clearInterval(this.handle);
+        this.handle = undefined;
+      }
+    });
   }
 
   start(): void {
@@ -28,9 +37,7 @@ export class Game {
     const update = this.runner.start();
     update();
 
-    const millisPerUpdate =
-      TimeConstants.MillisPerTick / TimeConstants.UpdatesPerTick;
-    this.handle = setInterval(() => update(), millisPerUpdate);
+    this.handle = setInterval(() => update(), MillisPerUpdate);
   }
 
   stop(): void {
