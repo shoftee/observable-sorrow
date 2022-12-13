@@ -5,6 +5,7 @@ import { single } from "@/app/utils/collections";
 import { EcsComponent, ValueComponent, World } from "@/app/ecs";
 import {
   Tuple,
+  Keyed,
   Read,
   Mut,
   Has,
@@ -309,6 +310,33 @@ describe("ecs world query", () => {
           [],
         ]);
       });
+    });
+  });
+  describe("keyed query", () => {
+    it("returns the correct values", () => {
+      world.spawn(new Id("shoftee"), new Player(20, 123));
+      world.spawn(new Id("another shoftee"), new Player(20, 123));
+
+      const query = Keyed({ id: Value(Id), player: Read(Player) });
+      world.queries.register(query);
+
+      const entries = Array.from(results(world, query));
+      expect(entries).to.deep.equal([
+        { id: "shoftee", player: { level: 20, exp: 123 } },
+        { id: "another shoftee", player: { level: 20, exp: 123 } },
+      ]);
+    });
+    it("returns only relevant objects", () => {
+      world.spawn(new Id("shoftee"), new Player(20, 123));
+      world.spawn(new Id("another shoftee"));
+
+      const query = Keyed({ id: Value(Id), player: Read(Player) });
+      world.queries.register(query);
+
+      const entries = Array.from(results(world, query));
+      expect(entries).to.deep.equal([
+        { id: "shoftee", player: { level: 20, exp: 123 } },
+      ]);
     });
   });
 });

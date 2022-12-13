@@ -6,6 +6,7 @@ export * from "./world/mut";
 export * from "./world/opt";
 export * from "./world/read";
 export * from "./world/tuple";
+export * from "./world/keyed";
 
 export * from "./system/commands";
 export * from "./system/events";
