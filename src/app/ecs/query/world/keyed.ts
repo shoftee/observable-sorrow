@@ -9,21 +9,6 @@ import {
   WorldQuery,
 } from "../types";
 
-export function Static<T>(data: T): QueryDescriptor<T> {
-  return {
-    inspect() {
-      return inspectable(Static);
-    },
-    newQuery() {
-      return {
-        fetch() {
-          return data;
-        },
-      };
-    },
-  };
-}
-
 type KeyedQuery = { [K in PropertyKey]: QueryDescriptor };
 type UnwrapKeyedWorldQuery<Q extends KeyedQuery> = {
   [K in keyof Q]: Q[K] extends WorldQuery<infer Result>

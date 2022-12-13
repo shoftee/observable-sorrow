@@ -94,7 +94,7 @@ export function ChildrenQuery<Q extends [...QueryDescriptor[]]>(
   const mapQuery = EntityMapQuery(...qs);
   return {
     inspect() {
-      return inspectable(ParentQuery, qs);
+      return inspectable(ChildrenQuery, qs);
     },
     newQuery(world) {
       const fetcher = mapQuery.create(world);
