@@ -27,6 +27,7 @@ import {
   Operation,
   Operand,
   OperationType,
+  Order,
 } from "../types";
 
 import { EffectDependencyResolver } from "./dependency-resolver";
@@ -50,12 +51,13 @@ const EffectTuples = EntityMapQuery(
 
 const OperationTuples = EntityMapQuery(
   Read(Operation),
-  Eager(ChildrenQuery(Entity(), Read(Operand), Read(NumberValue))),
+  Eager(ChildrenQuery(Entity(), Read(Operand), Read(Order), Read(NumberValue))),
 );
 
 type OperandTuple = [
   Readonly<EcsEntity>,
   Readonly<Operand>,
+  Readonly<Order>,
   Readonly<NumberValue>,
 ];
 
@@ -193,14 +195,15 @@ class EffectValueResolverImpl implements EffectValueResolver {
 type CalculationOperand = Readonly<{
   entity: EcsEntity;
   type: "base" | "ratio" | "exponent" | undefined;
+  order: number;
   value: number | undefined;
 }>;
 
 function* toOperands(
   tuples: Iterable<OperandTuple>,
 ): Iterable<CalculationOperand> {
-  for (const [entity, { type }, { value }] of tuples) {
-    yield { entity, type, value };
+  for (const [entity, { type }, { value: order }, { value }] of tuples) {
+    yield { entity, type, order, value };
   }
 }
 
@@ -226,11 +229,7 @@ const Calculators: Record<OperationType, CalculatorFn> = {
     return prod;
   },
   ratio: (tuples) => {
-    const arrays = Array.from(tuples).sort(
-      // always sort 'base' value first
-      // these should always be two, so this rule should be enough.
-      ({ type }, _) => (type === "base" ? -1 : 0),
-    );
+    const arrays = Array.from(tuples).sort((a, b) => a.order - b.order);
 
     // Extract base and ratio values from tuples.
     const [{ value: base }, { value: ratio }] = arrays;
