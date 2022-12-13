@@ -10,7 +10,7 @@ import {
 
 import {
   EcsComponent,
-  ImmutableSym,
+  IMMUTABLE,
   MarkerComponent,
   ReadonlyValueComponent,
   ValueComponent,
@@ -35,14 +35,14 @@ export class Constant extends ReadonlyValueComponent<number> {}
 export type OperationType = "sum" | "product" | "ratio";
 
 export class Operation extends EcsComponent {
-  [ImmutableSym] = true;
+  [IMMUTABLE] = true;
   constructor(readonly type: OperationType) {
     super();
   }
 }
 
 export class Operand extends EcsComponent {
-  [ImmutableSym] = true;
+  [IMMUTABLE] = true;
   constructor(readonly type?: "base" | "ratio" | "exponent") {
     super();
   }
@@ -53,7 +53,7 @@ export class Order extends ReadonlyValueComponent<number> {}
 export class Reference extends ReadonlyValueComponent<NumberEffectId> {}
 
 export class EffectTree extends EcsComponent {
-  [ImmutableSym] = true;
+  [IMMUTABLE] = true;
   readonly references = new Set<NumberEffectId>();
 }
 

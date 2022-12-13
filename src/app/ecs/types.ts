@@ -1,23 +1,23 @@
 import { Constructor as Ctor } from "@/app/utils/types";
 
-const EntitySym = Symbol.for("Entity");
+const ENTITY = Symbol.for("Entity");
 export class EcsEntity {
-  readonly [EntitySym]: number;
+  readonly [ENTITY]: number;
 
   constructor(id: number) {
-    this[EntitySym] = id;
+    this[ENTITY] = id;
   }
 }
 
-export const ImmutableSym = Symbol.for("Immutable");
-export const ChangeTicksSym = Symbol.for("ChangeTicks");
+export const IMMUTABLE = Symbol.for("Immutable");
+export const CHANGE_TICKS = Symbol.for("ChangeTicks");
 
 export abstract class EcsComponent {
-  [ChangeTicksSym]!: ComponentTicks;
+  [CHANGE_TICKS]!: ComponentTicks;
 }
 
 export abstract class MarkerComponent extends EcsComponent {
-  [ImmutableSym] = true;
+  [IMMUTABLE] = true;
 }
 
 export abstract class ValueComponent<T = unknown> extends EcsComponent {
@@ -25,20 +25,20 @@ export abstract class ValueComponent<T = unknown> extends EcsComponent {
 }
 
 export abstract class ReadonlyValueComponent<T> extends ValueComponent<T> {
-  [ImmutableSym] = true;
+  [IMMUTABLE] = true;
   constructor(readonly value: T) {
     super();
   }
 }
 
-export const ResourceSym = Symbol.for("Resource");
+export const RESOURCE = Symbol.for("Resource");
 export abstract class EcsResource {
-  protected [ResourceSym]!: true;
+  protected [RESOURCE]!: true;
 }
 
-export const EventSym = Symbol.for("Event");
+export const EVENT = Symbol.for("Event");
 export abstract class EcsEvent {
-  protected [EventSym]!: true;
+  protected [EVENT]!: true;
 }
 
 export type EcsStageType = "startup" | "first" | "main" | "last";

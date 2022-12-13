@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { ChangeTicksSym, ComponentTicks } from "@/app/ecs";
+import { CHANGE_TICKS, ComponentTicks } from "@/app/ecs";
 
 import {
   addState,
@@ -21,7 +21,7 @@ describe("delta merge", () => {
       const added = buffer.components.added;
 
       const newTime = {
-        [ChangeTicksSym]: new ComponentTicks(123),
+        [CHANGE_TICKS]: new ComponentTicks(123),
         paused: false,
         power: 1,
       };
@@ -34,7 +34,7 @@ describe("delta merge", () => {
       const added = buffer.components.added;
 
       const newTime = {
-        [ChangeTicksSym]: new ComponentTicks(123),
+        [CHANGE_TICKS]: new ComponentTicks(123),
         paused: false,
         power: 1,
       };
@@ -62,7 +62,7 @@ describe("delta merge", () => {
       addState(added, {
         resources: { catnip: newResource },
       });
-      expect(added.resources?.catnip).to.not.haveOwnProperty(ChangeTicksSym);
+      expect(added.resources?.catnip).to.not.haveOwnProperty(CHANGE_TICKS);
 
       expect(added).to.deep.equal({
         resources: { catnip: newResource },
@@ -140,7 +140,7 @@ describe("delta merge", () => {
 
       changeState(changed, { time: { paused: false, power: 1 } });
       const newTime = {
-        [ChangeTicksSym]: new ComponentTicks(123),
+        [CHANGE_TICKS]: new ComponentTicks(123),
         paused: false,
         power: 1,
       };

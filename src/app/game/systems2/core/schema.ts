@@ -1,16 +1,16 @@
 import { EcsComponent } from "@/app/ecs";
 
-const ComponentSym = Symbol();
+const COMPONENT = Symbol();
 export class SchemaComponent<C extends EcsComponent = EcsComponent> {
-  [ComponentSym]!: C;
+  [COMPONENT]!: C;
 }
 
-const EntitySym = Symbol();
+const ENTITY = Symbol();
 export class SchemaEntity<T = unknown> {
-  [EntitySym]!: T;
+  [ENTITY]!: T;
 }
 
-const EventSym = Symbol();
+const EVENT = Symbol();
 export class SchemaEvent<T = unknown> {
-  [EventSym]!: T;
+  [EVENT]!: T;
 }

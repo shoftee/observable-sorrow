@@ -2,13 +2,13 @@ import { MultiMap, Table } from "@/app/utils/collections";
 import { Constructor as Ctor, getConstructorOf } from "@/app/utils/types";
 
 import {
+  Archetype,
+  CHANGE_TICKS,
+  ComponentTicks,
   EcsEntity,
   EcsComponent,
-  ChangeTicksSym,
-  ComponentTicks,
-  Archetype,
+  IMMUTABLE,
   WorldTicks,
-  ImmutableSym,
 } from "../types";
 
 export class ComponentState {
@@ -31,8 +31,8 @@ export class ComponentState {
           throw new Error(`Entity already has component of type ${ctor}.`);
         }
 
-        component[ChangeTicksSym] = new ComponentTicks(added);
-        if (ImmutableSym in component) {
+        component[CHANGE_TICKS] = new ComponentTicks(added);
+        if (IMMUTABLE in component) {
           Object.freeze(component);
         }
 

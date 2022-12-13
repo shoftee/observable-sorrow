@@ -2,7 +2,7 @@ import { memoizer } from "@/app/utils/collections/memo";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import {
-  ChangeTicksSym,
+  CHANGE_TICKS,
   EcsComponent,
   inspectableNames,
   inspectable,
@@ -35,7 +35,7 @@ function newMut<C extends EcsComponent>(ctor: Ctor<C>): QueryDescriptor<C> {
               const success = Reflect.set(target, property, receiver);
               if (success) {
                 // set changed tick to current tick from world state
-                component[ChangeTicksSym].changed = ticks.current;
+                component[CHANGE_TICKS].changed = ticks.current;
               }
               return success;
             },
@@ -72,7 +72,7 @@ function newDiffMut<C extends EcsComponent>(ctor: Ctor<C>): Mut<C> {
               const success = Reflect.set(target, property, value, receiver);
               if (success) {
                 // set changed tick to current tick from world state
-                component[ChangeTicksSym].changed = ticks.current;
+                component[CHANGE_TICKS].changed = ticks.current;
               }
               return success;
             },

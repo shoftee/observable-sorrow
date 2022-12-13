@@ -2,7 +2,7 @@ import { memoizer } from "@/app/utils/collections/memo";
 import { Constructor as Ctor } from "@/app/utils/types";
 
 import {
-  ChangeTicksSym,
+  CHANGE_TICKS,
   EcsComponent,
   inspectable,
   inspectableNames,
@@ -49,8 +49,8 @@ function newChangeTrackers<C extends EcsComponent>(
     newQuery({ ticks }) {
       return {
         fetch({ archetype }) {
-          const component = archetype.get(ctor)! as C;
-          const componentTicks = component[ChangeTicksSym];
+          const component = archetype.get(ctor)!;
+          const componentTicks = component[CHANGE_TICKS];
           return {
             isAdded() {
               return componentTicks.isAdded(ticks.last, ticks.current);
@@ -62,7 +62,7 @@ function newChangeTrackers<C extends EcsComponent>(
               return this.isAdded() || this.isChanged();
             },
             value() {
-              return component;
+              return component as C;
             },
           };
         },
@@ -86,7 +86,7 @@ function newAdded<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
     newFilter({ ticks }) {
       return {
         matches({ archetype }) {
-          const componentTicks = archetype.get(ctor)![ChangeTicksSym];
+          const componentTicks = archetype.get(ctor)![CHANGE_TICKS];
           return componentTicks.isAdded(ticks.last, ticks.current);
         },
       };
@@ -108,7 +108,7 @@ function newChanged<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
     newFilter({ ticks }) {
       return {
         matches({ archetype }) {
-          const componentTicks = archetype.get(ctor)![ChangeTicksSym];
+          const componentTicks = archetype.get(ctor)![CHANGE_TICKS];
           return componentTicks.isChanged(ticks.last, ticks.current);
         },
       };
@@ -131,7 +131,7 @@ function newFresh<C extends EcsComponent>(ctor: Ctor<C>): FilterDescriptor {
     newFilter({ ticks }) {
       return {
         matches({ archetype }) {
-          const componentTicks = archetype.get(ctor)![ChangeTicksSym];
+          const componentTicks = archetype.get(ctor)![CHANGE_TICKS];
           return (
             componentTicks.isAdded(ticks.last, ticks.current) ||
             componentTicks.isChanged(ticks.last, ticks.current)
