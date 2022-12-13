@@ -1,8 +1,13 @@
 import { Queue } from "queue-typescript";
 
-import { MultiMap, map, consume, enqueueAll } from "@/app/utils/collections";
-import { Enumerable } from "@/app/utils/enumerable";
-
+import {
+  MultiMap,
+  map,
+  consume,
+  enqueueAll,
+  concat,
+  filter,
+} from "@/app/utils/collections";
 import { NumberEffectId } from "@/app/interfaces";
 
 import { EcsEntity, inspectable } from "@/app/ecs";
@@ -96,14 +101,16 @@ class EffectDependencyResolverImpl implements EffectDependencyResolver {
     const found = new Set<EcsEntity>();
 
     for (const effect of consume(queue)) {
-      const dependents = new Enumerable<EcsEntity>([])
-        .concat(
-          this.parentsLookup.get(effect)!,
-          this.referrersLookup.entriesForKey(effect),
-        )
-        .filter((e) => !found.has(e));
-
-      enqueueAll(queue, dependents);
+      enqueueAll(
+        queue,
+        filter(
+          concat(
+            this.parentsLookup.get(effect)!,
+            this.referrersLookup.entriesForKey(effect),
+          ),
+          (e) => !found.has(e),
+        ),
+      );
 
       found.add(effect);
     }
