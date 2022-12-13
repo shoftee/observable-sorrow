@@ -4,7 +4,7 @@ import { Archetype, World } from "@/app/ecs";
 
 import {
   QueryDescriptor,
-  QueryTuple,
+  UnwrapTupleQueryResults as Unwrap,
   WorldQuery,
   FilterDescriptor,
   OneOrMoreFilters,
@@ -12,7 +12,7 @@ import {
 import { EcsMetadata, inspectable } from "../../types";
 
 export class TupleQueryDescriptor<Q extends [...QueryDescriptor[]]>
-  implements QueryDescriptor<QueryTuple<Q>>
+  implements QueryDescriptor<Unwrap<Q>>
 {
   constructor(readonly queries: Q, readonly filters: FilterDescriptor[]) {}
 
@@ -29,7 +29,7 @@ export class TupleQueryDescriptor<Q extends [...QueryDescriptor[]]>
     return all(this.dependencies(), (f) => f.includes?.(archetype) ?? true);
   }
 
-  newQuery(world: World): WorldQuery<QueryTuple<Q>> {
+  newQuery(world: World): WorldQuery<Unwrap<Q>> {
     const filters = this.filters.map((f) => f.newFilter(world));
     const queries = this.queries.map((q) => q.newQuery(world));
     const instances = function* () {
@@ -47,7 +47,7 @@ export class TupleQueryDescriptor<Q extends [...QueryDescriptor[]]>
         }
       },
       fetch(ctx) {
-        return queries.map((q) => q.fetch(ctx)) as QueryTuple<Q>;
+        return queries.map((q) => q.fetch(ctx)) as Unwrap<Q>;
       },
     };
   }

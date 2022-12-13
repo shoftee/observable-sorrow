@@ -6,7 +6,7 @@ import { EcsEntity, EcsMetadata, World, inspectable } from "@/app/ecs";
 import {
   SystemParamDescriptor,
   QueryDescriptor,
-  QueryTuple,
+  UnwrapTupleQueryResults,
   OneOrMoreFilters,
   SystemParameter,
 } from "../types";
@@ -39,7 +39,7 @@ abstract class QueryFactoryBase<Q extends [...QueryDescriptor[]], R>
   abstract inspect(): EcsMetadata;
 
   protected abstract getQueryResult(
-    iterable: IterableIterator<QueryTuple<Q>>,
+    iterable: IterableIterator<UnwrapTupleQueryResults<Q>>,
   ): R;
 
   create(world: World): SystemParameter<R> {
@@ -60,7 +60,7 @@ abstract class QueryFactoryBase<Q extends [...QueryDescriptor[]], R>
 
 class IterableQueryFactory<
   Q extends [...QueryDescriptor[]],
-> extends QueryFactoryBase<Q, IterableQueryResult<QueryTuple<Q>>> {
+> extends QueryFactoryBase<Q, IterableQueryResult<UnwrapTupleQueryResults<Q>>> {
   constructor(...wq: Q) {
     super(Tuple(...wq));
   }
@@ -69,14 +69,16 @@ class IterableQueryFactory<
     return this.descriptor.inspect();
   }
 
-  protected getQueryResult(iterable: IterableIterator<QueryTuple<Q>>) {
+  protected getQueryResult(
+    iterable: IterableIterator<UnwrapTupleQueryResults<Q>>,
+  ) {
     return Array.from(iterable);
   }
 }
 
 class SingleQueryFactory<
   Q extends [...QueryDescriptor[]],
-> extends QueryFactoryBase<Q, QueryTuple<Q>> {
+> extends QueryFactoryBase<Q, UnwrapTupleQueryResults<Q>> {
   constructor(...wq: Q) {
     super(Tuple(...wq));
   }
@@ -85,7 +87,9 @@ class SingleQueryFactory<
     return inspectable(Single, this.descriptor.inspect().children);
   }
 
-  protected getQueryResult(iterable: IterableIterator<QueryTuple<Q>>) {
+  protected getQueryResult(
+    iterable: IterableIterator<UnwrapTupleQueryResults<Q>>,
+  ) {
     return single(iterable);
   }
 }
@@ -142,7 +146,7 @@ export function MapQuery<K, V>(
  */
 export function EntityMapQuery<Q extends [...QueryDescriptor[]]>(
   ...qs: Q
-): MapQueryFactory<EcsEntity, QueryTuple<Q>> {
+): MapQueryFactory<EcsEntity, UnwrapTupleQueryResults<Q>> {
   return new MapQueryFactory(Entity(), Tuple(...qs));
 }
 

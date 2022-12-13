@@ -1,6 +1,6 @@
 import { EcsEntity, inspectable } from "@/app/ecs";
 
-import { QueryDescriptor, QueryTuple } from "../types";
+import { QueryDescriptor, UnwrapTupleQueryResults as Unwrap } from "../types";
 
 import { EntityMapQuery } from "..";
 
@@ -39,9 +39,7 @@ export function Parents(): Parents {
   };
 }
 
-type ParentQuery<Q extends [...QueryDescriptor[]]> = QueryDescriptor<
-  QueryTuple<Q>
->;
+type ParentQuery<Q extends [...QueryDescriptor[]]> = QueryDescriptor<Unwrap<Q>>;
 export function ParentQuery<Q extends [...QueryDescriptor[]]>(
   ...qs: Q
 ): ParentQuery<Q> {
@@ -88,7 +86,7 @@ export function Children(): Children {
 }
 
 type ChildrenQuery<Q extends [...QueryDescriptor[]]> = QueryDescriptor<
-  Iterable<QueryTuple<Q>>
+  Iterable<Unwrap<Q>>
 >;
 export function ChildrenQuery<Q extends [...QueryDescriptor[]]>(
   ...qs: Q

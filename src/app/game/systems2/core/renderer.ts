@@ -8,7 +8,11 @@ import {
   World,
 } from "@/app/ecs";
 import { Tuple, ChangeTrackers, Query, Res } from "@/app/ecs/query";
-import { QueryDescriptor, QueryTuple, WorldQuery } from "@/app/ecs/query/types";
+import {
+  QueryDescriptor,
+  UnwrapTupleQueryResults as Unwrap,
+  WorldQuery,
+} from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
 
 import {
@@ -56,7 +60,7 @@ export class DeltaBuffer extends EcsResource {
 
 type SchemaStateExtractor<S, Q extends [...QueryDescriptor[]]> = (
   schema: StateSchema,
-  results: QueryTuple<Q>,
+  results: Unwrap<Q>,
 ) => S;
 
 type StateExtractor<S> = (schema: StateSchema) => S;

@@ -69,8 +69,8 @@ export function isQueryDescriptor<R = unknown>(
   return (d as QueryDescriptor<R>).newQuery !== undefined;
 }
 
-export type QueryTuple<F> = F extends [infer Head, ...infer Tail]
-  ? [...UnwrapQueryDescriptor<Head>, ...QueryTuple<Tail>]
+export type UnwrapTupleQueryResults<F> = F extends [infer Head, ...infer Tail]
+  ? [...UnwrapQueryDescriptor<Head>, ...UnwrapTupleQueryResults<Tail>]
   : [];
 type UnwrapQueryDescriptor<T> = T extends QueryDescriptor<infer Result>
   ? [Result]
