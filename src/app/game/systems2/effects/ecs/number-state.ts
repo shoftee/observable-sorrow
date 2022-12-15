@@ -15,10 +15,10 @@ export function NumberState(): SystemParamDescriptor<NumberState> {
       return inspectable(NumberState, [NumberValues]);
     },
     create(world) {
-      const valuesQuery = NumberValues.create(world);
+      const query = NumberValues.create(world);
       return {
         fetch() {
-          const values = valuesQuery.fetch();
+          const values = query.fetch();
           return new Proxy(
             {},
             {
@@ -29,7 +29,7 @@ export function NumberState(): SystemParamDescriptor<NumberState> {
           ) as NumberState;
         },
         cleanup() {
-          valuesQuery.cleanup?.();
+          query.cleanup?.();
         },
       };
     },
