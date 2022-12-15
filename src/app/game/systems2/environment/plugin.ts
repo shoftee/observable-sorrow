@@ -16,7 +16,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { RecalculateByList } from "../effects/ecs";
+import { RecalculateFresh } from "../effects/ecs";
 import { NumberValue, SeasonEffect, WeatherEffect } from "../effects/types";
 import { Timer } from "../time/types";
 import { Prng } from "../types/common";
@@ -96,7 +96,7 @@ const HandleWeatherChanged = System(
   }
 });
 
-const UpdateEffectTargets = RecalculateByList(
+const UpdateEffectTargets = RecalculateFresh(
   "weather.season-ratio",
   "weather.severity-ratio",
 );

@@ -1,4 +1,4 @@
-import { map } from "@/app/utils/collections";
+import { defined, map, untuple } from "@/app/utils/collections";
 
 import { NumberEffectId } from "@/app/interfaces";
 
@@ -16,6 +16,8 @@ import {
   Keyed,
   Value,
   Transform,
+  Fresh,
+  EntityLookup,
 } from "@/app/ecs/query";
 import { QueryDescriptor, SystemParamDescriptor } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";
@@ -26,6 +28,7 @@ import { EffectDependencyResolver } from "./dependency-resolver";
 import { NumberEffectEntities } from "./ecs";
 
 type EffectType = {
+  id?: NumberEffectId;
   value: E.NumberValue;
   reference?: NumberEffectId;
   default?: number;
@@ -33,8 +36,13 @@ type EffectType = {
   precalculated: boolean;
 };
 
+const FreshQuery = EntityLookup(Value(E.NumberEffect)).filter(
+  Fresh(E.NumberValue),
+);
+
 const EffectsQuery = EntityMapQuery(
   Keyed({
+    id: Opt(Value(E.NumberEffect)),
     value: DiffMut(E.NumberValue),
     reference: Opt(Value(E.Reference)),
     default: Opt(Value(E.Default)),
@@ -44,61 +52,72 @@ const EffectsQuery = EntityMapQuery(
 );
 
 const OperationsQuery = EntityMapQuery(
-  Keyed({
-    operation: Read(E.Operation),
-    operands: Transform(
-      ChildrenQuery(
-        Keyed({
-          entity: Entity(),
-          operand: Value(E.Operand),
-          order: Value(E.Order),
-          value: Value(E.NumberValue),
-        }),
-      ),
-      function UnpackOperands(operands) {
-        return Array.from(operands, ([operand]) => operand);
-      },
+  Read(E.Operation),
+  Transform(
+    ChildrenQuery(
+      Keyed({
+        entity: Entity(),
+        operand: Value(E.Operand),
+        order: Value(E.Order),
+        value: Value(E.NumberValue),
+      }),
     ),
-  }),
+    function UnpackOperands(operands) {
+      return Array.from(untuple(operands));
+    },
+  ),
 );
 
-type Operation = {
-  operation: Readonly<E.Operation>;
-  operands: Operand[];
-};
+type Operation = [Readonly<E.Operation>, Operand[]];
 
 type Operand = {
   entity: EcsEntity;
-  operand: E.Operand["value"];
-  order: number;
-  value?: number;
+  operand: Readonly<E.Operand["value"]>;
+  order: Readonly<number>;
+  value: Readonly<number | undefined>;
 };
 
-export const RecalculateByList = function (...ids: NumberEffectId[]) {
+// A system which will recalculate the dependencies for the specified effect IDs, but only if they are recently changed.
+export function RecalculateFresh(...ids: NumberEffectId[]) {
   return System(
+    FreshQuery,
     EffectDependencyResolver(),
     EffectValueResolver(),
-  )((dependencies, values) => {
-    for (const entity of dependencies.find(ids)) {
+  )((freshLookup, dependencies, values) => {
+    const entities = defined(map(ids, (id) => freshLookup.get(id)));
+    for (const entity of dependencies.findByEntities(entities)) {
       values.resolve(entity);
     }
   });
-};
+}
 
-export const RecalculateByQuery = function (
-  selector: QueryDescriptor<NumberEffectId>,
-) {
+// A system which will recalculate the dependencies of all effect IDs returned by the specified query.
+export function RecalculateById(selector: QueryDescriptor<NumberEffectId>) {
+  return System(
+    Query(selector),
+    EffectDependencyResolver(),
+    EffectValueResolver(),
+  )((idsQuery, dependencies, values) => {
+    const ids = untuple(idsQuery);
+    for (const entity of dependencies.findByIds(ids)) {
+      values.resolve(entity);
+    }
+  });
+}
+
+// A system which will recalculate the dependencies of all effect entities returned by the query.
+export function RecalculateByEntity(selector: QueryDescriptor<EcsEntity>) {
   return System(
     Query(selector),
     EffectDependencyResolver(),
     EffectValueResolver(),
   )((entityQuery, dependencies, values) => {
-    const ids = map(entityQuery, ([id]) => id);
-    for (const entity of dependencies.find(ids)) {
+    const entities = untuple(entityQuery);
+    for (const entity of dependencies.findByEntities(entities)) {
       values.resolve(entity);
     }
   });
-};
+}
 
 type EffectValueResolver = {
   resolve(entity: EcsEntity): void;
@@ -144,58 +163,57 @@ class EffectValueResolverImpl implements EffectValueResolver {
       Readonly<EcsEntity>
     >,
     private readonly effects: MapQueryResult<EcsEntity, [EffectType]>,
-    private readonly operations: MapQueryResult<EcsEntity, [Operation]>,
+    private readonly operations: MapQueryResult<EcsEntity, Operation>,
   ) {}
 
   resolve(entity: EcsEntity) {
-    this.gather(entity);
+    if (!this.resolved.has(entity)) {
+      this.gather(entity);
+    }
   }
 
-  private gather(current: EcsEntity): number | undefined {
-    const [{ value, ...effect }] = this.effects.get(current)!;
-    if (!this.resolved.has(current)) {
-      if (effect.precalculated) {
-        // effect already has a value to use
-        // assume gathered and proceed
-        this.resolved.add(current);
-      } else {
-        let gatheredValue: number | undefined;
-        if (effect.constant) {
-          gatheredValue = effect.constant;
-        } else {
-          // effect requires calculation
-          if (effect.reference) {
-            const referenced = this.lookup.get(effect.reference)!;
-            gatheredValue = this.gather(referenced);
-          } else {
-            const operationTuple = this.operations.get(current);
-            if (operationTuple) {
-              const [{ operation, operands }] = operationTuple;
-              gatheredValue = Calculators[operation.type](
-                this.gatherValues(operands),
-              );
-            }
-          }
-          if (gatheredValue === undefined && effect.default) {
-            // effect calculation yielded no result, use default value
-            gatheredValue = effect.default;
-          }
-        }
+  private gather(entity: EcsEntity): number | undefined {
+    const [{ value, ...effect }] = this.effects.get(entity)!;
 
-        this.resolved.add(current);
-        value.value = gatheredValue;
-        return gatheredValue;
-      }
+    if (this.resolved.has(entity)) {
+      return value.value;
     }
 
+    if (!effect.precalculated) {
+      let gatheredValue: number | undefined;
+      if (effect.constant !== undefined) {
+        gatheredValue = effect.constant;
+      } else {
+        if (effect.reference) {
+          const referenced = this.lookup.get(effect.reference);
+          if (referenced) {
+            gatheredValue = this.gather(referenced);
+          } else {
+            console.log("referenced effect not found", effect.reference);
+          }
+        } else {
+          const operation = this.operations.get(entity);
+          if (operation) {
+            gatheredValue = this.gatherOperation(operation);
+          }
+        }
+        if (gatheredValue === undefined && effect.default) {
+          gatheredValue = effect.default;
+        }
+      }
+
+      value.value = gatheredValue;
+    }
+
+    this.resolved.add(entity);
     return value.value;
   }
 
-  private *gatherValues(operands: Iterable<Operand>): Iterable<Operand> {
+  private gatherOperation([{ type }, operands]: Operation): number | undefined {
     for (const operand of operands) {
       this.gather(operand.entity);
-      yield operand;
     }
+    return Calculators[type](operands);
   }
 }
 
@@ -218,10 +236,10 @@ const Calculators: Record<E.OperationType, CalculatorFn> = {
     return prod;
   },
   ratio: (tuples) => {
-    const arrays = Array.from(tuples).sort((a, b) => a.order - b.order);
+    const array = Array.from(tuples).sort((a, b) => a.order - b.order);
 
     // Extract base and ratio values from tuples.
-    const [{ value: base }, { value: ratio }] = arrays;
+    const [{ value: base }, { value: ratio }] = array;
 
     return base === undefined || ratio === undefined
       ? undefined

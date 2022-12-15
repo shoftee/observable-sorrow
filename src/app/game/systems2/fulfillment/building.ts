@@ -19,6 +19,8 @@ import {
   Commands,
   EntityMapQuery,
   Fresh,
+  Filter,
+  Entity,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -32,6 +34,7 @@ import * as R from "../resource/types";
 
 import * as F from "./types";
 import { BufferedReceiverSystem } from "../types/ecs";
+import { RecalculateByEntity } from "../effects/ecs";
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new Building(meta.id);
@@ -94,7 +97,7 @@ const ProcessConstructBuildingOrders = BufferedReceiverSystem(
   );
 });
 
-const HandleLevelChanged = System(
+const UpdateBuildingPrices = System(
   EntityMapQuery(Value(Building), Value(Level)).filter(Fresh(Level)),
   EntityMapQuery(
     Value(PriceRatio),
@@ -119,11 +122,19 @@ const HandleLevelChanged = System(
   }
 });
 
+const UpdateLevelEffects = RecalculateByEntity(
+  Filter(Entity(), Has(BuildingLevelEffect), Fresh(NumberValue)),
+);
+
 export class BuildingOrderPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .registerEvent(events.ConstructBuildingOrder)
-      .addSystems([ProcessConstructBuildingOrders, HandleLevelChanged]);
+      .addSystems([
+        ProcessConstructBuildingOrders,
+        UpdateBuildingPrices,
+        UpdateLevelEffects,
+      ]);
   }
 }
 

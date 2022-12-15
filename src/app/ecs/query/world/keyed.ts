@@ -65,11 +65,11 @@ class KeyedQueryDescriptor<Q extends KeyedQuery>
         }
       },
       fetch(ctx) {
-        const result = {};
-        for (const [key, value] of Object.entries(worldQueryObj)) {
-          Reflect.set(result, key, value.fetch(ctx));
-        }
-        return result as UnwrapKeyedResults<Q>;
+        return new Proxy(worldQueryObj, {
+          get(target, p, receiver) {
+            return Reflect.get(target, p, receiver).fetch(ctx);
+          },
+        }) as UnwrapKeyedResults<Q>;
       },
     };
   }

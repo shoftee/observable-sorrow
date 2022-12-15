@@ -71,6 +71,10 @@ export function* filter<T>(
   }
 }
 
+export function untuple<T>(iterable: Iterable<[T]>): Iterable<T> {
+  return map(iterable, ([element]) => element);
+}
+
 export function* defined<T>(iterable: Iterable<T>): Iterable<NonNullable<T>> {
   for (const item of iterable) {
     if (item !== undefined && item !== null) {

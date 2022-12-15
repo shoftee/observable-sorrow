@@ -1,5 +1,5 @@
 import { cache } from "@/app/utils/cache";
-import { single } from "@/app/utils/collections";
+import { all, single } from "@/app/utils/collections";
 
 import { EcsEntity, EcsMetadata, World, inspectable } from "@/app/ecs";
 
@@ -9,6 +9,7 @@ import {
   UnwrapTupleQueryResults,
   OneOrMoreFilters,
   SystemParameter,
+  FilterDescriptor,
 } from "../types";
 
 import { Tuple, Entity, TupleQueryDescriptor } from "..";
@@ -84,7 +85,7 @@ class SingleQueryFactory<
   }
 
   inspect() {
-    return inspectable(Single, this.descriptor.inspect().children);
+    return inspectable(Single, [this.descriptor]);
   }
 
   protected getQueryResult(
@@ -163,11 +164,11 @@ export function EntityLookup<K>(
 /**
  * Eagerly turn iterables into arrays before they are included into a query's results.
  */
-export function Eager<T>(query: QueryDescriptor<Iterable<T>>) {
+export function Eager<T>(qd: QueryDescriptor<Iterable<T>>) {
   function Eager(result: Iterable<T>): T[] {
     return Array.from(result);
   }
-  return Transform(query, Eager);
+  return Transform(qd, Eager);
 }
 
 export function Transform<T, V>(
@@ -177,7 +178,7 @@ export function Transform<T, V>(
   return {
     ...qd,
     inspect() {
-      return inspectable(transformer, [qd]);
+      return inspectable(transformer.name ? Transform : transformer, [qd]);
     },
     newQuery(world) {
       const query = qd.newQuery(world);
@@ -185,6 +186,47 @@ export function Transform<T, V>(
         ...query,
         fetch(ctx) {
           return transformer(query.fetch(ctx));
+        },
+      };
+    },
+  };
+}
+
+export function Filter<T, F extends [...FilterDescriptor[]]>(
+  qd: QueryDescriptor<T>,
+  ...fd: F
+): QueryDescriptor<T> {
+  return {
+    inspect() {
+      return inspectable(Filter, [qd, ...fd]);
+    },
+    *dependencies() {
+      yield* [qd, ...fd];
+    },
+    includes(archetype) {
+      return (
+        (qd.includes?.(archetype) ?? true) &&
+        all(fd, (f) => f.includes?.(archetype) ?? true)
+      );
+    },
+    newQuery(world) {
+      const query = qd.newQuery(world);
+      const filters = Array.from(fd, (f) => f.newFilter(world));
+      return {
+        matches(ctx) {
+          return (
+            (query.matches?.(ctx) ?? true) &&
+            all(filters, (f) => f.matches?.(ctx) ?? true)
+          );
+        },
+        fetch(ctx) {
+          return query.fetch(ctx);
+        },
+        cleanup() {
+          query.cleanup?.();
+          for (const filter of filters) {
+            filter.cleanup?.();
+          }
         },
       };
     },

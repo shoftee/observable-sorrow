@@ -4,6 +4,8 @@ import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   ChangeTrackers,
   DiffMut,
+  Filter,
+  Fresh,
   Has,
   HasAll,
   Mut,
@@ -16,7 +18,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { NumberTrackersQuery, RecalculateByQuery } from "../effects/ecs";
+import { NumberTrackersQuery, RecalculateById } from "../effects/ecs";
 
 import { Resource } from "../types/common";
 import { Unlocked } from "../unlock/types";
@@ -24,8 +26,12 @@ import { Timer, TickTimer } from "../time/types";
 
 import * as R from "./types";
 
-const UpdateLimitEffects = RecalculateByQuery(Value(R.LimitEffect));
-const UpdateDeltaEffects = RecalculateByQuery(Value(R.DeltaEffect));
+const UpdateLimitEffects = RecalculateById(
+  Filter(Value(R.LimitEffect), Fresh(R.LimitEffect)),
+);
+const UpdateDeltaEffects = RecalculateById(
+  Filter(Value(R.DeltaEffect), Fresh(R.DeltaEffect)),
+);
 
 const UpdateEffectTargets = System(
   Query(DiffMut(R.Limit), Value(R.LimitEffect)).filter(Has(Resource)),

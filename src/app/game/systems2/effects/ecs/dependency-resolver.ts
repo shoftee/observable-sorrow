@@ -33,7 +33,8 @@ const ParentsQuery = MapQuery(Entity(), Parents());
 const RefsQuery = EntityLookup(Value(Reference));
 
 type EffectDependencyResolver = {
-  find(ids: Iterable<NumberEffectId>): Iterable<EcsEntity>;
+  findByIds(ids: Iterable<NumberEffectId>): Iterable<EcsEntity>;
+  findByEntities(entities: Iterable<EcsEntity>): Iterable<EcsEntity>;
 };
 
 export function EffectDependencyResolver(): SystemParamDescriptor<EffectDependencyResolver> {
@@ -90,8 +91,12 @@ class EffectDependencyResolverImpl implements EffectDependencyResolver {
     }
   }
 
-  find(ids: Iterable<NumberEffectId>): Iterable<EcsEntity> {
+  findByIds(ids: Iterable<NumberEffectId>): Iterable<EcsEntity> {
     const entities = map(ids, (id) => this.idsLookup.get(id)!);
+    return this.findByEntities(entities);
+  }
+
+  findByEntities(entities: Iterable<EcsEntity>): Iterable<EcsEntity> {
     return this.resolve(entities);
   }
 
@@ -115,6 +120,7 @@ class EffectDependencyResolverImpl implements EffectDependencyResolver {
       found.add(effect);
     }
 
-    yield* found;
+    // reverse results so that the top-level effects appear first.
+    yield* Array.from(found).reverse();
   }
 }
