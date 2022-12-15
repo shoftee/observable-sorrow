@@ -74,8 +74,7 @@ const OperationsQuery = EntityMapQuery(
     ChildrenQuery(
       Keyed({
         entity: Entity(),
-        operand: Value(E.Operand),
-        order: Value(E.Order),
+        operand: Read(E.Operand),
         value: Value(E.NumberValue),
       }),
     ),
@@ -89,8 +88,7 @@ type Operation = [Readonly<E.Operation>, Operand[]];
 
 type Operand = {
   entity: EcsEntity;
-  operand: Readonly<E.Operand["value"]>;
-  order: Readonly<number>;
+  operand: Readonly<E.Operand>;
   value: Readonly<number | undefined>;
 };
 
@@ -269,11 +267,11 @@ const Calculators: Record<E.OperationType, CalculatorFn> = {
     }
     return prod;
   },
-  ratio: (tuples) => {
-    const array = Array.from(tuples).sort((a, b) => a.order - b.order);
-
-    // Extract base and ratio values from tuples.
-    const [{ value: base }, { value: ratio }] = array;
+  ratio: ([a, b]) => {
+    const [base, ratio] =
+      a.operand.order < b.operand.order
+        ? [a.value, b.value]
+        : [b.value, a.value];
 
     return base === undefined || ratio === undefined
       ? undefined

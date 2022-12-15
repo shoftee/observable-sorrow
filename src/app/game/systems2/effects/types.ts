@@ -41,14 +41,12 @@ export class Operation extends EcsComponent {
   }
 }
 
-type OperandType = "base" | "ratio" | "exponent" | undefined;
-export class Operand extends ReadonlyValueComponent<OperandType> {
-  constructor(value?: NonNullable<OperandType>) {
-    super(value);
+export type OperandType = "base" | "ratio" | "exponent" | undefined;
+export class Operand extends EcsComponent {
+  constructor(readonly order: number, readonly type?: OperandType) {
+    super();
   }
 }
-
-export class Order extends ReadonlyValueComponent<number> {}
 
 export class Reference extends ReadonlyValueComponent<NumberEffectId> {}
 
@@ -95,8 +93,7 @@ function sum(...exprs: Expr[]): Expr {
     for (const [expr, i] of enumerate(exprs)) {
       yield function* () {
         yield* expr();
-        yield new Operand();
-        yield new Order(i + 1);
+        yield new Operand(i + 1);
       };
     }
   };
@@ -108,8 +105,7 @@ function product(...exprs: Expr[]) {
     for (const [expr, i] of enumerate(exprs)) {
       yield function* () {
         yield* expr();
-        yield new Operand();
-        yield new Order(i + 1);
+        yield new Operand(i + 1);
       };
     }
   };
@@ -120,13 +116,11 @@ function ratio(baseExpr: Expr, ratioExpr: Expr): Expr {
     yield new Operation("ratio");
     yield function* () {
       yield* baseExpr();
-      yield new Operand("base");
-      yield new Order(1);
+      yield new Operand(1, "base");
     };
     yield function* () {
       yield* ratioExpr();
-      yield new Operand("ratio");
-      yield new Order(2);
+      yield new Operand(2, "ratio");
     };
   };
 }
