@@ -17,6 +17,7 @@ import {
   MapQuery,
   Mut,
   Opt,
+  Query,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -31,7 +32,8 @@ import {
   EffectTree,
   Reference,
 } from "./types";
-import { EffectValueResolver, NumberEffectEntities } from "./ecs";
+import { EffectValueResolver } from "./ecs";
+import { untuple } from "@/app/utils/collections";
 
 function* numberComponents(id?: NumberEffectId) {
   yield new Effect();
@@ -70,12 +72,10 @@ const SpawnEffects = System(Commands())((cmds) => {
 });
 
 const InitializeEffectValues = System(
-  NumberEffectEntities,
+  Query(Entity()).filter(Has(Effect)),
   EffectValueResolver(),
 )((lookup, resolver) => {
-  for (const entity of lookup.values()) {
-    resolver.resolve(entity);
-  }
+  resolver.resolveByEntities(untuple(lookup));
 });
 
 const CollectEffectTrees = System(

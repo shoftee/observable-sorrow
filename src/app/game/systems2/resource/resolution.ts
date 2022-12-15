@@ -1,13 +1,13 @@
-import { NumberEffectId } from "@/app/interfaces";
+import { untuple } from "@/app/utils/collections";
 
 import { EcsPlugin, PluginApp } from "@/app/ecs";
 import {
   ChangeTrackers,
   DiffMut,
-  Filter,
   Fresh,
   Has,
   HasAll,
+  MapQuery,
   Mut,
   Opt,
   Query,
@@ -18,41 +18,42 @@ import {
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { NumberTrackersQuery, RecalculateById } from "../effects/ecs";
+import { EffectValueResolver } from "../effects/ecs";
 
 import { Resource } from "../types/common";
 import { Unlocked } from "../unlock/types";
 import { Timer, TickTimer } from "../time/types";
 
+import * as E from "../effects/types";
 import * as R from "./types";
 
-const UpdateLimitEffects = RecalculateById(
-  Filter(Value(R.LimitEffect), Fresh(R.LimitEffect)),
-);
-const UpdateDeltaEffects = RecalculateById(
-  Filter(Value(R.DeltaEffect), Fresh(R.DeltaEffect)),
-);
+const ResolveLimitAndDeltaEffects = System(
+  Query(Value(R.DeltaEffect)).filter(Fresh(R.DeltaEffect)),
+  Query(Value(R.LimitEffect)).filter(Fresh(R.LimitEffect)),
+  EffectValueResolver(),
+)((deltasQuery, limitsQuery, values) => {
+  values.resolveByEffectIds(untuple(deltasQuery));
+  values.resolveByEffectIds(untuple(limitsQuery));
+});
 
 const UpdateEffectTargets = System(
   Query(DiffMut(R.Limit), Value(R.LimitEffect)).filter(Has(Resource)),
   Query(DiffMut(R.Delta), Value(R.DeltaEffect)).filter(Has(Resource)),
-  NumberTrackersQuery,
+  MapQuery(Value(E.NumberEffect), Read(E.NumberValue)).filter(
+    Fresh(E.NumberValue),
+  ),
 )((limits, deltas, numbers) => {
-  function update(effect: NumberEffectId, component: { set value(v: number) }) {
-    const tracker = numbers.get(effect);
-    if (tracker && tracker.isAddedOrChanged()) {
-      const effectValue = tracker.value().value;
-      if (effectValue) {
-        component.value = effectValue;
-      }
+  for (const [limit, effect] of limits) {
+    const value = numbers.get(effect);
+    if (value) {
+      limit.value = value.value ?? 0;
     }
   }
-
-  for (const [limit, effect] of limits) {
-    update(effect, limit);
-  }
   for (const [delta, effect] of deltas) {
-    update(effect, delta);
+    const value = numbers.get(effect);
+    if (value) {
+      delta.value = value.value ?? 0;
+    }
   }
 });
 
@@ -161,8 +162,7 @@ export class ResourceResolutionPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addSystems([
-        UpdateLimitEffects,
-        UpdateDeltaEffects,
+        ResolveLimitAndDeltaEffects,
         UpdateEffectTargets,
         ProcessLedger,
         UnlockByQuantity,

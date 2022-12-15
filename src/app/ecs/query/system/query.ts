@@ -1,5 +1,5 @@
 import { cache } from "@/app/utils/cache";
-import { all, single } from "@/app/utils/collections";
+import { single, take } from "@/app/utils/collections";
 
 import { EcsEntity, EcsMetadata, World, inspectable } from "@/app/ecs";
 
@@ -9,7 +9,6 @@ import {
   UnwrapTupleQueryResults,
   OneOrMoreFilters,
   SystemParameter,
-  FilterDescriptor,
 } from "../types";
 
 import { Tuple, Entity, TupleQueryDescriptor } from "..";
@@ -77,6 +76,24 @@ class IterableQueryFactory<
   }
 }
 
+class TakeQueryFactory<
+  Q extends [...QueryDescriptor[]],
+> extends IterableQueryFactory<Q> {
+  constructor(readonly count: number, ...wq: Q) {
+    super(...wq);
+  }
+
+  inspect() {
+    return this.descriptor.inspect();
+  }
+
+  protected getQueryResult(
+    iterable: IterableIterator<UnwrapTupleQueryResults<Q>>,
+  ) {
+    return Array.from(take(iterable, this.count));
+  }
+}
+
 class SingleQueryFactory<
   Q extends [...QueryDescriptor[]],
 > extends QueryFactoryBase<Q, UnwrapTupleQueryResults<Q>> {
@@ -126,6 +143,14 @@ export function Single<Q extends [...QueryDescriptor[]]>(
   ...qs: Q
 ): SingleQueryFactory<Q> {
   return new SingleQueryFactory(...qs);
+}
+
+/** Like `Query(...)`, but only returns the first `count` items of the query. */
+export function Take<Q extends [...QueryDescriptor[]]>(
+  count: number,
+  ...qs: Q
+): TakeQueryFactory<Q> {
+  return new TakeQueryFactory(count, ...qs);
 }
 
 /** Used to create maps out of components.
@@ -186,47 +211,6 @@ export function Transform<T, V>(
         ...query,
         fetch(ctx) {
           return transformer(query.fetch(ctx));
-        },
-      };
-    },
-  };
-}
-
-export function Filter<T, F extends [...FilterDescriptor[]]>(
-  qd: QueryDescriptor<T>,
-  ...fd: F
-): QueryDescriptor<T> {
-  return {
-    inspect() {
-      return inspectable(Filter, [qd, ...fd]);
-    },
-    *dependencies() {
-      yield* [qd, ...fd];
-    },
-    includes(archetype) {
-      return (
-        (qd.includes?.(archetype) ?? true) &&
-        all(fd, (f) => f.includes?.(archetype) ?? true)
-      );
-    },
-    newQuery(world) {
-      const query = qd.newQuery(world);
-      const filters = Array.from(fd, (f) => f.newFilter(world));
-      return {
-        matches(ctx) {
-          return (
-            (query.matches?.(ctx) ?? true) &&
-            all(filters, (f) => f.matches?.(ctx) ?? true)
-          );
-        },
-        fetch(ctx) {
-          return query.fetch(ctx);
-        },
-        cleanup() {
-          query.cleanup?.();
-          for (const filter of filters) {
-            filter.cleanup?.();
-          }
         },
       };
     },

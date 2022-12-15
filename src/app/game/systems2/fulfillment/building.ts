@@ -1,4 +1,4 @@
-import { any } from "@/app/utils/collections";
+import { any, untuple } from "@/app/utils/collections";
 
 import {
   BuildingMetadataType,
@@ -19,7 +19,6 @@ import {
   Commands,
   EntityMapQuery,
   Fresh,
-  Filter,
   Entity,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
@@ -34,7 +33,7 @@ import * as R from "../resource/types";
 
 import * as F from "./types";
 import { BufferedReceiverSystem } from "../types/ecs";
-import { RecalculateByEntity } from "../effects/ecs";
+import { EffectValueResolver } from "../effects/ecs";
 
 function* buildingComponents(meta: BuildingMetadataType) {
   yield new Building(meta.id);
@@ -122,9 +121,12 @@ const UpdateBuildingPrices = System(
   }
 });
 
-const UpdateLevelEffects = RecalculateByEntity(
-  Filter(Entity(), Has(BuildingLevelEffect), Fresh(NumberValue)),
-);
+const UpdateLevelEffects = System(
+  Query(Entity()).filter(Has(BuildingLevelEffect), Fresh(NumberValue)),
+  EffectValueResolver(),
+)((entityQuery, values) => {
+  values.resolveByEntities(untuple(entityQuery));
+});
 
 export class BuildingOrderPlugin extends EcsPlugin {
   add(app: PluginApp): void {

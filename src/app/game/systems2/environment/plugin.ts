@@ -1,5 +1,3 @@
-import { take } from "@/app/utils/collections";
-
 import { TimeConstants } from "@/app/state";
 
 import { PluginApp, EcsPlugin } from "@/app/ecs";
@@ -12,11 +10,13 @@ import {
   Value,
   Fresh,
   Single,
+  Take,
+  Entity,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
 import { DeltaExtractor } from "../core";
-import { RecalculateFresh } from "../effects/ecs";
+import { EffectValueResolver } from "../effects/ecs";
 import { NumberValue, SeasonEffect, WeatherEffect } from "../effects/types";
 import { Timer } from "../time/types";
 import { Prng } from "../types/common";
@@ -72,34 +72,37 @@ const AdvanceCalendar = PerTickSystem(
   }
 });
 
-const UpdateSeasonEffect = System(
-  Query(Value(E.Season)).filter(Fresh(E.Season)),
-  Single(DiffMut(NumberValue)).filter(Has(SeasonEffect)),
-)((seasonQuery, [effect]) => {
-  for (const [season] of take(seasonQuery, 1)) {
-    effect.value = getWeatherSeasonRatio(season);
+const HandleSeasonChanged = System(
+  Take(1, Value(E.Season)).filter(Fresh(E.Season)),
+  Single(Entity(), DiffMut(NumberValue)).filter(Has(SeasonEffect)),
+  EffectValueResolver(),
+)(([season], effect, resolver) => {
+  if (season) {
+    const [id] = season;
+    const [entity, value] = effect;
+
+    value.value = getWeatherSeasonRatio(id);
+    resolver.resolveByEntities([entity]);
   }
 });
 
 const HandleWeatherChanged = System(
-  Query(Value(E.Weather), DiffMut(E.Labels)).filter(Fresh(E.Weather)),
-  Single(DiffMut(NumberValue)).filter(Has(WeatherEffect)),
-)((weatherQuery, [effect]) => {
-  for (const [weather, labels] of take(weatherQuery, 1)) {
-    effect.value = getWeatherSeverityRatio(weather);
+  Take(1, Value(E.Weather), DiffMut(E.Labels)).filter(Fresh(E.Weather)),
+  Single(Entity(), DiffMut(NumberValue)).filter(Has(WeatherEffect)),
+  EffectValueResolver(),
+)(([weather], effect, resolver) => {
+  if (weather) {
+    const [id, labels] = weather;
+    const [entity, value] = effect;
+
+    value.value = getWeatherSeverityRatio(id);
+    resolver.resolveByEntities([entity]);
 
     // TODO: Calendar tech
     labels.date =
-      weather === "neutral"
-        ? "calendar.full.no-weather"
-        : "calendar.full.weather";
+      id === "neutral" ? "calendar.full.no-weather" : "calendar.full.weather";
   }
 });
-
-const UpdateEffectTargets = RecalculateFresh(
-  "weather.season-ratio",
-  "weather.severity-ratio",
-);
 
 const CalendarExtractor = DeltaExtractor()((schema) => schema.calendar);
 
@@ -126,12 +129,7 @@ export class EnvironmentPlugin extends EcsPlugin {
   add(app: PluginApp): void {
     app
       .addStartupSystem(Setup)
-      .addSystems([
-        AdvanceCalendar,
-        UpdateSeasonEffect,
-        HandleWeatherChanged,
-        UpdateEffectTargets,
-      ])
+      .addSystems([AdvanceCalendar, HandleSeasonChanged, HandleWeatherChanged])
       .addSystems(Extractors, { stage: "last-start" });
   }
 }

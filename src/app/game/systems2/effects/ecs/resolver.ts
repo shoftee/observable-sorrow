@@ -1,4 +1,12 @@
-import { defined, map, untuple } from "@/app/utils/collections";
+import {
+  concat,
+  consume,
+  enqueueAll,
+  filter,
+  map,
+  MultiMap,
+  untuple,
+} from "@/app/utils/collections";
 
 import { NumberEffectId } from "@/app/interfaces";
 
@@ -11,21 +19,21 @@ import {
   IsMarked,
   ChildrenQuery,
   Entity,
-  Query,
   MapQueryResult,
   Keyed,
   Value,
   Transform,
   Fresh,
   EntityLookup,
+  IterableQueryResult,
+  MapQuery,
+  Parents,
 } from "@/app/ecs/query";
-import { QueryDescriptor, SystemParamDescriptor } from "@/app/ecs/query/types";
-import { System } from "@/app/ecs/system";
+import { SystemParamDescriptor } from "@/app/ecs/query/types";
 
 import * as E from "../types";
 
-import { EffectDependencyResolver } from "./dependency-resolver";
-import { NumberEffectEntities } from "./ecs";
+import { Queue } from "queue-typescript";
 
 type EffectType = {
   id?: NumberEffectId;
@@ -36,9 +44,18 @@ type EffectType = {
   precalculated: boolean;
 };
 
-const FreshQuery = EntityLookup(Value(E.NumberEffect)).filter(
+export const NumberEffectEntities = EntityLookup(Value(E.NumberEffect));
+
+export const FreshnessLookup = EntityLookup(Value(E.NumberEffect)).filter(
   Fresh(E.NumberValue),
 );
+
+// EcsEntity => Iterable of parent EcsEntity's
+// Not using EntityMapQuery because we only have one value and we don't want to deal with tuples.
+const ParentsQuery = MapQuery(Entity(), Parents());
+
+// NumberEffectId reference value => EcsEntity
+const RefsQuery = EntityLookup(Value(E.Reference));
 
 const EffectsQuery = EntityMapQuery(
   Keyed({
@@ -62,7 +79,7 @@ const OperationsQuery = EntityMapQuery(
         value: Value(E.NumberValue),
       }),
     ),
-    function UnpackOperands(operands) {
+    function Untuple(operands) {
       return Array.from(untuple(operands));
     },
   ),
@@ -77,62 +94,25 @@ type Operand = {
   value: Readonly<number | undefined>;
 };
 
-// A system which will recalculate the dependencies for the specified effect IDs, but only if they are recently changed.
-export function RecalculateFresh(...ids: NumberEffectId[]) {
-  return System(
-    FreshQuery,
-    EffectDependencyResolver(),
-    EffectValueResolver(),
-  )((freshLookup, dependencies, values) => {
-    const entities = defined(map(ids, (id) => freshLookup.get(id)));
-    for (const entity of dependencies.findByEntities(entities)) {
-      values.resolve(entity);
-    }
-  });
-}
-
-// A system which will recalculate the dependencies of all effect IDs returned by the specified query.
-export function RecalculateById(selector: QueryDescriptor<NumberEffectId>) {
-  return System(
-    Query(selector),
-    EffectDependencyResolver(),
-    EffectValueResolver(),
-  )((idsQuery, dependencies, values) => {
-    const ids = untuple(idsQuery);
-    for (const entity of dependencies.findByIds(ids)) {
-      values.resolve(entity);
-    }
-  });
-}
-
-// A system which will recalculate the dependencies of all effect entities returned by the query.
-export function RecalculateByEntity(selector: QueryDescriptor<EcsEntity>) {
-  return System(
-    Query(selector),
-    EffectDependencyResolver(),
-    EffectValueResolver(),
-  )((entityQuery, dependencies, values) => {
-    const entities = untuple(entityQuery);
-    for (const entity of dependencies.findByEntities(entities)) {
-      values.resolve(entity);
-    }
-  });
-}
-
 type EffectValueResolver = {
-  resolve(entity: EcsEntity): void;
+  resolveByEntities(entities: Iterable<EcsEntity>): void;
+  resolveByEffectIds(ids: Iterable<NumberEffectId>): void;
 };
 export function EffectValueResolver(): SystemParamDescriptor<EffectValueResolver> {
   return {
     inspect() {
       return inspectable(EffectValueResolver, [
         NumberEffectEntities,
+        ParentsQuery,
+        RefsQuery,
         EffectsQuery,
         OperationsQuery,
       ]);
     },
     create(world) {
       const lookupQuery = NumberEffectEntities.create(world);
+      const parentsQuery = ParentsQuery.create(world);
+      const refsQuery = RefsQuery.create(world);
       const effectsQuery = EffectsQuery.create(world);
       const operationsQuery = OperationsQuery.create(world);
 
@@ -140,12 +120,16 @@ export function EffectValueResolver(): SystemParamDescriptor<EffectValueResolver
         fetch() {
           return new EffectValueResolverImpl(
             lookupQuery.fetch(),
+            parentsQuery.fetch(),
+            refsQuery.fetch(),
             effectsQuery.fetch(),
             operationsQuery.fetch(),
           );
         },
         cleanup() {
           lookupQuery.cleanup?.();
+          parentsQuery.cleanup?.();
+          refsQuery.cleanup?.();
           effectsQuery.cleanup?.();
           operationsQuery.cleanup?.();
         },
@@ -155,6 +139,7 @@ export function EffectValueResolver(): SystemParamDescriptor<EffectValueResolver
 }
 
 class EffectValueResolverImpl implements EffectValueResolver {
+  private readonly referrersLookup = new MultiMap<EcsEntity, EcsEntity>();
   private readonly resolved = new Set<EcsEntity>();
 
   constructor(
@@ -162,11 +147,60 @@ class EffectValueResolverImpl implements EffectValueResolver {
       NumberEffectId,
       Readonly<EcsEntity>
     >,
+    private readonly parentsLookup: MapQueryResult<
+      EcsEntity,
+      Iterable<EcsEntity>
+    >,
+    refsLookup: IterableQueryResult<
+      [Readonly<NumberEffectId>, Readonly<EcsEntity>]
+    >,
     private readonly effects: MapQueryResult<EcsEntity, [EffectType]>,
     private readonly operations: MapQueryResult<EcsEntity, Operation>,
-  ) {}
+  ) {
+    for (const [ref, referrer] of refsLookup) {
+      const referenced = lookup.get(ref)!;
+      this.referrersLookup.add(referenced, referrer);
+    }
+  }
 
-  resolve(entity: EcsEntity) {
+  resolveByEntities(entities: Iterable<EcsEntity>) {
+    for (const entity of this.findDependents(entities)) {
+      this.resolve(entity);
+    }
+  }
+
+  resolveByEffectIds(ids: Iterable<NumberEffectId>) {
+    const entities = map(ids, (id) => this.lookup.get(id)!);
+    for (const entity of this.findDependents(entities)) {
+      this.resolve(entity);
+    }
+  }
+
+  private *findDependents(base: Iterable<EcsEntity>): Iterable<EcsEntity> {
+    const queue = new Queue<EcsEntity>(...base);
+
+    const found = new Set<EcsEntity>();
+
+    for (const effect of consume(queue)) {
+      enqueueAll(
+        queue,
+        filter(
+          concat(
+            this.parentsLookup.get(effect)!,
+            this.referrersLookup.entriesForKey(effect),
+          ),
+          (e) => !found.has(e),
+        ),
+      );
+
+      found.add(effect);
+    }
+
+    // reverse results so that the top-level effects appear first.
+    yield* Array.from(found).reverse();
+  }
+
+  private resolve(entity: EcsEntity) {
     if (!this.resolved.has(entity)) {
       this.gather(entity);
     }
