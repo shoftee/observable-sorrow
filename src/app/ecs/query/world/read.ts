@@ -11,16 +11,7 @@ import {
 import { QueryDescriptor } from "../types";
 
 type Read<C extends EcsComponent> = QueryDescriptor<Readonly<C>>;
-type UnwrapValueComponent<C extends EcsComponent> = C extends ValueComponent<
-  infer T
->
-  ? Readonly<T>
-  : never;
-type Value<C extends ValueComponent> = QueryDescriptor<UnwrapValueComponent<C>>;
-
 const ReadMemo = memoizer<Ctor<EcsComponent>, Read<EcsComponent>>();
-const ValueMemo = memoizer<Ctor<ValueComponent>, Value<ValueComponent>>();
-
 /** Include a read-only view of a component in the query results. */
 export function Read<C extends EcsComponent>(ctor: Ctor<C>) {
   return ReadMemo.get(ctor, newRead) as Read<C>;
@@ -43,14 +34,14 @@ function newRead<C extends EcsComponent>(ctor: Ctor<C>): Read<C> {
   };
 }
 
-/** Include a single-valued component in the query results. */
-export function Value<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
-  return ValueMemo.get(ctor, newValue) as Value<C>;
-}
-function newValue<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
+function makeExtractor<C extends EcsComponent, V>(
+  named: { name: string },
+  ctor: Ctor<C>,
+  selector: (component: C) => V,
+): QueryDescriptor<V> {
   return {
     inspect() {
-      return inspectable(Value, inspectableNames([ctor]));
+      return inspectable(named, inspectableNames([ctor]));
     },
     includes(archetype) {
       return archetype.has(ctor);
@@ -58,10 +49,32 @@ function newValue<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
     newQuery() {
       return {
         fetch({ archetype }) {
-          const entry = archetype.get(ctor)! as C;
-          return entry.value as UnwrapValueComponent<C>;
+          return selector(archetype.get(ctor)! as C);
         },
       };
     },
   };
+}
+
+/** Select arbitrary data from the specified component. */
+export function Extract<C extends EcsComponent>(ctor: Ctor<C>) {
+  return <V>(selector: (c: C) => V): QueryDescriptor<V> => {
+    return makeExtractor(Extract, ctor, selector);
+  };
+}
+
+type Value<C extends ValueComponent> = QueryDescriptor<UnwrapValueComponent<C>>;
+const ValueMemo = memoizer<Ctor<ValueComponent>, Value<ValueComponent>>();
+/** Like `Extract`, but for `ValueComponent`s. */
+export function Value<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
+  return ValueMemo.get(ctor, newValue) as Value<C>;
+}
+
+type UnwrapValueComponent<C extends EcsComponent> = C extends ValueComponent<
+  infer T
+>
+  ? Readonly<T>
+  : never;
+function newValue<C extends ValueComponent>(ctor: Ctor<C>): Value<C> {
+  return makeExtractor(Value, ctor, (c) => c.value as UnwrapValueComponent<C>);
 }
