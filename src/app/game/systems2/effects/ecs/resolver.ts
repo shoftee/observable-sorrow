@@ -1,8 +1,6 @@
 import {
   concat,
   consume,
-  enqueueAll,
-  filter,
   map,
   MultiMap,
   untuple,
@@ -162,40 +160,44 @@ class EffectValueResolverImpl implements EffectValueResolver {
   }
 
   resolveByEntities(entities: Iterable<EcsEntity>) {
-    for (const entity of this.findDependents(entities)) {
+    for (const entity of this.findRoots(entities)) {
       this.resolve(entity);
     }
   }
 
   resolveByEffectIds(ids: Iterable<NumberEffectId>) {
     const entities = map(ids, (id) => this.lookup.get(id)!);
-    for (const entity of this.findDependents(entities)) {
+    for (const entity of this.findRoots(entities)) {
       this.resolve(entity);
     }
   }
 
-  private *findDependents(base: Iterable<EcsEntity>): Iterable<EcsEntity> {
+  private *findRoots(base: Iterable<EcsEntity>): Iterable<EcsEntity> {
     const queue = new Queue<EcsEntity>(...base);
 
-    const found = new Set<EcsEntity>();
-
+    const roots = new Set<EcsEntity>();
     for (const effect of consume(queue)) {
-      enqueueAll(
-        queue,
-        filter(
-          concat(
-            this.parentsLookup.get(effect)!,
-            this.referrersLookup.entriesForKey(effect),
-          ),
-          (e) => !found.has(e),
-        ),
+      const dependents = concat(
+        this.parentsLookup.get(effect)!,
+        this.referrersLookup.entriesForKey(effect),
       );
 
-      found.add(effect);
+      let hasDependents = false;
+      for (const dependent of dependents) {
+        hasDependents ||= true;
+
+        if (!roots.has(dependent)) {
+          queue.enqueue(dependent);
+        }
+      }
+
+      // NOTE: only remembering the roots will cause issues if there are cycles
+      if (!hasDependents) {
+        roots.add(effect);
+      }
     }
 
-    // reverse results so that the top-level effects appear first.
-    yield* Array.from(found).reverse();
+    yield* roots;
   }
 
   private resolve(entity: EcsEntity) {
