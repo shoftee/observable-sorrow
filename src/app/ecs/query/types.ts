@@ -76,10 +76,10 @@ export type InferQueryResult<Q> = Q extends QueryDescriptor<infer R>
   : never;
 
 export type UnwrapDescriptorTuple<D> = D extends [infer Head, ...infer Tail]
-  ? [...UnwrapDescriptor<Head>, ...UnwrapDescriptorTuple<Tail>]
+  ? Head extends QueryDescriptor<infer Result>
+    ? [Result, ...UnwrapDescriptorTuple<Tail>]
+    : UnwrapDescriptorTuple<Tail>
   : [];
-
-type UnwrapDescriptor<D> = D extends QueryDescriptor<infer R> ? [R] : [];
 
 export interface SystemParameter<Result = unknown> {
   fetch(): Result;

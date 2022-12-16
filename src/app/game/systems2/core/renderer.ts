@@ -97,8 +97,6 @@ function SchemaExtractorQuery<Q extends [...QueryDescriptor[]]>(...qs: Q) {
   };
 }
 
-const R_DeltaBuffer = Res(DeltaBuffer);
-
 type MutatorFn<S, C extends EcsComponent> = (state: S, tracked: C) => void;
 
 export function DeltaExtractor<Q extends [...QueryDescriptor[]]>(
@@ -110,7 +108,7 @@ export function DeltaExtractor<Q extends [...QueryDescriptor[]]>(
       mutator: MutatorFn<S, C>,
     ) => {
       return System(
-        R_DeltaBuffer,
+        Res(DeltaBuffer),
         Query(
           ChangeTrackers(tracked),
           SchemaExtractorQuery(...stateQuery)(schemaExtractor),

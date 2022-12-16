@@ -45,14 +45,15 @@ function makeDescriptor<Q extends QueryDescriptor, R>(
   };
 }
 
-type IterbleDescriptor<Q extends Descriptor[]> = SystemParamDescriptor<
+type IterableDescriptor<Q extends Descriptor[]> = SystemParamDescriptor<
   Iterable<UnwrapDescriptorTuple<Q>>
 >;
+
 /** Builds a data query for the specified descriptors.
  *
  * You can specify both `QueryDescriptor`s and `FilterDescriptor`s in any order, but it's recommended you put the filters at the end.
  */
-export function Query<Q extends Descriptor[]>(...qs: Q): IterbleDescriptor<Q> {
+export function Query<Q extends Descriptor[]>(...qs: Q): IterableDescriptor<Q> {
   return makeDescriptor(Query, Tuple(...qs), (fetcher) =>
     Array.from(fetcher.values()),
   );
@@ -61,13 +62,13 @@ export function Query<Q extends Descriptor[]>(...qs: Q): IterbleDescriptor<Q> {
 export function Take<Q extends Descriptor[]>(
   count: number,
   ...qs: Q
-): IterbleDescriptor<Q> {
+): IterableDescriptor<Q> {
   return makeDescriptor(Take, Tuple(...qs), (fetcher) =>
     take(fetcher.values(), count),
   );
 }
 /** Equivalent to `Take(1, ...)`. */
-export function First<Q extends Descriptor[]>(...qs: Q): IterbleDescriptor<Q> {
+export function First<Q extends Descriptor[]>(...qs: Q): IterableDescriptor<Q> {
   return makeDescriptor(First, Tuple(...qs), (fetcher) =>
     take(fetcher.values(), 1),
   );
