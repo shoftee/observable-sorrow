@@ -71,6 +71,17 @@ export function* filter<T>(
   }
 }
 
+export function* ofType<T, V extends T>(
+  iterable: Iterable<T>,
+  assertion: (item: T) => item is V,
+): Iterable<V> {
+  for (const item of iterable) {
+    if (assertion(item)) {
+      yield item;
+    }
+  }
+}
+
 export function untuple<T>(iterable: Iterable<[T]>): Iterable<T> {
   return map(iterable, ([element]) => element);
 }

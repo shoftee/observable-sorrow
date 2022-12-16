@@ -72,17 +72,19 @@ const SpawnEffects = System(Commands())((cmds) => {
 });
 
 const InitializeEffectValues = System(
-  Query(Entity()).filter(Has(Effect)),
+  Query(Entity(), Has(Effect)),
   EffectValueResolver(),
 )((lookup, resolver) => {
   resolver.resolveByEntities(untuple(lookup));
 });
 
 const CollectEffectTrees = System(
-  MapQuery(Value(NumberEffect), Tuple(Entity(), Mut(EffectTree))).filter(
+  MapQuery(
+    Value(NumberEffect),
+    Tuple(Entity(), Mut(EffectTree)),
     Added(NumberEffect),
   ),
-  EntityMapQuery(Opt(Read(Reference)), Eager(Children())).filter(Has(Effect)),
+  EntityMapQuery(Opt(Read(Reference)), Eager(Children()), Has(Effect)),
 )((ids, effects) => {
   for (const [entity, { references }] of ids.values()) {
     collectReferences(
@@ -115,7 +117,7 @@ const NumberExtractor = DeltaExtractor(Value(NumberEffect))(
 );
 
 const EffectTreeExtractor = DeltaExtractor(
-  Tuple(Value(NumberEffect)).filter(Added(EffectTree)),
+  Tuple(Value(NumberEffect), Added(EffectTree)),
 )((schema, [[id]]) => schema.numbers[id]);
 
 const Extractors = [

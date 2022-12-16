@@ -4,7 +4,9 @@ import { Constructor as Ctor } from "@/app/utils/types";
 
 import { inspectableNames, inspectable, EcsComponent } from "../../types";
 
-import { FilterDescriptor, OneOrMoreCtors } from "../types";
+import { FilterDescriptor } from "../types";
+
+type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
 
 type Has = FilterDescriptor;
 const HasMemo = memoizer<Ctor, Has>();

@@ -41,7 +41,7 @@ const Setup = System(Commands())((cmds) => {
 });
 
 const ProcessSkyObserved = ThrottledReceiverSystem(SkyObserved)(
-  Single(DiffMut(Countdown)).filter(Has(RareEvent)),
+  Single(DiffMut(Countdown), Has(RareEvent)),
   NumberState(),
   ResourceLedger(),
   Dispatch(HistoryEventOccurred),
@@ -68,11 +68,9 @@ const ProcessSkyObserved = ThrottledReceiverSystem(SkyObserved)(
   });
 });
 
-const ProcessRareEvent = PerTickSystem(
-  Query(Read(Timer)).filter(Has(DayTimer)),
-)(
-  Single(DiffMut(Countdown), Read(Prng)).filter(Has(RareEvent)),
-  Single(Value(Unlocked)).filter(SectionPredicate("science")),
+const ProcessRareEvent = PerTickSystem(Query(Read(Timer), Has(DayTimer)))(
+  Single(DiffMut(Countdown), Read(Prng), Has(RareEvent)),
+  Single(Value(Unlocked), SectionPredicate("science")),
   Dispatch(HistoryEventOccurred),
 )(([countdown, prng], [scienceUnlocked], history) => {
   if (countdown.remaining > 0) {

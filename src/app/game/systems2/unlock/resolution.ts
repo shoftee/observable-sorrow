@@ -19,9 +19,7 @@ import { Building } from "../types/common";
 import { Unlocked, UnlockOnEffect } from "./types";
 
 const MarkUnlockedFromEffects = System(
-  MapQuery(Value(BooleanEffect), Value(BooleanValue)).filter(
-    Fresh(BooleanValue),
-  ),
+  MapQuery(Value(BooleanEffect), Value(BooleanValue), Fresh(BooleanValue)),
   MapQuery(Value(UnlockOnEffect), DiffMut(Unlocked)),
 )((effects, unlockedLookup) => {
   for (const [id, effectValue] of effects) {
@@ -33,7 +31,9 @@ const MarkUnlockedFromEffects = System(
 });
 
 const MarkAggregateUnlocks = System(
-  Query(DiffMut(Unlocked), ChildrenQuery(Value(Unlocked))).filter(
+  Query(
+    DiffMut(Unlocked),
+    ChildrenQuery(Value(Unlocked)),
     HasAny(Building, Section),
   ),
 )((query) => {

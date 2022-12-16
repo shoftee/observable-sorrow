@@ -28,8 +28,8 @@ import * as E from "../effects/types";
 import * as R from "./types";
 
 const ResolveLimitAndDeltaEffects = System(
-  Query(Value(R.DeltaEffect)).filter(Fresh(R.DeltaEffect)),
-  Query(Value(R.LimitEffect)).filter(Fresh(R.LimitEffect)),
+  Query(Value(R.DeltaEffect), Fresh(R.DeltaEffect)),
+  Query(Value(R.LimitEffect), Fresh(R.LimitEffect)),
   EffectValueResolver(),
 )((deltasQuery, limitsQuery, values) => {
   values.resolveByEffectIds(untuple(deltasQuery));
@@ -37,11 +37,9 @@ const ResolveLimitAndDeltaEffects = System(
 });
 
 const UpdateEffectTargets = System(
-  Query(DiffMut(R.Limit), Value(R.LimitEffect)).filter(Has(Resource)),
-  Query(DiffMut(R.Delta), Value(R.DeltaEffect)).filter(Has(Resource)),
-  MapQuery(Value(E.NumberEffect), Read(E.NumberValue)).filter(
-    Fresh(E.NumberValue),
-  ),
+  Query(DiffMut(R.Limit), Value(R.LimitEffect), Has(Resource)),
+  Query(DiffMut(R.Delta), Value(R.DeltaEffect), Has(Resource)),
+  MapQuery(Value(E.NumberEffect), Read(E.NumberValue), Fresh(E.NumberValue)),
 )((limits, deltas, numbers) => {
   for (const [limit, effect] of limits) {
     const value = numbers.get(effect);
@@ -58,7 +56,7 @@ const UpdateEffectTargets = System(
 });
 
 const ProcessLedger = System(
-  Single(Read(Timer)).filter(Has(TickTimer)),
+  Single(Read(Timer), Has(TickTimer)),
   Query(
     Read(R.LedgerEntry),
     Opt(Value(R.Delta)),
@@ -107,7 +105,9 @@ function calculateAmount(
 }
 
 const UnlockByQuantity = System(
-  Query(ChangeTrackers(R.Amount), Mut(Unlocked)).filter(
+  Query(
+    ChangeTrackers(R.Amount),
+    Mut(Unlocked),
     HasAll(Resource, R.UnlockOnFirstQuantity),
   ),
 )((amounts) => {
@@ -123,7 +123,9 @@ const UnlockByQuantity = System(
 });
 
 const UnlockByCapacity = System(
-  Query(ChangeTrackers(R.Limit), Mut(Unlocked)).filter(
+  Query(
+    ChangeTrackers(R.Limit),
+    Mut(Unlocked),
     HasAll(Resource, R.UnlockOnFirstCapacity),
   ),
 )((limits) => {

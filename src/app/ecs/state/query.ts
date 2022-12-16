@@ -1,6 +1,7 @@
 import { EcsEntity, Archetype } from "../types";
 import {
   Descriptor,
+  InferQueryResult,
   isQueryDescriptor,
   QueryDescriptor,
   WorldQuery,
@@ -9,8 +10,6 @@ import { World } from "../world";
 
 import { ComponentState } from "./components";
 import { getOrAdd, MultiMap } from "@/app/utils/collections";
-
-type Result<T = unknown> = T extends QueryDescriptor<infer R> ? R : never;
 
 export class QueryState {
   private readonly fetches = new Map<Descriptor, FetchState>();
@@ -66,17 +65,19 @@ export class QueryState {
     fetch.notify(this.epoch, this.components.entities());
   }
 
-  get<Q extends QueryDescriptor>(descriptor: Q): FetchCache<Result<Q>> {
+  get<Q extends QueryDescriptor>(
+    descriptor: Q,
+  ): FetchCache<InferQueryResult<Q>> {
     const fetch = this.fetches.get(descriptor);
     if (fetch === undefined) {
       throw new Error("Query is not registered.");
     }
-    return fetch as FetchCache<Result<Q>>;
+    return fetch as FetchCache<InferQueryResult<Q>>;
   }
 
   registerAndGet<Q extends QueryDescriptor>(
     descriptor: Q,
-  ): FetchCache<Result<Q>> {
+  ): FetchCache<InferQueryResult<Q>> {
     if (!this.fetches.has(descriptor)) {
       this.register(descriptor);
     }

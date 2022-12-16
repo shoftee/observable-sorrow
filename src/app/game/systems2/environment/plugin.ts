@@ -10,8 +10,8 @@ import {
   Value,
   Fresh,
   Single,
-  Take,
   Entity,
+  First,
 } from "@/app/ecs/query";
 import { System } from "@/app/ecs/system";
 
@@ -42,9 +42,7 @@ const Setup = System(Commands())((cmds) => {
   );
 });
 
-const AdvanceCalendar = PerTickSystem(
-  Query(Read(Timer)).filter(Has(E.DayTimer)),
-)(
+const AdvanceCalendar = PerTickSystem(Query(Read(Timer), Has(E.DayTimer)))(
   Single(
     DiffMut(E.Day),
     DiffMut(E.Season),
@@ -73,8 +71,8 @@ const AdvanceCalendar = PerTickSystem(
 });
 
 const HandleSeasonChanged = System(
-  Take(1, Value(E.Season)).filter(Fresh(E.Season)),
-  Single(Entity(), DiffMut(NumberValue)).filter(Has(SeasonEffect)),
+  First(Value(E.Season), Fresh(E.Season)),
+  Single(Entity(), DiffMut(NumberValue), Has(SeasonEffect)),
   EffectValueResolver(),
 )(([season], effect, resolver) => {
   if (season) {
@@ -87,8 +85,8 @@ const HandleSeasonChanged = System(
 });
 
 const HandleWeatherChanged = System(
-  Take(1, Value(E.Weather), DiffMut(E.Labels)).filter(Fresh(E.Weather)),
-  Single(Entity(), DiffMut(NumberValue)).filter(Has(WeatherEffect)),
+  First(Value(E.Weather), DiffMut(E.Labels), Fresh(E.Weather)),
+  Single(Entity(), DiffMut(NumberValue), Has(WeatherEffect)),
   EffectValueResolver(),
 )(([weather], effect, resolver) => {
   if (weather) {

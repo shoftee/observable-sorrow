@@ -178,13 +178,13 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const bothQuery = Tuple(Read(Player)).filter(Has(Id), Has(Name));
+        const bothQuery = Tuple(Read(Player), Has(Id), Has(Name));
         world.queries.register(bothQuery);
         const bothEntries = Array.from(results(world, bothQuery));
 
         expect(bothEntries).to.deep.equal([[{ level: 20, exp: 123 }]]);
 
-        const nameQuery = Tuple(Read(Player)).filter(Has(Name));
+        const nameQuery = Tuple(Read(Player), Has(Name));
         world.queries.register(nameQuery);
         const nameEntries = Array.from(results(world, nameQuery));
         expect(nameEntries).to.deep.equal([
@@ -192,7 +192,7 @@ describe("ecs world query", () => {
           [{ level: 30, exp: 345 }],
         ]);
 
-        const idQuery = Tuple(Read(Player)).filter(Has(Id));
+        const idQuery = Tuple(Read(Player), Has(Id));
         world.queries.register(idQuery);
         const idEntries = Array.from(results(world, idQuery));
         expect(idEntries).to.deep.equal([
@@ -214,12 +214,12 @@ describe("ecs world query", () => {
           new Player(40, 456),
         );
 
-        const withoutName = Tuple(Read(Player)).filter(HasNone(Name));
+        const withoutName = Tuple(Read(Player), HasNone(Name));
         world.queries.register(withoutName);
         const withoutNameEntries = single(results(world, withoutName));
         expect(withoutNameEntries).to.deep.equal([{ level: 40, exp: 456 }]);
 
-        const withoutId = Tuple(Read(Player)).filter(HasNone(Id));
+        const withoutId = Tuple(Read(Player), HasNone(Id));
         world.queries.register(withoutId);
         const withoutIdEntries = single(results(world, withoutId));
         expect(withoutIdEntries).to.deep.equal([{ level: 30, exp: 345 }]);

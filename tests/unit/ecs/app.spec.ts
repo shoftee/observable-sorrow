@@ -176,14 +176,14 @@ describe("ecs app", () => {
       });
 
       let detected = 0;
-      const ChangedCounter = System(
-        Query(Read(Player)).filter(Changed(Player)),
-      )((players) => {
-        for (const [{ level }] of players) {
-          expect(level).to.eq(20 + levelUps);
-          detected++;
-        }
-      });
+      const ChangedCounter = System(Query(Read(Player), Changed(Player)))(
+        (players) => {
+          for (const [{ level }] of players) {
+            expect(level).to.eq(20 + levelUps);
+            detected++;
+          }
+        },
+      );
 
       const SpawnSystem = System(Commands())((cmds) => {
         cmds.spawn(new Id("shoftee"), new Player(20));
@@ -221,7 +221,7 @@ describe("ecs app", () => {
       });
 
       let detected = 0;
-      const AddedCounter = System(Query(Read(Player)).filter(Added(Player)))(
+      const AddedCounter = System(Query(Read(Player), Added(Player)))(
         (players) => {
           for (const [{ level }] of players) {
             expect(level).to.eq(20);
@@ -259,7 +259,7 @@ describe("ecs app", () => {
         }
       });
 
-      const LevelUpper = System(Query(Mut(Player)).filter(Added(Player)))(
+      const LevelUpper = System(Query(Mut(Player), Added(Player)))(
         (players) => {
           for (const [player] of players) {
             player.level++;
@@ -325,15 +325,15 @@ describe("ecs app", () => {
         }
       });
 
-      const TrackRemovedPlayer = System(
-        Query(Value(Id)).filter(Removed(Player)),
-      )((query) => {
-        if (counter === 1) {
-          expect(Array.from(query)).to.deep.equal([["shoftee"]]);
-        } else if (counter === 2) {
-          expect(Array.from(query)).to.be.empty;
-        }
-      });
+      const TrackRemovedPlayer = System(Query(Value(Id), Removed(Player)))(
+        (query) => {
+          if (counter === 1) {
+            expect(Array.from(query)).to.deep.equal([["shoftee"]]);
+          } else if (counter === 2) {
+            expect(Array.from(query)).to.be.empty;
+          }
+        },
+      );
 
       const runner = new App()
         .addStartupSystem(Spawn)

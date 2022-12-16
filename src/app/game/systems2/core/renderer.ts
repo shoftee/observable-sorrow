@@ -10,7 +10,7 @@ import {
 import { Tuple, ChangeTrackers, Query, Res } from "@/app/ecs/query";
 import {
   QueryDescriptor,
-  UnwrapTupleQueryResults as Unwrap,
+  UnwrapDescriptorTuple as Unwrap,
   WorldQuery,
 } from "@/app/ecs/query/types";
 import { System } from "@/app/ecs/system";

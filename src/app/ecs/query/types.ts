@@ -1,5 +1,3 @@
-import { Constructor as Ctor } from "@/app/utils/types";
-
 import { Archetype, EcsComponent, EcsEntity, Inspectable } from "../types";
 import { World } from "../world";
 
@@ -11,7 +9,7 @@ import { World } from "../world";
  * 2. Call matches(). If returned value was false, skip query item and restart with next.
  * 3. Call fetch() to get query results.
  *
- * There are four basic kinds of world queries:
+ * There are a few basic kinds of world queries:
  * * Entity - ask for the entity for a given WQ result.
  * * Value(Component) - returns the value field of a ValueComponent<T>
  * * Ref(Component) - returns read-only view of a component.
@@ -19,7 +17,7 @@ import { World } from "../world";
  * * Opt(WorldQuery) - wrapper for making other world queries optional.
  *
  * Combine any of the above with this:
- * * All(WorldQuery_1, WorldQuery_2, WorldQuery_3,...) - returns an iterator over all component tuples that match the provided world queries
+ * * Tuple(WorldQuery_1, WorldQuery_2, WorldQuery_3,...) - returns an iterator over all component tuples that match the provided world queries
  * * Map([ValueComponent query], [any WorldQuery]) - returns a map keyed by the provided value component and valued with the result from the provided world query. Can be combined with All().
  *
  * Filters:
@@ -32,10 +30,10 @@ import { World } from "../world";
  * * ChangeTrackers(C) - return the change tracking information for C, can be used to determine if C was added or changed since the last system execution. Cannot be used for removal detection.
  */
 
-export type FetchContext<C extends EcsComponent = EcsComponent> = {
+export interface FetchContext<C extends EcsComponent = EcsComponent> {
   entity: EcsEntity;
   archetype: Archetype<C>;
-};
+}
 
 export interface WorldFilter {
   matches?(ctx: FetchContext): boolean;
@@ -45,6 +43,10 @@ export interface WorldFilter {
 export interface WorldQuery<Result> extends WorldFilter {
   fetch(ctx: FetchContext): Result;
 }
+
+export type InferWorldQueryResult<Q> = Q extends WorldQuery<infer R>
+  ? R
+  : never;
 
 export interface Descriptor extends Inspectable {
   includes?(archetype: Archetype): boolean;
@@ -69,22 +71,21 @@ export function isQueryDescriptor<R = unknown>(
   return (d as QueryDescriptor<R>).newQuery !== undefined;
 }
 
-export type UnwrapTupleQueryResults<F> = F extends [infer Head, ...infer Tail]
-  ? [...UnwrapQueryDescriptor<Head>, ...UnwrapTupleQueryResults<Tail>]
-  : [];
-type UnwrapQueryDescriptor<T> = T extends QueryDescriptor<infer Result>
-  ? [Result]
-  : [T];
+export type InferQueryResult<Q> = Q extends QueryDescriptor<infer R>
+  ? R
+  : never;
 
-export type SystemParameter<Result = unknown> = {
+export type UnwrapDescriptorTuple<D> = D extends [infer Head, ...infer Tail]
+  ? [...UnwrapDescriptor<Head>, ...UnwrapDescriptorTuple<Tail>]
+  : [];
+
+type UnwrapDescriptor<D> = D extends QueryDescriptor<infer R> ? [R] : [];
+
+export interface SystemParameter<Result = unknown> {
   fetch(): Result;
   cleanup?(): void;
-};
+}
 
-export type SystemParamDescriptor<Result = unknown> = Inspectable & {
+export interface SystemParamDescriptor<Result = unknown> extends Inspectable {
   create(world: World): SystemParameter<Result>;
-};
-
-export type OneOrMoreCtors = [Ctor<EcsComponent>, ...Ctor<EcsComponent>[]];
-
-export type OneOrMoreFilters = [FilterDescriptor, ...FilterDescriptor[]];
+}

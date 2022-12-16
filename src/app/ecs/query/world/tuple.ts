@@ -1,32 +1,39 @@
-import { all } from "@/app/utils/collections";
+import { all, ofType } from "@/app/utils/collections";
 
 import { Archetype, World } from "@/app/ecs";
 
 import {
   QueryDescriptor,
-  UnwrapTupleQueryResults as Unwrap,
+  UnwrapDescriptorTuple as Unwrap,
   WorldQuery,
   FilterDescriptor,
-  OneOrMoreFilters,
+  Descriptor,
+  isFilterDescriptor,
+  isQueryDescriptor,
 } from "../types";
-import { EcsMetadata, inspectable } from "../../types";
+import { inspectable } from "../../types";
 
-export class TupleQueryDescriptor<Q extends [...QueryDescriptor[]]>
+export class TupleQueryDescriptor<Q extends Descriptor[]>
   implements QueryDescriptor<Unwrap<Q>>
 {
-  constructor(readonly queries: Q, readonly filters: FilterDescriptor[]) {}
+  private readonly filters: FilterDescriptor[];
+  private readonly queries: QueryDescriptor[];
 
-  inspect(): EcsMetadata {
-    return inspectable(Tuple, this.dependencies());
+  constructor(readonly descriptors: Descriptor[]) {
+    this.filters = Array.from(ofType(descriptors, isFilterDescriptor));
+    this.queries = Array.from(ofType(descriptors, isQueryDescriptor));
+  }
+
+  inspect() {
+    return inspectable(Tuple, this.descriptors);
   }
 
   *dependencies() {
-    yield* this.filters;
-    yield* this.queries;
+    yield* this.descriptors;
   }
 
   includes(archetype: Archetype): boolean {
-    return all(this.dependencies(), (f) => f.includes?.(archetype) ?? true);
+    return all(this.descriptors, (f) => f.includes?.(archetype) ?? true);
   }
 
   newQuery(world: World): WorldQuery<Unwrap<Q>> {
@@ -51,18 +58,11 @@ export class TupleQueryDescriptor<Q extends [...QueryDescriptor[]]>
       },
     };
   }
-
-  filter(...filters: OneOrMoreFilters): TupleQueryDescriptor<Q> {
-    return new TupleQueryDescriptor(this.queries, [
-      ...this.filters,
-      ...filters,
-    ]);
-  }
 }
 
 /** Includes results only when they match all provided sub-queries. */
-export function Tuple<Q extends [...QueryDescriptor[]]>(
+export function Tuple<Q extends [...Descriptor[]]>(
   ...qs: Q
 ): TupleQueryDescriptor<Q> {
-  return new TupleQueryDescriptor(qs, []);
+  return new TupleQueryDescriptor(qs);
 }

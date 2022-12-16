@@ -1,10 +1,4 @@
-import {
-  concat,
-  consume,
-  map,
-  MultiMap,
-  untuple,
-} from "@/app/utils/collections";
+import { concat, consume, map, MultiMap } from "@/app/utils/collections";
 
 import { NumberEffectId } from "@/app/interfaces";
 
@@ -17,15 +11,13 @@ import {
   IsMarked,
   ChildrenQuery,
   Entity,
-  MapQueryResult,
+  MapResult,
   Keyed,
   Value,
-  Transform,
-  Fresh,
   EntityLookup,
-  IterableQueryResult,
   MapQuery,
   Parents,
+  Eager,
 } from "@/app/ecs/query";
 import { SystemParamDescriptor } from "@/app/ecs/query/types";
 
@@ -43,10 +35,6 @@ type EffectType = {
 };
 
 export const NumberEffectEntities = EntityLookup(Value(E.NumberEffect));
-
-export const FreshnessLookup = EntityLookup(Value(E.NumberEffect)).filter(
-  Fresh(E.NumberValue),
-);
 
 // EcsEntity => Iterable of parent EcsEntity's
 // Not using EntityMapQuery because we only have one value and we don't want to deal with tuples.
@@ -68,7 +56,7 @@ const EffectsQuery = EntityMapQuery(
 
 const OperationsQuery = EntityMapQuery(
   Read(E.Operation),
-  Transform(
+  Eager(
     ChildrenQuery(
       Keyed({
         entity: Entity(),
@@ -76,13 +64,10 @@ const OperationsQuery = EntityMapQuery(
         value: Value(E.NumberValue),
       }),
     ),
-    function Untuple(operands) {
-      return Array.from(untuple(operands));
-    },
   ),
 );
 
-type Operation = [Readonly<E.Operation>, Operand[]];
+type Operation = [Readonly<E.Operation>, [Operand][]];
 
 type Operand = {
   entity: EcsEntity;
@@ -139,19 +124,11 @@ class EffectValueResolverImpl implements EffectValueResolver {
   private readonly resolved = new Set<EcsEntity>();
 
   constructor(
-    private readonly lookup: MapQueryResult<
-      NumberEffectId,
-      Readonly<EcsEntity>
-    >,
-    private readonly parentsLookup: MapQueryResult<
-      EcsEntity,
-      Iterable<EcsEntity>
-    >,
-    refsLookup: IterableQueryResult<
-      [Readonly<NumberEffectId>, Readonly<EcsEntity>]
-    >,
-    private readonly effects: MapQueryResult<EcsEntity, [EffectType]>,
-    private readonly operations: MapQueryResult<EcsEntity, Operation>,
+    private readonly lookup: MapResult<NumberEffectId, Readonly<EcsEntity>>,
+    private readonly parentsLookup: MapResult<EcsEntity, Iterable<EcsEntity>>,
+    refsLookup: MapResult<NumberEffectId, Readonly<EcsEntity>>,
+    private readonly effects: MapResult<EcsEntity, [EffectType]>,
+    private readonly operations: MapResult<EcsEntity, Operation>,
   ) {
     for (const [ref, referrer] of refsLookup) {
       const referenced = lookup.get(ref)!;
@@ -243,19 +220,19 @@ class EffectValueResolverImpl implements EffectValueResolver {
     return value.value;
   }
 
-  private gatherOperation([{ type }, operands]: Operation): number | undefined {
-    for (const operand of operands) {
-      this.gather(operand.entity);
+  private gatherOperation([{ type }, operands]: Operation) {
+    for (const [{ entity }] of operands) {
+      this.gather(entity);
     }
     return Calculators[type](operands);
   }
 }
 
-type CalculatorFn = (tuples: Iterable<Operand>) => number | undefined;
+type CalculatorFn = (tuples: Iterable<[Operand]>) => number | undefined;
 const Calculators: Record<E.OperationType, CalculatorFn> = {
   sum: (tuples) => {
     let sum = 0;
-    for (const { value } of tuples) {
+    for (const [{ value }] of tuples) {
       if (value === undefined) return undefined;
       sum += value;
     }
@@ -263,13 +240,13 @@ const Calculators: Record<E.OperationType, CalculatorFn> = {
   },
   product: (tuples) => {
     let prod = 1;
-    for (const { value } of tuples) {
+    for (const [{ value }] of tuples) {
       if (value === undefined) return undefined;
       prod *= value;
     }
     return prod;
   },
-  ratio: ([a, b]) => {
+  ratio: ([[a], [b]]) => {
     const [base, ratio] =
       a.operand.order < b.operand.order
         ? [a.value, b.value]

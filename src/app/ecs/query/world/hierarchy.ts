@@ -1,6 +1,6 @@
 import { EcsEntity, inspectable } from "@/app/ecs";
 
-import { QueryDescriptor, UnwrapTupleQueryResults as Unwrap } from "../types";
+import { Descriptor, QueryDescriptor, UnwrapDescriptorTuple } from "../types";
 
 import { EntityMapQuery } from "..";
 
@@ -39,10 +39,10 @@ export function Parents(): Parents {
   };
 }
 
-type ParentQuery<Q extends [...QueryDescriptor[]]> = QueryDescriptor<Unwrap<Q>>;
-export function ParentQuery<Q extends [...QueryDescriptor[]]>(
-  ...qs: Q
-): ParentQuery<Q> {
+type ParentQuery<D extends Descriptor[]> = QueryDescriptor<
+  UnwrapDescriptorTuple<D>
+>;
+export function ParentQuery<D extends Descriptor[]>(...qs: D): ParentQuery<D> {
   const mapQuery = EntityMapQuery(...qs);
   return {
     inspect() {
@@ -85,12 +85,12 @@ export function Children(): Children {
   };
 }
 
-type ChildrenQuery<Q extends [...QueryDescriptor[]]> = QueryDescriptor<
-  Iterable<Unwrap<Q>>
+type ChildrenQuery<D extends Descriptor[]> = QueryDescriptor<
+  Iterable<UnwrapDescriptorTuple<D>>
 >;
-export function ChildrenQuery<Q extends [...QueryDescriptor[]]>(
-  ...qs: Q
-): ChildrenQuery<Q> {
+export function ChildrenQuery<D extends Descriptor[]>(
+  ...qs: D
+): ChildrenQuery<D> {
   const mapQuery = EntityMapQuery(...qs);
   return {
     inspect() {

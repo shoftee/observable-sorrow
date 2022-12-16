@@ -4,7 +4,7 @@ import { World } from "../../world";
 import {
   Descriptor,
   FilterDescriptor,
-  OneOrMoreFilters,
+  InferQueryResult,
   QueryDescriptor,
   WorldQuery,
 } from "../types";
@@ -16,7 +16,7 @@ type UnwrapKeyedWorldQuery<Q extends KeyedQuery> = {
     : never;
 };
 type UnwrapKeyedResults<Q extends KeyedQuery> = {
-  [K in keyof Q]: Q[K] extends QueryDescriptor<infer Result> ? Result : never;
+  [K in keyof Q]: InferQueryResult<Q[K]>;
 };
 
 class KeyedQueryDescriptor<Q extends KeyedQuery>
@@ -25,13 +25,6 @@ class KeyedQueryDescriptor<Q extends KeyedQuery>
   private readonly descriptors: QueryDescriptor[];
   constructor(readonly descriptorObj: Q, readonly filters: FilterDescriptor[]) {
     this.descriptors = Object.values(this.descriptorObj);
-  }
-
-  filter(...filters: OneOrMoreFilters): KeyedQueryDescriptor<Q> {
-    return new KeyedQueryDescriptor(this.descriptorObj, [
-      ...this.filters,
-      ...filters,
-    ]);
   }
 
   inspect(): EcsMetadata {
@@ -60,8 +53,8 @@ class KeyedQueryDescriptor<Q extends KeyedQuery>
         return all(instances(), (f) => f.matches?.(ctx) ?? true);
       },
       cleanup() {
-        for (const { cleanup } of instances()) {
-          cleanup?.();
+        for (const instance of instances()) {
+          instance.cleanup?.();
         }
       },
       fetch(ctx) {

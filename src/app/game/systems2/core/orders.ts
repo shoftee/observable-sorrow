@@ -4,7 +4,7 @@ import { ResourceId } from "@/app/interfaces";
 import { Ledger, ResourceMap } from "@/app/state";
 
 import { inspectable } from "@/app/ecs";
-import { MapQuery, Value, Tuple, Opt, DiffMut } from "@/app/ecs/query";
+import { MapQuery, Value, Opt, DiffMut, Keyed } from "@/app/ecs/query";
 import { SystemParamDescriptor } from "@/app/ecs/query/types";
 
 import { Amount, Limit, LedgerEntry } from "../resource/types";
@@ -12,7 +12,11 @@ import { Resource } from "../types/common";
 
 export const ResourceMapQuery = MapQuery(
   Value(Resource),
-  Tuple(Value(Amount), Opt(Value(Limit)), DiffMut(LedgerEntry)),
+  Keyed({
+    amount: Value(Amount),
+    limit: Opt(Value(Limit)),
+    ledgerEntry: DiffMut(LedgerEntry),
+  }),
 );
 
 type Order = Partial<{
@@ -20,19 +24,18 @@ type Order = Partial<{
   readonly credits: ResourceMap;
 }>;
 
-type ResourceTuple = [
-  Readonly<number>,
-  Readonly<number> | undefined,
-  LedgerEntry,
-];
+type ResourceTuple = {
+  amount: number;
+  limit: number | undefined;
+  ledgerEntry: LedgerEntry;
+};
 
 type OrderHandlers = Partial<{
   success(rewards: ResourceMap): void;
   failure(): void;
 }>;
 
-type ResourceTupleMap = {
-  [Symbol.iterator](): IterableIterator<[ResourceId, ResourceTuple]>;
+type ResourceTupleMap = Iterable<[ResourceId, ResourceTuple]> & {
   get(id: ResourceId): ResourceTuple | undefined;
 };
 
@@ -73,8 +76,8 @@ class ResourceLedgerImpl implements ResourceLedger {
   private readonly ambient = new Ledger();
 
   constructor(private readonly resources: ResourceTupleMap) {
-    for (const [id, [, , entry]] of resources) {
-      this.ambient.add(id, entry);
+    for (const [id, { ledgerEntry }] of resources) {
+      this.ambient.add(id, ledgerEntry);
     }
   }
 
@@ -88,7 +91,7 @@ class ResourceLedgerImpl implements ResourceLedger {
     for (const [id, credit] of order.credits ?? []) {
       transaction.addCredit(id, credit);
 
-      const [amount] = this.resources.get(id)!;
+      const { amount } = this.resources.get(id)!;
       if (amount < credit) {
         return undefined;
       }
@@ -101,7 +104,7 @@ class ResourceLedgerImpl implements ResourceLedger {
     for (const [id, quantity] of order.debits ?? []) {
       transaction.addDebit(id, quantity);
 
-      const [amount, limit] = this.resources.get(id)!;
+      const { amount, limit } = this.resources.get(id)!;
       if (limit) {
         const debit = transaction.getDebit(id);
         const credit = transaction.getCredit(id);
@@ -118,9 +121,9 @@ class ResourceLedgerImpl implements ResourceLedger {
     if (rewards) {
       // Apply changes to base resource deltas.
       for (const [id, change] of transaction.entries()) {
-        const [, , entry] = this.resources.get(id)!;
-        entry.debit += change.debit;
-        entry.credit += change.credit;
+        const { ledgerEntry } = this.resources.get(id)!;
+        ledgerEntry.debit += change.debit;
+        ledgerEntry.credit += change.credit;
       }
 
       transaction.rebase();

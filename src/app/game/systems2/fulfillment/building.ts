@@ -97,14 +97,12 @@ const ProcessConstructBuildingOrders = BufferedReceiverSystem(
 });
 
 const UpdateBuildingPrices = System(
-  EntityMapQuery(Value(Building), Value(Level)).filter(Fresh(Level)),
+  EntityMapQuery(Value(Building), Value(Level), Fresh(Level)),
   EntityMapQuery(
     Value(PriceRatio),
     ChildrenQuery(Value(F.BaseRequirement), DiffMut(F.Requirement)),
   ),
-  MapQuery(Value(BuildingLevelEffect), DiffMut(NumberValue)).filter(
-    Has(Effect),
-  ),
+  MapQuery(Value(BuildingLevelEffect), DiffMut(NumberValue), Has(Effect)),
 )((trackersQuery, requirementsQuery, effectsQuery) => {
   for (const [entity, [id, level]] of trackersQuery) {
     // Update ingredient requirements
@@ -122,7 +120,7 @@ const UpdateBuildingPrices = System(
 });
 
 const UpdateLevelEffects = System(
-  Query(Entity()).filter(Has(BuildingLevelEffect), Fresh(NumberValue)),
+  Query(Entity(), Has(BuildingLevelEffect), Fresh(NumberValue)),
   EffectValueResolver(),
 )((entityQuery, values) => {
   values.resolveByEntities(untuple(entityQuery));
@@ -140,14 +138,13 @@ export class BuildingOrderPlugin extends EcsPlugin {
   }
 }
 
-const Q_Resource = Value(Resource);
-
 const ProcessRatioUnlocks = System(
   Query(
-    ChildrenQuery(Q_Resource, Value(F.Requirement)),
+    ChildrenQuery(Value(Resource), Value(F.Requirement)),
     ChildrenQuery(DiffMut(Unlocked), Value(PriceRatio)),
-  ).filter(Has(Building)),
-  MapQuery(Q_Resource, Value(R.Amount)),
+    Has(Building),
+  ),
+  MapQuery(Value(Resource), Value(R.Amount)),
 )((buildings, amounts) => {
   for (const [ingredients, unlocks] of buildings) {
     for (const [unlocked, ratio] of unlocks) {
