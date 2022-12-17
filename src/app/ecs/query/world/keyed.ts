@@ -1,13 +1,19 @@
 import { all } from "@/app/utils/collections";
-import { Archetype, EcsComponent, EcsMetadata, inspectable } from "../../types";
-import { World } from "../../world";
+
+import {
+  Archetype,
+  EcsComponent,
+  EcsMetadata,
+  inspectable,
+} from "@/app/ecs/types";
+import { World } from "@/app/ecs/world";
 import {
   Descriptor,
   FilterDescriptor,
   InferQueryResult,
   QueryDescriptor,
   WorldQuery,
-} from "../types";
+} from "@/app/ecs/query/types";
 
 type KeyedQuery = { [K in PropertyKey]: QueryDescriptor };
 type UnwrapKeyedWorldQuery<Q extends KeyedQuery> = {
