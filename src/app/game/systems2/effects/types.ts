@@ -41,10 +41,9 @@ export class Operation extends EcsComponent {
   }
 }
 
-export type OperandType = "base" | "ratio" | "exponent" | undefined;
-export class Operand extends EcsComponent {
-  constructor(readonly order: number, readonly type?: OperandType) {
-    super();
+export class Order extends ReadonlyValueComponent<number> {
+  constructor(readonly value: number) {
+    super(value);
   }
 }
 
@@ -71,61 +70,57 @@ export type EffectCompositeItem = EcsComponent | Expr;
 
 export type Expr = () => Iterable<EffectCompositeItem>;
 
-function constant(value: number): Expr {
+function CONST(value: number): Expr {
   return function* () {
     yield new Constant(value);
   };
 }
 
-function TODO(_reason: string): Expr {
-  return () => [];
-}
-
-function reference(id: NumberEffectId): Expr {
+function REFERENCE(id: NumberEffectId): Expr {
   return function* () {
     yield new Reference(id);
   };
 }
 
-function sum(...exprs: Expr[]): Expr {
+function SUM(...exprs: Expr[]): Expr {
   return function* () {
     yield new Operation("sum");
     for (const [expr, i] of enumerate(exprs)) {
       yield function* () {
         yield* expr();
-        yield new Operand(i + 1);
+        yield new Order(i + 1);
       };
     }
   };
 }
 
-function product(...exprs: Expr[]) {
+function PRODUCT(...exprs: Expr[]) {
   return function* () {
     yield new Operation("product");
     for (const [expr, i] of enumerate(exprs)) {
       yield function* () {
         yield* expr();
-        yield new Operand(i + 1);
+        yield new Order(i + 1);
       };
     }
   };
 }
 
-function ratio(baseExpr: Expr, ratioExpr: Expr): Expr {
+function RATIO(base: Expr, ratio: Expr): Expr {
   return function* () {
     yield new Operation("ratio");
     yield function* () {
-      yield* baseExpr();
-      yield new Operand(1, "base");
+      yield* base();
+      yield new Order(1);
     };
     yield function* () {
-      yield* ratioExpr();
-      yield new Operand(2, "ratio");
+      yield* ratio();
+      yield new Order(2);
     };
   };
 }
 
-function buildingLevel(building: BuildingId): Expr {
+function BUILDING_LEVEL(building: BuildingId): Expr {
   return function* () {
     yield new Precalculated();
     yield new BuildingLevelEffect(building);
@@ -133,42 +128,42 @@ function buildingLevel(building: BuildingId): Expr {
 }
 
 export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
-  "catnip.limit": reference("catnip.limit.base"),
-  "catnip.limit.base": constant(5000),
+  "catnip.limit": REFERENCE("catnip.limit.base"),
+  "catnip.limit.base": CONST(5000),
 
-  "wood.limit": reference("wood.limit.base"),
-  "wood.limit.base": constant(200),
+  "wood.limit": REFERENCE("wood.limit.base"),
+  "wood.limit.base": CONST(200),
 
-  "minerals.limit": reference("minerals.limit.base"),
-  "minerals.limit.base": constant(250),
+  "minerals.limit": REFERENCE("minerals.limit.base"),
+  "minerals.limit.base": CONST(250),
 
-  "catpower.limit": sum(reference("hut.catpower-limit")),
-  "hut.catpower-limit.base": constant(75),
-  "hut.catpower-limit": product(
-    reference("hut.catpower-limit.base"),
-    buildingLevel("hut"),
+  "catpower.limit": SUM(REFERENCE("hut.catpower-limit")),
+  "hut.catpower-limit.base": CONST(75),
+  "hut.catpower-limit": PRODUCT(
+    REFERENCE("hut.catpower-limit.base"),
+    BUILDING_LEVEL("hut"),
   ),
 
-  "kittens.limit": sum(reference("hut.kittens-limit")),
-  "hut.kittens-limit.base": constant(2),
-  "hut.kittens-limit": product(
-    reference("hut.kittens-limit.base"),
-    buildingLevel("hut"),
+  "kittens.limit": SUM(REFERENCE("hut.kittens-limit")),
+  "hut.kittens-limit.base": CONST(2),
+  "hut.kittens-limit": PRODUCT(
+    REFERENCE("hut.kittens-limit.base"),
+    BUILDING_LEVEL("hut"),
   ),
 
-  "catnip.delta": reference("catnip.production"),
-  "catnip.production": ratio(
-    reference("catnip-field.catnip"),
-    reference("weather.ratio"),
+  "catnip.delta": REFERENCE("catnip.production"),
+  "catnip.production": RATIO(
+    REFERENCE("catnip-field.catnip"),
+    REFERENCE("weather.ratio"),
   ),
-  "catnip-field.catnip": product(
-    reference("catnip-field.catnip.base"),
-    buildingLevel("catnip-field"),
+  "catnip-field.catnip": PRODUCT(
+    REFERENCE("catnip-field.catnip.base"),
+    BUILDING_LEVEL("catnip-field"),
   ),
-  "catnip-field.catnip.base": constant(0.125),
-  "weather.ratio": sum(
-    reference("weather.season-ratio"),
-    reference("weather.severity-ratio"),
+  "catnip-field.catnip.base": CONST(0.125),
+  "weather.ratio": SUM(
+    REFERENCE("weather.season-ratio"),
+    REFERENCE("weather.severity-ratio"),
   ),
   "weather.season-ratio": function* () {
     yield new Default(0);
@@ -181,35 +176,31 @@ export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
     yield new WeatherEffect();
   },
 
-  "science.limit": sum(reference("library.science-limit")),
-  "library.science-limit.base": constant(250),
-  "library.science-limit": product(
-    reference("library.science-limit.base"),
-    buildingLevel("library"),
+  "science.limit": SUM(REFERENCE("library.science-limit")),
+  "library.science-limit.base": CONST(250),
+  "library.science-limit": PRODUCT(
+    REFERENCE("library.science-limit.base"),
+    BUILDING_LEVEL("library"),
   ),
 
-  "science.ratio": sum(reference("library.science-ratio")),
-  "library.science-ratio.base": constant(0.1),
-  "library.science-ratio": product(
-    reference("library.science-ratio.base"),
-    buildingLevel("library"),
+  "science.ratio": SUM(REFERENCE("library.science-ratio")),
+  "library.science-ratio.base": CONST(0.1),
+  "library.science-ratio": PRODUCT(
+    REFERENCE("library.science-ratio.base"),
+    BUILDING_LEVEL("library"),
   ),
 
-  "wood.delta": reference("wood.production"),
-  "wood.production": TODO("needs jobs"),
+  // "wood.delta": REFERENCE("wood.production"),
 
-  "minerals.delta": reference("minerals.production"),
-  "minerals.production": TODO("needs jobs and minerals.ratio"),
+  // "minerals.delta": REFERENCE("minerals.production"),
 
-  "science.delta": reference("science.production"),
-  "science.production": TODO("needs jobs"),
+  // "science.delta": REFERENCE("science.production"),
 
-  "astronomy.rare-event.reward.base": constant(25),
-  "astronomy.rare-event.reward": ratio(
-    reference("astronomy.rare-event.reward.base"),
-    reference("science.ratio"),
+  "astronomy.rare-event.reward.base": CONST(25),
+  "astronomy.rare-event.reward": RATIO(
+    REFERENCE("astronomy.rare-event.reward.base"),
+    REFERENCE("science.ratio"),
   ),
 
-  "catpower.delta": reference("catpower.production"),
-  "catpower.production": TODO("needs jobs"),
+  // "catpower.delta": REFERENCE("catpower.production"),
 };

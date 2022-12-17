@@ -1,4 +1,12 @@
-import { concat, consume, map, MultiMap } from "@/app/utils/collections";
+import { Queue } from "queue-typescript";
+
+import {
+  concat,
+  consume,
+  map,
+  MultiMap,
+  untuple,
+} from "@/app/utils/collections";
 
 import { NumberEffectId } from "@/app/interfaces";
 
@@ -17,13 +25,11 @@ import {
   EntityLookup,
   MapQuery,
   Parents,
-  Eager,
+  Transform,
 } from "@/app/ecs/query";
 import { SystemParamDescriptor } from "@/app/ecs/query/types";
 
 import * as E from "../types";
-
-import { Queue } from "queue-typescript";
 
 type EffectType = {
   id?: NumberEffectId;
@@ -56,22 +62,25 @@ const EffectsQuery = EntityMapQuery(
 
 const OperationsQuery = EntityMapQuery(
   Read(E.Operation),
-  Eager(
+  Transform(
     ChildrenQuery(
       Keyed({
         entity: Entity(),
-        operand: Read(E.Operand),
+        order: Value(E.Order),
         value: Value(E.NumberValue),
       }),
     ),
+    function UnpackOperands(iterable): Operand[] {
+      return Array.from(untuple(iterable)).sort((a, b) => a.order - b.order);
+    },
   ),
 );
 
-type Operation = [Readonly<E.Operation>, [Operand][]];
+type Operation = [Readonly<E.Operation>, Operand[]];
 
 type Operand = {
   entity: EcsEntity;
-  operand: Readonly<E.Operand>;
+  order: Readonly<number>;
   value: Readonly<number | undefined>;
 };
 
@@ -200,7 +209,7 @@ class EffectValueResolverImpl implements EffectValueResolver {
           if (referenced) {
             gatheredValue = this.gather(referenced);
           } else {
-            console.log("referenced effect not found", effect.reference);
+            console.log("referenced effect not found:", effect.reference);
           }
         } else {
           const operation = this.operations.get(entity);
@@ -221,18 +230,18 @@ class EffectValueResolverImpl implements EffectValueResolver {
   }
 
   private gatherOperation([{ type }, operands]: Operation) {
-    for (const [{ entity }] of operands) {
+    for (const { entity } of operands) {
       this.gather(entity);
     }
     return Calculators[type](operands);
   }
 }
 
-type CalculatorFn = (tuples: Iterable<[Operand]>) => number | undefined;
+type CalculatorFn = (tuples: Iterable<Operand>) => number | undefined;
 const Calculators: Record<E.OperationType, CalculatorFn> = {
   sum: (tuples) => {
     let sum = 0;
-    for (const [{ value }] of tuples) {
+    for (const { value } of tuples) {
       if (value === undefined) return undefined;
       sum += value;
     }
@@ -240,18 +249,14 @@ const Calculators: Record<E.OperationType, CalculatorFn> = {
   },
   product: (tuples) => {
     let prod = 1;
-    for (const [{ value }] of tuples) {
+    for (const { value } of tuples) {
       if (value === undefined) return undefined;
       prod *= value;
     }
     return prod;
   },
-  ratio: ([[a], [b]]) => {
-    const [base, ratio] =
-      a.operand.order < b.operand.order
-        ? [a.value, b.value]
-        : [b.value, a.value];
-
+  ratio: ([a, b]) => {
+    const [base, ratio] = [a.value, b.value];
     return base === undefined || ratio === undefined
       ? undefined
       : base * (1 + ratio);

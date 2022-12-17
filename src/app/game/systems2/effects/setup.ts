@@ -1,3 +1,5 @@
+import { untuple } from "@/app/utils/collections";
+
 import { NumberEffectId } from "@/app/interfaces";
 
 import { EcsEntity, EcsPlugin, PluginApp } from "@/app/ecs";
@@ -33,7 +35,6 @@ import {
   Reference,
 } from "./types";
 import { EffectValueResolver } from "./ecs";
-import { untuple } from "@/app/utils/collections";
 
 function* numberComponents(id?: NumberEffectId) {
   yield new Effect();
