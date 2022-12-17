@@ -8,7 +8,9 @@ import {
 import { ChoiceSpecification, choose } from "@/app/utils/probability";
 
 export class Level extends ValueComponent<number> {
-  value = 0;
+  constructor() {
+    super(0);
+  }
 }
 
 export class PriceRatio extends ReadonlyValueComponent<number> {}

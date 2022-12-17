@@ -19,17 +19,9 @@ import {
 import { QueryDescriptor } from "@/app/ecs/query/types";
 
 describe("ecs world query", () => {
-  class Id extends ValueComponent<string> {
-    constructor(readonly value: string) {
-      super();
-    }
-  }
+  class Id extends ValueComponent<string> {}
 
-  class Name extends ValueComponent<string> {
-    constructor(readonly value: string) {
-      super();
-    }
-  }
+  class Name extends ValueComponent<string> {}
 
   class Player extends EcsComponent {
     constructor(public level: number, public exp: number) {

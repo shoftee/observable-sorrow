@@ -11,7 +11,7 @@ function* sectionComponents(meta: SectionMetadataType) {
   yield new Section(meta.id);
   yield new Title(meta.label);
   yield new Unlocked(!meta.unlockEffect);
-  yield new AlertLabel();
+  yield new AlertLabel(undefined);
 }
 
 const Setup = System(Commands())((cmds) => {

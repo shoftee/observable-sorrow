@@ -9,23 +9,11 @@ export class Progress extends EcsComponent {
   eta: number | undefined;
 }
 
-export class Capped extends ValueComponent<boolean> {
-  constructor(public value: boolean) {
-    super();
-  }
-}
+export class Capped extends ValueComponent<boolean> {}
 
-export class Requirement extends ValueComponent<number> {
-  constructor(public value: number) {
-    super();
-  }
-}
+export class Requirement extends ValueComponent<number> {}
 
-export class BaseRequirement extends ValueComponent<number> {
-  constructor(public value: number) {
-    super();
-  }
-}
+export class BaseRequirement extends ValueComponent<number> {}
 
 export function* fulfillmentComponents(id: FulfillmentId) {
   yield new Fulfillment(id);

@@ -5,19 +5,27 @@ import { EcsComponent, MarkerComponent, ValueComponent } from "@/app/ecs";
 export class DayTimer extends MarkerComponent {}
 
 export class Day extends ValueComponent<number> {
-  value = 0;
+  constructor() {
+    super(0);
+  }
 }
 
 export class Season extends ValueComponent<SeasonId> {
-  value: SeasonId = "spring";
+  constructor() {
+    super("spring");
+  }
 }
 
 export class Year extends ValueComponent<number> {
-  value = 0;
+  constructor() {
+    super(0);
+  }
 }
 
 export class Weather extends ValueComponent<WeatherId> {
-  value: WeatherId = "neutral";
+  constructor() {
+    super("neutral");
+  }
 }
 
 export class Labels extends EcsComponent {

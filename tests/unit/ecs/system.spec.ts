@@ -15,11 +15,7 @@ import {
 import { System } from "@/app/ecs/system";
 
 describe("ecs systems", () => {
-  class Id extends ValueComponent<string> {
-    constructor(readonly value: string) {
-      super();
-    }
-  }
+  class Id extends ValueComponent<string> {}
 
   class Player extends EcsComponent {
     constructor(public level: number) {

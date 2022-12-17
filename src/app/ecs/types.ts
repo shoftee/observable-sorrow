@@ -21,13 +21,15 @@ export abstract class MarkerComponent extends EcsComponent {
 }
 
 export abstract class ValueComponent<T = unknown> extends EcsComponent {
-  abstract get value(): T;
+  constructor(public value: T) {
+    super();
+  }
 }
 
 export abstract class ReadonlyValueComponent<T> extends ValueComponent<T> {
   [IMMUTABLE] = true;
   constructor(readonly value: T) {
-    super();
+    super(value);
   }
 }
 

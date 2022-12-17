@@ -1,19 +1,9 @@
 import { SectionId } from "@/app/interfaces";
 
-import { ValueComponent } from "@/app/ecs";
+import { ReadonlyValueComponent, ValueComponent } from "@/app/ecs";
 
-export class Section extends ValueComponent<SectionId> {
-  constructor(readonly value: SectionId) {
-    super();
-  }
-}
+export class Section extends ReadonlyValueComponent<SectionId> {}
 
-export class Title extends ValueComponent<string> {
-  constructor(public value: string) {
-    super();
-  }
-}
+export class Title extends ValueComponent<string> {}
 
-export class AlertLabel extends ValueComponent<string | undefined> {
-  value: string | undefined;
-}
+export class AlertLabel extends ValueComponent<string | undefined> {}

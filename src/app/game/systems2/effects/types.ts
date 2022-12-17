@@ -21,12 +21,17 @@ export class Effect extends MarkerComponent {}
 export class NumberEffect extends ReadonlyValueComponent<NumberEffectId> {}
 
 export class NumberValue extends ValueComponent<number | undefined> {
-  value: number | undefined;
+  constructor() {
+    super(undefined);
+  }
 }
 
 export class BooleanEffect extends ReadonlyValueComponent<BooleanEffectId> {}
+
 export class BooleanValue extends ValueComponent<boolean | undefined> {
-  value: boolean | undefined;
+  constructor() {
+    super(undefined);
+  }
 }
 
 export class Default extends ReadonlyValueComponent<number> {}
@@ -59,11 +64,15 @@ export class Precalculated extends MarkerComponent {}
 export class BuildingLevelEffect extends ReadonlyValueComponent<BuildingId> {}
 
 export class WeatherEffect extends ValueComponent<WeatherId> {
-  value: WeatherId = "neutral";
+  constructor() {
+    super("neutral");
+  }
 }
 
 export class SeasonEffect extends ValueComponent<SeasonId> {
-  value: SeasonId = "spring";
+  constructor() {
+    super("spring");
+  }
 }
 
 export type EffectCompositeItem = EcsComponent | Expr;

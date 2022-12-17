@@ -8,17 +8,23 @@ import {
 } from "@/app/ecs";
 
 export class Amount extends ValueComponent<number> {
-  value = 0;
+  constructor() {
+    super(0);
+  }
 }
 
 export class Limit extends ValueComponent<number> {
-  value = 0;
+  constructor() {
+    super(0);
+  }
 }
 
 export class LimitEffect extends ReadonlyValueComponent<LimitEffectId> {}
 
 export class Delta extends ValueComponent<number> {
-  value = 0;
+  constructor() {
+    super(0);
+  }
 }
 
 export class DeltaEffect extends ReadonlyValueComponent<DeltaEffectId> {}
