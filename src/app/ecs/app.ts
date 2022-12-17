@@ -7,12 +7,16 @@ import { EcsResource, EcsEvent, EcsStage, EcsStageType } from "./types";
 import { SystemSpecification as SystemSpec } from "./system";
 import { World } from "./world";
 
-type SystemId = { id: string };
-type TopologySpecParam = {
+interface SystemId {
+  id: string;
+}
+interface TopologySpecParam {
   after?: SystemId[];
   stage?: EcsStage;
-};
-type TopologySpec = SystemId & { after?: SystemId[] };
+}
+interface TopologySpec extends SystemId {
+  after?: SystemId[];
+}
 
 export class App {
   private readonly systems = new Map<string, SystemSpec>();
@@ -171,7 +175,7 @@ export class GameRunner {
   }
 }
 
-export type PluginApp = {
+export interface PluginApp {
   registerEvent(ctr: Ctor<EcsEvent>): PluginApp;
   insertResource<R extends EcsResource>(resource: R): PluginApp;
   addStartupSystem(spec: SystemSpec): PluginApp;
@@ -181,7 +185,7 @@ export type PluginApp = {
     topology?: Partial<TopologySpecParam>,
   ): PluginApp;
   addPlugin(plugin: EcsPlugin): PluginApp;
-};
+}
 
 export abstract class EcsPlugin {
   abstract add(app: PluginApp): void;

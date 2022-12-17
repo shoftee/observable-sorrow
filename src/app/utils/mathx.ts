@@ -17,11 +17,11 @@ function rounded(
   return fn(epsilonCorrected) / scale;
 }
 
-export type Prng = {
+export interface Prng {
   state(): number;
   next(): number;
   fork(): Prng;
-};
+}
 
 export function random(seed: number): Prng {
   let state = seed;

@@ -8,8 +8,9 @@ import { NumberEffect, NumberValue } from "../types";
 
 const NumberValues = MapQuery(Value(NumberEffect), Value(NumberValue));
 
-type NumberState = { [K in NumberEffectId]: number | undefined };
-export function NumberState(): SystemParamDescriptor<NumberState> {
+type Lookup = { readonly [K in NumberEffectId]: number | undefined };
+type NumberState = SystemParamDescriptor<Lookup>;
+export function NumberState(): NumberState {
   return {
     inspect() {
       return inspectable(NumberState, [NumberValues]);
@@ -26,7 +27,7 @@ export function NumberState(): SystemParamDescriptor<NumberState> {
                 return values.get(key as NumberEffectId);
               },
             },
-          ) as NumberState;
+          ) as Lookup;
         },
         cleanup() {
           query.cleanup?.();

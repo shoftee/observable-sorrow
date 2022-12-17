@@ -5,8 +5,8 @@ import { inspectable, Inspectable } from "./types";
 
 import { World } from "./world";
 
-export type SystemFn<F extends [...SystemParamDescriptor[]]> = (
-  ...args: SystemParamTuple<F>
+export type SystemFn<D extends [...SystemParamDescriptor[]]> = (
+  ...args: UnwrapSystemParamTuple<D>
 ) => void;
 
 export interface SystemSpecification extends Inspectable {
@@ -14,11 +14,10 @@ export interface SystemSpecification extends Inspectable {
   build(world: World): () => void;
 }
 
-export type SystemParamTuple<F> = F extends [infer Head, ...infer Tail]
-  ? [...UnwrapSystemParamDescriptor<Head>, ...SystemParamTuple<Tail>]
-  : [];
-type UnwrapSystemParamDescriptor<F> = F extends SystemParamDescriptor<infer T>
-  ? [T]
+export type UnwrapSystemParamTuple<D> = D extends [infer Head, ...infer Tail]
+  ? Head extends SystemParamDescriptor<infer Result>
+    ? [Result, ...UnwrapSystemParamTuple<Tail>]
+    : never[] // deny elements that are not SystemParamDescriptor
   : [];
 
 /**
@@ -35,7 +34,9 @@ export function System<F extends [...SystemParamDescriptor[]]>(...ds: F) {
       build(world: World) {
         const params = ds.map((f) => f.create(world));
         return () => {
-          const args = params.map((p) => p.fetch()) as SystemParamTuple<F>;
+          const args = params.map((p) =>
+            p.fetch(),
+          ) as UnwrapSystemParamTuple<F>;
           fn(...args);
           params.forEach((f) => f.cleanup?.());
         };

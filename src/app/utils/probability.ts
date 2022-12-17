@@ -1,10 +1,10 @@
-export type ChoiceSpecification<TResult> = {
+export interface ChoiceSpecification<TResult> {
   readonly options: {
     readonly frequency?: number;
     readonly result: TResult;
   }[];
   readonly total: number;
-};
+}
 
 type RandomFunc = () => number;
 

@@ -78,7 +78,9 @@ export type InferQueryResult<Q> = Q extends QueryDescriptor<infer R>
 export type UnwrapDescriptorTuple<D> = D extends [infer Head, ...infer Tail]
   ? Head extends QueryDescriptor<infer Result>
     ? [Result, ...UnwrapDescriptorTuple<Tail>]
-    : UnwrapDescriptorTuple<Tail>
+    : // skip elements that are not QueryDescriptor
+      // these could be FilterDescriptor instead, which is fine to skip
+      UnwrapDescriptorTuple<Tail>
   : [];
 
 export interface SystemParameter<Result = unknown> {

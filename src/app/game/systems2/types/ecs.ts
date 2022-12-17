@@ -8,14 +8,14 @@ import { Receive } from "@/app/ecs/query";
 import { SystemParamDescriptor } from "@/app/ecs/query/types";
 import {
   System,
-  SystemParamTuple,
+  UnwrapSystemParamTuple,
   SystemSpecification,
 } from "@/app/ecs/system";
 
 type ReceiverSystemFn<
   E extends EcsEvent,
   F extends [...SystemParamDescriptor[]],
-> = (event: E, ...args: SystemParamTuple<F>) => void;
+> = (event: E, ...args: UnwrapSystemParamTuple<F>) => void;
 
 /** Calls the runner as if the events appeared one at a time. */
 export function ThrottledReceiverSystem<E extends EcsEvent>(ctor: Ctor<E>) {

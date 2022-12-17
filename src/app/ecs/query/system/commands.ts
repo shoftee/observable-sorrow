@@ -4,24 +4,24 @@ import { EcsComponent, EcsEntity, World, inspectable } from "@/app/ecs";
 
 import { SystemParamDescriptor } from "../types";
 
-export type WorldCmds = {
+export interface WorldCmds {
   spawn(...components: EcsComponent[]): EntityCmds;
   spawnChild(parent: EcsEntity, ...components: EcsComponent[]): EntityCmds;
   with(entity: EcsEntity): EntityCmds;
   link(parent: EcsEntity, ...children: EcsEntity[]): WorldCmds;
   despawn(...entities: EcsEntity[]): WorldCmds;
-};
+}
 
-export type EntityCmds = {
+export interface EntityCmds {
   insert(...components: EcsComponent[]): EntityCmds;
   remove(...ctors: Ctor<EcsComponent>[]): EntityCmds;
   defer(fn: (entity: EcsEntity) => void): EntityCmds;
-};
+}
 
-type CommandParams = {
+interface CommandParams {
   self?: EcsEntity;
   parent?: EcsEntity;
-};
+}
 
 class EntityCommandsImpl {
   private readonly parent?: EcsEntity;
@@ -70,8 +70,38 @@ class EntityCommandsImpl {
   }
 }
 
-type CommandsFactory = SystemParamDescriptor<WorldCmds>;
+function makeWorldCommands(world: World): WorldCmds {
+  return {
+    spawn(...components) {
+      return new EntityCommandsImpl(world).insert(...components);
+    },
+    spawnChild(parent, ...components) {
+      return new EntityCommandsImpl(world, { parent }).insert(...components);
+    },
+    with(entity) {
+      return new EntityCommandsImpl(world, { self: entity });
+    },
+    link(parent, ...children) {
+      world.defer(function* (world: World) {
+        world.hierarchy.link(parent, children);
+        yield parent;
+        yield* children;
+      });
+      return this;
+    },
+    despawn(...entities) {
+      world.defer(function* (world: World) {
+        for (const entity of entities) {
+          world.despawn(entity);
+        }
+        yield* entities;
+      });
+      return this;
+    },
+  };
+}
 
+type CommandsFactory = SystemParamDescriptor<WorldCmds>;
 /** Used to create and remove entities and components. */
 export function Commands(): CommandsFactory {
   return {
@@ -79,36 +109,7 @@ export function Commands(): CommandsFactory {
       return inspectable(Commands);
     },
     create(world: World) {
-      const commands: WorldCmds = {
-        spawn(...components) {
-          return new EntityCommandsImpl(world).insert(...components);
-        },
-        spawnChild(parent, ...components) {
-          return new EntityCommandsImpl(world, { parent }).insert(
-            ...components,
-          );
-        },
-        with(entity) {
-          return new EntityCommandsImpl(world, { self: entity });
-        },
-        link(parent, ...children) {
-          world.defer(function* (world: World) {
-            world.hierarchy.link(parent, children);
-            yield parent;
-            yield* children;
-          });
-          return this;
-        },
-        despawn(...entities) {
-          world.defer(function* (world: World) {
-            for (const entity of entities) {
-              world.despawn(entity);
-            }
-            yield* entities;
-          });
-          return this;
-        },
-      };
+      const commands = makeWorldCommands(world);
       return {
         fetch() {
           return commands;

@@ -128,13 +128,13 @@ function BUILDING_LEVEL(building: BuildingId): Expr {
 }
 
 export const NumberExprs: Partial<Record<NumberEffectId, Expr>> = {
-  "catnip.limit": REFERENCE("catnip.limit.base"),
+  "catnip.limit": SUM(REFERENCE("catnip.limit.base")),
   "catnip.limit.base": CONST(5000),
 
-  "wood.limit": REFERENCE("wood.limit.base"),
+  "wood.limit": SUM(REFERENCE("wood.limit.base")),
   "wood.limit.base": CONST(200),
 
-  "minerals.limit": REFERENCE("minerals.limit.base"),
+  "minerals.limit": SUM(REFERENCE("minerals.limit.base")),
   "minerals.limit.base": CONST(250),
 
   "catpower.limit": SUM(REFERENCE("hut.catpower-limit")),
