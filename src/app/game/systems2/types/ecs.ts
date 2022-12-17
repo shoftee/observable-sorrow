@@ -12,10 +12,10 @@ import {
   SystemSpecification,
 } from "@/app/ecs/system";
 
-type ReceiverSystemFn<
-  E extends EcsEvent,
-  F extends [...SystemParamDescriptor[]],
-> = (event: E, ...args: UnwrapSystemParamTuple<F>) => void;
+type ReceiverSystemFn<E extends EcsEvent, D extends SystemParamDescriptor[]> = (
+  event: E,
+  ...args: UnwrapSystemParamTuple<D>
+) => void;
 
 /** Calls the runner as if the events appeared one at a time. */
 export function ThrottledReceiverSystem<E extends EcsEvent>(ctor: Ctor<E>) {
@@ -36,20 +36,20 @@ function ReceiverSystem<E extends EcsEvent>(
       return inspectable(Receive, inspectableNames([eventCtor]));
     },
   };
-  return <F extends [...SystemParamDescriptor[]]>(...fs: F) => {
-    return (runner: ReceiverSystemFn<E, F>) => {
-      return <SystemSpecification>{
+  return <D extends SystemParamDescriptor[]>(...ds: D) => {
+    return (runner: ReceiverSystemFn<E, D>): SystemSpecification => {
+      return {
         id: uuidv4(),
         inspect() {
-          return inspectable(ReceiverSystem, [eventInspectable, ...fs]);
+          return inspectable(ReceiverSystem, [eventInspectable, ...ds]);
         },
         build(world) {
           let currentEvent: E;
-          const innerFn = System(...fs)((...args) => {
+          const innerFn = System(...ds)((...args) => {
             runner(currentEvent, ...args);
           }).build(world);
 
-          const receiverSystem = System(Receive(eventCtor))((events) => {
+          const receiverSpec = System(Receive(eventCtor))((events) => {
             const relevantEvents = throttle
               ? take(events.pull(), 1)
               : events.pull();
@@ -59,7 +59,7 @@ function ReceiverSystem<E extends EcsEvent>(
             }
           });
 
-          return receiverSystem.build(world);
+          return receiverSpec.build(world);
         },
       };
     };
